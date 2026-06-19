@@ -37,8 +37,35 @@
               @if (!readOnly) {
                 <p class="welcome-title">สวัสดีครับ! ผมคือ <strong>Netbay Agent</strong></p>
                 <p class="welcome-sub">ช่วยท่านสร้างใบอนุญาตนำเข้า RGoods และจัดการเอกสารศุลกากรได้ครับ</p>
+                <p class="welcome-q">ต้องการทำอะไรวันนี้?</p>
+                <button class="welcome-card" (click)="chat.openImportLicenseMenu()">
+                  <span class="welcome-card__icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0463EF"
+                      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                      <polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                  </span>
+                  <span class="welcome-card__body">
+                    <span class="welcome-card__title">ขอใบอนุญาตนำเข้า (อย.)</span>
+                    <span class="welcome-card__sub">RGoods, เครื่องมือแพทย์, วัตถุอันตราย</span>
+                  </span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#CCCCCC"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="welcome-card__chev">
+                    <polyline points="9 18 15 12 9 6"/>
+                  </svg>
+                </button>
               } @else {
                 <span class="readonly-tag">ข้อความต้อนรับ</span>
+              }
+            }
+
+            <!-- Import license menu (3 doc-type cards) -->
+            @case ('import-license-menu') {
+              @if (!readOnly) {
+                <app-import-license-menu />
+              } @else {
+                <span class="readonly-tag">เลือกประเภทเอกสารแล้ว</span>
               }
             }
 
@@ -50,8 +77,8 @@
             <!-- SPN not found → import license menu -->
             @case ('spn-not-found') {
               @if (!readOnly) {
-                <!-- TODO: ImportLicenseMenuComponent -->
-                <p>ไม่พบข้อมูลใน SPN — กรุณาเลือกประเภทเอกสาร</p>
+                <p class="welcome-sub" style="margin-bottom:10px">ไม่พบข้อมูลใบขนใน SPN — กรุณาเลือกประเภทเอกสารที่มีครับ</p>
+                <app-import-license-menu />
               } @else {
                 <span class="readonly-tag">เลือกประเภทเอกสารแล้ว</span>
               }

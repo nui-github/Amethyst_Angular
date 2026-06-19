@@ -68,3 +68,63 @@
   color: var(--bizx-n600);
   margin: 0;
 }
+
+.welcome-q {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--bizx-navy);
+  margin: 12px 0 8px;
+}
+
+.welcome-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 16px;
+  background: #fff;
+  border: 1.5px solid var(--bizx-n200);
+  border-radius: 14px;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: all 0.18s;
+
+  &:hover {
+    border-color: var(--bizx-blue);
+    background: rgba(4, 99, 239, 0.03);
+  }
+
+  &__icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(4, 99, 239, 0.10);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+  }
+
+  &__title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--bizx-navy);
+  }
+
+  &__sub {
+    font-size: 12px;
+    color: var(--bizx-n500);
+  }
+
+  &__chev {
+    flex-shrink: 0;
+  }
+}

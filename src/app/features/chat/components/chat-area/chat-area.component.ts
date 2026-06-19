@@ -15,6 +15,7 @@ import { ChoiceCardComponent } from '../choice-card/choice-card.component';
 import { OcrResultsComponent } from '../ocr-results/ocr-results.component';
 import { StatusCardComponent } from '../status-card/status-card.component';
 import { OcrProgressComponent } from '../ocr-progress/ocr-progress.component';
+import { ImportLicenseMenuComponent } from '../import-license-menu/import-license-menu.component';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 
 /**
@@ -36,7 +37,7 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
     CommonModule, SafeHtmlPipe, NzSpinModule,
     TypingIndicatorComponent, FlagCardComponent, SpnResultComponent,
     SpnCardComponent, ChoiceCardComponent, OcrResultsComponent,
-    StatusCardComponent, OcrProgressComponent,
+    StatusCardComponent, OcrProgressComponent, ImportLicenseMenuComponent,
   ],
   templateUrl: './chat-area.component.html',
   styleUrl: './chat-area.component.scss',

@@ -171,6 +171,12 @@ export class ChatService {
     this.bot('spn-not-found');
   }
 
+  // ── Import license menu (entry from welcome card) ──────────────────────────
+  openImportLicenseMenu(): void {
+    this.user('ขอใบอนุญาตนำเข้า (อย.)');
+    this.withTyping(() => this.bot('import-license-menu'), 500);
+  }
+
   // ── Document choice flows ──────────────────────────────────────────────────
   chooseCustomsDocs(): void {
     this.user('ใบขนสินค้า');
