@@ -11,7 +11,7 @@
     <button class="new-chat-btn" (click)="chat.newChat()">+ New Chat</button>
     <nav class="sidebar__nav">
       <button class="nav-item nav-item--active" (click)="chat.setSidebarActive('chatbot')">Chatbot</button>
-      <button class="nav-item" (click)="chat.setSidebarActive('queue')">
+      <button class="nav-item" (click)="goToQueue()">
         คิวงาน
         @if (chat.needsYouCount() > 0) {
           <span class="badge">{{ chat.needsYouCount() }}</span>
@@ -41,7 +41,7 @@
     <!-- Quick action chips -->
     <div class="quick-bar">
       <button class="quick-chip" (click)="chat.send('สร้าง RGoods')">ขอใบอนุญาตนำเข้า</button>
-      <button class="quick-chip" (click)="chat.setSidebarActive('queue')">จัดการคิวงาน</button>
+      <button class="quick-chip" (click)="goToQueue()">จัดการคิวงาน</button>
       <button class="quick-chip" (click)="chat.send('อัปโหลดเอกสาร')">อัปโหลดเอกสาร</button>
     </div>
 
@@ -52,7 +52,7 @@
         [(ngModel)]="inputText"
         (keydown)="onKeydown($event)"
         placeholder="พิมพ์คำสั่ง เช่น สร้าง RGoods ด้วยใบขน Ref : HTHM000000003..."
-        [autosize]="{ minRows: 1, maxRows: 4 }"
+        nzAutosize
         class="chat-input"
       ></textarea>
       <p class="input-hint">กด Enter เพื่อส่ง · Shift+Enter ขึ้นบรรทัดใหม่</p>

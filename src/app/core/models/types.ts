@@ -38,12 +38,12 @@ export interface ChatMessage {
 
 export interface SpnResultData {
   ref: string;
-  importer: string;
-  port: string;
-  declarationDate: string;
-  hsCode: string;
-  countryOrigin: string;
-  licenseType: string;
+  importer?: string;
+  port?: string;
+  declarationDate?: string;
+  hsCode?: string;
+  countryOrigin?: string;
+  licenseType?: string;
 }
 
 export interface OcrResultsData {

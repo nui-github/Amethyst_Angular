@@ -50,7 +50,7 @@
         }
 
         <button nz-button nzType="primary" nzSize="small"
-          [disabled]="!getPending(flag.id)?.trim()"
+          [disabled]="!getPending(flag.id).trim()"
           (click)="confirmFlag(flag)"
           class="flag-item__confirm-btn">
           ยืนยัน
