@@ -1,0 +1,86 @@
+.spn-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__title { font-size: 12px; font-weight: 700; color: var(--bizx-navy); }
+  &__count  { font-size: 11px; color: var(--bizx-n500); margin-left: auto; }
+}
+
+.spn-table {
+  border: 1px solid var(--bizx-n200);
+  border-radius: 10px;
+  overflow: hidden;
+  font-size: 12px;
+}
+
+.spn-row {
+  display: grid;
+  grid-template-columns: 30px 130px 1fr 70px 90px;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--bizx-n200);
+
+  &:last-child { border-bottom: none; }
+
+  &--header {
+    background: var(--bizx-n50);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--bizx-n500);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    padding: 6px 10px;
+  }
+
+  &--selected { background: rgba(4, 99, 239, 0.04); }
+  &--queued   { opacity: 0.55; }
+
+  &:not(.spn-row--header):not(.spn-row--queued):hover {
+    background: var(--bizx-n50);
+  }
+}
+
+.spn-checkbox {
+  width: 14px; height: 14px; cursor: pointer; accent-color: var(--bizx-blue);
+}
+
+.col-check  { display: flex; justify-content: center; }
+.col-action { display: flex; justify-content: flex-end; }
+
+.ref-num   { display: block; font-weight: 700; color: var(--bizx-blue); }
+.goods-name{ display: block; color: var(--bizx-navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sub-text  { display: block; font-size: 10px; color: var(--bizx-n500); margin-top: 1px; }
+
+// Pagination
+.spn-page {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.page-btn {
+  min-width: 26px;
+  height: 26px;
+  border: 1px solid var(--bizx-n200);
+  border-radius: 6px;
+  background: #fff;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  transition: all 0.12s;
+
+  &:disabled { opacity: 0.35; cursor: default; }
+  &:not(:disabled):hover { border-color: var(--bizx-blue); color: var(--bizx-blue); }
+  &--active { background: var(--bizx-blue); color: #fff; border-color: var(--bizx-blue); }
+}
