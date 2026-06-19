@@ -1,0 +1,67 @@
+.email-draft {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  &--sent { opacity: 0.85; }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--bizx-blue);
+    margin: 0;
+  }
+}
+
+.email-sent-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--bizx-teal-dark);
+  padding: 8px 12px;
+  background: rgba(22, 234, 158, 0.08);
+  border-radius: 8px;
+  border: 1px solid rgba(22, 234, 158, 0.3);
+}
+
+.email-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--bizx-n600);
+  }
+}
+
+.send-email-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #034DBA, #0463EF);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: opacity 0.15s;
+
+  &:disabled { opacity: 0.35; cursor: default; }
+  &:not(:disabled):hover { opacity: 0.88; }
+}

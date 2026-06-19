@@ -1,0 +1,43 @@
+<div class="email-draft" [class.email-draft--sent]="data.isSent">
+
+  <p class="email-draft__title">
+    <lucide-icon [img]="Mail" [size]="14" [color]="data.isSent ? '#0D8F61' : '#0463EF'" />
+    {{ data.isSent ? 'ส่งอีเมลแล้ว' : 'ร่างอีเมลถึงลูกค้า' }}
+  </p>
+
+  @if (data.isSent) {
+    <!-- Sent state: read-only -->
+    <div class="email-sent-info">
+      <lucide-icon [img]="Check" [size]="15" color="#0D8F61" />
+      <span>ส่งอีเมลถึง <strong>{{ to() || data.to }}</strong> เรียบร้อยแล้ว</span>
+    </div>
+  } @else {
+    <!-- Editable state -->
+    <div class="email-fields">
+      <div class="field">
+        <label>ถึง</label>
+        <input nz-input nzSize="small"
+          [ngModel]="to()" (ngModelChange)="to.set($event)"
+          placeholder="กรอกอีเมลลูกค้า" />
+      </div>
+      <div class="field">
+        <label>หัวข้อ</label>
+        <input nz-input nzSize="small"
+          [ngModel]="subject()" (ngModelChange)="subject.set($event)" />
+      </div>
+      <div class="field">
+        <label>เนื้อหา</label>
+        <textarea nz-input nzSize="small" [nzAutosize]="{ minRows: 3, maxRows: 6 }"
+          [ngModel]="body()" (ngModelChange)="body.set($event)">
+        </textarea>
+      </div>
+    </div>
+
+    <button class="send-email-btn"
+      [disabled]="!canSend()"
+      (click)="send()">
+      <lucide-icon [img]="Send" [size]="14" color="#fff" />
+      ส่งอีเมล
+    </button>
+  }
+</div>

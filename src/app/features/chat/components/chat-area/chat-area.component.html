@@ -124,8 +124,7 @@
             <!-- Email draft (interactive) -->
             @case ('email-draft') {
               @if (!readOnly) {
-                <!-- TODO: EmailDraftComponent -->
-                <p>ร่างอีเมล — TODO EmailDraftComponent</p>
+                <app-email-draft [data]="asEmailDraft(msg.data)" [msgId]="msg.id" />
               } @else {
                 <span class="readonly-tag">✓ ส่งอีเมลแล้ว</span>
               }
