@@ -154,8 +154,7 @@
             <!-- ShippingNet connect -->
             @case ('connect') {
               @if (!readOnly) {
-                <!-- TODO: ConnectPanelComponent -->
-                <p>เชื่อมต่อ ShippingNet — TODO ConnectPanelComponent</p>
+                <app-connect-panel />
               } @else {
                 <span class="readonly-tag">✓ เชื่อมต่อแล้ว</span>
               }
