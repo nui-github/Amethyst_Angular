@@ -1,0 +1,93 @@
+.form-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #0D8F61;
+    margin: 0;
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 12px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  position: relative;
+
+  &__label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--bizx-n600);
+  }
+
+  &__badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 4px;
+
+    &--ocr {
+      background: rgba(22, 234, 158, 0.15);
+      color: #0D8F61;
+    }
+
+    &--req {
+      background: rgba(4, 99, 239, 0.10);
+      color: #0463EF;
+    }
+  }
+}
+
+// Input state colors
+.input--filled {
+  border-color: #16EA9E !important;
+  background: rgba(22, 234, 158, 0.06) !important;
+  color: #0D8F61 !important;
+}
+
+.input--missing {
+  border-color: #70A0F0 !important;
+  background: rgba(4, 99, 239, 0.04) !important;
+}
+
+.input--done {
+  border-color: #16EA9E !important;
+  background: rgba(22, 234, 158, 0.06) !important;
+  color: #0D8F61 !important;
+}
+
+.preview-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 20px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #034DBA, #0463EF);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  align-self: flex-start;
+  margin-top: 4px;
+  transition: opacity 0.15s;
+
+  &:disabled { opacity: 0.35; cursor: default; }
+  &:not(:disabled):hover { opacity: 0.88; }
+}

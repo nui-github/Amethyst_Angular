@@ -133,8 +133,7 @@
             <!-- Form fill panel -->
             @case ('form') {
               @if (!readOnly) {
-                <!-- TODO: FormPanelComponent -->
-                <p>ฟอร์มกรอกข้อมูล — TODO FormPanelComponent</p>
+                <app-form-panel />
               } @else {
                 <span class="readonly-tag">✓ กรอกข้อมูลแล้ว</span>
               }

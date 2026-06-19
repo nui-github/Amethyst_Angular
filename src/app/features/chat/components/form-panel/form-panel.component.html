@@ -1,0 +1,41 @@
+<div class="form-panel">
+  <p class="form-panel__title">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0D8F61"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 6 9 17l-5-5"/>
+    </svg>
+    OCR อ่านข้อมูลได้แล้วครับ — กรุณาตรวจสอบและกรอกข้อมูลที่ขาด
+  </p>
+
+  <div class="form-grid">
+    @for (field of fields; track field.key) {
+      <div class="form-field"
+        [class.form-field--filled]="isFilled(field.key) && !isRequired(field.key)"
+        [class.form-field--missing]="isRequired(field.key) && !isFilled(field.key)"
+        [class.form-field--done]="isRequired(field.key) && isFilled(field.key)">
+
+        <label class="form-field__label">{{ field.label }}</label>
+
+        <input nz-input nzSize="small"
+          [class.input--filled]="isFilled(field.key) && !isRequired(field.key)"
+          [class.input--missing]="isRequired(field.key) && !isFilled(field.key)"
+          [class.input--done]="isRequired(field.key) && isFilled(field.key)"
+          [placeholder]="field.placeholder ?? ''"
+          [ngModel]="getValue(field.key)"
+          (ngModelChange)="onInput(field.key, $event)" />
+
+        @if (isFilled(field.key) && !isRequired(field.key)) {
+          <span class="form-field__badge form-field__badge--ocr">OCR</span>
+        }
+        @if (isRequired(field.key) && !isFilled(field.key)) {
+          <span class="form-field__badge form-field__badge--req">ต้องกรอก</span>
+        }
+      </div>
+    }
+  </div>
+
+  <button class="preview-btn" [disabled]="!canPreview()" (click)="preview()">
+    <lucide-icon [img]="Eye" [size]="14" color="#fff" />
+    ดูพรีวิวและยืนยันส่งกรม
+  </button>
+</div>
