@@ -1,0 +1,84 @@
+.flag-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #B45309;
+    margin: 0;
+  }
+
+  &__proceed {
+    align-self: flex-end;
+    margin-top: 4px;
+  }
+}
+
+.flag-item {
+  border: 1.5px solid var(--bizx-n200);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all 0.2s;
+
+  &--confirmed {
+    background: rgba(22, 234, 158, 0.06);
+    border-color: rgba(22, 234, 158, 0.4);
+  }
+
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    flex-shrink: 0;
+  }
+
+  &__name {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--bizx-navy);
+  }
+
+  &__detail {
+    font-size: 11px;
+    color: var(--bizx-n600);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  &__options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  &__input {
+    font-size: 12px;
+  }
+
+  &__confirm-btn {
+    align-self: flex-start;
+  }
+
+  &__done {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #0D8F61;
+  }
+}

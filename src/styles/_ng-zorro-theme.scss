@@ -1,0 +1,34 @@
+// Override ng-zorro (Ant Design) tokens with BizX colors
+// Applied after ng-zorro-antd.min.css in angular.json
+
+:root {
+  --ant-color-primary:          #0463EF;
+  --ant-color-primary-hover:    #034DBA;
+  --ant-color-primary-active:   #023A8C;
+  --ant-color-primary-bg:       rgba(4, 99, 239, 0.08);
+  --ant-color-primary-border:   rgba(4, 99, 239, 0.25);
+
+  --ant-color-success:          #16EA9E;
+  --ant-color-success-hover:    #11BB7F;
+  --ant-color-success-bg:       rgba(22, 234, 158, 0.10);
+  --ant-color-success-border:   rgba(22, 234, 158, 0.30);
+
+  --ant-color-warning:          #F59E0B;
+  --ant-color-error:            #EF4444;
+  --ant-color-info:             #0463EF;
+
+  --ant-color-text:             #010136;
+  --ant-color-text-secondary:   #666666;
+  --ant-color-text-tertiary:    #999999;
+  --ant-color-border:           #E0E0E0;
+  --ant-color-bg-container:     #ffffff;
+  --ant-color-bg-layout:        #F2F2F2;
+  --ant-color-bg-elevated:      #ffffff;
+
+  --ant-font-family: 'IBM Plex Sans Thai', -apple-system, sans-serif;
+  --ant-font-size:   13px;
+
+  --ant-border-radius:    8px;
+  --ant-border-radius-lg: 12px;
+  --ant-border-radius-sm: 4px;
+}

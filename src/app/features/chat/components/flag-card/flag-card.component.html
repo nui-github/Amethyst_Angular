@@ -1,0 +1,68 @@
+<div class="flag-card">
+  <p class="flag-card__title">
+    <lucide-icon name="alert-triangle" [size]="14" color="#F59E0B" />
+    พบ {{ localFlags().length }} จุดที่ต้องตรวจสอบ — กรุณายืนยันข้อมูลก่อนดำเนินการต่อ
+  </p>
+
+  @for (flag of localFlags(); track flag.id) {
+    <div class="flag-item" [class.flag-item--confirmed]="flag.isConfirmed">
+
+      <!-- Header -->
+      <div class="flag-item__head">
+        <span class="flag-item__badge"
+          [style.background]="confColor(flag.conf) + '20'"
+          [style.color]="confColor(flag.conf)">
+          AI {{ flag.conf }}%
+        </span>
+        <span class="flag-item__name">{{ flag.title }}</span>
+      </div>
+
+      <p class="flag-item__detail">{{ flag.detail }}</p>
+
+      <!-- Confirmed state -->
+      @if (flag.isConfirmed) {
+        <div class="flag-item__done">
+          <lucide-icon name="check" [size]="13" color="#0D8F61" />
+          <span>ยืนยัน: <strong>{{ flag.confirmedValue }}</strong></span>
+          <button nz-button nzType="link" nzSize="small" (click)="unconfirmFlag(flag)">แก้ไข</button>
+        </div>
+      }
+
+      <!-- Interactive state -->
+      @if (!flag.isConfirmed) {
+        @if (flag.inputType === 'qty' && flag.qtyOptions) {
+          <div class="flag-item__options">
+            @for (opt of flag.qtyOptions; track opt) {
+              <button nz-button nzSize="small"
+                [nzType]="getPending(flag.id) === opt ? 'primary' : 'default'"
+                (click)="selectQty(flag.id, opt)">
+                {{ opt }}
+              </button>
+            }
+          </div>
+        }
+
+        @if (flag.inputType === 'text') {
+          <input nz-input [placeholder]="'กรอก ' + flag.title"
+            [ngModel]="getPending(flag.id)"
+            (ngModelChange)="onTextInput(flag.id, $event)"
+            class="flag-item__input" />
+        }
+
+        <button nz-button nzType="primary" nzSize="small"
+          [disabled]="!getPending(flag.id)?.trim()"
+          (click)="confirmFlag(flag)"
+          class="flag-item__confirm-btn">
+          ยืนยัน
+        </button>
+      }
+
+    </div>
+  }
+
+  <!-- Proceed button -->
+  <button nz-button nzType="primary" [disabled]="!allDone()"
+    (click)="proceed()" class="flag-card__proceed">
+    ถัดไป →
+  </button>
+</div>

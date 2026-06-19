@@ -1,0 +1,11 @@
+:host { display: block; background: #f5f5f5; min-height: 100vh; }
+.print-page { max-width: 794px; margin: 0 auto; background: #fff; padding: 32px 24px; }
+.actions { display: flex; gap: 8px; margin-bottom: 20px; button { cursor: pointer; padding: 7px 16px; border-radius: 8px; border: 1px solid #ccc; } button:first-child { background: #0463EF; color: #fff; border: none; } }
+.header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid #010136; h1 { font-size: 16px; font-weight: 700; color: #010136; margin: 0; } p { font-size: 12px; color: #0463EF; margin: 2px 0 0; } }
+.bx-badge { width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg,#0463EF,#16EA9E); color: #fff; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.draft-badge { display: inline-block; margin-top: 6px; padding: 2px 12px; border-radius: 20px; background: rgba(4,99,239,0.08); border: 1px solid rgba(4,99,239,0.25); font-size: 11px; color: #0463EF; font-weight: 600; }
+.ref-row { display: flex; gap: 16px; padding: 10px 14px; border-radius: 10px; background: rgba(4,99,239,0.04); border: 1px solid rgba(4,99,239,0.15); margin-bottom: 20px; div { flex: 1; } label { display: block; font-size: 10px; color: #888; margin-bottom: 2px; } strong { font-size: 13px; font-weight: 700; color: #010136; } }
+section { margin-bottom: 20px; h2 { font-size: 11px; font-weight: 700; color: #fff; background: #0463EF; padding: 5px 12px; border-radius: 6px 6px 0 0; margin: 0; } }
+.grid { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid #E0E0E0; border-top: none; border-radius: 0 0 6px 6px; padding: 12px 14px; gap: 0 24px; }
+.field { padding: 6px 0; border-bottom: 1px solid #E0E0E0; label { display: block; font-size: 10px; color: #888; margin-bottom: 1px; } span { font-size: 12px; font-weight: 600; color: #010136; } &.full { grid-column: span 2; } }
+@media print { .no-print { display: none !important; } :host { background: #fff; } }

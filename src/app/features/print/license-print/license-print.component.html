@@ -1,0 +1,49 @@
+@if (data(); as d) {
+  <div class="print-page">
+    <div class="no-print actions">
+      <button (click)="print()">พิมพ์ / บันทึก PDF</button>
+      <button (click)="close()">ปิด</button>
+    </div>
+    <div class="header">
+      <div class="bx-badge">BX</div>
+      <div>
+        <h1>ใบอนุญาตนำเข้า (ร่าง)</h1>
+        <p>แบบ {{ d.licenseType }} — ร่างสำหรับยื่นกรมศุลกากร</p>
+        <span class="draft-badge">DRAFT — ยังไม่ได้รับการอนุมัติจากกรม</span>
+      </div>
+    </div>
+    <div class="ref-row">
+      <div><label>เลขอ้างอิงใบขน</label><strong>{{ d.ref || '—' }}</strong></div>
+      <div><label>เลขใบอนุญาต (ชั่วคราว)</label><strong style="color:#0463EF">{{ d.refNo || '—' }}</strong></div>
+      <div><label>วันที่พิมพ์</label><strong>{{ d.printedAt }}</strong></div>
+    </div>
+    <section>
+      <h2>ข้อมูลผู้นำเข้า</h2>
+      <div class="grid">
+        <div class="field full"><label>ชื่อผู้นำเข้า</label><span>{{ d.importer }}</span></div>
+        <div class="field"><label>ผู้ดำเนินพิธีการ</label><span>{{ d.declarant }}</span></div>
+        <div class="field"><label>ท่าเรือ</label><span>{{ d.port }}</span></div>
+      </div>
+    </section>
+    <section>
+      <h2>รายละเอียดสินค้า</h2>
+      <div class="grid">
+        <div class="field full"><label>รายละเอียดสินค้า</label><span>{{ d.goodsDesc }}</span></div>
+        <div class="field"><label>HS Code</label><span>{{ d.hsCode }}</span></div>
+        <div class="field"><label>ประเทศต้นทาง</label><span>{{ d.countryOrigin }}</span></div>
+        <div class="field"><label>ปริมาณ</label><span>{{ d.quantity }} {{ d.unit }}</span></div>
+        <div class="field"><label>เลขล็อต</label><span>{{ d.lotNo }}</span></div>
+        <div class="field"><label>เลข U</label><span>{{ d.uNo }}</span></div>
+      </div>
+    </section>
+    <section>
+      <h2>เอกสารอ้างอิง</h2>
+      <div class="grid">
+        <div class="field"><label>Invoice No.</label><span>{{ d.invoiceNo }}</span></div>
+        <div class="field"><label>Invoice Date</label><span>{{ d.invoiceDate }}</span></div>
+        <div class="field"><label>Drug Reg. No.</label><span>{{ d.drugRegNo }}</span></div>
+        <div class="field"><label>วันที่นำเข้า</label><span>{{ d.importDate }}</span></div>
+      </div>
+    </section>
+  </div>
+}

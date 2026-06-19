@@ -1,0 +1,160 @@
+// Shared chat component styles — not covered by ng-zorro
+
+// Message appear animation
+@keyframes msgAppear {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.msg-appear {
+  animation: msgAppear 0.22s ease-out forwards;
+}
+
+// Typing indicator dots
+@keyframes bounceDot {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.45; }
+  40%           { transform: translateY(-6px); opacity: 1; }
+}
+
+.typing-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--bizx-blue);
+  display: inline-block;
+  animation: bounceDot 1.2s ease-in-out infinite;
+
+  &:nth-child(2) { animation-delay: 0.15s; }
+  &:nth-child(3) { animation-delay: 0.30s; }
+}
+
+// OCR progress bar fill
+@keyframes ocrFill {
+  from { width: 0; }
+}
+
+.ocr-fill {
+  background: linear-gradient(90deg, var(--bizx-blue), var(--bizx-teal));
+  border-radius: 9999px;
+  height: 100%;
+  transition: width 0.6s ease;
+}
+
+// Status dot pulse
+@keyframes pulseDot {
+  0%, 100% { opacity: 1;   transform: scale(1); }
+  50%       { opacity: 0.6; transform: scale(1.15); }
+}
+
+.status-dot-pulse {
+  animation: pulseDot 2s ease-in-out infinite;
+}
+
+// AI bot bubble
+.bot-bubble {
+  background: #ffffff;
+  border: 1px solid #DDE1F8;
+  border-radius: 16px;
+  box-shadow: var(--bizx-shadow-card);
+  padding: 16px 20px;
+  font-size: 13px;
+  color: var(--bizx-navy);
+  line-height: 1.6;
+}
+
+// User bubble
+.user-bubble {
+  background: var(--bizx-grad-primary);
+  color: #ffffff;
+  border-radius: 18px 18px 4px 18px;
+  padding: 10px 16px;
+  font-size: 13px;
+  max-width: 320px;
+  box-shadow: var(--bizx-shadow-primary);
+}
+
+// AI avatar
+.ai-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  background: var(--bizx-grad-avatar);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+// User avatar
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--bizx-grad-user);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+// Quick chip
+.quick-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--bizx-blue-border);
+  background: var(--bizx-blue-tint);
+  color: var(--bizx-blue);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover {
+    background: var(--bizx-blue);
+    color: #ffffff;
+    border-color: var(--bizx-blue);
+  }
+}
+
+// Info card (inside bot bubble)
+.info-card {
+  border: 1px solid var(--bizx-n200);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 10px;
+
+  &__head {
+    background: #F5F6FF;
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--bizx-navy);
+    border-bottom: 1px solid var(--bizx-n200);
+  }
+
+  &__body {
+    background: #ffffff;
+    padding: 0 14px;
+  }
+
+  &__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 0;
+    font-size: 12px;
+    border-bottom: 1px dashed var(--bizx-n200);
+
+    &:last-child { border-bottom: none; }
+
+    span:first-child { color: var(--bizx-n600); }
+    span:last-child  { font-weight: 600; color: var(--bizx-navy); }
+  }
+}

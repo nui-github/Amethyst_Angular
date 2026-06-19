@@ -1,0 +1,27 @@
+@use 'variables';
+@use 'ng-zorro-theme';
+@use 'chat';
+
+// IBM Plex Sans Thai
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'IBM Plex Sans Thai', -apple-system, sans-serif;
+  font-size: 13px;
+  color: var(--bizx-navy);
+  background: var(--bizx-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+// Scrollbar
+::-webkit-scrollbar       { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bizx-n300); border-radius: 9999px; }
+
+// Prevent textarea resize
+textarea { resize: none; }

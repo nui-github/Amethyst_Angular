@@ -1,0 +1,44 @@
+// BizX Design Tokens — single source of truth
+// Usage: var(--bizx-blue), var(--bizx-navy) etc.
+
+:root {
+  // Navy
+  --bizx-navy:        #010136;
+  --bizx-navy-mid:    #40406A;
+  --bizx-navy-light:  #8080A5;
+
+  // Blue (action)
+  --bizx-blue:        #0463EF;
+  --bizx-blue-deep:   #034DBA;
+  --bizx-blue-light:  #B0D0FF;
+  --bizx-blue-tint:   rgba(4, 99, 239, 0.08);
+  --bizx-blue-border: rgba(4, 99, 239, 0.25);
+
+  // Teal (success)
+  --bizx-teal:        #16EA9E;
+  --bizx-teal-mid:    #11BB7F;
+  --bizx-teal-dark:   #0D8F61;
+  --bizx-teal-tint:   rgba(22, 234, 158, 0.10);
+
+  // Neutral
+  --bizx-bg:          #F2F2F2;
+  --bizx-n50:         #F9F9F9;
+  --bizx-n100:        #F2F2F2;
+  --bizx-n200:        #E0E0E0;
+  --bizx-n300:        #CCCCCC;
+  --bizx-n500:        #999999;
+  --bizx-n600:        #666666;
+  --bizx-n800:        #333333;
+
+  // Gradients
+  --bizx-grad-primary: linear-gradient(135deg, #034DBA, #0463EF);
+  --bizx-grad-teal:    linear-gradient(135deg, #11BB7F, #16EA9E);
+  --bizx-grad-avatar:  linear-gradient(90deg,  #0463EF, #16EA9E);
+  --bizx-grad-user:    linear-gradient(135deg, #40406A, #0463EF);
+
+  // Shadows
+  --bizx-shadow-card:    0 2px 12px rgba(4, 10, 80, 0.07);
+  --bizx-shadow-primary: 0 4px 14px rgba(4, 99, 239, 0.25);
+  --bizx-shadow-teal:    0 4px 14px rgba(22, 234, 158, 0.30);
+  --bizx-shadow-modal:   0 20px 60px rgba(1, 1, 54, 0.22);
+}

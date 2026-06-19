@@ -1,0 +1,61 @@
+<div class="shell">
+  <!-- Sidebar (TODO: SidebarComponent) -->
+  <aside class="sidebar">
+    <div class="sidebar__logo">
+      <div class="bx-badge">BX</div>
+      <div>
+        <p class="sidebar__name">Netbay Agent</p>
+        <p class="sidebar__sub">Assistant</p>
+      </div>
+    </div>
+    <button class="new-chat-btn" (click)="chat.newChat()">+ New Chat</button>
+    <nav class="sidebar__nav">
+      <button class="nav-item nav-item--active" (click)="chat.setSidebarActive('chatbot')">Chatbot</button>
+      <button class="nav-item" (click)="chat.setSidebarActive('queue')">
+        คิวงาน
+        @if (chat.needsYouCount() > 0) {
+          <span class="badge">{{ chat.needsYouCount() }}</span>
+        }
+      </button>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <!-- Header -->
+    <header class="header">
+      <span class="header__breadcrumb">Netbay Agent › Chatbot</span>
+      <span class="status-pill" [class.connected]="chat.isConnected()">
+        <span class="status-dot" [class.status-dot--live]="chat.isConnected()"></span>
+        {{ chat.isConnected() ? 'เชื่อมต่อแล้ว' : 'ยังไม่เชื่อมต่อ SPN' }}
+      </span>
+    </header>
+
+    <!-- Chat area -->
+    <app-chat-area
+      [messages]="chat.messages()"
+      [isTyping]="chat.isTyping()"
+      [readOnly]="false"
+      class="chat-area" />
+
+    <!-- Quick action chips -->
+    <div class="quick-bar">
+      <button class="quick-chip" (click)="chat.send('สร้าง RGoods')">ขอใบอนุญาตนำเข้า</button>
+      <button class="quick-chip" (click)="chat.setSidebarActive('queue')">จัดการคิวงาน</button>
+      <button class="quick-chip" (click)="chat.send('อัปโหลดเอกสาร')">อัปโหลดเอกสาร</button>
+    </div>
+
+    <!-- Input -->
+    <div class="input-bar">
+      <textarea
+        nz-input
+        [(ngModel)]="inputText"
+        (keydown)="onKeydown($event)"
+        placeholder="พิมพ์คำสั่ง เช่น สร้าง RGoods ด้วยใบขน Ref : HTHM000000003..."
+        [autosize]="{ minRows: 1, maxRows: 4 }"
+        class="chat-input"
+      ></textarea>
+      <p class="input-hint">กด Enter เพื่อส่ง · Shift+Enter ขึ้นบรรทัดใหม่</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,171 @@
+<div class="chat-area">
+  @for (msg of messages; track msg.id) {
+
+    <!-- ── User bubble ───────────────────────────────────────── -->
+    @if (msg.role === 'user') {
+      <div class="msg-row msg-row--user msg-appear">
+        <div class="user-bubble">{{ msg.content }}</div>
+        <div class="user-avatar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+      </div>
+
+    <!-- ── Bot bubble ────────────────────────────────────────── -->
+    } @else {
+      <div class="msg-row msg-row--bot msg-appear">
+        <div class="msg-row__meta">
+          <div class="ai-avatar">AI</div>
+          <span class="agent-label">Netbay Agent</span>
+        </div>
+
+        <div class="bot-bubble">
+          @switch (msg.type) {
+
+            <!-- Plain text / simple HTML -->
+            @case ('text') {
+              @if (msg.content) {
+                <div [innerHTML]="msg.content | safeHtml"></div>
+              }
+            }
+
+            <!-- Welcome card -->
+            @case ('welcome') {
+              @if (!readOnly) {
+                <p class="welcome-title">สวัสดีครับ! ผมคือ <strong>Netbay Agent</strong></p>
+                <p class="welcome-sub">ช่วยท่านสร้างใบอนุญาตนำเข้า RGoods และจัดการเอกสารศุลกากรได้ครับ</p>
+              } @else {
+                <span class="readonly-tag">ข้อความต้อนรับ</span>
+              }
+            }
+
+            <!-- SPN lookup success -->
+            @case ('spn-result') {
+              <app-spn-result [data]="asAny(msg.data)" />
+            }
+
+            <!-- SPN not found → import license menu -->
+            @case ('spn-not-found') {
+              @if (!readOnly) {
+                <!-- TODO: ImportLicenseMenuComponent -->
+                <p>ไม่พบข้อมูลใน SPN — กรุณาเลือกประเภทเอกสาร</p>
+              } @else {
+                <span class="readonly-tag">เลือกประเภทเอกสารแล้ว</span>
+              }
+            }
+
+            <!-- OCR progress animation -->
+            @case ('ocr-progress') {
+              @if (!readOnly) {
+                <app-ocr-progress [progress]="ocr.progress()" [stages]="ocr.stages()" />
+              } @else {
+                <span class="readonly-tag">✓ OCR เสร็จสิ้นแล้ว</span>
+              }
+            }
+
+            <!-- OCR results summary -->
+            @case ('ocr-results') {
+              <app-ocr-results [data]="asAny(msg.data)" />
+            }
+
+            <!-- Flag confirmation (interactive) -->
+            @case ('flag-card') {
+              @if (!readOnly) {
+                <app-flag-card
+                  [data]="asFlagCard(msg.data)"
+                  (flagConfirmed)="chat.confirmFlag(msg.id, $event.flagId, $event.value)"
+                  (allConfirmed)="chat.onAllFlagsConfirmed()" />
+              } @else {
+                <span class="readonly-tag">✓ ยืนยัน flag แล้ว</span>
+              }
+            }
+
+            <!-- 2-choice decision card -->
+            @case ('choice-card') {
+              @if (!readOnly) {
+                <app-choice-card
+                  [data]="asChoiceCard(msg.data)"
+                  (chosen)="onChoice(msg, $event)" />
+              } @else {
+                <span class="readonly-tag">เลือกแล้ว</span>
+              }
+            }
+
+            <!-- Email draft (interactive) -->
+            @case ('email-draft') {
+              @if (!readOnly) {
+                <!-- TODO: EmailDraftComponent -->
+                <p>ร่างอีเมล — TODO EmailDraftComponent</p>
+              } @else {
+                <span class="readonly-tag">✓ ส่งอีเมลแล้ว</span>
+              }
+            }
+
+            <!-- Form fill panel -->
+            @case ('form') {
+              @if (!readOnly) {
+                <!-- TODO: FormPanelComponent -->
+                <p>ฟอร์มกรอกข้อมูล — TODO FormPanelComponent</p>
+              } @else {
+                <span class="readonly-tag">✓ กรอกข้อมูลแล้ว</span>
+              }
+            }
+
+            <!-- Upload panel -->
+            @case ('full-upload') {
+              @if (!readOnly) {
+                <!-- TODO: FullUploadComponent -->
+                <p>อัปโหลดเอกสาร — TODO FullUploadComponent</p>
+              } @else {
+                <span class="readonly-tag">✓ อัปโหลดเอกสารแล้ว</span>
+              }
+            }
+
+            <!-- ShippingNet connect -->
+            @case ('connect') {
+              @if (!readOnly) {
+                <!-- TODO: ConnectPanelComponent -->
+                <p>เชื่อมต่อ ShippingNet — TODO ConnectPanelComponent</p>
+              } @else {
+                <span class="readonly-tag">✓ เชื่อมต่อแล้ว</span>
+              }
+            }
+
+            <!-- SPN multi-select list -->
+            @case ('spn-list') {
+              @if (!readOnly) {
+                <app-spn-card (requestPermit)="chat.onRequestPermit($event)" />
+              } @else {
+                <span class="readonly-tag">✓ เลือก SPN แล้ว</span>
+              }
+            }
+
+            <!-- Submission status card -->
+            @case ('status-card') {
+              <app-status-card [data]="asAny(msg.data)" />
+            }
+
+          }
+        </div>
+
+        <p class="msg-time">{{ msg.time }}</p>
+      </div>
+    }
+  }
+
+  @if (isTyping && !readOnly) {
+    <div class="msg-row msg-row--bot">
+      <div class="msg-row__meta">
+        <div class="ai-avatar">AI</div>
+      </div>
+      <div class="bot-bubble">
+        <app-typing-indicator />
+      </div>
+    </div>
+  }
+
+  <div #bottom></div>
+</div>
