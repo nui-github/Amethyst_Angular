@@ -1,88 +1,137 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
-import { QueueService, STATUS_META } from '@app/core/services/queue.service';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzTagModule } from 'ng-zorro-antd/tag';
+import { LucideAngularModule, AlertTriangle, Mail, Clock, CheckCircle2, Ban, Search, RotateCcw, Send, ChevronLeft } from 'lucide-angular';
+import { QueueService, STATUS_META, AGENCY_SHORT } from '@app/core/services/queue.service';
 import { ChatAreaComponent } from '../../chat/components/chat-area/chat-area.component';
+import { Shipment, ShipmentStatus, ChatMessage } from '@app/core/models/types';
+import { generateId, getTime } from '@app/shared/utils/helpers';
 
-/** TODO: implement full QueuePage — see ANGULAR.md */
+export { STATUS_META, AGENCY_SHORT };
+
+const STAGE_LABELS = ['','ตรวจรับใบขน','วิเคราะห์ HS','จัดประเภท','ร่างใบอนุญาต','ตรวจ flag','ยืนยันร่าง','แจ้งลูกค้า','ยื่นกรม'];
+
 @Component({
   selector: 'app-queue-page',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, ChatAreaComponent],
-  styles: [`
-    .page { display:flex; flex-direction:column; height:100vh; background:#F2F2F2; font-family:'IBM Plex Sans Thai',sans-serif; }
-    .header { background:#fff; border-bottom:1px solid #E0E0E0; padding:12px 20px; display:flex; align-items:center; gap:12px; flex-shrink:0; }
-    .back-btn { background:none; border:none; color:#0463EF; font-size:13px; cursor:pointer; padding:4px 8px; border-radius:6px; }
-    .back-btn:hover { background:#EFF6FF; }
-    .title { font-size:15px; font-weight:700; color:#010136; }
-    .body { display:flex; flex:1; overflow:hidden; }
-    .list { width:320px; flex-shrink:0; background:#fff; border-right:1px solid #E0E0E0; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:6px; }
-    .row { padding:12px 14px; border:1px solid #E0E0E0; border-radius:10px; cursor:pointer; transition:all .15s; }
-    .row:hover { background:#F9FAFB; }
-    .row--active { background:#EFF6FF; border-color:#0463EF; border-left:3px solid #0463EF; }
-    .row__name { font-size:13px; font-weight:700; color:#010136; margin:0 0 2px; }
-    .row__goods { font-size:11px; color:#666; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .row__badge { display:inline-block; font-size:10px; font-weight:700; padding:1px 7px; border-radius:20px; margin-left:6px; }
-    .new-badge { background:#EFF6FF; color:#0463EF; }
-    .detail { flex:1; overflow:hidden; display:flex; flex-direction:column; }
-    .detail-header { background:#fff; border-bottom:1px solid #E0E0E0; padding:12px 16px; flex-shrink:0; }
-    .detail-title { font-size:13px; font-weight:700; color:#010136; margin:0 0 2px; }
-    .detail-sub { font-size:11px; color:#999; margin:0; }
-    .empty { flex:1; display:flex; align-items:center; justify-content:center; color:#999; font-size:13px; }
-  `],
-  template: `
-    <div class="page">
-      <div class="header">
-        <button class="back-btn" (click)="router.navigate(['/'])">← กลับ</button>
-        <span class="title">คิวงานขอใบอนุญาต</span>
-        <span style="font-size:12px;color:#999;margin-left:auto">{{ queue.queue().length }} รายการ</span>
-      </div>
-      <div class="body">
-        <div class="list">
-          @for (s of queue.queue(); track s.id) {
-            <div class="row" [class.row--active]="queue.openId() === s.id"
-              (click)="queue.open(s.id)">
-              <p class="row__name">
-                {{ s.chatName ?? s.customsNo }}
-                @if (s.isNew) { <span class="row__badge new-badge">ใหม่</span> }
-              </p>
-              <p class="row__goods">{{ s.goods }}</p>
-              <p class="row__goods" style="margin-top:2px">
-                <span class="row__badge"
-                  [style.background]="statusMeta(s.statusKey).bg"
-                  [style.color]="statusMeta(s.statusKey).text">
-                  {{ statusMeta(s.statusKey).label }}
-                </span>
-              </p>
-            </div>
-          }
-        </div>
-        @if (openShipment()) {
-          <div class="detail">
-            <div class="detail-header">
-              <p class="detail-title">{{ openShipment()!.chatName ?? openShipment()!.customsNo }}</p>
-              <p class="detail-sub">{{ openShipment()!.goods }} · {{ openShipment()!.customer }}</p>
-            </div>
-            <app-chat-area [messages]="openShipment()!.messages ?? []" [readOnly]="true" />
-          </div>
-        } @else {
-          <div class="empty">เลือกรายการเพื่อดูประวัติการสนทนา</div>
-        }
-      </div>
-    </div>
-  `,
+  imports: [CommonModule, FormsModule, NzInputModule, NzButtonModule, NzTagModule, LucideAngularModule, ChatAreaComponent],
+  templateUrl: './queue-page.component.html',
+  styleUrl:    './queue-page.component.scss',
 })
 export class QueuePageComponent {
-  readonly queue  = inject(QueueService);
+  readonly q      = inject(QueueService);
   readonly router = inject(Router);
 
-  openShipment() {
-    const id = this.queue.openId();
-    return id ? this.queue.get(id) : null;
+  // Icons
+  readonly icWarn    = AlertTriangle;
+  readonly icMail    = Mail;
+  readonly icClock   = Clock;
+  readonly icCheck   = CheckCircle2;
+  readonly icBan     = Ban;
+  readonly icSearch  = Search;
+  readonly icBack    = ChevronLeft;
+  readonly icReset   = RotateCcw;
+  readonly icSend    = Send;
+
+  // State
+  searchTerm   = signal('');
+  statusFilter = signal<ShipmentStatus | 'all'>('all');
+  stageLabels  = STAGE_LABELS;
+
+  // Derived
+  readonly filteredQueue = computed(() => {
+    const term   = this.searchTerm().toLowerCase();
+    const filter = this.statusFilter();
+    return this.q.queue().filter(s => {
+      const matchStatus = filter === 'all' || s.statusKey === filter;
+      const matchTerm   = !term ||
+        (s.chatName ?? s.customsNo).toLowerCase().includes(term) ||
+        s.goods.toLowerCase().includes(term) ||
+        (s.hthmRef ?? '').toLowerCase().includes(term);
+      return matchStatus && matchTerm;
+    });
+  });
+
+  readonly openShipment = computed<Shipment | null>(() => {
+    const id = this.q.openId();
+    return id ? (this.q.get(id) ?? null) : null;
+  });
+
+  // Stat counts
+  countByStatus(key: ShipmentStatus): number {
+    return this.q.queue().filter(s => s.statusKey === key).length;
   }
 
   statusMeta(key: string) {
-    return STATUS_META[key as keyof typeof STATUS_META] ?? { bg: '#F3F4F6', text: '#666', label: key };
+    return STATUS_META[key as ShipmentStatus] ?? { label: key, bg: '#F3F4F6', text: '#6B7280', dot: '#999' };
   }
+
+  agencyShort(key: string): string {
+    return (AGENCY_SHORT as Record<string, string>)[key] ?? '—';
+  }
+
+  isDone(step: number, stage: number)   { return step < stage; }
+  isActive(step: number, stage: number) { return step === stage; }
+
+  // Actions
+  selectRow(id: string): void { this.q.open(id); }
+
+  pushMsg(text: string, patch?: Partial<Shipment>): void {
+    const ship = this.openShipment();
+    if (!ship) return;
+    const msg: ChatMessage = { id: generateId(), role: 'user', type: 'text', content: text, time: getTime() };
+    const botMsg: ChatMessage = { id: generateId(), role: 'bot', type: 'text', content: '', time: getTime() };
+    const updated = [...(ship.messages ?? []), msg, botMsg];
+    this.q.update(ship.id, { messages: updated, ...patch });
+  }
+
+  confirm(): void {
+    const ship = this.openShipment();
+    if (!ship) return;
+    const bot: ChatMessage = { id: generateId(), role: 'bot', type: 'text',
+      content: `ยืนยันแล้ว ✓ ร่างอีเมลถึง ${ship.email.toName} พร้อมส่ง`, time: getTime() };
+    const updated = [...(ship.messages ?? []), bot];
+    this.q.update(ship.id, { messages: updated, statusKey: 'email_outbox', stage: 6 });
+  }
+
+  sendEmail(): void {
+    const ship = this.openShipment();
+    if (!ship) return;
+    const bot: ChatMessage = { id: generateId(), role: 'bot', type: 'text',
+      content: `ส่งอีเมลถึง ${ship.email.toName} (${ship.email.to}) เรียบร้อยแล้ว — รอลูกค้ายืนยัน`, time: getTime() };
+    const updated = [...(ship.messages ?? []), bot];
+    this.q.update(ship.id, { messages: updated, statusKey: 'await_customer', stage: 7 });
+  }
+
+  customerConfirmed(): void {
+    const ship = this.openShipment();
+    if (!ship) return;
+    const bot: ChatMessage = { id: generateId(), role: 'bot', type: 'text',
+      content: 'ลูกค้ายืนยันเอกสารแล้ว ✓ — กดยื่นกรมเมื่อพร้อม', time: getTime() };
+    this.q.update(ship.id, { messages: [...(ship.messages ?? []), bot] });
+  }
+
+  submit(): void {
+    const ship = this.openShipment();
+    if (!ship) return;
+    const bot: ChatMessage = { id: generateId(), role: 'bot', type: 'text',
+      content: `ยื่นเอกสารถึงกรมเรียบร้อยแล้ว ✓\n\nแบบฟอร์ม: ${ship.formCode} — ${ship.customsNo}`, time: getTime() };
+    this.q.update(ship.id, { messages: [...(ship.messages ?? []), bot], statusKey: 'submitted', stage: 8 });
+  }
+
+  readonly statCards = [
+    { key: "needs_you"      as ShipmentStatus, label: "รอคุณยืนยัน",       dot: "#F59E0B" },
+    { key: "email_outbox"   as ShipmentStatus, label: "ร่างอีเมลรอส่ง",    dot: "#3B82F6" },
+    { key: "await_customer" as ShipmentStatus, label: "รอลูกค้ายืนยัน",    dot: "#7C3AED" },
+    { key: "submitted"      as ShipmentStatus, label: "ยื่นแล้ว",            dot: "#10B981" },
+  ];
+
+  back(): void { this.router.navigate(['/']); }
 }
+
+// Stat card config appended here — also add to class body above

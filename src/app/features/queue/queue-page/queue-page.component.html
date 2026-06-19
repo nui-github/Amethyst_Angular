@@ -1,0 +1,148 @@
+<div class="queue-page">
+
+  <!-- ── Header ────────────────────────────────────────────── -->
+  <div class="qp-header">
+    <button class="back-btn" (click)="back()">
+      <lucide-icon [img]="icBack" [size]="15" /> กลับ
+    </button>
+    <div>
+      <h1 class="qp-title">คิวงานขอใบอนุญาต</h1>
+      <p class="qp-sub">{{ q.queue().length }} รายการ · รอคุณยืนยัน {{ countByStatus('needs_you') }}</p>
+    </div>
+    <div class="qp-stats">
+      @for (s of statCards; track s.key) {
+        <button class="stat-card" [class.stat-card--active]="statusFilter() === s.key"
+          [style.borderColor]="statusFilter() === s.key ? s.dot : '#E5E7EB'"
+          (click)="statusFilter.set(statusFilter() === s.key ? 'all' : s.key)">
+          <span class="stat-dot" [style.background]="s.dot"></span>
+          <span class="stat-label">{{ s.label }}</span>
+          <span class="stat-count" [style.color]="s.dot">{{ countByStatus(s.key) }}</span>
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- ── Body ──────────────────────────────────────────────── -->
+  <div class="qp-body">
+
+    <!-- ListView -->
+    <div class="list-panel" [class.list-panel--narrow]="!!openShipment()">
+      <div class="list-search">
+        <input nz-input nzSize="small" [ngModel]="searchTerm()"
+          (ngModelChange)="searchTerm.set($event)"
+          placeholder="ค้นหา ref, ผู้นำเข้า, สินค้า..." />
+      </div>
+
+      <div class="list-rows">
+        @for (s of filteredQueue(); track s.id) {
+          <button class="list-row" [class.list-row--active]="q.openId() === s.id"
+            (click)="selectRow(s.id)">
+            <div class="list-row__main">
+              <span class="list-row__name">
+                {{ s.chatName ?? s.customsNo }}
+                @if (s.isNew) { <span class="badge-new">ใหม่</span> }
+              </span>
+              <span class="list-row__goods">{{ s.goods }}</span>
+              @if (s.chatName) {
+                <span class="list-row__customs">{{ s.customsNo }}</span>
+              }
+            </div>
+            <div class="list-row__badges">
+              <span class="status-badge"
+                [style.background]="statusMeta(s.statusKey).bg"
+                [style.color]="statusMeta(s.statusKey).text">
+                {{ statusMeta(s.statusKey).label }}
+              </span>
+              <span class="agency-badge">{{ agencyShort(s.agency) }}</span>
+            </div>
+          </button>
+        }
+
+        @if (filteredQueue().length === 0) {
+          <div class="list-empty">ไม่มีรายการ</div>
+        }
+      </div>
+    </div>
+
+    <!-- ShipmentChatView -->
+    @if (openShipment(); as ship) {
+      <div class="detail-panel">
+
+        <!-- Detail header -->
+        <div class="detail-header">
+          <div class="detail-header__top">
+            <div>
+              <h2 class="detail-title">{{ ship.chatName ?? ship.customsNo }}</h2>
+              <p class="detail-sub">{{ ship.goods }} · {{ ship.customer }}</p>
+            </div>
+            <span class="status-badge status-badge--lg"
+              [style.background]="statusMeta(ship.statusKey).bg"
+              [style.color]="statusMeta(ship.statusKey).text">
+              {{ statusMeta(ship.statusKey).label }}
+            </span>
+          </div>
+
+          <!-- 8-step progress bar -->
+          <div class="steps-bar">
+            @for (label of stageLabels.slice(1); track label; let i = $index) {
+              <div class="step" [class.step--done]="isDone(i+1, ship.stage)"
+                [class.step--active]="isActive(i+1, ship.stage)">
+                <div class="step__dot">{{ isDone(i+1, ship.stage) ? '✓' : i+1 }}</div>
+                <span class="step__label">{{ label }}</span>
+              </div>
+              @if (i < 7) { <div class="step__line" [class.step__line--done]="isDone(i+1, ship.stage)"></div> }
+            }
+          </div>
+        </div>
+
+        <!-- Chat history -->
+        <app-chat-area [messages]="ship.messages ?? []" [readOnly]="true" class="detail-chat" />
+
+        <!-- Action bars -->
+        @if (ship.statusKey === 'needs_you') {
+          <div class="action-bar">
+            <button nz-button nzSize="default" style="flex-shrink:0">
+              <lucide-icon [img]="icReset" [size]="13" /> ส่งกลับ AI
+            </button>
+            <button nz-button nzType="primary" nzSize="default" nzBlock (click)="confirm()">
+              ยืนยันและดำเนินการต่อ →
+            </button>
+          </div>
+        }
+
+        @if (ship.statusKey === 'email_outbox') {
+          <div class="action-bar">
+            <button nz-button nzType="primary" nzSize="default" nzBlock (click)="sendEmail()">
+              <lucide-icon [img]="icMail" [size]="13" /> ส่งอีเมลหาลูกค้า
+            </button>
+          </div>
+        }
+
+        @if (ship.statusKey === 'await_customer') {
+          <div class="action-bar">
+            <button nz-button nzSize="default" style="flex-shrink:0">แก้ไขเอกสาร</button>
+            <button nz-button nzType="primary" nzSize="default" (click)="customerConfirmed()" style="flex:1">
+              ลูกค้ายืนยันเอกสารแล้ว
+            </button>
+            <button nz-button nzType="primary" nzSize="default"
+              style="background:linear-gradient(135deg,#11BB7F,#16EA9E);border:none;flex:1"
+              (click)="submit()">
+              ยื่นกรม ✓
+            </button>
+          </div>
+        }
+
+        @if (ship.statusKey === 'submitted') {
+          <div class="action-bar action-bar--done">
+            <lucide-icon [img]="icCheck" [size]="15" color="#065F46" />
+            <span>ยื่นเอกสารถึงกรมเรียบร้อยแล้ว</span>
+          </div>
+        }
+
+      </div>
+    } @else {
+      <div class="detail-empty">เลือกรายการเพื่อดูประวัติและดำเนินการ</div>
+    }
+
+  </div>
+</div>
