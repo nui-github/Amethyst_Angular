@@ -144,8 +144,7 @@
             <!-- Upload panel -->
             @case ('full-upload') {
               @if (!readOnly) {
-                <!-- TODO: FullUploadComponent -->
-                <p>อัปโหลดเอกสาร — TODO FullUploadComponent</p>
+                <app-full-upload />
               } @else {
                 <span class="readonly-tag">✓ อัปโหลดเอกสารแล้ว</span>
               }

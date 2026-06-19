@@ -1,0 +1,45 @@
+<div class="upload-wrap">
+  <p class="upload-title">อัปโหลดเอกสารประกอบ</p>
+  <p class="upload-sub">AI จะ OCR ดึงข้อมูลจากทุกไฟล์ที่อัปโหลด</p>
+
+  <div class="slots">
+    @for (slot of slots(); track slot.key) {
+      <label class="slot" [class.slot--filled]="!!slot.file"
+        [style.--accent]="slot.color" [for]="'upload_' + slot.key">
+
+        <div class="slot__icon" [style.background]="slot.color + '18'">
+          <lucide-icon [img]="$any(slot.icon)" [size]="20" [color]="slot.color" />
+        </div>
+
+        <div class="slot__body">
+          <span class="slot__label">{{ slot.label }}</span>
+          @if (slot.file) {
+            <span class="slot__file">{{ slot.file.name }}</span>
+          } @else {
+            <span class="slot__hint">คลิกเพื่อเลือกไฟล์ · PDF, JPG, PNG, XML</span>
+          }
+        </div>
+
+        @if (slot.file) {
+          <button class="slot__clear" (click)="$event.preventDefault(); clearSlot(slot.key)">
+            <lucide-icon [img]="X" [size]="13" color="#999" />
+          </button>
+        } @else {
+          <lucide-icon [img]="Upload" [size]="15" color="#CCC" />
+        }
+
+        <input [id]="'upload_' + slot.key" type="file"
+          accept=".pdf,.jpg,.jpeg,.png,.xml"
+          style="display:none"
+          (change)="onFileChange(slot.key, $event)" />
+      </label>
+    }
+  </div>
+
+  <button nz-button nzType="primary" nzBlock
+    [disabled]="!hasAny()" (click)="startOCR()"
+    class="ocr-btn">
+    <lucide-icon [img]="Upload" [size]="14" color="#fff" />
+    เริ่ม OCR และวิเคราะห์เอกสาร
+  </button>
+</div>
