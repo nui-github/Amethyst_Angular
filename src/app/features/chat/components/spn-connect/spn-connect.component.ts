@@ -55,13 +55,13 @@ export class SpnConnectComponent {
     this.urls().find(u => u.id === this.selectedUrlId()) ?? null
   );
 
-  // Step 3: Login
-  username  = '';
-  password  = '';
-  loading   = signal(false);
+  // Step 3: Login — use signals so computed() reacts to changes
+  username   = signal('');
+  password   = signal('');
+  loading    = signal(false);
   loginError = signal('');
 
-  readonly loginValid = computed(() => this.username.trim() && this.password.trim());
+  readonly loginValid = computed(() => this.username().trim().length > 0 && this.password().trim().length > 0);
 
   // Env color
   envColor(env: string): string {
@@ -115,15 +115,14 @@ export class SpnConnectComponent {
     this.loading.set(true);
     this.loginError.set('');
 
-    // Mock auth 1200ms
+    // Mock auth 1200ms — any non-empty credentials succeed
     setTimeout(() => {
       this.loading.set(false);
-      // Mock: any non-empty credentials succeed
       this.step.set('success');
       this.chat.onSpnConnected(
         this.selectedCompany()!.name,
         this.selectedUrl()!.url,
-        this.username,
+        this.username(),
       );
     }, 1200);
   }
