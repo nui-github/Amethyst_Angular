@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, PanelLeft, Bell, Activity, User } from 'lucide-angular';
+import { LucideAngularModule, PanelLeftOpen, PanelLeftClose, Bell, Activity, User } from 'lucide-angular';
 import { ChatService } from '@app/core/services/chat.service';
 
 @Component({
@@ -11,8 +11,10 @@ import { ChatService } from '@app/core/services/chat.service';
   template: `
     <header class="chat-header">
       <div class="header-left">
-        <button class="icon-btn" (click)="toggleSidebar.emit()">
-          <lucide-icon [img]="icToggle" [size]="16" color="#8080A5" />
+        <!-- Always visible: shows correct icon based on sidebar state -->
+        <button class="icon-btn icon-btn--panel" (click)="toggleSidebar.emit()"
+          [title]="sidebarCollapsed ? 'เปิด Sidebar' : 'ปิด Sidebar'">
+          <lucide-icon [img]="sidebarCollapsed ? icPanelOpen : icPanelClose" [size]="17" color="#6B7280" />
         </button>
         <span class="breadcrumb">
           Netbay Agent <span class="sep">›</span> <strong>{{ page }}</strong>
@@ -33,11 +35,13 @@ import { ChatService } from '@app/core/services/chat.service';
 })
 export class ChatHeaderComponent {
   @Input() page = 'Chatbot';
+  @Input() sidebarCollapsed = false;
   @Output() toggleSidebar = new EventEmitter<void>();
 
-  readonly chat       = inject(ChatService);
-  readonly icToggle   = PanelLeft;
-  readonly icBell     = Bell;
-  readonly icActivity = Activity;
-  readonly icUser     = User;
+  readonly chat          = inject(ChatService);
+  readonly icPanelClose  = PanelLeftClose;
+  readonly icPanelOpen   = PanelLeftOpen;
+  readonly icBell        = Bell;
+  readonly icActivity    = Activity;
+  readonly icUser        = User;
 }

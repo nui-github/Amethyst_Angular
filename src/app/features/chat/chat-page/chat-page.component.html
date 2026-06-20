@@ -7,7 +7,7 @@
   <div class="main">
 
     <!-- Header component -->
-    <app-chat-header page="Chatbot" (toggleSidebar)="toggleSidebar()" />
+    <app-chat-header page="Chatbot" [sidebarCollapsed]="collapsed()" (toggleSidebar)="toggleSidebar()" />
 
     <!-- Chat area -->
     <app-chat-area

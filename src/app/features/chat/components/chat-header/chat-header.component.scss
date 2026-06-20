@@ -16,7 +16,13 @@
   width: 30px; height: 30px; border-radius: 8px; border: none;
   background: transparent; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  &:hover { background: #F5F5F5; }
+  transition: background 0.12s;
+  &:hover { background: #F0F1F5; }
+
+  &--panel {
+    width: 32px; height: 32px; border-radius: 8px;
+    &:hover { background: #EAECF4; }
+  }
 }
 
 .status-pill {

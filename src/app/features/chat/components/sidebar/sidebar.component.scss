@@ -12,6 +12,8 @@
   &--collapsed {
     width: 52px;
 
+    .toggle-btn { display: none; }        // hidden — chat header takes over
+    .sb-logo-name { display: none; }
     .new-chat-btn { justify-content: center; padding: 8px; }
     .new-chat-btn span { display: none; }
     .nav-item span { display: none; }
@@ -19,8 +21,6 @@
     .nav-chevron { display: none; }
     .nav-badge { display: none; }
     .sb-label { display: none; }
-    .sb-logo-text { display: none; }
-    .sb-logo-name { display: none; }
   }
 }
 
