@@ -1,41 +1,59 @@
 <div class="flag-card">
-  <p class="flag-card__title">
-    <lucide-icon [img]="AlertTriangle" [size]="14" color="#F59E0B" />
-    พบ {{ localFlags().length }} จุดที่ต้องตรวจสอบ — กรุณายืนยันข้อมูลก่อนดำเนินการต่อ
-  </p>
 
-  @for (flag of localFlags(); track flag.id) {
+  <!-- Summary header -->
+  <div class="flag-card__header">
+    <div class="flag-card__warn-icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/>
+        <path d="M12 9v4"/><path d="M12 17h.01"/>
+      </svg>
+    </div>
+    <div>
+      <p class="flag-card__title">พบ {{ localFlags().length }} จุดที่ต้องตรวจสอบ</p>
+      <p class="flag-card__sub">กรุณายืนยันข้อมูลแต่ละจุดก่อนดำเนินการต่อ</p>
+    </div>
+    <div class="flag-card__progress">
+      <span class="flag-progress-text">{{ confirmedCount() }}/{{ localFlags().length }}</span>
+      <div class="flag-progress-bar">
+        <div class="flag-progress-fill"
+          [style.width.%]="(confirmedCount() / localFlags().length) * 100"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Flag items -->
+  @for (flag of localFlags(); track flag.id; let i = $index) {
     <div class="flag-item" [class.flag-item--confirmed]="flag.isConfirmed">
 
-      <!-- Header -->
-      <div class="flag-item__head">
-        <span class="flag-item__badge"
-          [style.background]="confColor(flag.conf) + '20'"
-          [style.color]="confColor(flag.conf)">
-          AI {{ flag.conf }}%
-        </span>
-        <span class="flag-item__name">{{ flag.title }}</span>
+      <!-- Flag number + confidence -->
+      <div class="flag-item__meta">
+        <span class="flag-num">{{ i + 1 }}</span>
+        <div class="flag-item__head-text">
+          <span class="flag-item__name">{{ flag.title }}</span>
+          <span class="flag-conf-pill" [style.background]="confColor(flag.conf) + '15'" [style.color]="confColor(flag.conf)">
+            AI {{ flag.conf }}%
+          </span>
+        </div>
       </div>
 
       <p class="flag-item__detail">{{ flag.detail }}</p>
 
-      <!-- Confirmed state -->
+      <!-- ── Confirmed state ── -->
       @if (flag.isConfirmed) {
-        <div class="flag-item__done">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0D8F61" stroke-width="2.5"
-            stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-          <span>ยืนยัน: <strong>{{ flag.confirmedValue }}</strong></span>
-          <button nz-button nzType="link" nzSize="small" (click)="unconfirmFlag(flag)">แก้ไข</button>
+        <div class="flag-confirmed-row">
+          <div class="flag-confirmed-val">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0D8F61" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            <span>{{ flag.confirmedValue }}</span>
+          </div>
+          <button class="flag-edit-btn" (click)="unconfirmFlag(flag)">แก้ไข</button>
         </div>
-      }
 
-      <!-- Interactive state -->
-      @if (!flag.isConfirmed) {
+      <!-- ── Interactive state ── -->
+      } @else {
         @if (flag.inputType === 'qty' && flag.qtyOptions) {
-          <div class="flag-item__options">
+          <div class="flag-option-group">
             @for (opt of flag.qtyOptions; track opt) {
-              <button nz-button nzSize="small"
-                [nzType]="getPending(flag.id) === opt ? 'primary' : 'default'"
+              <button class="flag-option-btn" [class.flag-option-btn--selected]="getPending(flag.id) === opt"
                 (click)="selectQty(flag.id, opt)">
                 {{ opt }}
               </button>
@@ -44,26 +62,35 @@
         }
 
         @if (flag.inputType === 'text') {
-          <input nz-input [placeholder]="'กรอก ' + flag.title"
-            [ngModel]="getPending(flag.id)"
-            (ngModelChange)="onTextInput(flag.id, $event)"
-            class="flag-item__input" />
+          <input class="flag-text-input" nz-input
+            [placeholder]="'กรอก ' + flag.title"
+            [value]="getPending(flag.id)"
+            (input)="onTextInput(flag.id, $any($event.target).value)" />
         }
 
-        <button nz-button nzType="primary" nzSize="small"
+        <button class="flag-confirm-btn"
+          [class.flag-confirm-btn--ready]="!!getPending(flag.id).trim()"
           [disabled]="!getPending(flag.id).trim()"
-          (click)="confirmFlag(flag)"
-          class="flag-item__confirm-btn">
-          ยืนยัน
+          (click)="confirmFlag(flag)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          ยืนยันข้อมูล
         </button>
       }
 
     </div>
   }
 
-  <!-- Proceed button -->
-  <button nz-button nzType="primary" [disabled]="!allDone()"
-    (click)="proceed()" class="flag-card__proceed">
-    ถัดไป →
-  </button>
+  <!-- Proceed -->
+  <div class="flag-card__footer">
+    <p class="flag-card__footer-hint">
+      @if (!allDone()) { ยืนยันให้ครบทุกจุด เพื่อดำเนินการต่อ }
+      @else { ✓ ยืนยันครบทุกจุดแล้ว }
+    </p>
+    <button class="flag-proceed-btn" [class.flag-proceed-btn--ready]="allDone()"
+      [disabled]="!allDone()" (click)="proceed()">
+      ดำเนินการต่อ
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+    </button>
+  </div>
+
 </div>

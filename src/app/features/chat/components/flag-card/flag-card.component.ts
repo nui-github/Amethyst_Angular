@@ -32,7 +32,8 @@ export class FlagCardComponent implements OnInit {
   pendingValues = signal<Record<string, string>>({});
   localFlags    = signal<FlagItem[]>([]);
 
-  readonly allDone = () => this.localFlags().every(f => f.isConfirmed);
+  readonly allDone         = () => this.localFlags().every(f => f.isConfirmed);
+  readonly confirmedCount  = () => this.localFlags().filter(f => f.isConfirmed).length;
 
   ngOnInit(): void {
     this.localFlags.set(this.data.flags.map(f => ({ ...f })));
@@ -44,6 +45,8 @@ export class FlagCardComponent implements OnInit {
 
   onTextInput(flagId: string, value: string): void {
     this.pendingValues.update(v => ({ ...v, [flagId]: value }));
+    // force CD for OnPush
+    this.localFlags.update(f => [...f]);
   }
 
   confirmFlag(flag: FlagItem): void {
