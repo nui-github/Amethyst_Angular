@@ -1,34 +1,127 @@
-// Override ng-zorro (Ant Design) tokens with BizX colors
+// ng-zorro (Ant Design) token overrides — BizX Design System
 // Applied after ng-zorro-antd.min.css in angular.json
 
 :root {
-  --ant-color-primary:          #0463EF;
-  --ant-color-primary-hover:    #034DBA;
-  --ant-color-primary-active:   #023A8C;
-  --ant-color-primary-bg:       rgba(4, 99, 239, 0.08);
-  --ant-color-primary-border:   rgba(4, 99, 239, 0.25);
+  // ── Primary color (Blue #0463EF) ─────────────────────────────────────────
+  --ant-color-primary:           #0463EF;
+  --ant-color-primary-hover:     #034DBA;
+  --ant-color-primary-active:    #02388C;
+  --ant-color-primary-bg:        rgba(4, 99, 239, 0.08);
+  --ant-color-primary-bg-hover:  rgba(4, 99, 239, 0.12);
+  --ant-color-primary-border:    rgba(4, 99, 239, 0.3);
+  --ant-color-link:              #0463EF;
+  --ant-color-link-hover:        #034DBA;
 
-  --ant-color-success:          #16EA9E;
-  --ant-color-success-hover:    #11BB7F;
-  --ant-color-success-bg:       rgba(22, 234, 158, 0.10);
-  --ant-color-success-border:   rgba(22, 234, 158, 0.30);
+  // ── Success color (Teal #16EA9E) ─────────────────────────────────────────
+  --ant-color-success:           #16EA9E;
+  --ant-color-success-hover:     #11BB7F;
+  --ant-color-success-active:    #0D8F61;
+  --ant-color-success-bg:        rgba(22, 234, 158, 0.08);
+  --ant-color-success-border:    rgba(22, 234, 158, 0.3);
 
-  --ant-color-warning:          #F59E0B;
-  --ant-color-error:            #EF4444;
-  --ant-color-info:             #0463EF;
+  // ── Semantic ──────────────────────────────────────────────────────────────
+  --ant-color-warning:           #F59E0B;
+  --ant-color-warning-bg:        rgba(245, 158, 11, 0.08);
+  --ant-color-error:             #EF4444;
+  --ant-color-error-bg:          rgba(239, 68, 68, 0.08);
+  --ant-color-info:              #0463EF;
 
-  --ant-color-text:             #010136;
-  --ant-color-text-secondary:   #666666;
-  --ant-color-text-tertiary:    #999999;
-  --ant-color-border:           #E0E0E0;
-  --ant-color-bg-container:     #ffffff;
-  --ant-color-bg-layout:        #F2F2F2;
-  --ant-color-bg-elevated:      #ffffff;
+  // ── Text ─────────────────────────────────────────────────────────────────
+  --ant-color-text:              #010136;
+  --ant-color-text-secondary:    #666666;
+  --ant-color-text-tertiary:     #999999;
+  --ant-color-text-quaternary:   #CCCCCC;
 
-  --ant-font-family: 'IBM Plex Sans Thai', -apple-system, sans-serif;
-  --ant-font-size:   13px;
+  // ── Background ───────────────────────────────────────────────────────────
+  --ant-color-bg-container:      #ffffff;
+  --ant-color-bg-layout:         #F0F0F0;
+  --ant-color-bg-elevated:       #ffffff;
+  --ant-color-bg-spotlight:      rgba(4, 99, 239, 0.08);
 
-  --ant-border-radius:    8px;
-  --ant-border-radius-lg: 12px;
-  --ant-border-radius-sm: 4px;
+  // ── Border ───────────────────────────────────────────────────────────────
+  --ant-color-border:            #E0E0E0;
+  --ant-color-border-secondary:  #CCCCCC;
+  --ant-color-split:             #E0E0E0;
+
+  // ── Font ─────────────────────────────────────────────────────────────────
+  --ant-font-family:    'IBM Plex Sans Thai', -apple-system, sans-serif;
+  --ant-font-size:      13px;
+  --ant-font-size-lg:   14px;
+  --ant-font-size-sm:   12px;
+  --ant-line-height:    1.5;
+
+  // ── Border radius ─────────────────────────────────────────────────────────
+  // Buttons, inputs, selects, tags → 4px
+  --ant-border-radius:       4px;
+  --ant-border-radius-sm:    4px;
+  --ant-border-radius-xs:    2px;
+  // Cards, panels, modals → 8px (set via class overrides below)
+  --ant-border-radius-lg:    8px;
+  --ant-border-radius-outer: 8px;
+
+  // ── Shadows ───────────────────────────────────────────────────────────────
+  --ant-box-shadow:           0 2px 8px rgba(4, 10, 80, 0.08);
+  --ant-box-shadow-secondary: 0 4px 16px rgba(4, 10, 80, 0.12);
+  --ant-box-shadow-tertiary:  0 1px 4px rgba(4, 10, 80, 0.06);
+
+  // ── Control heights ───────────────────────────────────────────────────────
+  --ant-control-height:    32px;
+  --ant-control-height-sm: 26px;
+  --ant-control-height-lg: 38px;
+
+  // ── Motion ───────────────────────────────────────────────────────────────
+  --ant-motion-duration-fast: 0.1s;
+  --ant-motion-duration-mid:  0.18s;
+  --ant-motion-duration-slow: 0.25s;
 }
+
+// ── Component-level overrides ─────────────────────────────────────────────────
+
+// Buttons: 4px radius, proper gradient for primary
+.ant-btn-primary {
+  background: linear-gradient(135deg, #034DBA, #0463EF) !important;
+  border-color: #0463EF !important;
+  border-radius: 4px !important;
+  font-weight: 600 !important;
+
+  &:hover, &:focus {
+    background: linear-gradient(135deg, #02388C, #034DBA) !important;
+    border-color: #034DBA !important;
+  }
+}
+
+.ant-btn {
+  border-radius: 4px !important;
+  font-weight: 500;
+  font-family: 'IBM Plex Sans Thai', sans-serif;
+  transition: all 0.15s ease !important;
+}
+
+// Cards → 8px
+.ant-card { border-radius: 8px !important; }
+
+// Modals → 8px
+.ant-modal-content { border-radius: 8px !important; }
+
+// Dropdowns → 8px
+.ant-dropdown-menu { border-radius: 8px !important; }
+.ant-select-dropdown { border-radius: 8px !important; }
+
+// Inputs → 4px
+.ant-input,
+.ant-input-affix-wrapper,
+.ant-select-selector,
+.ant-picker {
+  border-radius: 4px !important;
+
+  &:hover   { border-color: #0463EF !important; }
+  &:focus,
+  &.ant-input-focused,
+  &.ant-input-affix-wrapper-focused {
+    border-color: #0463EF !important;
+    box-shadow: 0 0 0 2px rgba(4, 99, 239, 0.12) !important;
+  }
+}
+
+// Tags / badges → 4px
+.ant-tag { border-radius: 4px !important; }
