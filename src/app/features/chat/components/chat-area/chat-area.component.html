@@ -175,6 +175,11 @@
               }
             }
 
+            <!-- HS Code AI analysis -->
+            @case ('hs-analysis') {
+              <app-hs-analysis [data]="$any(msg.data)" />
+            }
+
             <!-- SPN multi-step connect -->
             @case ('spn-connect') {
               @if (!readOnly) {

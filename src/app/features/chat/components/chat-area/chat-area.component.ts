@@ -18,6 +18,7 @@ import { OcrProgressComponent } from '../ocr-progress/ocr-progress.component';
 import { ImportLicenseMenuComponent } from '../import-license-menu/import-license-menu.component';
 import { ConnectPanelComponent } from '../connect/connect-panel.component';
 import { SpnConnectComponent } from '../spn-connect/spn-connect.component';
+import { HsAnalysisComponent } from '../hs-analysis/hs-analysis.component';
 import { FullUploadComponent } from '../full-upload/full-upload.component';
 import { SingleUploadComponent } from '../single-upload/single-upload.component';
 import { EmailDraftComponent } from '../email-draft/email-draft.component';
@@ -45,7 +46,7 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
     SpnCardComponent, ChoiceCardComponent, OcrResultsComponent,
     StatusCardComponent, OcrProgressComponent, ImportLicenseMenuComponent,
     ConnectPanelComponent, FullUploadComponent, SingleUploadComponent, EmailDraftComponent, FormPanelComponent,
-    SpnConnectComponent,
+    SpnConnectComponent, HsAnalysisComponent,
   ],
   templateUrl: './chat-area.component.html',
   styleUrl: './chat-area.component.scss',

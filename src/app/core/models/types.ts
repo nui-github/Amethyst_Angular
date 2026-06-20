@@ -24,7 +24,8 @@ export type MessageType =
   | 'email-draft'        // editable email composer (interactive)
   | 'status-card'        // submission result card
   | 'spn-connect'        // multi-step SPN company → URL → login flow
-  | 'single-upload';     // single-slot upload (ใบขนสินค้า path)
+  | 'single-upload'      // single-slot upload (ใบขนสินค้า path)
+  | 'hs-analysis';       // AI HS Code classification result
 
 export interface ChatMessage {
   id: string;
@@ -87,6 +88,19 @@ export interface EmailDraftData {
   subject: string;
   body: string;
   isSent: boolean;
+}
+
+export interface HsAnalysisData {
+  hsCode: string;
+  description: string;
+  goodsName: string;
+  requiresPermit: boolean;
+  direction: 'import' | 'export' | 'both';
+  agency: string;
+  agencyFull: string;
+  licenseType?: string;
+  legalRef?: string;
+  confidence: number;
 }
 
 export interface StatusCardData {

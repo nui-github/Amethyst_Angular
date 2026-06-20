@@ -6,6 +6,7 @@ import {
 } from '@app/core/models/types';
 import { OcrService } from './ocr.service';
 import { QueueService } from './queue.service';
+import { analyzeHsCode } from '@mock/hs-analysis.mock';
 import { KNOWN_REFS, MOCK_FORM_DATA, MOCK_SPN_LIST } from '@mock/spn.mock';
 import { environment } from '@env/environment';
 
@@ -260,7 +261,17 @@ export class ChatService {
       hsCode: result.hsCode, countryOrigin: result.countryOrigin,
       lotNo: result.lotNo, uNo: result.uNo,
     } satisfies OcrResultsData);
-    this.withTyping(() => this.showFlags(), 800);
+
+    // If HS Code is available → auto-run AI analysis
+    if (result.hsCode) {
+      this.withTyping(() => {
+        const analysis = analyzeHsCode(result.hsCode);
+        this.bot('hs-analysis', analysis);
+        setTimeout(() => this.withTyping(() => this.showFlags(), 600), 400);
+      }, 600);
+    } else {
+      this.withTyping(() => this.showFlags(), 800);
+    }
   }
 
   // ── Flag confirm flow ──────────────────────────────────────────────────────
