@@ -1,24 +1,30 @@
 .sidebar {
   width: 224px;
+  height: 100%;
   flex-shrink: 0;
   background: #ffffff;
   border-right: 1px solid #E8E8E8;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
-  transition: width 0.2s ease;
+  overflow: hidden;
+  transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1);
 
   &--collapsed {
     width: 52px;
 
     .new-chat-btn { justify-content: center; padding: 8px; }
+    .new-chat-btn span { display: none; }
     .nav-item span { display: none; }
     .nav-item { justify-content: center; padding: 8px; gap: 0; }
     .nav-chevron { display: none; }
     .nav-badge { display: none; }
+    .sb-label { display: none; }
+    .sb-logo-text { display: none; }
+    .sb-logo-name { display: none; }
   }
 }
+
+// ── Logo bar ──────────────────────────────────────────────────────────────────
 
 .sb-logo {
   display: flex;
@@ -30,35 +36,47 @@
   flex-shrink: 0;
 }
 
-.bx-badge {
-  width: 30px; height: 30px; border-radius: 8px;
-  background: linear-gradient(90deg, #0463EF, #16EA9E);
-  color: #fff; font-size: 10px; font-weight: 800;
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-
-  &--sm { width: 22px; height: 22px; border-radius: 6px; font-size: 9px; }
+.sb-logo-name {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
-.sb-name { font-size: 13px; font-weight: 700; color: #010136; margin: 0; flex: 1; }
-.sb-sub  { font-size: 10px; color: #8080A5; margin: 0; }
+.sb-name { font-size: 13px; font-weight: 700; color: #010136; margin: 0; white-space: nowrap; }
+.sb-sub  { font-size: 10px; color: #8080A5; margin: 0; white-space: nowrap; }
 
 .toggle-btn {
   margin-left: auto; width: 24px; height: 24px; border-radius: 6px;
   border: none; background: transparent; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   &:hover { background: #F5F5F5; }
 }
 
+// ── Nav sections ──────────────────────────────────────────────────────────────
+
+.sb-nav {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 4px 0 8px;
+
+  &::-webkit-scrollbar { width: 3px; }
+  &::-webkit-scrollbar-thumb { background: #E0E0E0; border-radius: 99px; }
+}
+
 .sb-section {
-  padding: 8px 8px 0;
-  display: flex; flex-direction: column; gap: 1px;
+  padding: 6px 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
 }
 
 .sb-label {
-  font-size: 10px; font-weight: 600; color: #999;
-  text-transform: uppercase; letter-spacing: 0.6px;
-  padding: 6px 8px 3px; margin: 0;
+  font-size: 10px; font-weight: 600; color: #B0B4C4;
+  text-transform: uppercase; letter-spacing: 0.7px;
+  padding: 8px 8px 3px; margin: 0;
 }
 
 .nav-item {
@@ -70,16 +88,16 @@
   transition: background 0.12s; font-family: inherit;
   white-space: nowrap; overflow: hidden;
 
-  lucide-icon { flex-shrink: 0; color: #6B7280; }
+  lucide-icon { flex-shrink: 0; color: #9CA3AF; }
 
-  &:hover { background: #F5F5F5; }
+  &:hover { background: #F5F5F5; lucide-icon { color: #6B7280; } }
 
   &--active {
     background: #EFF6FF; color: #0463EF; font-weight: 600;
     lucide-icon { color: #0463EF; }
   }
 
-  &--expand .nav-chevron { margin-left: auto; color: #C0C0C0; flex-shrink: 0; }
+  &--expand .nav-chevron { margin-left: auto; color: #D1D5DB; flex-shrink: 0; }
 }
 
 .nav-badge {
@@ -91,25 +109,57 @@
 .new-chat-btn {
   display: flex; align-items: center; gap: 7px;
   width: 100%; padding: 8px 12px; border-radius: 8px;
-  border: 1px solid #E0E0E0; background: #fff;
-  color: #010136; font-size: 12px; font-weight: 600;
-  cursor: pointer; font-family: inherit; transition: background 0.12s;
-  margin-bottom: 4px;
-  lucide-icon { color: #6B7280; }
-  &:hover { background: #F5F5F5; }
+  border: 1px solid #E8E8E8; background: #FAFAFA;
+  color: #374151; font-size: 12px; font-weight: 600;
+  cursor: pointer; font-family: inherit; transition: all 0.12s;
+  margin-bottom: 2px;
+  lucide-icon { color: #9CA3AF; }
+  &:hover { background: #F0F0F0; border-color: #D1D5DB; }
 }
 
-.sb-spacer { flex: 1; }
+// ── Footer with BizX logo ─────────────────────────────────────────────────────
 
 .sb-footer {
-  padding: 0 8px 12px;
-  display: flex; flex-direction: column; gap: 2px;
+  flex-shrink: 0;
+  border-top: 1px solid #F0F1F5;
+  padding: 0;
 }
 
-.sb-divider { height: 1px; background: #F0F0F0; margin: 6px 0; }
+.bizx-logo-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.12s;
+  font-family: inherit;
 
-.sb-bizx-logo {
-  display: flex; align-items: center; gap: 8px; padding: 6px 10px;
+  &:hover { background: #F5F7FF; }
+
+  img, svg { display: block; }
 }
 
-.sb-bizx-text { font-size: 16px; font-weight: 900; color: #010136; letter-spacing: -0.5px; }
+.bizx-logo-full {
+  height: 28px;
+  width: auto;
+}
+
+.bizx-logo-icon {
+  width: 28px;
+  height: 28px;
+}
+
+// Settings
+.settings-btn {
+  display: flex; align-items: center; gap: 9px;
+  width: 100%; padding: 9px 18px;
+  border: none; background: transparent;
+  color: #6B7280; font-size: 12px; font-weight: 500;
+  cursor: pointer; font-family: inherit;
+  transition: background 0.12s;
+  lucide-icon { color: #9CA3AF; flex-shrink: 0; }
+  &:hover { background: #F5F5F5; }
+}
