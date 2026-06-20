@@ -1,0 +1,67 @@
+<div class="ocr-wrap">
+
+  <!-- Header -->
+  <div class="ocr-header">
+    <div class="ocr-header__left">
+      <div class="ocr-pulse" [class.ocr-pulse--done]="progress === 100">
+        <span class="ocr-pulse__dot"></span>
+        @if (progress < 100) { <span class="ocr-pulse__ring"></span> }
+      </div>
+      <div>
+        <p class="ocr-header__title">
+          {{ progress < 100 ? 'กำลัง OCR และวิเคราะห์เอกสาร' : 'วิเคราะห์เสร็จสมบูรณ์' }}
+        </p>
+        <p class="ocr-header__sub">
+          {{ progress < 100 ? 'AI กำลังประมวลผล...' : 'พร้อมตรวจสอบและยืนยันข้อมูล' }}
+        </p>
+      </div>
+    </div>
+    <span class="ocr-pct" [class.ocr-pct--done]="progress === 100">{{ progress }}%</span>
+  </div>
+
+  <!-- Progress bar -->
+  <div class="ocr-bar-track">
+    <div class="ocr-fill" [style.width.%]="progress"></div>
+  </div>
+
+  <!-- Stage grid -->
+  <div class="stage-grid">
+    @for (s of stageDefs; track s.label; let i = $index) {
+      <div class="stage-item"
+        [class.stage-item--done]="isDone(i)"
+        [class.stage-item--active]="isActive(i)"
+        [class.stage-item--pending]="isPending(i)">
+
+        <div class="stage-item__icon">
+          @if (isDone(i)) {
+            <!-- Checkmark -->
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 6 9 17l-5-5"/>
+            </svg>
+          } @else {
+            <!-- Stage icon -->
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              [innerHTML]="stageIcons[i]">
+            </svg>
+          }
+        </div>
+
+        <div class="stage-item__body">
+          <span class="stage-item__label">{{ s.label }}</span>
+          <span class="stage-item__desc">{{ s.desc }}</span>
+        </div>
+
+        @if (isActive(i)) {
+          <div class="stage-dots">
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+</div>

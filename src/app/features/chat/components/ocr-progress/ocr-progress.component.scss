@@ -1,73 +1,180 @@
 .ocr-wrap {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 14px;
 }
 
-.ocr-title {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--bizx-blue);
-  margin: 0;
+// ── Header ─────────────────────────────────────────────────────────────────────
+
+.ocr-header {
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: space-between;
+  gap: 12px;
+
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--bizx-navy);
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  &__sub {
+    font-size: 11px;
+    color: #9CA3AF;
+    margin: 2px 0 0;
+  }
 }
 
-.ocr-stages {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.stage-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  color: var(--bizx-n500);
-  transition: color 0.2s;
-
-  &--done  { color: var(--bizx-teal-dark); }
-  &--active { color: var(--bizx-blue); font-weight: 600; }
-}
-
-.stage-icon {
-  width: 20px;
-  height: 20px;
+// Animated pulse dot
+.ocr-pulse {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+
+  &__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0463EF, #16EA9E);
+    z-index: 1;
+  }
+
+  &__ring {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid rgba(4, 99, 239, 0.2);
+    animation: ocr-ring-pulse 1.8s ease-out infinite;
+  }
 }
 
-.stage-label { flex: 1; }
+@keyframes ocr-ring-pulse {
+  0%   { transform: scale(0.6); opacity: 0.8; }
+  100% { transform: scale(1.3); opacity: 0; }
+}
+
+// Percentage
+.ocr-pct {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0463EF;
+  letter-spacing: -0.5px;
+  line-height: 1;
+  flex-shrink: 0;
+  min-width: 52px;
+  text-align: right;
+
+  &--done { color: #0D8F61; }
+}
+
+// ── Progress bar ──────────────────────────────────────────────────────────────
+
+.ocr-bar-track {
+  height: 5px;
+  background: #F0F1F8;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.ocr-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #0463EF 0%, #16EA9E 100%);
+  border-radius: 9999px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// ── Stage grid ─────────────────────────────────────────────────────────────────
+
+.stage-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.stage-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #F0F1F8;
+  background: #FAFAFA;
+  transition: all 0.2s;
+
+  &--done {
+    background: rgba(13, 143, 97, 0.05);
+    border-color: rgba(13, 143, 97, 0.18);
+  }
+
+  &--active {
+    background: rgba(4, 99, 239, 0.04);
+    border-color: rgba(4, 99, 239, 0.2);
+    box-shadow: 0 0 0 2px rgba(4, 99, 239, 0.08);
+  }
+
+  &--pending {
+    opacity: 0.45;
+  }
+
+  &__icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    background: #F0F1F8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #9CA3AF;
+    transition: all 0.2s;
+
+    .stage-item--done &  { background: rgba(13, 143, 97, 0.12); color: #0D8F61; }
+    .stage-item--active & { background: rgba(4, 99, 239, 0.12); color: #0463EF; }
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  &__label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #374151;
+    line-height: 1.3;
+
+    .stage-item--done &  { color: #0D8F61; }
+    .stage-item--active & { color: #0463EF; }
+    .stage-item--pending & { color: #9CA3AF; }
+  }
+
+  &__desc {
+    font-size: 10.5px;
+    color: #9CA3AF;
+    line-height: 1.3;
+  }
+}
 
 .stage-dots {
   display: flex;
   gap: 3px;
   align-items: center;
-}
-
-.ocr-bar-track {
-  height: 6px;
-  background: var(--bizx-n200);
-  border-radius: 9999px;
-  overflow: hidden;
-  margin-top: 4px;
-}
-
-.ocr-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--bizx-blue), var(--bizx-teal));
-  border-radius: 9999px;
-  transition: width 0.5s ease;
-}
-
-.ocr-pct {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--bizx-blue);
-  margin: 0;
-  text-align: right;
+  padding-top: 4px;
+  flex-shrink: 0;
 }
