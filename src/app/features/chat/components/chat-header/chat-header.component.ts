@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, MessageSquareText, Bell, Activity, User } from 'lucide-angular';
+import { LucideAngularModule, PanelLeft, Bell, Activity, User } from 'lucide-angular';
 import { ChatService } from '@app/core/services/chat.service';
 
 @Component({
@@ -36,7 +36,7 @@ export class ChatHeaderComponent {
   @Output() toggleSidebar = new EventEmitter<void>();
 
   readonly chat       = inject(ChatService);
-  readonly icToggle   = MessageSquareText;
+  readonly icToggle   = PanelLeft;
   readonly icBell     = Bell;
   readonly icActivity = Activity;
   readonly icUser     = User;

@@ -152,14 +152,16 @@
   height: 28px;
 }
 
-// Settings
+// Settings — same style as nav items
 .settings-btn {
   display: flex; align-items: center; gap: 9px;
-  width: 100%; padding: 9px 18px;
+  width: calc(100% - 16px); margin: 4px 8px 2px;
+  padding: 7px 10px; border-radius: 8px;
   border: none; background: transparent;
-  color: #6B7280; font-size: 12px; font-weight: 500;
+  color: #6B7280; font-size: 13px; font-weight: 500;
   cursor: pointer; font-family: inherit;
   transition: background 0.12s;
+  white-space: nowrap; overflow: hidden;
   lucide-icon { color: #9CA3AF; flex-shrink: 0; }
-  &:hover { background: #F5F5F5; }
+  &:hover { background: #F5F5F5; color: #374151; lucide-icon { color: #6B7280; } }
 }
