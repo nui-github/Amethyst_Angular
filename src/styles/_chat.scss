@@ -1,160 +1,134 @@
-// Shared chat component styles — not covered by ng-zorro
+// ── Chat animations ──────────────────────────────────────────────────────────
 
-// Message appear animation
 @keyframes msgAppear {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
 .msg-appear {
-  animation: msgAppear 0.22s ease-out forwards;
+  animation: msgAppear 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-// Typing indicator dots
+// ── Typing indicator ─────────────────────────────────────────────────────────
+
 @keyframes bounceDot {
-  0%, 80%, 100% { transform: translateY(0); opacity: 0.45; }
-  40%           { transform: translateY(-6px); opacity: 1; }
+  0%, 80%, 100% { transform: translateY(0);    opacity: 0.35; }
+  40%           { transform: translateY(-5px);  opacity: 1; }
 }
 
 .typing-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px; height: 6px;
   border-radius: 50%;
   background: var(--bizx-blue);
   display: inline-block;
   animation: bounceDot 1.2s ease-in-out infinite;
-
   &:nth-child(2) { animation-delay: 0.15s; }
   &:nth-child(3) { animation-delay: 0.30s; }
 }
 
-// OCR progress bar fill
-@keyframes ocrFill {
-  from { width: 0; }
-}
+// ── OCR progress bar ─────────────────────────────────────────────────────────
 
 .ocr-fill {
   background: linear-gradient(90deg, var(--bizx-blue), var(--bizx-teal));
   border-radius: 9999px;
   height: 100%;
-  transition: width 0.6s ease;
+  transition: width 0.5s ease;
 }
 
-// Status dot pulse
+// ── Status pulse ──────────────────────────────────────────────────────────────
+
 @keyframes pulseDot {
-  0%, 100% { opacity: 1;   transform: scale(1); }
-  50%       { opacity: 0.6; transform: scale(1.15); }
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.55; transform: scale(1.25); }
 }
 
 .status-dot-pulse {
   animation: pulseDot 2s ease-in-out infinite;
 }
 
-// AI bot bubble
-.bot-bubble {
-  background: #ffffff;
-  border: 1px solid #DDE1F8;
-  border-radius: 16px;
-  box-shadow: var(--bizx-shadow-card);
-  padding: 16px 20px;
-  font-size: 13px;
-  color: var(--bizx-navy);
-  line-height: 1.6;
-}
+// ── AI avatar ─────────────────────────────────────────────────────────────────
 
-// User bubble
-.user-bubble {
-  background: var(--bizx-grad-primary);
-  color: #ffffff;
-  border-radius: 18px 18px 4px 18px;
-  padding: 10px 16px;
-  font-size: 13px;
-  max-width: 320px;
-  box-shadow: var(--bizx-shadow-primary);
-}
-
-// AI avatar
 .ai-avatar {
-  width: 24px;
-  height: 24px;
-  border-radius: 8px;
-  background: var(--bizx-grad-avatar);
-  color: #fff;
-  font-size: 9px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-// User avatar
-.user-avatar {
-  width: 32px;
-  height: 32px;
+  width: 28px; height: 28px;
   border-radius: 10px;
-  background: var(--bizx-grad-user);
+  background: linear-gradient(135deg, #0463EF, #16EA9E);
   color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-size: 9px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(4, 99, 239, 0.28);
+}
+
+// ── User avatar ───────────────────────────────────────────────────────────────
+
+.user-avatar {
+  width: 28px; height: 28px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #40406A, #0463EF);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
 
-// Quick chip
-.quick-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 12px;
-  border-radius: 20px;
-  border: 1px solid var(--bizx-blue-border);
-  background: var(--bizx-blue-tint);
-  color: var(--bizx-blue);
-  font-size: 11px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s;
+// ── Info card (used inside bot bubbles) ───────────────────────────────────────
 
-  &:hover {
-    background: var(--bizx-blue);
-    color: #ffffff;
-    border-color: var(--bizx-blue);
-  }
-}
-
-// Info card (inside bot bubble)
 .info-card {
-  border: 1px solid var(--bizx-n200);
+  border: 1px solid #EAECF4;
   border-radius: 12px;
   overflow: hidden;
   margin-top: 10px;
+  background: #fff;
 
   &__head {
-    background: #F5F6FF;
-    padding: 10px 14px;
-    font-size: 12px;
+    background: #F7F8FD;
+    padding: 9px 14px;
+    font-size: 11px;
     font-weight: 700;
     color: var(--bizx-navy);
-    border-bottom: 1px solid var(--bizx-n200);
+    border-bottom: 1px solid #EAECF4;
+    letter-spacing: 0.1px;
   }
 
-  &__body {
-    background: #ffffff;
-    padding: 0 14px;
-  }
+  &__body { background: #fff; }
 
   &__row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 9px 0;
+    padding: 9px 14px;
     font-size: 12px;
-    border-bottom: 1px dashed var(--bizx-n200);
+    border-bottom: 1px solid #F3F4F6;
 
     &:last-child { border-bottom: none; }
 
-    span:first-child { color: var(--bizx-n600); }
+    span:first-child { color: var(--bizx-n500); }
     span:last-child  { font-weight: 600; color: var(--bizx-navy); }
+  }
+}
+
+// ── Quick chip ────────────────────────────────────────────────────────────────
+
+.quick-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid rgba(4, 99, 239, 0.2);
+  background: rgba(4, 99, 239, 0.06);
+  color: var(--bizx-blue);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+
+  &:hover {
+    background: var(--bizx-blue);
+    color: #fff;
+    border-color: var(--bizx-blue);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(4, 99, 239, 0.25);
   }
 }

@@ -35,19 +35,23 @@
     <!-- Input bar -->
     <div class="input-bar">
       <div class="input-wrap">
-        <button class="input-icon-btn">
-          <lucide-icon [img]="icPaperclip" [size]="16" color="#999" />
-        </button>
-        <textarea
-          nz-input [(ngModel)]="inputText" (keydown)="onKeydown($event)"
-          placeholder="พิมพ์คำสั่ง เช่น สร้าง RGoods ด้วยใบขน Ref : HTHM000000003..."
-          nzAutosize class="chat-textarea">
-        </textarea>
-        <button class="send-btn" (click)="send()" [disabled]="!inputText.trim()">
-          <lucide-icon [img]="icSend" [size]="15" color="#fff" />
-        </button>
+        <div class="input-row">
+          <button class="input-icon-btn">
+            <lucide-icon [img]="icPaperclip" [size]="16" />
+          </button>
+          <textarea
+            nz-input [(ngModel)]="inputText" (keydown)="onKeydown($event)"
+            placeholder="พิมพ์คำสั่ง หรือถาม AI..."
+            nzAutosize class="chat-textarea">
+          </textarea>
+          <button class="send-btn" (click)="send()" [disabled]="!inputText.trim()">
+            <lucide-icon [img]="icSend" [size]="14" [color]="inputText.trim() ? '#fff' : '#9CA3AF'" />
+          </button>
+        </div>
+        <div class="input-footer">
+          <p class="input-hint">Enter ส่ง · Shift+Enter ขึ้นบรรทัดใหม่</p>
+        </div>
       </div>
-      <p class="input-hint">กด Enter เพื่อส่ง · Shift+Enter ขึ้นบรรทัดใหม่</p>
     </div>
 
   </div>

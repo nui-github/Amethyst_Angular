@@ -1,8 +1,10 @@
+// ── Shell ─────────────────────────────────────────────────────────────────────
+
 .shell {
   display: flex;
   height: 100vh;
   overflow: hidden;
-  background: var(--bizx-bg);
+  background: #F4F5F7;
 }
 
 .main {
@@ -20,83 +22,153 @@
   flex-direction: column;
 }
 
+// ── Quick chips ────────────────────────────────────────────────────────────────
+
 .quick-bar {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 6px 20px 0;
-  max-width: 720px;
-  width: 100%;
-  margin: 0 auto;
+  padding: 10px 24px 6px;
   flex-wrap: wrap;
+  background: transparent;
 }
 
 .qchip {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
-  padding: 5px 12px;
+  padding: 6px 14px;
   border-radius: 20px;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  border: 1.5px solid;
-  transition: all 0.15s;
+  border: 1.5px solid transparent;
+  transition: all 0.15s ease;
   font-family: inherit;
   white-space: nowrap;
-  background: transparent;
+  line-height: 1;
 
-  &--blue   { color: #0463EF; border-color: rgba(4,99,239,0.25);   &:hover { background: #0463EF;  color: #fff; border-color: #0463EF; } }
-  &--teal   { color: #0D8F61; border-color: rgba(22,234,158,0.35); &:hover { background: #11BB7F;  color: #fff; border-color: #11BB7F; } }
-  &--purple { color: #7C3AED; border-color: rgba(124,58,237,0.25); &:hover { background: #7C3AED;  color: #fff; border-color: #7C3AED; } }
-  &--orange { color: #B45309; border-color: rgba(180,83,9,0.25);   &:hover { background: #B45309;  color: #fff; border-color: #B45309; } }
+  &--blue {
+    color: #0463EF;
+    background: rgba(4, 99, 239, 0.07);
+    border-color: rgba(4, 99, 239, 0.18);
+    &:hover { background: #0463EF; color: #fff; border-color: #0463EF; box-shadow: 0 3px 10px rgba(4,99,239,0.3); transform: translateY(-1px); }
+  }
+  &--teal {
+    color: #0D8F61;
+    background: rgba(22, 234, 158, 0.07);
+    border-color: rgba(22, 234, 158, 0.3);
+    &:hover { background: #11BB7F; color: #fff; border-color: #11BB7F; box-shadow: 0 3px 10px rgba(22,234,158,0.3); transform: translateY(-1px); }
+  }
+  &--purple {
+    color: #7C3AED;
+    background: rgba(124, 58, 237, 0.07);
+    border-color: rgba(124, 58, 237, 0.18);
+    &:hover { background: #7C3AED; color: #fff; border-color: #7C3AED; box-shadow: 0 3px 10px rgba(124,58,237,0.25); transform: translateY(-1px); }
+  }
+  &--orange {
+    color: #B45309;
+    background: rgba(180, 83, 9, 0.07);
+    border-color: rgba(180, 83, 9, 0.18);
+    &:hover { background: #B45309; color: #fff; border-color: #B45309; box-shadow: 0 3px 10px rgba(180,83,9,0.25); transform: translateY(-1px); }
+  }
 }
 
+// ── Chat input — Claude Code style ────────────────────────────────────────────
+
 .input-bar {
-  padding: 8px 20px 10px;
-  background: #fff;
-  border-top: 1px solid #E8E8E8;
+  padding: 6px 20px 14px;
+  background: #F4F5F7;
 }
 
 .input-wrap {
   display: flex;
-  align-items: flex-end;
-  gap: 6px;
-  max-width: 680px;
+  flex-direction: column;
+  max-width: 760px;
   margin: 0 auto;
-  border: 1.5px solid #E0E0E0;
-  border-radius: 14px;
-  padding: 6px 8px 6px 6px;
-  transition: border-color 0.15s;
-  background: #fff;
-  &:focus-within { border-color: #0463EF; }
+  background: #ffffff;
+  border: 1.5px solid #E2E4EC;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(4, 10, 80, 0.06), 0 0 0 0px rgba(4, 99, 239, 0);
+  transition: border-color 0.18s, box-shadow 0.18s;
+  overflow: hidden;
+
+  &:focus-within {
+    border-color: rgba(4, 99, 239, 0.5);
+    box-shadow: 0 2px 8px rgba(4, 10, 80, 0.06), 0 0 0 3px rgba(4, 99, 239, 0.08);
+  }
+}
+
+.input-row {
+  display: flex;
+  align-items: flex-end;
+  padding: 10px 12px 10px 10px;
+  gap: 8px;
 }
 
 .input-icon-btn {
-  width: 28px; height: 28px; border: none; background: transparent;
-  cursor: pointer; border-radius: 6px; display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  &:hover { background: #F5F5F5; }
+  width: 30px; height: 30px;
+  border: none; background: transparent;
+  cursor: pointer; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; color: #9CA3AF;
+  transition: background 0.12s, color 0.12s;
+  &:hover { background: #F3F4F6; color: #6B7280; }
 }
 
 .chat-textarea {
-  flex: 1; border: none !important; box-shadow: none !important;
-  background: transparent !important; padding: 4px 0 !important;
-  font-size: 13px; font-family: inherit; resize: none;
-  min-height: 24px; max-height: 120px; line-height: 1.5; color: #010136;
-  &::placeholder { color: #AAAAAA; }
+  flex: 1;
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  padding: 2px 0 !important;
+  font-size: 13.5px;
+  font-family: 'IBM Plex Sans Thai', -apple-system, sans-serif;
+  resize: none;
+  min-height: 22px;
+  max-height: 140px;
+  line-height: 1.55;
+  color: #1A1A2E;
+  outline: none;
+
+  &::placeholder { color: #B0B4C4; }
   &:focus { outline: none; box-shadow: none !important; border: none !important; }
 }
 
 .send-btn {
-  width: 32px; height: 32px; border-radius: 9px; border: none;
-  background: linear-gradient(135deg, #034DBA, #0463EF);
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; transition: opacity 0.15s;
-  &:disabled { opacity: 0.35; cursor: default; }
-  &:not(:disabled):hover { opacity: 0.88; }
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(145deg, #0558E0, #0463EF);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: opacity 0.15s, transform 0.15s;
+  box-shadow: 0 2px 6px rgba(4, 99, 239, 0.35);
+
+  &:disabled {
+    background: #E2E4EC;
+    box-shadow: none;
+    cursor: default;
+  }
+
+  &:not(:disabled):hover { opacity: 0.88; transform: scale(1.05); }
+  &:not(:disabled):active { transform: scale(0.97); }
+}
+
+.input-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px 8px;
 }
 
 .input-hint {
-  text-align: center; font-size: 10px; color: #BBBBBB; margin: 5px 0 0;
+  font-size: 10.5px;
+  color: #C0C4D0;
+  margin: 0;
+  text-align: center;
+  letter-spacing: 0.1px;
 }
