@@ -116,7 +116,9 @@
         <div class="form-field">
           <label>ชื่อผู้ใช้ (Username)</label>
           <nz-input-group [nzPrefix]="userIcon" nzSize="default">
-            <input nz-input [ngModel]="username()" (ngModelChange)="username.set($event)"
+            <input nz-input
+              [value]="username()"
+              (input)="username.set($any($event.target).value)"
               placeholder="กรอก Username" [disabled]="loading()" />
           </nz-input-group>
           <ng-template #userIcon><lucide-icon [img]="User" [size]="14" color="#AAAAAA" /></ng-template>
@@ -124,7 +126,9 @@
         <div class="form-field">
           <label>รหัสผ่าน (Password)</label>
           <nz-input-group [nzPrefix]="lockIcon" nzSize="default">
-            <input nz-input type="password" [ngModel]="password()" (ngModelChange)="password.set($event)"
+            <input nz-input type="password"
+              [value]="password()"
+              (input)="password.set($any($event.target).value)"
               placeholder="กรอก Password" [disabled]="loading()" />
           </nz-input-group>
           <ng-template #lockIcon><lucide-icon [img]="Lock" [size]="14" color="#AAAAAA" /></ng-template>
