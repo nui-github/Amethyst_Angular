@@ -283,7 +283,7 @@ export class ChatService {
         id: `fg${gen}_qty`, title: 'ปริมาณไม่ตรงกัน',
         detail: 'Invoice: 250 กก. / Packing List: 248.5 กก. — กรุณาระบุปริมาณที่ถูกต้อง',
         conf: 72, inputType: 'qty',
-        qtyOptions: ['250 กิโลกรัม', '248.5 กิโลกรัม', 'อื่นๆ'],
+        qtyOptions: ['250 กิโลกรัม', '248.5 กิโลกรัม'],
         confirmedValue: null, isConfirmed: false,
       },
       {
