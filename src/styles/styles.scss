@@ -46,7 +46,15 @@ button {
   justify-content: center;
   gap: 6px;
   line-height: 1.3;
+}
 
-  // Don't override buttons that use block/other display intentionally
-  &.nav-item, &.new-chat-btn, &.settings-btn { display: flex; }
+// Left-aligned full-width buttons (sidebar, settings)
+button.nav-item,
+button.new-chat-btn,
+button.settings-btn,
+button.back-btn,
+button.list-row,
+button.bizx-logo-btn {
+  display: flex;
+  justify-content: flex-start;
 }
