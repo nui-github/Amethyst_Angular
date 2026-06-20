@@ -1,0 +1,115 @@
+.sidebar {
+  width: 224px;
+  flex-shrink: 0;
+  background: #ffffff;
+  border-right: 1px solid #E8E8E8;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: width 0.2s ease;
+
+  &--collapsed {
+    width: 52px;
+
+    .new-chat-btn { justify-content: center; padding: 8px; }
+    .nav-item span { display: none; }
+    .nav-item { justify-content: center; padding: 8px; gap: 0; }
+    .nav-chevron { display: none; }
+    .nav-badge { display: none; }
+  }
+}
+
+.sb-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px 0 14px;
+  height: 48px;
+  border-bottom: 1px solid #E8E8E8;
+  flex-shrink: 0;
+}
+
+.bx-badge {
+  width: 30px; height: 30px; border-radius: 8px;
+  background: linear-gradient(90deg, #0463EF, #16EA9E);
+  color: #fff; font-size: 10px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+
+  &--sm { width: 22px; height: 22px; border-radius: 6px; font-size: 9px; }
+}
+
+.sb-name { font-size: 13px; font-weight: 700; color: #010136; margin: 0; flex: 1; }
+.sb-sub  { font-size: 10px; color: #8080A5; margin: 0; }
+
+.toggle-btn {
+  margin-left: auto; width: 24px; height: 24px; border-radius: 6px;
+  border: none; background: transparent; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  &:hover { background: #F5F5F5; }
+}
+
+.sb-section {
+  padding: 8px 8px 0;
+  display: flex; flex-direction: column; gap: 1px;
+}
+
+.sb-label {
+  font-size: 10px; font-weight: 600; color: #999;
+  text-transform: uppercase; letter-spacing: 0.6px;
+  padding: 6px 8px 3px; margin: 0;
+}
+
+.nav-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 7px 10px; border-radius: 8px;
+  border: none; background: transparent;
+  color: #374151; font-size: 13px; font-weight: 500;
+  cursor: pointer; text-align: left; width: 100%;
+  transition: background 0.12s; font-family: inherit;
+  white-space: nowrap; overflow: hidden;
+
+  lucide-icon { flex-shrink: 0; color: #6B7280; }
+
+  &:hover { background: #F5F5F5; }
+
+  &--active {
+    background: #EFF6FF; color: #0463EF; font-weight: 600;
+    lucide-icon { color: #0463EF; }
+  }
+
+  &--expand .nav-chevron { margin-left: auto; color: #C0C0C0; flex-shrink: 0; }
+}
+
+.nav-badge {
+  margin-left: auto; background: #EF4444; color: #fff;
+  font-size: 10px; font-weight: 700; border-radius: 99px;
+  padding: 1px 6px; line-height: 1.4; flex-shrink: 0;
+}
+
+.new-chat-btn {
+  display: flex; align-items: center; gap: 7px;
+  width: 100%; padding: 8px 12px; border-radius: 8px;
+  border: 1px solid #E0E0E0; background: #fff;
+  color: #010136; font-size: 12px; font-weight: 600;
+  cursor: pointer; font-family: inherit; transition: background 0.12s;
+  margin-bottom: 4px;
+  lucide-icon { color: #6B7280; }
+  &:hover { background: #F5F5F5; }
+}
+
+.sb-spacer { flex: 1; }
+
+.sb-footer {
+  padding: 0 8px 12px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+
+.sb-divider { height: 1px; background: #F0F0F0; margin: 6px 0; }
+
+.sb-bizx-logo {
+  display: flex; align-items: center; gap: 8px; padding: 6px 10px;
+}
+
+.sb-bizx-text { font-size: 16px; font-weight: 900; color: #010136; letter-spacing: -0.5px; }

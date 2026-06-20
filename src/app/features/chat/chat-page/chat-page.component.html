@@ -1,120 +1,13 @@
 <div class="shell">
 
-  <!-- ── Sidebar ──────────────────────────────────────────────── -->
-  <aside class="sidebar">
+  <!-- Sidebar component -->
+  <app-sidebar [collapsed]="collapsed()" (toggleCollapse)="toggleSidebar()" />
 
-    <!-- Logo -->
-    <div class="sb-logo">
-      <div class="bx-badge">BX</div>
-      <div>
-        <p class="sb-name">Netbay Agent</p>
-        <p class="sb-sub">Assistant</p>
-      </div>
-    </div>
-
-    <!-- New Chat -->
-    <div class="sb-section">
-      <button class="new-chat-btn" (click)="chat.newChat()">
-        <lucide-icon [img]="icPlus" [size]="14" />
-        New Chat
-      </button>
-    </div>
-
-    <!-- เครื่องมือ -->
-    <div class="sb-section">
-      <p class="sb-label">เครื่องมือ</p>
-      <button class="nav-item nav-item--active">
-        <lucide-icon [img]="icMessage" [size]="15" />
-        <span>Chatbot</span>
-      </button>
-      <button class="nav-item" (click)="goToQueue()">
-        <lucide-icon [img]="icList" [size]="15" />
-        <span>คิวงาน</span>
-        @if (queue.needsYouCount() > 0) {
-          <span class="nav-badge">{{ queue.needsYouCount() }}</span>
-        }
-      </button>
-      <button class="nav-item nav-item--expand">
-        <lucide-icon [img]="icDashboard" [size]="15" />
-        <span>Dashboard</span>
-        <lucide-icon [img]="icChevronRight" [size]="13" class="nav-chevron" />
-      </button>
-    </div>
-
-    <!-- เอกสาร -->
-    <div class="sb-section">
-      <p class="sb-label">เอกสาร</p>
-      <button class="nav-item nav-item--expand">
-        <lucide-icon [img]="icFileCheck" [size]="15" />
-        <span>ใบอนุญาต</span>
-        <lucide-icon [img]="icChevronRight" [size]="13" class="nav-chevron" />
-      </button>
-      <button class="nav-item nav-item--expand">
-        <lucide-icon [img]="icPackage" [size]="15" />
-        <span>RGoods</span>
-        <lucide-icon [img]="icChevronRight" [size]="13" class="nav-chevron" />
-      </button>
-      <button class="nav-item nav-item--expand">
-        <lucide-icon [img]="icFileText" [size]="15" />
-        <span>ใบขน</span>
-        <lucide-icon [img]="icChevronRight" [size]="13" class="nav-chevron" />
-      </button>
-      <button class="nav-item nav-item--expand">
-        <lucide-icon [img]="icBarChart" [size]="15" />
-        <span>Analytics</span>
-        <lucide-icon [img]="icChevronRight" [size]="13" class="nav-chevron" />
-      </button>
-      <button class="nav-item">
-        <lucide-icon [img]="icMore" [size]="15" />
-        <span>More</span>
-      </button>
-    </div>
-
-    <div class="sb-spacer"></div>
-
-    <!-- Footer -->
-    <div class="sb-footer">
-      <button class="nav-item">
-        <lucide-icon [img]="icSettings" [size]="14" />
-        <span>ตั้งค่า</span>
-      </button>
-      <div class="sb-divider"></div>
-      <div class="sb-bizx-logo">
-        <div class="bx-badge bx-badge--sm">BX</div>
-        <span class="sb-bizx-text">BizX</span>
-      </div>
-    </div>
-  </aside>
-
-  <!-- ── Main ─────────────────────────────────────────────────── -->
+  <!-- Main -->
   <div class="main">
 
-    <!-- Header -->
-    <header class="header">
-      <div class="header__left">
-        <button class="header-icon-btn">
-          <lucide-icon [img]="icMessage" [size]="16" />
-        </button>
-        <span class="header__breadcrumb">
-          Netbay Agent <span class="sep">›</span> <strong>Chatbot</strong>
-        </span>
-      </div>
-      <div class="header__right">
-        <span class="status-pill" [class.status-pill--on]="chat.isConnected()">
-          <span class="status-dot" [class.status-dot--live]="chat.isConnected()"></span>
-          {{ chat.isConnected() ? 'เชื่อมต่อแล้ว' : 'ยังไม่เชื่อมต่อ SPN' }}
-        </span>
-        <button class="header-icon-btn">
-          <lucide-icon [img]="icBell" [size]="16" />
-        </button>
-        <button class="header-icon-btn">
-          <lucide-icon [img]="icActivity" [size]="16" />
-        </button>
-        <div class="header-avatar">
-          <lucide-icon [img]="icUser" [size]="15" color="#fff" />
-        </div>
-      </div>
-    </header>
+    <!-- Header component -->
+    <app-chat-header page="Chatbot" (toggleSidebar)="toggleSidebar()" />
 
     <!-- Chat area -->
     <app-chat-area
@@ -125,24 +18,17 @@
 
     <!-- Quick action chips -->
     <div class="quick-bar">
-      <button class="qchip qchip--blue"
-        (click)="chat.send('สร้าง RGoods')">
-        <lucide-icon [img]="icFileCheck" [size]="13" />
-        ขอใบอนุญาตนำเข้า
+      <button class="qchip qchip--blue" (click)="chat.send('สร้าง RGoods')">
+        <lucide-icon [img]="icFileCheck" [size]="13" /> ขอใบอนุญาตนำเข้า
       </button>
-      <button class="qchip qchip--teal"
-        (click)="chat.send('ดูสถานะใบขน')">
-        <lucide-icon [img]="icEye" [size]="13" />
-        ดูสถานะการยื่นขอใบอนุญาต
+      <button class="qchip qchip--teal" (click)="chat.send('ดูสถานะใบขน')">
+        <lucide-icon [img]="icEye" [size]="13" /> ดูสถานะการยื่นขอใบอนุญาต
       </button>
       <button class="qchip qchip--purple" (click)="goToQueue()">
-        <lucide-icon [img]="icList" [size]="13" />
-        จัดการคิวงาน
+        <lucide-icon [img]="icUpload" [size]="13" /> จัดการคิวงาน
       </button>
-      <button class="qchip qchip--orange"
-        (click)="chat.send('อัปโหลดเอกสาร')">
-        <lucide-icon [img]="icUpload" [size]="13" />
-        อัปโหลดเอกสาร
+      <button class="qchip qchip--orange" (click)="chat.send('อัปโหลดเอกสาร')">
+        <lucide-icon [img]="icUpload" [size]="13" /> อัปโหลดเอกสาร
       </button>
     </div>
 
@@ -153,13 +39,10 @@
           <lucide-icon [img]="icPaperclip" [size]="16" color="#999" />
         </button>
         <textarea
-          nz-input
-          [(ngModel)]="inputText"
-          (keydown)="onKeydown($event)"
+          nz-input [(ngModel)]="inputText" (keydown)="onKeydown($event)"
           placeholder="พิมพ์คำสั่ง เช่น สร้าง RGoods ด้วยใบขน Ref : HTHM000000003..."
-          nzAutosize
-          class="chat-textarea"
-        ></textarea>
+          nzAutosize class="chat-textarea">
+        </textarea>
         <button class="send-btn" (click)="send()" [disabled]="!inputText.trim()">
           <lucide-icon [img]="icSend" [size]="15" color="#fff" />
         </button>

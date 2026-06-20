@@ -1,0 +1,73 @@
+<aside class="sidebar" [class.sidebar--collapsed]="collapsed">
+
+  <!-- Logo -->
+  <div class="sb-logo">
+    <div class="bx-badge">BX</div>
+    @if (!collapsed) {
+      <div>
+        <p class="sb-name">Netbay Agent</p>
+        <p class="sb-sub">Assistant</p>
+      </div>
+    }
+    <button class="toggle-btn" (click)="toggleCollapse.emit()">
+      <lucide-icon [img]="collapsed ? icChevR : icChevL" [size]="13" color="#999" />
+    </button>
+  </div>
+
+  <!-- New Chat -->
+  <div class="sb-section">
+    <button class="new-chat-btn" (click)="newChat()" [title]="collapsed ? 'New Chat' : ''">
+      <lucide-icon [img]="icPlus" [size]="14" color="#6B7280" />
+      @if (!collapsed) { <span>New Chat</span> }
+    </button>
+  </div>
+
+  <!-- เครื่องมือ -->
+  <div class="sb-section">
+    @if (!collapsed) { <p class="sb-label">เครื่องมือ</p> }
+    <button class="nav-item" [class.nav-item--active]="isChat()" (click)="goChat()" [title]="collapsed ? 'Chatbot' : ''">
+      <lucide-icon [img]="icMessage" [size]="15" />
+      @if (!collapsed) { <span>Chatbot</span> }
+    </button>
+    <button class="nav-item" [class.nav-item--active]="isQueue()" (click)="goQueue()" [title]="collapsed ? 'คิวงาน' : ''">
+      <lucide-icon [img]="icList" [size]="15" />
+      @if (!collapsed) { <span>คิวงาน</span> }
+      @if (queue.needsYouCount() > 0) {
+        <span class="nav-badge">{{ queue.needsYouCount() }}</span>
+      }
+    </button>
+    <button class="nav-item" [title]="collapsed ? 'Dashboard' : ''">
+      <lucide-icon [img]="icDash" [size]="15" />
+      @if (!collapsed) { <span>Dashboard</span><lucide-icon [img]="icChevR" [size]="13" class="nav-chevron" /> }
+    </button>
+  </div>
+
+  <!-- เอกสาร -->
+  @if (!collapsed) {
+    <div class="sb-section">
+      <p class="sb-label">เอกสาร</p>
+      <button class="nav-item nav-item--expand"><lucide-icon [img]="icLicense" [size]="15" /><span>ใบอนุญาต</span><lucide-icon [img]="icChevR" [size]="13" class="nav-chevron" /></button>
+      <button class="nav-item nav-item--expand"><lucide-icon [img]="icRGoods" [size]="15" /><span>RGoods</span><lucide-icon [img]="icChevR" [size]="13" class="nav-chevron" /></button>
+      <button class="nav-item nav-item--expand"><lucide-icon [img]="icCustoms" [size]="15" /><span>ใบขน</span><lucide-icon [img]="icChevR" [size]="13" class="nav-chevron" /></button>
+      <button class="nav-item nav-item--expand"><lucide-icon [img]="icAnalytics" [size]="15" /><span>Analytics</span><lucide-icon [img]="icChevR" [size]="13" class="nav-chevron" /></button>
+      <button class="nav-item"><lucide-icon [img]="icMore" [size]="15" /><span>More</span></button>
+    </div>
+  }
+
+  <div class="sb-spacer"></div>
+
+  <!-- Footer -->
+  <div class="sb-footer">
+    <button class="nav-item" [title]="collapsed ? 'ตั้งค่า' : ''">
+      <lucide-icon [img]="icSettings" [size]="14" />
+      @if (!collapsed) { <span>ตั้งค่า</span> }
+    </button>
+    @if (!collapsed) {
+      <div class="sb-divider"></div>
+      <div class="sb-bizx-logo">
+        <div class="bx-badge bx-badge--sm">BX</div>
+        <span class="sb-bizx-text">BizX</span>
+      </div>
+    }
+  </div>
+</aside>

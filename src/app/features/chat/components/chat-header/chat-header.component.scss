@@ -1,0 +1,43 @@
+.chat-header {
+  height: 48px; background: #fff; border-bottom: 1px solid #E8E8E8;
+  display: flex; align-items: center; padding: 0 16px; gap: 12px; flex-shrink: 0;
+}
+
+.header-left { display: flex; align-items: center; gap: 10px; flex: 1; }
+.header-right { display: flex; align-items: center; gap: 8px; }
+
+.breadcrumb {
+  font-size: 13px; color: #8080A5;
+  .sep { margin: 0 5px; }
+  strong { color: #010136; font-weight: 700; }
+}
+
+.icon-btn {
+  width: 30px; height: 30px; border-radius: 8px; border: none;
+  background: transparent; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  &:hover { background: #F5F5F5; }
+}
+
+.status-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 11px; border-radius: 99px; font-size: 11px; font-weight: 600;
+  background: rgba(153,153,153,0.1); color: #8080A5; border: 1px solid rgba(153,153,153,0.2);
+
+  &--on { background: rgba(22,234,158,0.1); color: #0D8F61; border-color: rgba(22,234,158,0.35); }
+}
+
+.status-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: #CCC;
+  &--live { background: #16EA9E; animation: pulseDot 2s ease-in-out infinite; }
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.6; transform: scale(1.2); }
+}
+
+.avatar {
+  width: 30px; height: 30px; border-radius: 8px; background: #0463EF;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
