@@ -178,10 +178,33 @@ export class ChatService {
   }
 
   // ── Document choice flows ──────────────────────────────────────────────────
+
+  /** ใบขนสินค้า: ask user whether they have an SPN ref or want to upload directly */
   chooseCustomsDocs(): void {
     this.user('ใบขนสินค้า');
     this.markFlowStart();
-    this.withTyping(() => { this.step.set('invoice_upload'); this.bot('full-upload'); }, 400);
+    this.withTyping(() => {
+      this.bot('choice-card', {
+        question: 'มีเลขอ้างอิงใบขนสินค้า (HTHM...) หรือต้องการอัปโหลดเอกสารเองครับ?',
+        options: [
+          { label: 'มีเลข Ref ใบขน (HTHM...)', value: 'spn',    description: 'ดึงข้อมูลจาก ShippingNet อัตโนมัติ' },
+          { label: 'อัปโหลดเอกสารเอง',          value: 'upload', description: 'AI OCR ดึงข้อมูลจากไฟล์ที่อัปโหลด' },
+        ],
+      } satisfies import('@app/core/models/types').ChoiceCardData);
+    }, 400);
+  }
+
+  /** Handle the SPN vs Upload choice from chooseCustomsDocs */
+  onCustomsDocsChoice(value: string): void {
+    if (value === 'spn') {
+      this.user('มีเลข Ref ใบขน');
+      this.withTyping(() => this.bot('text', undefined,
+        'กรุณาพิมพ์เลข Ref ใบขนสินค้า (HTHM...) ในช่องแชทด้านล่างครับ'
+      ), 400);
+    } else {
+      this.user('อัปโหลดเอกสารเอง');
+      this.withTyping(() => { this.step.set('invoice_upload'); this.bot('full-upload'); }, 400);
+    }
   }
 
   chooseInvoiceFirst(): void {

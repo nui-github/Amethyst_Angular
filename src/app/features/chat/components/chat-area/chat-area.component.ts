@@ -80,6 +80,9 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked {
     const hasSubmit  = data.options.some(o => o.value === 'submit');
     const hasConfirm = data.options.some(o => o.value === 'confirmed');
 
+    const hasSpn    = data.options.some(o => o.value === 'spn');
+
+    if (hasSpn)     return this.chat.onCustomsDocsChoice(value);
     if (hasEmail)   return this.chat.onProceedChoice(value);
     if (hasSubmit)  return this.chat.onPreviewChoice(value);
     if (hasConfirm) return this.chat.onPostEmailChoice(value);
