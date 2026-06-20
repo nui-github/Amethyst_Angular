@@ -49,7 +49,7 @@
 
           <!-- Quick action chips -->
           <div class="welcome-chips">
-            <button class="wchip wchip--blue" (click)="chat.send('สร้าง RGoods')">
+            <button class="wchip wchip--blue" (click)="chat.openImportLicenseMenu()">
               <lucide-icon [img]="icFileCheck" [size]="14" /> ขอใบอนุญาตนำเข้า
             </button>
             <button class="wchip wchip--teal" (click)="chat.send('ดูสถานะใบขน')">
@@ -58,7 +58,7 @@
             <button class="wchip wchip--purple" (click)="goToQueue()">
               <lucide-icon [img]="icList" [size]="14" /> คิวงาน
             </button>
-            <button class="wchip wchip--orange" (click)="chat.send('อัปโหลดเอกสาร')">
+            <button class="wchip wchip--orange" (click)="chat.chooseFullUpload()">
               <lucide-icon [img]="icUpload" [size]="14" /> อัปโหลดเอกสาร
             </button>
           </div>
