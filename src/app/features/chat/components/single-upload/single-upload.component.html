@@ -1,0 +1,62 @@
+<div class="su-wrap">
+
+  <p class="su-title">อัปโหลดใบขนสินค้า</p>
+  <p class="su-sub">AI จะ OCR ดึงข้อมูลจากไฟล์ที่อัปโหลด รองรับทั้งไฟล์รูปภาพและ XML จากระบบ</p>
+
+  <!-- Drop zone -->
+  <label class="drop-zone" for="su_file"
+    [class.drop-zone--over]="dragging()"
+    [class.drop-zone--filled]="!!file()"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave()"
+    (drop)="onDrop($event)">
+
+    @if (!file()) {
+      <!-- Empty state -->
+      <div class="drop-zone__empty">
+        <div class="drop-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0463EF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+        </div>
+        <p class="drop-zone__main">คลิกหรือลากไฟล์มาวางที่นี่</p>
+        <p class="drop-zone__types">
+          <span class="file-tag">PDF</span>
+          <span class="file-tag">JPG</span>
+          <span class="file-tag">PNG</span>
+          <span class="file-tag file-tag--xml">XML</span>
+        </p>
+        <p class="drop-zone__note">XML จากระบบศุลกากร — ดึงข้อมูลได้โดยตรงโดยไม่ต้อง OCR</p>
+      </div>
+    } @else {
+      <!-- File selected -->
+      <div class="drop-zone__file">
+        <div class="file-icon">
+          @if (file()!.name.endsWith('.xml')) {
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          } @else {
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0463EF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          }
+        </div>
+        <div class="file-info">
+          <p class="file-name">{{ file()!.name }}</p>
+          <p class="file-size">{{ formatSize(file()!.size) }}</p>
+        </div>
+        <button class="file-clear" (click)="$event.preventDefault(); clear()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+    }
+
+    <input id="su_file" type="file" accept=".pdf,.jpg,.jpeg,.png,.xml" style="display:none"
+      (change)="onFileChange($event)" />
+  </label>
+
+  <button nz-button nzType="primary" nzBlock [disabled]="!file()" (click)="startOCR()" class="su-btn">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    {{ file()?.name?.endsWith('.xml') ? 'ประมวลผล XML' : 'เริ่ม OCR และวิเคราะห์เอกสาร' }}
+  </button>
+
+</div>

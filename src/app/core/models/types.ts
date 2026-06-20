@@ -23,7 +23,8 @@ export type MessageType =
   | 'spn-list'           // SPN multi-select list
   | 'email-draft'        // editable email composer (interactive)
   | 'status-card'        // submission result card
-  | 'spn-connect';       // multi-step SPN company → URL → login flow
+  | 'spn-connect'        // multi-step SPN company → URL → login flow
+  | 'single-upload';     // single-slot upload (ใบขนสินค้า path)
 
 export interface ChatMessage {
   id: string;

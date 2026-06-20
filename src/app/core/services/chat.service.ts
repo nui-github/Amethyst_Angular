@@ -221,7 +221,7 @@ export class ChatService {
       this.withTyping(() => this.showSpnConnect(), 400);
     } else {
       this.user('อัปโหลดเอกสารเอง');
-      this.withTyping(() => { this.step.set('invoice_upload'); this.bot('full-upload'); }, 400);
+      this.withTyping(() => { this.step.set('invoice_upload'); this.bot('single-upload'); }, 400);
     }
   }
 

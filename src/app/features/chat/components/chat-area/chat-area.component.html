@@ -139,7 +139,16 @@
               }
             }
 
-            <!-- Upload panel -->
+            <!-- Single-slot upload (ใบขนสินค้า path) -->
+            @case ('single-upload') {
+              @if (!readOnly) {
+                <app-single-upload />
+              } @else {
+                <span class="readonly-tag">✓ อัปโหลดใบขนสินค้าแล้ว</span>
+              }
+            }
+
+            <!-- Multi-slot upload panel -->
             @case ('full-upload') {
               @if (!readOnly) {
                 <app-full-upload />

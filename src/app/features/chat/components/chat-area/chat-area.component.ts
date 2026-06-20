@@ -19,6 +19,7 @@ import { ImportLicenseMenuComponent } from '../import-license-menu/import-licens
 import { ConnectPanelComponent } from '../connect/connect-panel.component';
 import { SpnConnectComponent } from '../spn-connect/spn-connect.component';
 import { FullUploadComponent } from '../full-upload/full-upload.component';
+import { SingleUploadComponent } from '../single-upload/single-upload.component';
 import { EmailDraftComponent } from '../email-draft/email-draft.component';
 import { FormPanelComponent } from '../form-panel/form-panel.component';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
@@ -43,7 +44,7 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
     TypingIndicatorComponent, FlagCardComponent, SpnResultComponent,
     SpnCardComponent, ChoiceCardComponent, OcrResultsComponent,
     StatusCardComponent, OcrProgressComponent, ImportLicenseMenuComponent,
-    ConnectPanelComponent, FullUploadComponent, EmailDraftComponent, FormPanelComponent,
+    ConnectPanelComponent, FullUploadComponent, SingleUploadComponent, EmailDraftComponent, FormPanelComponent,
     SpnConnectComponent,
   ],
   templateUrl: './chat-area.component.html',
