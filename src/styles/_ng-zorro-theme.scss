@@ -77,16 +77,30 @@
 
 // ── Component-level overrides ─────────────────────────────────────────────────
 
-// Buttons: 4px radius, proper gradient for primary
+// Buttons: 4px radius, solid primary color, white text
 .ant-btn-primary {
-  background: linear-gradient(135deg, #034DBA, #0463EF) !important;
+  background: #0463EF !important;
   border-color: #0463EF !important;
   border-radius: 4px !important;
+  color: #ffffff !important;
   font-weight: 600 !important;
 
   &:hover, &:focus {
-    background: linear-gradient(135deg, #02388C, #034DBA) !important;
+    background: #034DBA !important;
     border-color: #034DBA !important;
+    color: #ffffff !important;
+  }
+
+  &:active {
+    background: #02388C !important;
+    border-color: #02388C !important;
+  }
+
+  &[disabled], &:disabled {
+    background: #B0C8F8 !important;
+    border-color: #B0C8F8 !important;
+    color: #ffffff !important;
+    cursor: not-allowed !important;
   }
 }
 
