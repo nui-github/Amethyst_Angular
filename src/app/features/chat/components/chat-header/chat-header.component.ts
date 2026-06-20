@@ -11,11 +11,12 @@ import { ChatService } from '@app/core/services/chat.service';
   template: `
     <header class="chat-header">
       <div class="header-left">
-        <!-- Always visible: shows correct icon based on sidebar state -->
-        <button class="icon-btn icon-btn--panel" (click)="toggleSidebar.emit()"
-          [title]="sidebarCollapsed ? 'เปิด Sidebar' : 'ปิด Sidebar'">
-          <lucide-icon [img]="sidebarCollapsed ? icPanelOpen : icPanelClose" [size]="17" color="#6B7280" />
-        </button>
+        <!-- Only visible when sidebar is collapsed -->
+        @if (sidebarCollapsed) {
+          <button class="icon-btn icon-btn--panel" (click)="toggleSidebar.emit()" title="เปิด Sidebar">
+            <lucide-icon [img]="icPanelOpen" [size]="17" color="#6B7280" />
+          </button>
+        }
         <span class="breadcrumb">
           Netbay Agent <span class="sep">›</span> <strong>{{ page }}</strong>
         </span>

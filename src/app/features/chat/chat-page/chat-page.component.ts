@@ -1,14 +1,13 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { NzInputModule } from 'ng-zorro-antd/input';
-import { LucideAngularModule, Send, Paperclip, Upload, Eye, FileCheck2 } from 'lucide-angular';
+import { LucideAngularModule, Send, Paperclip, Upload, Eye, FileCheck2, List, PanelLeftOpen } from 'lucide-angular';
 import { ChatService } from '@app/core/services/chat.service';
 import { QueueService } from '@app/core/services/queue.service';
 import { ChatAreaComponent } from '../components/chat-area/chat-area.component';
 import { SidebarComponent } from '../components/sidebar/sidebar.component';
-import { ChatHeaderComponent } from '../components/chat-header/chat-header.component';
 
 @Component({
   selector: 'app-chat-page',
@@ -17,7 +16,7 @@ import { ChatHeaderComponent } from '../components/chat-header/chat-header.compo
   imports: [
     CommonModule, FormsModule, RouterModule,
     NzInputModule, LucideAngularModule,
-    ChatAreaComponent, SidebarComponent, ChatHeaderComponent,
+    ChatAreaComponent, SidebarComponent,
   ],
   templateUrl: './chat-page.component.html',
   styleUrl:    './chat-page.component.scss',
@@ -32,9 +31,16 @@ export class ChatPageComponent {
   readonly icUpload     = Upload;
   readonly icEye        = Eye;
   readonly icFileCheck  = FileCheck2;
+  readonly icList       = List;
+  readonly icPanelOpen  = PanelLeftOpen;
 
-  inputText  = '';
-  collapsed  = signal(false);
+  inputText = '';
+  collapsed = signal(false);
+
+  /** True when only the initial welcome message exists (no user messages yet) */
+  readonly isWelcome = computed(() =>
+    this.chat.messages().length === 1 && this.chat.messages()[0].type === 'welcome'
+  );
 
   goToQueue(): void { this.router.navigate(['/queue']); }
 

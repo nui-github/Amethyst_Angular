@@ -1,38 +1,80 @@
 <div class="shell">
 
-  <!-- Sidebar component -->
+  <!-- Sidebar -->
   <app-sidebar [collapsed]="collapsed()" (toggleCollapse)="toggleSidebar()" />
 
   <!-- Main -->
   <div class="main">
 
-    <!-- Header component -->
-    <app-chat-header page="Chatbot" [sidebarCollapsed]="collapsed()" (toggleSidebar)="toggleSidebar()" />
-
-    <!-- Chat area -->
-    <app-chat-area
-      [messages]="chat.messages()"
-      [isTyping]="chat.isTyping()"
-      [readOnly]="false"
-      class="chat-area-host" />
-
-    <!-- Quick action chips -->
-    <div class="quick-bar">
-      <button class="qchip qchip--blue" (click)="chat.send('สร้าง RGoods')">
-        <lucide-icon [img]="icFileCheck" [size]="13" /> ขอใบอนุญาตนำเข้า
-      </button>
-      <button class="qchip qchip--teal" (click)="chat.send('ดูสถานะใบขน')">
-        <lucide-icon [img]="icEye" [size]="13" /> ดูสถานะการยื่นขอใบอนุญาต
-      </button>
-      <button class="qchip qchip--purple" (click)="goToQueue()">
-        <lucide-icon [img]="icUpload" [size]="13" /> จัดการคิวงาน
-      </button>
-      <button class="qchip qchip--orange" (click)="chat.send('อัปโหลดเอกสาร')">
-        <lucide-icon [img]="icUpload" [size]="13" /> อัปโหลดเอกสาร
-      </button>
+    <!-- Minimal top bar (no header — just panel toggle when collapsed) -->
+    <div class="topbar">
+      @if (collapsed()) {
+        <button class="topbar-toggle" (click)="toggleSidebar()" title="เปิด Sidebar">
+          <lucide-icon [img]="icPanelOpen" [size]="17" color="#6B7280" />
+        </button>
+      }
     </div>
 
-    <!-- Input bar -->
+    <!-- WELCOME STATE: centered layout (only when first welcome message) -->
+    @if (isWelcome()) {
+      <div class="welcome-layout">
+        <div class="welcome-center">
+
+          <!-- AI Illustration -->
+          <div class="welcome-avatar">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="welcome-svg">
+              <defs>
+                <linearGradient id="wg1" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#0463EF"/>
+                  <stop offset="100%" stop-color="#16EA9E"/>
+                </linearGradient>
+                <linearGradient id="wg2" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#034DBA" stop-opacity="0.15"/>
+                  <stop offset="100%" stop-color="#16EA9E" stop-opacity="0.08"/>
+                </linearGradient>
+              </defs>
+              <!-- Glow ring -->
+              <circle cx="50" cy="50" r="46" fill="url(#wg2)" />
+              <!-- 4-point star shape -->
+              <path d="M50 10 C50 10 56 38 64 44 C72 50 90 50 90 50 C90 50 72 50 64 56 C56 62 50 90 50 90 C50 90 44 62 36 56 C28 50 10 50 10 50 C10 50 28 50 36 44 C44 38 50 10 50 10 Z"
+                fill="url(#wg1)" />
+              <!-- Small accent dot -->
+              <circle cx="73" cy="27" r="5" fill="#0463EF" opacity="0.8"/>
+            </svg>
+          </div>
+
+          <!-- Greeting -->
+          <h1 class="welcome-greeting">สวัสดีครับ! ผมคือ <span class="brand">Netbay Agent</span></h1>
+          <p class="welcome-tagline">วันนี้อยากให้ AI ช่วยเรื่องอะไรครับ?</p>
+
+          <!-- Quick action chips -->
+          <div class="welcome-chips">
+            <button class="wchip wchip--blue" (click)="chat.send('สร้าง RGoods')">
+              <lucide-icon [img]="icFileCheck" [size]="14" /> ขอใบอนุญาตนำเข้า
+            </button>
+            <button class="wchip wchip--teal" (click)="chat.send('ดูสถานะใบขน')">
+              <lucide-icon [img]="icEye" [size]="14" /> ดูสถานะการยื่น
+            </button>
+            <button class="wchip wchip--purple" (click)="goToQueue()">
+              <lucide-icon [img]="icList" [size]="14" /> คิวงาน
+            </button>
+            <button class="wchip wchip--orange" (click)="chat.send('อัปโหลดเอกสาร')">
+              <lucide-icon [img]="icUpload" [size]="14" /> อัปโหลดเอกสาร
+            </button>
+          </div>
+        </div>
+      </div>
+
+    } @else {
+      <!-- CHAT STATE: normal message list -->
+      <app-chat-area
+        [messages]="chat.messages()"
+        [isTyping]="chat.isTyping()"
+        [readOnly]="false"
+        class="chat-area-host" />
+    }
+
+    <!-- Input bar — always at bottom -->
     <div class="input-bar">
       <div class="input-wrap">
         <div class="input-row">
