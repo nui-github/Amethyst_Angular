@@ -110,48 +110,79 @@
   }
 }
 
-// ── Simple pill buttons (no description) ─────────────────────────────────────
+// ── Status question (simple mode) ─────────────────────────────────────────────
 
-.choice-pills {
+.choice-card__q-wrap {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
 }
 
-.pill {
+.choice-card__status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #F59E0B;
+  flex-shrink: 0;
+  animation: statusPulse 2s ease-in-out infinite;
+}
+
+@keyframes statusPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(0.8); }
+}
+
+.choice-card__question--status {
+  font-size: 12.5px;
+  color: #6B7280;
+  font-weight: 500;
+  font-style: italic;
+}
+
+// ── Action buttons (simple 2-option mode) ─────────────────────────────────────
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.action-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
+  gap: 7px;
+  padding: 9px 18px;
   border-radius: 6px;
-  border: 1.5px solid #E2E4EC;
-  background: #fff;
-  color: var(--bizx-navy);
   font-size: 13px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.14s;
-
-  lucide-icon { color: #9CA3AF; }
-
-  &:hover {
-    border-color: #0463EF;
-    color: #0463EF;
-    background: rgba(4, 99, 239, 0.04);
-    lucide-icon { color: #0463EF; }
-  }
+  transition: all 0.15s;
+  border: 1.5px solid;
 
   &--primary {
     background: #0463EF;
     border-color: #0463EF;
     color: #fff;
-    lucide-icon { color: #fff; }
+    box-shadow: 0 2px 8px rgba(4, 99, 239, 0.25);
 
     &:hover {
       background: #034DBA;
       border-color: #034DBA;
-      color: #fff;
+      box-shadow: 0 4px 12px rgba(4, 99, 239, 0.3);
+      transform: translateY(-1px);
+    }
+  }
+
+  &--secondary {
+    background: #fff;
+    border-color: #E2E4EC;
+    color: #374151;
+
+    &:hover {
+      border-color: #9CA3AF;
+      background: #F9FAFB;
+      transform: translateY(-1px);
     }
   }
 }

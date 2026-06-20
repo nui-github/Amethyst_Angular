@@ -1,6 +1,11 @@
 <div class="choice-card">
   @if (data.question) {
-    <p class="choice-card__question">{{ data.question }}</p>
+    <div class="choice-card__q-wrap">
+      @if (isSimple) {
+        <span class="choice-card__status-dot"></span>
+      }
+      <p class="choice-card__question" [class.choice-card__question--status]="isSimple">{{ data.question }}</p>
+    </div>
   }
 
   <!-- Rich cards when options have descriptions -->
@@ -34,11 +39,19 @@
       }
     </div>
 
-  <!-- Simple pills when no descriptions -->
+  <!-- Simple action buttons when no descriptions -->
   } @else {
-    <div class="choice-pills">
+    <div class="action-buttons">
       @for (opt of data.options; track opt.value; let i = $index) {
-        <button class="pill" [class.pill--primary]="i === 0" (click)="chosen.emit(opt.value)">
+        <button class="action-btn"
+          [class.action-btn--primary]="i === 0"
+          [class.action-btn--secondary]="i !== 0"
+          (click)="chosen.emit(opt.value)">
+          @if (i === 0) {
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          } @else {
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          }
           {{ opt.label }}
         </button>
       }
