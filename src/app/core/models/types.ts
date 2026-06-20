@@ -22,7 +22,8 @@ export type MessageType =
   | 'connect'            // ShippingNet login
   | 'spn-list'           // SPN multi-select list
   | 'email-draft'        // editable email composer (interactive)
-  | 'status-card';       // submission result card
+  | 'status-card'        // submission result card
+  | 'spn-connect';       // multi-step SPN company → URL → login flow
 
 export interface ChatMessage {
   id: string;

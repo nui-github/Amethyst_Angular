@@ -165,3 +165,24 @@
   lucide-icon { color: #9CA3AF; flex-shrink: 0; }
   &:hover { background: #F5F5F5; color: #374151; lucide-icon { color: #6B7280; } }
 }
+
+// SPN connection badge
+.spn-badge {
+  display: flex; align-items: center; gap: 7px;
+  margin: 0 8px 2px;
+  padding: 6px 10px; border-radius: 6px;
+  background: rgba(13, 143, 97, 0.08);
+  border: 1px solid rgba(13, 143, 97, 0.2);
+  overflow: hidden;
+}
+
+.spn-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #16EA9E; flex-shrink: 0;
+  animation: pulseDot 2s ease-in-out infinite;
+}
+
+.spn-badge__text {
+  font-size: 11px; font-weight: 600; color: #0D8F61;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}

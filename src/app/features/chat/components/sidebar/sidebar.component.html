@@ -66,6 +66,16 @@
       @if (!collapsed) { <span>ตั้งค่า</span> }
     </button>
 
+    <!-- SPN connection badge -->
+    @if (chat.isConnected()) {
+      <div class="spn-badge" [title]="chat.spnSession()?.url ?? ''">
+        <span class="spn-dot"></span>
+        @if (!collapsed) {
+          <span class="spn-badge__text">{{ chat.spnSession()?.companyName ?? 'เชื่อมต่อ SPN แล้ว' }}</span>
+        }
+      </div>
+    }
+
     <!-- BizX logo — full or icon only -->
     <a href="https://bizx-uat.devnetbay.com/" target="_blank" rel="noopener" class="bizx-logo-btn">
       @if (!collapsed) {

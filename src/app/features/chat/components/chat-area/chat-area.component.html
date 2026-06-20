@@ -166,6 +166,15 @@
               }
             }
 
+            <!-- SPN multi-step connect -->
+            @case ('spn-connect') {
+              @if (!readOnly) {
+                <app-spn-connect />
+              } @else {
+                <span class="readonly-tag">✓ เชื่อมต่อ ShippingNet แล้ว</span>
+              }
+            }
+
             <!-- Submission status card -->
             @case ('status-card') {
               <app-status-card [data]="asAny(msg.data)" />

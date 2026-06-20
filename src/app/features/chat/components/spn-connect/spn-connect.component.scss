@@ -1,0 +1,153 @@
+.spn-connect {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+// ── Step indicator ─────────────────────────────────────────────────────────────
+
+.steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.step-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.step-circle {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: #E8EAF2;
+  color: #9CA3AF;
+  font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+
+  .step-item--active & { background: #0463EF; color: #fff; }
+  .step-item--done &   { background: #0D8F61; color: #fff; }
+}
+
+.step-label {
+  font-size: 10px; color: #9CA3AF; white-space: nowrap;
+  .step-item--active & { color: #0463EF; font-weight: 700; }
+  .step-item--done &   { color: #0D8F61; }
+}
+
+.step-line {
+  flex: 1; height: 1.5px; background: #E8EAF2; margin: 0 6px 14px;
+  min-width: 20px; transition: background 0.2s;
+  &--done { background: #0D8F61; }
+}
+
+// ── Step body ─────────────────────────────────────────────────────────────────
+
+.step-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.step-title {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 13px; font-weight: 700; color: var(--bizx-navy); margin: 0;
+}
+
+.step-desc {
+  font-size: 12px; color: #6B7280; margin: 0; line-height: 1.5;
+}
+
+.form-rows { display: flex; flex-direction: column; gap: 10px; }
+
+.form-field {
+  display: flex; flex-direction: column; gap: 4px;
+
+  label { font-size: 11px; font-weight: 600; color: #6B7280; }
+
+  .w-full { width: 100%; }
+}
+
+.next-btn { margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+
+// ── URL cards ──────────────────────────────────────────────────────────────────
+
+.url-cards { display: flex; flex-direction: column; gap: 8px; }
+
+.url-card {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px;
+  border: 1.5px solid #E8EAF2;
+  border-radius: 8px;
+  background: #FAFAFA;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  text-align: left;
+  width: 100%;
+
+  &:hover { border-color: #0463EF; background: #fff; }
+
+  &--selected {
+    border-color: #0463EF;
+    background: rgba(4, 99, 239, 0.04);
+  }
+
+  &__left { display: flex; align-items: center; gap: 10px; }
+
+  &__label { font-size: 13px; font-weight: 600; color: var(--bizx-navy); margin: 0; }
+  &__url   { font-size: 11px; color: #6B7280; margin: 2px 0 0; font-family: monospace; }
+
+  &__check {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 1.5px solid #D1D5DB;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all 0.15s;
+
+    &--on { background: #0463EF; border-color: #0463EF; }
+  }
+}
+
+.env-badge {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.5px;
+  padding: 2px 7px; border-radius: 4px;
+  flex-shrink: 0;
+}
+
+// ── Login ─────────────────────────────────────────────────────────────────────
+
+.login-url-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; color: #6B7280;
+  padding: 4px 10px; border-radius: 4px;
+  background: #F3F4F6; width: fit-content;
+  font-family: monospace;
+}
+
+.login-error {
+  font-size: 12px; color: #EF4444; margin: 0;
+  padding: 8px 12px; background: rgba(239,68,68,0.06);
+  border-radius: 4px; border: 1px solid rgba(239,68,68,0.2);
+}
+
+// ── Success ───────────────────────────────────────────────────────────────────
+
+.success-body { align-items: center; text-align: center; padding: 8px 0 4px; }
+
+.success-icon {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: rgba(13, 143, 97, 0.08);
+  display: flex; align-items: center; justify-content: center;
+}
+
+.success-title { font-size: 15px; font-weight: 800; color: var(--bizx-navy); margin: 0; }
+.success-sub   { font-size: 12px; color: #6B7280; margin: 0; }
+.success-note  { font-size: 12px; color: #0D8F61; margin: 0; }
+
+// ── Button row ────────────────────────────────────────────────────────────────
+
+.btn-row { display: flex; gap: 8px; margin-top: 4px; justify-content: flex-end; }

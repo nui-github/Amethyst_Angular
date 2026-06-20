@@ -22,6 +22,7 @@ export class ChatService {
   // ── State ──────────────────────────────────────────────────────────────────
   readonly messages        = signal<ChatMessage[]>([WELCOME]);
   readonly isTyping        = signal(false);
+  readonly spnSession      = signal<{ companyName: string; url: string; username: string } | null>(null);
   readonly step            = signal<ChatStep>('idle');
   readonly isConnected     = signal(false);
   readonly pendingRef      = signal('');
@@ -117,9 +118,27 @@ export class ChatService {
     }
   }
 
-  // ── Connect flow ───────────────────────────────────────────────────────────
+  // ── SPN new connect flow ───────────────────────────────────────────────────
+
+  /** Show the multi-step SPN connect card (Company → URL → Login) */
+  showSpnConnect(): void {
+    this.bot('spn-connect');
+  }
+
+  /** Called by SpnConnectComponent after successful login */
+  onSpnConnected(companyName: string, url: string, username: string): void {
+    this.isConnected.set(true);
+    this.spnSession.set({ companyName, url, username });
+    // After success, fetch the SPN list
+    this.withTyping(() => {
+      this.bot('text', undefined, `เชื่อมต่อ ${companyName} สำเร็จแล้วครับ — กำลังดึงรายการใบขนสินค้า...`);
+      setTimeout(() => this.showSPNList(), 800);
+    }, 600);
+  }
+
+  // ── Legacy connect flow (kept for fallback) ────────────────────────────────
   private showConnect(): void {
-    this.bot('connect');
+    this.showSpnConnect();
   }
 
   onConnected(ref: string): void {
@@ -133,6 +152,7 @@ export class ChatService {
 
   disconnect(): void {
     this.isConnected.set(false);
+    this.spnSession.set(null);
     this.withTyping(() => this.bot('text', undefined, 'ตัดการเชื่อมต่อ ShippingNet เรียบร้อยแล้ว'), 300);
   }
 
@@ -179,16 +199,16 @@ export class ChatService {
 
   // ── Document choice flows ──────────────────────────────────────────────────
 
-  /** ใบขนสินค้า: ask user whether they have an SPN ref or want to upload directly */
+  /** ใบขนสินค้า: ask user whether to connect SPN or upload manually */
   chooseCustomsDocs(): void {
     this.user('ใบขนสินค้า');
     this.markFlowStart();
     this.withTyping(() => {
       this.bot('choice-card', {
-        question: 'มีเลขอ้างอิงใบขนสินค้า (HTHM...) หรือต้องการอัปโหลดเอกสารเองครับ?',
+        question: 'ต้องการดึงข้อมูลจาก ShippingNet หรืออัปโหลดเอกสารเองครับ?',
         options: [
-          { label: 'มีเลข Ref ใบขน (HTHM...)', value: 'spn',    description: 'ดึงข้อมูลจาก ShippingNet อัตโนมัติ' },
-          { label: 'อัปโหลดเอกสารเอง',          value: 'upload', description: 'AI OCR ดึงข้อมูลจากไฟล์ที่อัปโหลด' },
+          { label: 'ดึงข้อมูลจาก ShippingNet', value: 'spn',    description: 'ต้องมี account SPN — ระบบจะดึงข้อมูลใบขนให้อัตโนมัติ' },
+          { label: 'อัปโหลดเอกสารเอง',          value: 'upload', description: 'AI OCR ดึงข้อมูลจากไฟล์ที่อัปโหลด ไม่ต้องมี SPN' },
         ],
       } satisfies import('@app/core/models/types').ChoiceCardData);
     }, 400);
@@ -197,10 +217,8 @@ export class ChatService {
   /** Handle the SPN vs Upload choice from chooseCustomsDocs */
   onCustomsDocsChoice(value: string): void {
     if (value === 'spn') {
-      this.user('มีเลข Ref ใบขน');
-      this.withTyping(() => this.bot('text', undefined,
-        'กรุณาพิมพ์เลข Ref ใบขนสินค้า (HTHM...) ในช่องแชทด้านล่างครับ'
-      ), 400);
+      this.user('ดึงข้อมูลจาก ShippingNet');
+      this.withTyping(() => this.showSpnConnect(), 400);
     } else {
       this.user('อัปโหลดเอกสารเอง');
       this.withTyping(() => { this.step.set('invoice_upload'); this.bot('full-upload'); }, 400);
