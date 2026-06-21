@@ -56,6 +56,7 @@ src/
 |------|-------------|
 | [`ANGULAR.md`](./ANGULAR.md) | Dev guide — component list, patterns, how to add new message types |
 | [`docs/DESIGN.md`](./docs/DESIGN.md) | BizX design system — colors, typography, components |
+| [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) | System overview, chat flow state machine, shipment lifecycle, design decisions |
 | [`docs/API.md`](./docs/API.md) | API contracts — endpoints to replace mock data |
 
 ---
