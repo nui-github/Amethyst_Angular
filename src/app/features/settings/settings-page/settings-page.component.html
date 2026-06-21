@@ -1,0 +1,143 @@
+<div class="settings-shell">
+
+  <!-- Top header -->
+  <div class="settings-header">
+    <button class="back-btn" (click)="goBack()">
+      <lucide-icon [img]="ArrowLeft" [size]="15" />
+    </button>
+    <lucide-icon [img]="Settings" [size]="15" color="#0463EF" />
+    <span class="settings-header__title">ตั้งค่าระบบ</span>
+  </div>
+
+  <div class="settings-body">
+
+    <!-- Settings sidebar nav -->
+    <nav class="settings-nav">
+      <p class="settings-nav__label">การตั้งค่า</p>
+      @for (item of navItems; track item.id) {
+        <button class="settings-nav__item" [class.settings-nav__item--active]="activeSection() === item.id"
+          (click)="activeSection.set(item.id)">
+          <lucide-icon [img]="item.icon" [size]="14" />
+          <span>{{ item.label }}</span>
+        </button>
+      }
+    </nav>
+
+    <!-- Content area -->
+    <div class="settings-content">
+
+      <!-- ── SPN URL Section ── -->
+      @if (activeSection() === 'spn-url') {
+
+        <!-- Company list view -->
+        @if (!selectedCompanyId()) {
+          <div class="content-header">
+            <p class="content-title">ตั้งชื่อ SPN URL</p>
+            <p class="content-desc">เลือก Company เพื่อจัดการชื่อ URL ที่ใช้งาน ชื่อที่ตั้งจะแสดงแทนค่าเริ่มต้นในทุกที่</p>
+          </div>
+
+          <div class="company-list">
+            @for (company of companies; track company.id) {
+              <button class="company-card" (click)="selectCompany(company.id)">
+                <div class="company-card__icon">
+                  <lucide-icon [img]="Building2" [size]="15" color="#0463EF" />
+                </div>
+                <div class="company-card__body">
+                  <p class="company-card__name">{{ company.name }}</p>
+                  <p class="company-card__meta">
+                    {{ company.urls.length }} URLs
+                    @if (customizedCount(company) > 0) {
+                      · <span class="meta-custom">{{ customizedCount(company) }} แก้ไขแล้ว</span>
+                    }
+                  </p>
+                </div>
+                <lucide-icon [img]="ChevronRight" [size]="14" color="#CCCCCC" />
+              </button>
+            }
+          </div>
+
+        <!-- URL detail view (per company) -->
+        } @else {
+          <div class="content-header">
+            <button class="breadcrumb-btn" (click)="backToList()">
+              <lucide-icon [img]="ArrowLeft" [size]="13" color="#6B7280" />
+              <span>ตั้งชื่อ SPN URL</span>
+            </button>
+            <p class="content-title">{{ selectedCompany()?.name }}</p>
+            <p class="content-desc">ตั้งชื่อให้จดจำง่ายสำหรับแต่ละ URL ชื่อใหม่จะแทนที่ค่าเริ่มต้นในทุกที่</p>
+          </div>
+
+          <div class="url-table">
+            <div class="url-table__head">
+              <span>ชื่อ URL</span>
+              <span>URL</span>
+              <span>ENV</span>
+              <span></span>
+            </div>
+
+            @for (u of selectedCompany()!.urls; track u.id) {
+              <div class="url-table__row" [class.url-table__row--editing]="editingId() === u.id">
+
+                <!-- Name cell -->
+                <div class="url-table__cell">
+                  @if (editingId() === u.id) {
+                    <div class="inline-edit">
+                      <input class="edit-input" [value]="editingValue()"
+                        (input)="editingValue.set($any($event.target).value)"
+                        (keydown.enter)="saveEdit(u.id)"
+                        (keydown.escape)="cancelEdit()"
+                        autofocus />
+                    </div>
+                  } @else {
+                    <span class="url-name" [class.url-name--custom]="isCustom(u)">{{ displayLabel(u) }}</span>
+                    @if (isCustom(u)) {
+                      <span class="custom-badge">แก้ไขแล้ว</span>
+                    }
+                  }
+                </div>
+
+                <!-- URL cell -->
+                <div class="url-table__cell">
+                  <span class="url-mono">{{ u.url }}</span>
+                </div>
+
+                <!-- ENV cell -->
+                <div class="url-table__cell">
+                  <span class="env-chip"
+                    [style.background]="envColor(u.env) + '18'"
+                    [style.color]="envColor(u.env)">
+                    {{ envLabel(u.env) }}
+                  </span>
+                </div>
+
+                <!-- Action cell -->
+                <div class="url-table__cell url-table__actions">
+                  @if (editingId() === u.id) {
+                    <button class="action-btn action-btn--save" (click)="saveEdit(u.id)" title="บันทึก">
+                      <lucide-icon [img]="Check" [size]="13" color="#0D8F61" />
+                    </button>
+                    <button class="action-btn" (click)="cancelEdit()" title="ยกเลิก">
+                      <lucide-icon [img]="IconX" [size]="13" color="#9CA3AF" />
+                    </button>
+                  } @else {
+                    <button class="action-btn" (click)="startEdit(u)" title="แก้ไขชื่อ">
+                      <lucide-icon [img]="Pencil" [size]="13" color="#6B7280" />
+                    </button>
+                    @if (isCustom(u)) {
+                      <button class="action-btn action-btn--danger" (click)="resetUrl(u)" title="รีเซ็ต">
+                        <lucide-icon [img]="RotateCcw" [size]="13" color="#EF4444" />
+                      </button>
+                    }
+                  }
+                </div>
+
+              </div>
+            }
+          </div>
+        }
+      }
+
+    </div>
+  </div>
+
+</div>

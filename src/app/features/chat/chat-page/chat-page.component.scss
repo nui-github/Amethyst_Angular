@@ -20,11 +20,12 @@
 // ── Minimal top bar ───────────────────────────────────────────────────────────
 
 .topbar {
-  height: 44px;
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 10;
   display: flex;
   align-items: center;
-  padding: 0 12px;
-  flex-shrink: 0;
 }
 
 .topbar-toggle {

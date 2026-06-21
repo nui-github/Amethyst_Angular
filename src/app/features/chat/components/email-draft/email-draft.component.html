@@ -1,43 +1,74 @@
 <div class="email-draft" [class.email-draft--sent]="data.isSent">
 
-  <p class="email-draft__title">
-    <lucide-icon [img]="Mail" [size]="14" [color]="data.isSent ? '#0D8F61' : '#0463EF'" />
-    {{ data.isSent ? 'ส่งอีเมลแล้ว' : 'ร่างอีเมลถึงลูกค้า' }}
-  </p>
+  <!-- Header -->
+  <div class="email-header">
+    <div class="email-header__left">
+      <div class="email-icon-wrap" [style.background]="data.isSent ? 'rgba(13,143,97,0.1)' : 'rgba(4,99,239,0.08)'">
+        <lucide-icon [img]="Mail" [size]="14" [color]="data.isSent ? '#0D8F61' : '#0463EF'" />
+      </div>
+      <div>
+        <p class="email-header__title">{{ data.isSent ? 'ส่งอีเมลแล้ว' : 'ร่างอีเมลถึงลูกค้า' }}</p>
+        <p class="email-header__sub">{{ data.isSent ? 'อีเมลถูกส่งเรียบร้อยแล้ว' : 'ตรวจสอบและแก้ไขก่อนส่ง' }}</p>
+      </div>
+    </div>
+    @if (data.isSent) {
+      <span class="sent-badge">
+        <lucide-icon [img]="Check" [size]="11" color="#0D8F61" /> ส่งแล้ว
+      </span>
+    } @else {
+      <span class="draft-badge">ร่าง</span>
+    }
+  </div>
 
   @if (data.isSent) {
-    <!-- Sent state: read-only -->
-    <div class="email-sent-info">
-      <lucide-icon [img]="Check" [size]="15" color="#0D8F61" />
-      <span>ส่งอีเมลถึง <strong>{{ to() || data.to }}</strong> เรียบร้อยแล้ว</span>
-    </div>
-  } @else {
-    <!-- Editable state -->
-    <div class="email-fields">
-      <div class="field">
-        <label>ถึง</label>
-        <input nz-input nzSize="small"
-          [ngModel]="to()" (ngModelChange)="to.set($event)"
-          placeholder="กรอกอีเมลลูกค้า" />
-      </div>
-      <div class="field">
-        <label>หัวข้อ</label>
-        <input nz-input nzSize="small"
-          [ngModel]="subject()" (ngModelChange)="subject.set($event)" />
-      </div>
-      <div class="field">
-        <label>เนื้อหา</label>
-        <textarea nz-input nzSize="small" [nzAutosize]="{ minRows: 3, maxRows: 6 }"
-          [ngModel]="body()" (ngModelChange)="body.set($event)">
-        </textarea>
-      </div>
+    <!-- Sent state -->
+    <div class="email-sent-row">
+      <lucide-icon [img]="Check" [size]="14" color="#0D8F61" />
+      <span>ส่งถึง <strong>{{ to() || data.to }}</strong> เรียบร้อยแล้ว</span>
     </div>
 
-    <button class="send-email-btn"
-      [disabled]="!canSend()"
-      (click)="send()">
-      <lucide-icon [img]="Send" [size]="14" color="#fff" />
-      ส่งอีเมล
-    </button>
+  } @else {
+    <!-- Compose body -->
+    <div class="email-compose">
+
+      <!-- To -->
+      <div class="compose-row">
+        <span class="compose-label">ถึง</span>
+        <input class="compose-input"
+          [ngModel]="to()" (ngModelChange)="to.set($event)"
+          placeholder="อีเมลลูกค้า" type="email" />
+      </div>
+
+      <div class="compose-divider"></div>
+
+      <!-- Subject -->
+      <div class="compose-row">
+        <span class="compose-label">หัวข้อ</span>
+        <input class="compose-input compose-input--subject"
+          [ngModel]="subject()" (ngModelChange)="subject.set($event)"
+          placeholder="หัวข้ออีเมล" />
+      </div>
+
+      <div class="compose-divider"></div>
+
+      <!-- Body -->
+      <textarea class="compose-body"
+        [ngModel]="body()" (ngModelChange)="body.set($event)"
+        placeholder="เนื้อหาอีเมล..." rows="6">
+      </textarea>
+
+    </div>
+
+    <!-- Action bar -->
+    <div class="email-actions">
+      <button class="send-btn" [disabled]="!canSend()" (click)="send()">
+        <lucide-icon [img]="Send" [size]="13" color="#fff" />
+        ส่งอีเมล
+      </button>
+      <span class="char-hint" [class.char-hint--ready]="canSend()">
+        {{ canSend() ? 'พร้อมส่ง' : 'กรอกให้ครบก่อนส่ง' }}
+      </span>
+    </div>
   }
+
 </div>

@@ -1,0 +1,312 @@
+.settings-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #F5F6FA;
+}
+
+// ── Top header ────────────────────────────────────────────────────────────────
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 20px;
+  height: 52px;
+  background: #fff;
+  border-bottom: 1px solid #E8E8E8;
+  flex-shrink: 0;
+
+  &__title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #010136;
+  }
+}
+
+.back-btn {
+  width: 28px; height: 28px;
+  border-radius: 7px;
+  border: 1px solid #E8EAF2;
+  background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0; color: #6B7280;
+  &:hover { background: #F5F6FA; }
+}
+
+// ── Two-panel body ────────────────────────────────────────────────────────────
+
+.settings-body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+// ── Settings sidebar nav ──────────────────────────────────────────────────────
+
+.settings-nav {
+  width: 200px;
+  flex-shrink: 0;
+  background: #fff;
+  border-right: 1px solid #E8EAF2;
+  padding: 16px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  &__label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #BBBBBB;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 0 10px;
+    margin: 0 0 6px;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: #6B7280;
+    text-align: left;
+    width: 100%;
+    font-family: inherit;
+    transition: background 0.15s, color 0.15s;
+
+    &:hover { background: #F5F6FA; color: #010136; }
+
+    &--active {
+      background: rgba(4, 99, 239, 0.08);
+      color: #0463EF;
+      font-weight: 600;
+    }
+  }
+}
+
+// ── Content area ──────────────────────────────────────────────────────────────
+
+.settings-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.content-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 680px;
+}
+
+.content-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #010136;
+  margin: 0;
+}
+
+.content-desc {
+  font-size: 12px;
+  color: #6B7280;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.breadcrumb-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: #6B7280;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  margin-bottom: 4px;
+  font-family: inherit;
+  &:hover { color: #0463EF; }
+
+  span { font-weight: 500; }
+}
+
+// ── Company list ──────────────────────────────────────────────────────────────
+
+.company-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 560px;
+}
+
+.company-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: #fff;
+  border: 1.5px solid #E8EAF2;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  width: 100%;
+  transition: border-color 0.15s, box-shadow 0.15s;
+
+  &:hover {
+    border-color: #0463EF;
+    box-shadow: 0 2px 8px rgba(4, 99, 239, 0.08);
+  }
+
+  &__icon {
+    width: 36px; height: 36px;
+    border-radius: 9px;
+    background: rgba(4, 99, 239, 0.07);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  &__body { flex: 1; min-width: 0; }
+
+  &__name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #010136;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__meta {
+    font-size: 11px;
+    color: #9CA3AF;
+    margin: 2px 0 0;
+  }
+}
+
+.meta-custom { color: #0463EF; font-weight: 600; }
+
+// ── URL table ──────────────────────────────────────────────────────────────────
+
+.url-table {
+  background: #fff;
+  border: 1.5px solid #E8EAF2;
+  border-radius: 10px;
+  overflow: hidden;
+  max-width: 720px;
+
+  &__head {
+    display: grid;
+    grid-template-columns: 220px 1fr 60px 80px;
+    padding: 10px 16px;
+    background: #F8F9FB;
+    border-bottom: 1px solid #E8EAF2;
+    font-size: 11px;
+    font-weight: 700;
+    color: #9CA3AF;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 220px 1fr 60px 80px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #F5F6FA;
+    align-items: center;
+    transition: background 0.12s;
+
+    &:last-child { border-bottom: none; }
+    &:hover { background: #FAFBFC; }
+    &--editing { background: rgba(4, 99, 239, 0.03); }
+  }
+
+  &__cell {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    padding-right: 8px;
+  }
+
+  &__actions {
+    justify-content: flex-end;
+    padding-right: 0;
+    gap: 4px;
+  }
+}
+
+.url-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #010136;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &--custom { color: #0463EF; }
+}
+
+.custom-badge {
+  font-size: 10px;
+  font-weight: 600;
+  color: #0463EF;
+  background: rgba(4, 99, 239, 0.08);
+  padding: 1px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.url-mono {
+  font-size: 11px;
+  color: #9CA3AF;
+  font-family: monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.env-chip {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.4px;
+  padding: 2px 6px; border-radius: 4px; white-space: nowrap;
+}
+
+// ── Inline edit ───────────────────────────────────────────────────────────────
+
+.inline-edit { display: flex; align-items: center; width: 100%; }
+
+.edit-input {
+  font-size: 13px; font-weight: 600; color: #010136;
+  border: 1.5px solid #0463EF;
+  border-radius: 6px;
+  padding: 4px 8px;
+  outline: none; width: 100%;
+  font-family: inherit;
+  background: #fff;
+  &:focus { box-shadow: 0 0 0 3px rgba(4,99,239,0.12); }
+}
+
+.action-btn {
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  border: 1px solid #E8EAF2;
+  background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0; transition: all 0.14s;
+
+  &:hover { background: #F5F6FA; }
+  &--save:hover  { background: rgba(13,143,97,0.08); border-color: #0D8F61; }
+  &--danger:hover { background: rgba(239,68,68,0.06); border-color: #EF4444; }
+}

@@ -62,9 +62,10 @@ ChatMessage.type → @switch in ChatAreaComponent
 ### Services (inject, never constructor)
 ```ts
 // All state — inject in components with inject(ChatService)
-ChatService    → src/app/core/services/chat.service.ts
-QueueService   → src/app/core/services/queue.service.ts
-OcrService     → src/app/core/services/ocr.service.ts
+ChatService      → src/app/core/services/chat.service.ts
+QueueService     → src/app/core/services/queue.service.ts
+OcrService       → src/app/core/services/ocr.service.ts
+UrlLabelService  → src/app/core/services/url-label.service.ts  ← custom SPN URL names (localStorage)
 ```
 
 ### Path Aliases (tsconfig.json)
@@ -117,6 +118,8 @@ src/
 │   │   │       └── typing-indicator/  ← 3-dot bounce (inline template)
 │   │   ├── queue/
 │   │   │   └── queue-page/            ← ListView + ShipmentChatView
+│   │   ├── settings/
+│   │   │   └── settings-page/         ← 2-panel settings (nav sidebar + content)
 │   │   └── print/
 │   │       └── license-print/         ← A4 print page
 │   └── shared/

@@ -12,8 +12,9 @@
   &--collapsed {
     width: 52px;
 
-    .toggle-btn { display: none; }        // hidden — chat header takes over
+    .toggle-btn { display: none; }
     .sb-logo-name { display: none; }
+    .sb-logo { justify-content: center; padding: 0; }
     .new-chat-btn { justify-content: center; padding: 8px; }
     .new-chat-btn span { display: none; }
     .nav-item span { display: none; }
@@ -21,6 +22,10 @@
     .nav-chevron { display: none; }
     .nav-badge { display: none; }
     .sb-label { display: none; }
+    .sb-profile { justify-content: center; padding: 10px 0; }
+    .settings-btn { justify-content: center; padding: 8px; margin: 4px auto 2px; width: 36px; }
+    .bizx-logo-btn { justify-content: center; margin: 2px auto 4px; width: 36px; padding: 7px 0; }
+    .sb-collapse-toggle { display: flex; justify-content: center; padding: 6px 0 2px; }
   }
 }
 
@@ -45,13 +50,29 @@
 }
 
 .sb-name { font-size: 13px; font-weight: 700; color: #010136; margin: 0; white-space: nowrap; }
-.sb-sub  { font-size: 10px; color: #8080A5; margin: 0; white-space: nowrap; }
+
+.app-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #0463EF, #16EA9E);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(4, 99, 239, 0.3);
+}
 
 .toggle-btn {
   margin-left: auto; width: 24px; height: 24px; border-radius: 6px;
   border: none; background: transparent; cursor: pointer;
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   &:hover { background: #F5F5F5; }
+}
+
+.sb-collapse-toggle {
+  padding: 6px 8px 2px;
+  border-bottom: 1px solid #F0F1F5;
 }
 
 // ── Nav sections ──────────────────────────────────────────────────────────────
@@ -117,6 +138,57 @@
   &:hover { background: #F0F0F0; border-color: #D1D5DB; }
 }
 
+// ── Profile ───────────────────────────────────────────────────────────────────
+
+.sb-profile {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-top: 1px solid #F0F1F5;
+  cursor: pointer;
+  transition: background 0.15s;
+  &:hover { background: #F5F6FA; }
+}
+
+.sb-profile__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: #DDE8FF;
+  color: #0463EF;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sb-profile__info {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.sb-profile__name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #010136;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sb-profile__role {
+  font-size: 10px;
+  color: #8080A5;
+  margin: 0;
+  white-space: nowrap;
+}
+
 // ── Footer with BizX logo ─────────────────────────────────────────────────────
 
 .sb-footer {
@@ -129,15 +201,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  padding: 12px 16px;
+  width: calc(100% - 16px);
+  margin: 2px 8px 4px;
+  padding: 7px 10px;
+  border-radius: 8px;
   border: none;
-  background: transparent;
+  background: #F3F4F6;
   cursor: pointer;
   transition: background 0.12s;
   font-family: inherit;
+  text-decoration: none;
 
-  &:hover { background: #F5F7FF; }
+  &:hover { background: #E8EAF0; }
 
   img, svg { display: block; }
 }

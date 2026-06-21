@@ -6,15 +6,6 @@
   <!-- Main -->
   <div class="main">
 
-    <!-- Panel toggle — only rendered when sidebar is collapsed -->
-    @if (collapsed()) {
-      <div class="topbar">
-        <button class="topbar-toggle" (click)="toggleSidebar()" title="เปิด Sidebar">
-          <lucide-icon [img]="icPanelOpen" [size]="17" color="#6B7280" />
-        </button>
-      </div>
-    }
-
     <!-- WELCOME STATE: centered layout (only when first welcome message) -->
     @if (isWelcome()) {
       <div class="welcome-layout">

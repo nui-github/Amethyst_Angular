@@ -71,14 +71,35 @@
 
       <div class="url-cards">
         @for (u of urls(); track u.id) {
-          <button class="url-card" [class.url-card--selected]="selectedUrlId() === u.id"
+          <div class="url-card" [class.url-card--selected]="selectedUrlId() === u.id"
             (click)="selectUrl(u.id)">
             <div class="url-card__left">
               <span class="env-badge" [style.background]="envColor(u.env) + '18'" [style.color]="envColor(u.env)">
                 {{ envLabel(u.env) }}
               </span>
-              <div>
-                <p class="url-card__label">{{ u.label }}</p>
+              <div class="url-card__info">
+                @if (editingUrlId() === u.id) {
+                  <div class="url-rename" (click)="$event.stopPropagation()">
+                    <input class="rename-input" [value]="editingValue()"
+                      (input)="editingValue.set($any($event.target).value)"
+                      (keydown.enter)="saveEdit(u.id)"
+                      (keydown.escape)="cancelEdit()"
+                      autofocus />
+                    <button class="rename-btn rename-btn--save" (click)="saveEdit(u.id)" title="บันทึก">
+                      <lucide-icon [img]="Check" [size]="12" color="#0D8F61" />
+                    </button>
+                    <button class="rename-btn" (click)="cancelEdit()" title="ยกเลิก">
+                      <lucide-icon [img]="IconX" [size]="12" color="#9CA3AF" />
+                    </button>
+                  </div>
+                } @else {
+                  <div class="url-label-row">
+                    <p class="url-card__label">{{ displayLabel(u) }}</p>
+                    <button class="edit-label-btn" (click)="startEdit(u, $event)" title="ตั้งชื่อ">
+                      <lucide-icon [img]="Pencil" [size]="11" color="#9CA3AF" />
+                    </button>
+                  </div>
+                }
                 <p class="url-card__url">{{ u.url }}</p>
               </div>
             </div>
@@ -87,7 +108,7 @@
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
               }
             </div>
-          </button>
+          </div>
         }
       </div>
 

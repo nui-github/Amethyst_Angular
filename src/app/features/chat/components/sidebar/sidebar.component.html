@@ -2,15 +2,27 @@
 
   <!-- Logo bar -->
   <div class="sb-logo">
-    <div class="bx-badge">BX</div>
-    <div class="sb-logo-name">
-      <p class="sb-name">Netbay Agent</p>
-      <p class="sb-sub">Assistant</p>
+    <div class="app-icon">
+      <lucide-icon [img]="icBot" [size]="18" color="#ffffff" />
     </div>
-    <button class="toggle-btn" (click)="toggleCollapse.emit()">
-      <lucide-icon [img]="collapsed ? icPanelOpen : icPanelClose" [size]="16" color="#B0B4C4" />
-    </button>
+    @if (!collapsed) {
+      <div class="sb-logo-name">
+        <p class="sb-name">Netbay Agent</p>
+      </div>
+      <button class="toggle-btn" (click)="toggleCollapse.emit()">
+        <lucide-icon [img]="icPanelClose" [size]="16" color="#B0B4C4" />
+      </button>
+    }
   </div>
+
+  <!-- Collapsed: toggle as top nav item -->
+  @if (collapsed) {
+    <div class="sb-collapse-toggle">
+      <button class="nav-item" (click)="toggleCollapse.emit()" title="เปิด Sidebar">
+        <lucide-icon [img]="icPanelOpen" [size]="15" />
+      </button>
+    </div>
+  }
 
   <!-- Scrollable nav area -->
   <div class="sb-nav">
@@ -61,10 +73,21 @@
   <div class="sb-footer">
 
     <!-- Settings -->
-    <button class="settings-btn" [title]="collapsed ? 'ตั้งค่า' : ''">
+    <button class="settings-btn" [title]="collapsed ? 'ตั้งค่า' : ''" (click)="router.navigate(['/settings'])">
       <lucide-icon [img]="icSettings" [size]="14" />
       @if (!collapsed) { <span>ตั้งค่า</span> }
     </button>
+
+    <!-- Profile -->
+    <div class="sb-profile" [title]="collapsed ? 'Mr. John Doe' : ''">
+      <div class="sb-profile__avatar">J</div>
+      @if (!collapsed) {
+        <div class="sb-profile__info">
+          <p class="sb-profile__name">Mr. John Doe</p>
+          <p class="sb-profile__role">Admin</p>
+        </div>
+      }
+    </div>
 
     <!-- SPN connection badge -->
     @if (chat.isConnected()) {

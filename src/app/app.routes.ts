@@ -16,5 +16,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/print/license-print/license-print.component')
       .then(m => m.LicensePrintComponent),
   },
+  {
+    path: 'settings',
+    loadComponent: () => import('./features/settings/settings-page/settings-page.component')
+      .then(m => m.SettingsPageComponent),
+  },
   { path: '**', redirectTo: '' },
 ];

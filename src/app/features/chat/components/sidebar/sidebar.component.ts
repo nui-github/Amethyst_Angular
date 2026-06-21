@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { LucideAngularModule, MessageSquareText, LayoutDashboard, FileCheck2, Package, FileText, BarChart2, Settings, Plus, ChevronRight, PanelLeftClose, PanelLeftOpen, MoreHorizontal, List } from 'lucide-angular';
+import { LucideAngularModule, MessageSquareText, LayoutDashboard, FileCheck2, Package, FileText, BarChart2, Settings, Plus, ChevronRight, PanelLeftClose, PanelLeftOpen, MoreHorizontal, List, Bot } from 'lucide-angular';
 import { ChatService } from '@app/core/services/chat.service';
 import { QueueService } from '@app/core/services/queue.service';
 
@@ -35,6 +35,7 @@ export class SidebarComponent {
   readonly icPanelOpen   = PanelLeftOpen;
   readonly icMore     = MoreHorizontal;
   readonly icList     = List;
+  readonly icBot      = Bot;
 
   isChat  = () => this.router.url === '/' || this.router.url === '';
   isQueue = () => this.router.url === '/queue';
