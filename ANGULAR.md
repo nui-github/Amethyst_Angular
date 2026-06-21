@@ -117,6 +117,8 @@ Key methods:
 
 ## Mock → Real API
 
+> Full API contracts (request/response shapes, endpoints) are in **[docs/API.md](./docs/API.md)**
+
 When ready to connect real APIs, edit `src/environments/environment.prod.ts`:
 ```ts
 useMock: false,
@@ -228,7 +230,10 @@ readonly CheckCircle = CheckCircle;
 // template: <lucide-icon [img]="CheckCircle" [size]="16" />
 ```
 
-### BizX Colors
+### BizX Design System
+Full reference (colors, typography, spacing, component patterns, do/don't rules) is in **[docs/DESIGN.md](./docs/DESIGN.md)**.
+
+### BizX Colors (quick ref)
 Never use Tailwind classes. Use CSS custom properties:
 ```scss
 var(--bizx-blue)   // #0463EF
