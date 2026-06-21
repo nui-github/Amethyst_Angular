@@ -1,7 +1,7 @@
 # Angular Implementation Guide — ShippingNet Assistant
 
 > Handoff doc for dev team. Read this before touching any component.  
-> Architecture decisions are final — follow the patterns shown in `FlagCardComponent` and `ChoiceCardComponent`.
+> Architecture decisions are final — follow patterns in `FlagCardComponent` and `ChoiceCardComponent`.
 
 ---
 
@@ -78,189 +78,40 @@ Key methods:
 
 ---
 
-## Components to Implement
+## Implementation Status
 
-### ✅ Done
-- `ChatAreaComponent` — @switch renderer, readOnly mode
-- `FlagCardComponent` — full interactive implementation
-- `ChoiceCardComponent` — 2-option card
-- `SpnResultComponent` — SPN data display card
-- `LicensePrintComponent` — A4 print page
-- `TypingIndicatorComponent` — 3-dot bounce
+### ✅ Fully Implemented
 
-### 🔲 TODO — follow patterns below
+| Component | Path | Notes |
+|---|---|---|
+| `ChatAreaComponent` | `features/chat/components/chat-area/` | @switch renderer, readOnly mode |
+| `ChatHeaderComponent` | `features/chat/components/chat-header/` | Sidebar toggle, breadcrumb, status pill |
+| `SidebarComponent` | `features/chat/components/sidebar/` | Collapsible 224px/48px rail, SPN badge, BizX logo |
+| `FlagCardComponent` | `features/chat/components/flag-card/` | Full interactive, progress tracker |
+| `ChoiceCardComponent` | `features/chat/components/choice-card/` | Rich cards (with desc) + simple card (no desc) |
+| `SpnResultComponent` | `features/chat/components/spn-result/` | Inline template |
+| `SpnCardComponent` | `features/chat/components/spn-card/` | Checkbox multi-select, pagination |
+| `SpnConnectComponent` | `features/chat/components/spn-connect/` | Multi-step: company → URL → login → success |
+| `ConnectPanelComponent` | `features/chat/components/connect/` | Simple username/password (legacy `'connect'` type) |
+| `OcrProgressComponent` | `features/chat/components/ocr-progress/` | 4-stage grid, % counter, pulse dot |
+| `OcrResultsComponent` | `features/chat/components/ocr-results/` | Inline template, info-card layout |
+| `HsAnalysisComponent` | `features/chat/components/hs-analysis/` | AI HS code analysis card, permit tags |
+| `FormPanelComponent` | `features/chat/components/form-panel/` | Editable form, importDate + drugRegNo required |
+| `FullUploadComponent` | `features/chat/components/full-upload/` | 4-slot drag-drop (invoice/customs/coa/ulicense) |
+| `SingleUploadComponent` | `features/chat/components/single-upload/` | Single-slot upload for ใบขนสินค้า flow |
+| `EmailDraftComponent` | `features/chat/components/email-draft/` | To/Subject/Body, send disabled until all filled |
+| `StatusCardComponent` | `features/chat/components/status-card/` | Inline template, teal success card + action chips |
+| `ImportLicenseMenuComponent` | `features/chat/components/import-license-menu/` | 3-option doc type menu |
+| `TypingIndicatorComponent` | `features/chat/components/typing-indicator/` | Inline template, 3-dot bounce |
+| `QueuePageComponent` | `features/queue/queue-page/` | ListView + ShipmentChatView, status action bars |
+| `LicensePrintComponent` | `features/print/license-print/` | A4 draft, auto window.print() |
 
----
+### 🔲 Suggested Next Steps
 
-### `SidebarComponent`
-**Path**: `features/chat/components/sidebar/`  
-**Pattern**: display component, inject `ChatService` + `QueueService`
-
-```ts
-@Input() collapsed = false;
-@Output() toggleCollapse = new EventEmitter<void>();
-// Reads: chat.sidebarActive(), queue.needsYouCount()
-// Calls: chat.setSidebarActive(), chat.newChat()
-```
-
-Sections: logo, New Chat button, nav items (Chatbot, คิวงาน+badge, Dashboard), settings footer  
-Collapsed state: 48px rail, icon-only with tooltip
-
----
-
-### `ChatHeaderComponent`
-**Path**: `features/chat/components/chat-header/`
-
-```ts
-@Input() currentPage: string;
-@Input() isConnected: boolean;
-@Output() toggleSidebar = new EventEmitter<void>();
-@Output() disconnect = new EventEmitter<void>();
-```
-
-Contains: sidebar toggle icon, breadcrumb (Netbay Agent › {page}), status pill, bell icon, avatar
-
----
-
-### `ConnectPanelComponent`
-**Path**: `features/chat/components/connect/`  
-**MessageType**: `'connect'`
-
-```ts
-@Output() connected = new EventEmitter<string>(); // emits pendingRef
-```
-
-Shows username + password form (ng-zorro NzFormModule).  
-On submit: call mock auth (1200ms delay) → emit `connected` with `chat.pendingRef()`.  
-ChatArea wires: `(connected)="chat.onConnected($event)"`
-
----
-
-### `SpnCardComponent` (SPN multi-select list)
-**Path**: `features/chat/components/spn-card/`  
-**MessageType**: `'spn-list'`
-
-```ts
-@Input() entries: SPNEntry[] = []; // from chat.spnEntries()
-@Output() requestPermit = new EventEmitter<string[]>(); // selected refs
-```
-
-Table with checkbox per row, 5 rows/page (nz-pagination), "ขอใบอนุญาต" button.  
-ChatArea wires: `(requestPermit)="chat.onRequestPermit($event)"`
-
----
-
-### `OcrProgressComponent`
-**Path**: `features/chat/components/ocr-progress/`  
-**MessageType**: `'ocr-progress'`
-
-```ts
-@Input() progress = 0;     // 0–100
-@Input() stages: string[]; // completed stage names
-```
-
-Shows 4 stage rows with checkmark when complete + `.ocr-fill` gradient progress bar.
-
----
-
-### `OcrResultsComponent`
-**Path**: `features/chat/components/ocr-results/`  
-**MessageType**: `'ocr-results'`
-
-```ts
-@Input() data!: OcrResultsData;
-```
-
-Display-only card: invoice no, date, quantity, HS code, importer, port, lot no, U no.  
-Use `info-card` CSS classes from `_chat.scss`.
-
----
-
-### `FormPanelComponent`
-**Path**: `features/chat/components/form-panel/`  
-**MessageType**: `'form'`
-
-Editable form bound to `chat.formData()`. Fields:
-- importDate (required, starts empty — nz-date-picker)
-- drugRegNo (required, starts empty — nz-input)
-- invoiceNo, quantity, importer, port etc. (pre-filled from OCR, editable)
-
-```ts
-// On change: call chat.formData.update(...)
-// Has "ดูพรีวิว" button → calls chat.onPreviewChoice('preview')
-```
-
----
-
-### `FullUploadComponent`
-**Path**: `features/chat/components/full-upload/`  
-**MessageType**: `'full-upload'`
-
-4 drag-drop slots: invoice / customs / coa / ulicense.  
-nz-upload component per slot.  
-"เริ่ม OCR" button → calls `chat.startOCR(files)`.
-
----
-
-### `EmailDraftComponent`
-**Path**: `features/chat/components/email-draft/`  
-**MessageType**: `'email-draft'`
-
-```ts
-@Input() data!: EmailDraftData;
-@Output() sent = new EventEmitter<void>();
-```
-
-Editable To / Subject / Body fields.  
-Send button disabled until all 3 non-empty.  
-On send: emit `sent` → ChatArea calls `chat.onEmailSent(msg.id)`.  
-Sent state: show read-only "ส่งแล้ว" label.
-
----
-
-### `StatusCardComponent`
-**Path**: `features/chat/components/status-card/`  
-**MessageType**: `'status-card'`
-
-```ts
-@Input() data!: StatusCardData;
-// { refNo, customsRef, submittedAt }
-```
-
-Success card (teal): ref no, temp license no, date, status badge.  
-Chips: "ตรวจสอบสถานะ", "สร้างใบใหม่", "พิมพ์ใบอนุญาต"  
-Chips call `chat.send(text)` directly.
-
----
-
-### `ImportLicenseMenuComponent`
-**Path**: `features/chat/components/import-license-menu/`  
-**MessageType**: `'spn-not-found'`
-
-3-card menu (nz-card):
-- "ใบขนสินค้า" → `chat.chooseCustomsDocs()`
-- "ใบ Invoice" → `chat.chooseInvoiceFirst()`
-- "เอกสารชุดสำหรับการขอใบอนุญาตนำเข้า" → `chat.chooseFullUpload()`
-
----
-
-### `QueuePageComponent` (full implementation)
-**Path**: `features/queue/queue-page/`  
-Current stub shows basic list. Full implementation:
-
-```
-Layout: flex row
-  ListView (300px) — list of Shipment rows
-    - search input (nz-input)
-    - each row: chatName or customsNo, goods, status badge, agency badge, isNew badge
-    - click → queue.open(id)
-  ShipmentChatView (flex-1) — shown when openId is set
-    - header: customsNo, status badge, 8-step progress bar
-    - <app-chat-area [messages]="shipment.messages" [readOnly]="true" />
-    - action bars per statusKey (needs_you, email_outbox, await_customer, submitted)
-```
-
-ng-zorro components: `nz-badge`, `nz-tag`, `nz-steps` (or custom), `nz-message` for toast.
+- Replace mock SPN/OCR/queue data with real API calls
+- `QueuePageComponent` — complete action bar flows (email_outbox → await_customer → submitted)
+- Mobile responsive: collapse sidebar at <768px
+- Real-time status updates / notifications
 
 ---
 
@@ -283,8 +134,6 @@ files.forEach(f => form.append('files', f as File))
 return this.http.post<OcrResult>(environment.ocrApiUrl, form).toPromise()
 ```
 
-See `API.md` (in the Next.js project) for full request/response contracts.
-
 ---
 
 ## File Structure
@@ -293,48 +142,97 @@ See `API.md` (in the Next.js project) for full request/response contracts.
 src/
 ├── app/
 │   ├── core/
-│   │   ├── models/types.ts           ← all interfaces
+│   │   ├── mock/                      ← mock data (replaces with real API calls)
+│   │   │   ├── spn.mock.ts            ← KNOWN_REFS, MOCK_FORM_DATA, MOCK_SPN_LIST
+│   │   │   ├── ocr.mock.ts            ← MOCK_OCR_RESULT, OcrResult
+│   │   │   ├── queue.mock.ts          ← MOCK_QUEUE, STATUS_META, AGENCY_LABEL
+│   │   │   ├── spn-companies.mock.ts  ← MOCK_SPN_COMPANIES
+│   │   │   └── hs-analysis.mock.ts    ← analyzeHsCode()
+│   │   ├── models/
+│   │   │   └── types.ts               ← all interfaces + MessageType union
 │   │   └── services/
-│   │       ├── chat.service.ts       ← all chat state + logic
-│   │       ├── queue.service.ts      ← queue state
-│   │       └── ocr.service.ts        ← OCR flow
+│   │       ├── chat.service.ts        ← all chat state + logic
+│   │       ├── queue.service.ts       ← queue state
+│   │       └── ocr.service.ts         ← OCR flow
 │   ├── features/
 │   │   ├── chat/
-│   │   │   ├── chat-page/            ← ✅ implemented (shell)
+│   │   │   ├── chat-page/             ← shell page + QuickActionBar
 │   │   │   └── components/
-│   │   │       ├── chat-area/        ← ✅ @switch renderer
-│   │   │       ├── flag-card/        ← ✅ full implementation
-│   │   │       ├── choice-card/      ← ✅ implemented
-│   │   │       ├── spn-result/       ← ✅ implemented
-│   │   │       ├── typing-indicator/ ← ✅ implemented
-│   │   │       ├── sidebar/          ← 🔲 TODO
-│   │   │       ├── chat-header/      ← 🔲 TODO
-│   │   │       ├── connect/          ← 🔲 TODO
-│   │   │       ├── spn-card/         ← 🔲 TODO (SPN list)
-│   │   │       ├── ocr-progress/     ← 🔲 TODO
-│   │   │       ├── ocr-results/      ← 🔲 TODO
-│   │   │       ├── form-panel/       ← 🔲 TODO
-│   │   │       ├── full-upload/      ← 🔲 TODO
-│   │   │       ├── email-draft/      ← 🔲 TODO
-│   │   │       ├── status-card/      ← 🔲 TODO
-│   │   │       └── import-license-menu/ ← 🔲 TODO
+│   │   │       ├── chat-area/         ← @switch renderer
+│   │   │       ├── chat-header/       ← top header bar
+│   │   │       ├── sidebar/           ← collapsible nav
+│   │   │       ├── flag-card/         ← flag review interactive card
+│   │   │       ├── choice-card/       ← 2-option decision card
+│   │   │       ├── spn-result/        ← SPN data info card (inline template)
+│   │   │       ├── spn-card/          ← SPN multi-select list
+│   │   │       ├── spn-connect/       ← multi-step ShippingNet login
+│   │   │       ├── connect/           ← simple legacy connect form
+│   │   │       ├── ocr-progress/      ← OCR stage progress card
+│   │   │       ├── ocr-results/       ← OCR data display card (inline template)
+│   │   │       ├── hs-analysis/       ← AI HS code analysis card
+│   │   │       ├── form-panel/        ← editable license form
+│   │   │       ├── full-upload/       ← 4-slot document upload
+│   │   │       ├── single-upload/     ← single-slot upload (ใบขนสินค้า flow)
+│   │   │       ├── email-draft/       ← editable email composer
+│   │   │       ├── status-card/       ← submission success card (inline template)
+│   │   │       ├── import-license-menu/ ← 3-card doc type selector (inline template)
+│   │   │       └── typing-indicator/  ← 3-dot bounce (inline template)
 │   │   ├── queue/
-│   │   │   └── queue-page/           ← 🔲 TODO (full implementation)
+│   │   │   └── queue-page/            ← full queue UI
 │   │   └── print/
-│   │       └── license-print/        ← ✅ implemented
+│   │       └── license-print/         ← A4 print page
 │   └── shared/
-│       ├── pipes/safe-html.pipe.ts   ← ✅
-│       └── utils/svg-icons.ts        ← ✅ (for [innerHTML] only)
-├── mock/
-│   ├── queue.mock.ts
-│   ├── spn.mock.ts
-│   └── ocr.mock.ts
-├── styles/
-│   ├── _variables.scss   ← BizX CSS custom properties
-│   ├── _ng-zorro-theme.scss ← Ant Design token overrides
-│   ├── _chat.scss        ← .bot-bubble, .user-bubble, .ai-avatar etc.
-│   └── styles.scss       ← entry point
-└── environments/
-    ├── environment.ts        ← useMock: true
-    └── environment.prod.ts   ← useMock: false
+│       ├── pipes/safe-html.pipe.ts    ← DomSanitizer pipe
+│       └── utils/
+│           ├── helpers.ts             ← generateId(), getTime()
+│           └── svg-icons.ts           ← inline SVG strings (for [innerHTML] only)
+├── environments/
+│   ├── environment.ts                 ← useMock: true
+│   └── environment.prod.ts            ← useMock: false
+└── styles/
+    ├── _variables.scss                ← BizX CSS custom properties
+    ├── _ng-zorro-theme.scss           ← Ant Design token overrides
+    ├── _chat.scss                     ← .bot-bubble, .user-bubble, .ai-avatar etc.
+    └── styles.scss                    ← entry point (imports all partials)
 ```
+
+---
+
+## Key Patterns
+
+### Inline template vs separate HTML
+Components with simple, self-contained output use inline `template:` in the `@Component` decorator:
+`SpnResultComponent`, `OcrResultsComponent`, `StatusCardComponent`, `ImportLicenseMenuComponent`, `TypingIndicatorComponent`, `ConnectPanelComponent`
+
+All others use separate `.html` files.
+
+### Path aliases (tsconfig.json)
+```ts
+@app/*   → src/app/*
+@mock/*  → src/app/core/mock/*
+@env/*   → src/environments/*
+```
+
+### Angular Signals + OnPush
+All components use `ChangeDetectionStrategy.OnPush`.  
+State lives in services as `signal()` / `computed()`.  
+Use `(input)="signal.set($event.target.value)"` — NOT `(ngModelChange)` — for signal updates in OnPush.
+
+### LucideAngularModule
+Import `LucideAngularModule` + individual icons from `lucide-angular`.  
+Assign icons to `readonly` class fields, bind with `[img]="iconField"`.
+
+```ts
+import { LucideAngularModule, CheckCircle } from 'lucide-angular';
+readonly CheckCircle = CheckCircle;
+// template: <lucide-icon [img]="CheckCircle" [size]="16" />
+```
+
+### BizX Colors
+Never use Tailwind classes. Use CSS custom properties:
+```scss
+var(--bizx-blue)   // #0463EF
+var(--bizx-navy)   // #0E1B4D
+var(--bizx-teal)   // #0D8F61
+```
+Or inline `style="color: #0463EF"` for one-offs.

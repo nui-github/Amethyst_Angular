@@ -21,7 +21,7 @@
     "lib": ["ES2022", "dom"],
     "paths": {
       "@app/*": ["src/app/*"],
-      "@mock/*": ["src/mock/*"],
+      "@mock/*": ["src/app/core/mock/*"],
       "@env/*": ["src/environments/*"]
     }
   },
