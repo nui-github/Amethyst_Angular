@@ -23,6 +23,7 @@ import { FullUploadComponent } from '../full-upload/full-upload.component';
 import { SingleUploadComponent } from '../single-upload/single-upload.component';
 import { EmailDraftComponent } from '../email-draft/email-draft.component';
 import { FormPanelComponent } from '../form-panel/form-panel.component';
+import { FormPreviewComponent } from '../form-preview/form-preview.component';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 
 /**
@@ -46,7 +47,7 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
     SpnCardComponent, ChoiceCardComponent, OcrResultsComponent,
     StatusCardComponent, OcrProgressComponent, ImportLicenseMenuComponent,
     ConnectPanelComponent, FullUploadComponent, SingleUploadComponent, EmailDraftComponent, FormPanelComponent,
-    SpnConnectComponent, HsAnalysisComponent,
+    SpnConnectComponent, HsAnalysisComponent, FormPreviewComponent,
   ],
   templateUrl: './chat-area.component.html',
   styleUrl: './chat-area.component.scss',
@@ -76,6 +77,10 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked {
   asEmailDraft(data: unknown)  { return data as EmailDraftData; }
   asChoiceCard(data: unknown)  { return data as ChoiceCardData; }
   asAny(data: unknown)         { return data as Record<string, unknown>; }
+  uploadMode(msg: ChatMessage): 'customs' | 'invoice' {
+    const d = msg.data as Record<string, unknown> | undefined;
+    return (d?.['mode'] === 'invoice') ? 'invoice' : 'customs';
+  }
 
   onChoice(msg: ChatMessage, value: string): void {
     const data = msg.data as ChoiceCardData;

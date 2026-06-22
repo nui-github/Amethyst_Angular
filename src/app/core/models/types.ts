@@ -25,7 +25,8 @@ export type MessageType =
   | 'status-card'        // submission result card
   | 'spn-connect'        // multi-step SPN company → URL → login flow
   | 'single-upload'      // single-slot upload (ใบขนสินค้า path)
-  | 'hs-analysis';       // AI HS Code classification result
+  | 'hs-analysis'        // AI HS Code classification result
+  | 'form-preview';      // pre-submit data review table
 
 export interface ChatMessage {
   id: string;

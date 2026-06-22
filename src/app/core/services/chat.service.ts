@@ -250,7 +250,7 @@ export class ChatService {
   chooseInvoiceFirst(): void {
     this.user('ใบ Invoice');
     this.markFlowStart();
-    this.withTyping(() => { this.step.set('invoice_upload'); this.bot('full-upload'); }, 400);
+    this.withTyping(() => { this.step.set('invoice_upload'); this.bot('single-upload', { mode: 'invoice' }); }, 400);
   }
 
   chooseFullUpload(): void {
@@ -401,13 +401,16 @@ export class ChatService {
   // ── Preview / Submit ───────────────────────────────────────────────────────
   private showPreview(): void {
     this.step.set('preview');
-    this.bot('choice-card', {
-      question: `พรีวิวร่างใบอนุญาต — Invoice ${this.formData().invoiceNo ?? '—'} · HS ${this.formData().hsCode ?? '—'} · ${this.formData().importer ?? '—'}`,
-      options: [
-        { label: 'ยืนยันส่งกรม', value: 'submit', description: 'ส่งคำขออนุญาตไปยังกรมศุลกากร' },
-        { label: 'แก้ไขเพิ่มเติม', value: 'edit', description: 'กลับไปแก้ไขข้อมูล' },
-      ],
-    } satisfies ChoiceCardData);
+    this.bot('form-preview', { ...this.formData() });
+    this.withTyping(() => {
+      this.bot('choice-card', {
+        question: 'ข้อมูลครบถ้วนแล้วครับ — ต้องการดำเนินการต่ออย่างไร?',
+        options: [
+          { label: 'ยืนยันส่งกรม',        value: 'submit', description: 'ส่งคำขออนุญาตไปยังหน่วยงานที่เกี่ยวข้อง' },
+          { label: 'แก้ไขเอกสารเพิ่มเติม', value: 'edit',   description: 'กลับไปแก้ไขหรืออัปโหลดเอกสารใหม่' },
+        ],
+      } satisfies ChoiceCardData);
+    }, 600);
   }
 
   onPreviewChoice(value: string): void {

@@ -119,9 +119,9 @@
             <!-- Single-slot upload (ใบขนสินค้า path) -->
             @case ('single-upload') {
               @if (!readOnly) {
-                <app-single-upload />
+                <app-single-upload [mode]="uploadMode(msg)" />
               } @else {
-                <span class="readonly-tag">✓ อัปโหลดใบขนสินค้าแล้ว</span>
+                <span class="readonly-tag">✓ อัปโหลดเอกสารแล้ว</span>
               }
             }
 
@@ -169,6 +169,11 @@
             <!-- Submission status card -->
             @case ('status-card') {
               <app-status-card [data]="asAny(msg.data)" />
+            }
+
+            <!-- Pre-submit data review table -->
+            @case ('form-preview') {
+              <app-form-preview [data]="asAny(msg.data)" />
             }
 
           }
