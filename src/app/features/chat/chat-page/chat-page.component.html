@@ -40,17 +40,17 @@
 
           <!-- Quick action chips -->
           <div class="welcome-chips">
-            <button class="wchip wchip--blue" (click)="chat.openImportLicenseMenu()">
-              <lucide-icon [img]="icFileCheck" [size]="14" /> ขอใบอนุญาตนำเข้า
+            <button class="wchip wchip--blue" (click)="chat.showDocTypeChoice()">
+              <lucide-icon [img]="icFileCheck" [size]="14" /> ขอใบอนุญาต
             </button>
-            <button class="wchip wchip--teal" (click)="chat.send('ดูสถานะใบขน')">
-              <lucide-icon [img]="icEye" [size]="14" /> ดูสถานะการยื่น
+            <button class="wchip wchip--orange" disabled>
+              <lucide-icon [img]="icFileOutput" [size]="14" /> สร้างใบขนสินค้า
+            </button>
+            <button class="wchip wchip--teal" disabled>
+              <lucide-icon [img]="icLandmark" [size]="14" /> ขอตราสารเครดิต (L/C)
             </button>
             <button class="wchip wchip--purple" (click)="goToQueue()">
               <lucide-icon [img]="icList" [size]="14" /> คิวงาน
-            </button>
-            <button class="wchip wchip--orange" (click)="chat.chooseFullUpload()">
-              <lucide-icon [img]="icUpload" [size]="14" /> อัปโหลดเอกสาร
             </button>
           </div>
         </div>

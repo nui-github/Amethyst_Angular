@@ -192,38 +192,59 @@ export class ChatService {
     this.bot('spn-not-found');
   }
 
-  // ── Import license menu (entry from welcome card) ──────────────────────────
+  // ── Doc type gate (entry from welcome card) ────────────────────────────────
+  showDocTypeChoice(): void {
+    this.bot('choice-card', {
+      question: 'ท่านต้องการดำเนินการด้านใดครับ?',
+      options: [
+        { label: 'เอกสารนำเข้าสินค้า', value: 'import', description: 'ขอใบอนุญาต, RGoods, วิเคราะห์ HS Code' },
+        { label: 'เอกสารส่งออกสินค้า', value: 'export', description: 'ใบขนส่งออก, ภาษีส่งออก (เร็วๆ นี้)' },
+      ],
+    } satisfies ChoiceCardData);
+  }
+
+  onDocTypeChoice(value: string): void {
+    if (value === 'import') {
+      this.user('เอกสารนำเข้าสินค้า');
+      this.withTyping(() => {
+        this.bot('choice-card', {
+          question: 'ต้องการดึงข้อมูลจาก ShippingNet หรืออัปโหลดเอกสารเองครับ?',
+          options: [
+            { label: 'ดึงข้อมูลจาก ShippingNet', value: 'spn',    description: 'ต้องมี account SPN — ระบบจะดึงข้อมูลใบขนให้อัตโนมัติ' },
+            { label: 'อัปโหลดเอกสารเอง',          value: 'upload', description: 'AI OCR ดึงข้อมูลจากไฟล์ที่อัปโหลด ไม่ต้องมี SPN' },
+          ],
+        } satisfies ChoiceCardData);
+      }, 400);
+    } else {
+      this.user('เอกสารส่งออกสินค้า');
+      this.withTyping(() => this.bot('text', undefined,
+        'ขออภัยครับ ระบบจัดการเอกสารส่งออกยังอยู่ระหว่างพัฒนา — จะเปิดให้ใช้งานเร็วๆ นี้ครับ'), 500);
+    }
+  }
+
+  // ── Import license menu ────────────────────────────────────────────────────
   openImportLicenseMenu(): void {
-    this.user('ขอใบอนุญาตนำเข้า (อย.)');
-    this.withTyping(() => this.bot('import-license-menu'), 500);
+    this.withTyping(() => this.bot('import-license-menu'), 400);
   }
 
   // ── Document choice flows ──────────────────────────────────────────────────
 
-  /** ใบขนสินค้า: ask user whether to connect SPN or upload manually */
-  chooseCustomsDocs(): void {
-    this.user('ใบขนสินค้า');
-    this.markFlowStart();
-    this.withTyping(() => {
-      this.bot('choice-card', {
-        question: 'ต้องการดึงข้อมูลจาก ShippingNet หรืออัปโหลดเอกสารเองครับ?',
-        options: [
-          { label: 'ดึงข้อมูลจาก ShippingNet', value: 'spn',    description: 'ต้องมี account SPN — ระบบจะดึงข้อมูลใบขนให้อัตโนมัติ' },
-          { label: 'อัปโหลดเอกสารเอง',          value: 'upload', description: 'AI OCR ดึงข้อมูลจากไฟล์ที่อัปโหลด ไม่ต้องมี SPN' },
-        ],
-      } satisfies import('@app/core/models/types').ChoiceCardData);
-    }, 400);
-  }
-
-  /** Handle the SPN vs Upload choice from chooseCustomsDocs */
+  /** Handle the SPN vs Upload choice */
   onCustomsDocsChoice(value: string): void {
     if (value === 'spn') {
       this.user('ดึงข้อมูลจาก ShippingNet');
       this.withTyping(() => this.showSpnConnect(), 400);
     } else {
       this.user('อัปโหลดเอกสารเอง');
-      this.withTyping(() => { this.step.set('invoice_upload'); this.bot('single-upload'); }, 400);
+      this.openImportLicenseMenu();
     }
+  }
+
+  /** ใบขนสินค้า from menu → single-upload (XML) */
+  chooseCustomsDocs(): void {
+    this.user('ใบขนสินค้า');
+    this.markFlowStart();
+    this.withTyping(() => { this.step.set('invoice_upload'); this.bot('single-upload'); }, 400);
   }
 
   chooseInvoiceFirst(): void {

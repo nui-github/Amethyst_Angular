@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { NzInputModule } from 'ng-zorro-antd/input';
-import { LucideAngularModule, Send, Paperclip, Upload, Eye, FileCheck2, List, PanelLeftOpen } from 'lucide-angular';
+import { LucideAngularModule, Send, Paperclip, Upload, Eye, FileCheck2, List, PanelLeftOpen, Landmark, FileOutput } from 'lucide-angular';
 import { ChatService } from '@app/core/services/chat.service';
 import { QueueService } from '@app/core/services/queue.service';
 import { ChatAreaComponent } from '../components/chat-area/chat-area.component';
@@ -32,6 +32,8 @@ export class ChatPageComponent {
   readonly icEye        = Eye;
   readonly icFileCheck  = FileCheck2;
   readonly icList       = List;
+  readonly icLandmark   = Landmark;
+  readonly icFileOutput = FileOutput;
   readonly icPanelOpen  = PanelLeftOpen;
 
   inputText = '';
