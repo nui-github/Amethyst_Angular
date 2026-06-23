@@ -57,6 +57,8 @@ ChatMessage.type → @switch in ChatAreaComponent
   'import-license-menu'→ ImportLicenseMenuComponent
   'status-card'        → StatusCardComponent
   'spn-result'         → SpnResultComponent
+  'form-preview'       → FormPreviewComponent   (pre-submit data review table)
+  'missing-fields'     → MissingFieldsComponent (incomplete OCR → fill + optional re-upload)
 ```
 
 ### Services (inject, never constructor)
@@ -115,6 +117,8 @@ src/
 │   │   │       ├── email-draft/       ← email composer
 │   │   │       ├── status-card/       ← submission success (inline template)
 │   │   │       ├── import-license-menu/ ← 3-card doc type selector (inline template)
+│   │   │       ├── form-preview/      ← pre-submit data review table (4 sections)
+│   │   │       ├── missing-fields/    ← incomplete OCR form + optional re-upload
 │   │   │       └── typing-indicator/  ← 3-dot bounce (inline template)
 │   │   ├── queue/
 │   │   │   └── queue-page/            ← ListView + ShipmentChatView

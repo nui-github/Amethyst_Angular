@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ChoiceCardData } from '@app/core/models/types';
 
@@ -14,8 +14,15 @@ export class ChoiceCardComponent {
   @Input({ required: true }) data!: ChoiceCardData;
   @Output() chosen = new EventEmitter<string>();
 
-  /** Rich layout when options have descriptions */
+  selectedValue = signal<string | null>(null);
+
   get isSimple(): boolean {
     return this.data.options.every(o => !o.description);
+  }
+
+  select(value: string): void {
+    if (this.selectedValue() !== null) return;
+    this.selectedValue.set(value);
+    this.chosen.emit(value);
   }
 }

@@ -1,0 +1,142 @@
+.mf-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1.5px solid rgba(180, 83, 9, 0.25);
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+
+  &--submitted {
+    opacity: 0.7;
+    pointer-events: none;
+  }
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+
+.mf-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  background: rgba(180, 83, 9, 0.04);
+  border-bottom: 1px solid rgba(180, 83, 9, 0.12);
+
+  &__icon {
+    width: 32px; height: 32px;
+    border-radius: 9px;
+    background: rgba(180, 83, 9, 0.08);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+  &__title {
+    font-size: 13px; font-weight: 700; color: #010136; margin: 0;
+  }
+  &__sub {
+    font-size: 11px; color: #6B7280; margin: 3px 0 0; line-height: 1.5;
+  }
+}
+
+// ── Sections ──────────────────────────────────────────────────────────────────
+
+.mf-section {
+  padding: 14px 16px;
+  border-bottom: 1px solid #F5F6FA;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &:last-of-type { border-bottom: none; }
+
+  &__label {
+    font-size: 11px; font-weight: 700; color: #6B7280;
+    text-transform: uppercase; letter-spacing: 0.4px; margin: 0;
+  }
+
+  &__hint {
+    font-size: 11px; color: #9CA3AF; margin: -4px 0 0; line-height: 1.5;
+  }
+}
+
+// ── Fields ────────────────────────────────────────────────────────────────────
+
+.mf-fields { display: flex; flex-direction: column; gap: 8px; }
+
+.mf-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &__label {
+    font-size: 12px; font-weight: 600; color: #374151;
+  }
+}
+
+// ── Upload drop zone ──────────────────────────────────────────────────────────
+
+.mf-drop {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px dashed #D1D5DB;
+  border-radius: 8px;
+  padding: 14px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  min-height: 72px;
+
+  &:hover { border-color: #9CA3AF; background: #FAFAFA; }
+  &--over { border-color: #0463EF; background: rgba(4,99,239,0.03); }
+  &--filled { border-color: #0D8F61; background: rgba(13,143,97,0.03); }
+
+  &__empty {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 4px; color: #9CA3AF; font-size: 12px; text-align: center;
+  }
+
+  &__types {
+    font-size: 10px; color: #CCCCCC; letter-spacing: 0.3px;
+  }
+
+  &__file {
+    display: flex; align-items: center; gap: 8px; width: 100%;
+  }
+}
+
+.mf-file-name {
+  font-size: 12px; font-weight: 600; color: #0D8F61; flex: 1; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.mf-file-size { font-size: 11px; color: #9CA3AF; flex-shrink: 0; }
+
+.mf-clear {
+  background: none; border: none; cursor: pointer; color: #9CA3AF;
+  font-size: 12px; padding: 2px 6px; border-radius: 4px;
+  &:hover { background: #F3F4F6; color: #6B7280; }
+}
+
+// ── Actions ───────────────────────────────────────────────────────────────────
+
+.mf-actions {
+  padding: 12px 16px;
+  border-top: 1px solid #F0F1F8;
+  background: #FAFBFF;
+
+  button {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+}
+
+// ── Done state ────────────────────────────────────────────────────────────────
+
+.mf-done {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 16px;
+  font-size: 13px;
+  color: #0D8F61;
+  font-weight: 600;
+}

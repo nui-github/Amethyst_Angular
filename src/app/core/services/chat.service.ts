@@ -3,6 +3,7 @@ import {
   ChatMessage, ChatStep, LicenseFormData, MessageType,
   FlagCardData, FlagItem, ChoiceCardData, EmailDraftData,
   StatusCardData, OcrResultsData, SpnResultData, Shipment,
+  MissingField, MissingFieldsData,
 } from '@app/core/models/types';
 import { OcrService } from './ocr.service';
 import { QueueService } from './queue.service';
@@ -260,7 +261,10 @@ export class ChatService {
     this.bot('full-upload');
   }
 
-  private showFullUpload(): void {
+  private isReEditOCR = false;
+
+  private showFullUpload(reEdit = false): void {
+    this.isReEditOCR = reEdit;
     this.markFlowStart();
     this.step.set('full_upload');
     this.bot('full-upload');
@@ -275,7 +279,19 @@ export class ChatService {
     this.showOCRResults(result);
   }
 
-  private showOCRResults(result: typeof import('@mock/ocr.mock').MOCK_OCR_RESULT): void {
+  // Required fields to be considered "complete" for manual upload paths
+  private readonly REQUIRED_FIELDS: MissingField[] = [
+    { key: 'invoiceNo',   label: 'Invoice No.',         placeholder: 'เช่น INV-2024-8834' },
+    { key: 'importer',    label: 'ผู้นำเข้า',             placeholder: 'ชื่อบริษัทผู้นำเข้า' },
+    { key: 'goodsDesc',   label: 'รายละเอียดสินค้า',     placeholder: 'เช่น ยาปฏิชีวนะ HS 2941' },
+    { key: 'port',        label: 'ท่าเรือ/ด่านนำเข้า',   placeholder: 'เช่น ท่าเรือแหลมฉบัง' },
+  ];
+
+  private getMissingFields(data: LicenseFormData): MissingField[] {
+    return this.REQUIRED_FIELDS.filter(f => !((data as Record<string, string>)[f.key]?.trim()));
+  }
+
+  private showOCRResults(result: typeof import('@mock/ocr.mock').MOCK_OCR_RESULT, round = 1): void {
     this.bot('ocr-results', {
       invoiceNo: result.invoiceNo, invoiceDate: result.invoiceDate,
       quantity: result.quantity, importer: result.importer, port: result.port,
@@ -283,15 +299,93 @@ export class ChatService {
       lotNo: result.lotNo, uNo: result.uNo,
     } satisfies OcrResultsData);
 
-    // If HS Code is available → auto-run AI analysis
-    if (result.hsCode) {
+    // Skip missing fields check for re-edit paths (post-email, post-flag edit)
+    if (this.isReEditOCR) {
+      this.isReEditOCR = false;
+      this.continueAfterOCR();
+      return;
+    }
+
+    const currentData = this.formData();
+    const missing = this.getMissingFields(currentData);
+
+    if (missing.length > 0) {
+      // Show missing fields form — user fills in or uploads more
       this.withTyping(() => {
-        const analysis = analyzeHsCode(result.hsCode);
+        this.bot('missing-fields', {
+          missingFields: missing,
+          existingData: { ...currentData },
+          round,
+        } satisfies MissingFieldsData);
+      }, 600);
+    } else {
+      this.continueAfterOCR();
+    }
+  }
+
+  private continueAfterOCR(): void {
+    if (this.formData().hsCode) {
+      this.withTyping(() => {
+        const analysis = analyzeHsCode(this.formData().hsCode!);
         this.bot('hs-analysis', analysis);
         setTimeout(() => this.withTyping(() => this.showFlags(), 600), 400);
       }, 600);
     } else {
       this.withTyping(() => this.showFlags(), 800);
+    }
+  }
+
+  /** Called from MissingFieldsComponent when user submits */
+  async onMissingFieldsSubmit(extra: LicenseFormData, file: File | undefined, round: number): Promise<void> {
+    // Merge manually filled fields
+    this.formData.update(f => ({ ...f, ...extra }));
+
+    if (file) {
+      // OCR the additional file, merge, then re-check
+      this.bot('text', undefined, 'กำลัง OCR เอกสารที่อัปโหลดเพิ่ม...');
+      this.bot('ocr-progress');
+      const result = await this.ocr.startOCR([file]);
+      // Merge: existing fields take priority for fields already filled
+      const merged = { ...result, ...this.formData(), ...extra };
+      this.formData.set(merged);
+      const stillMissing = this.getMissingFields(this.formData());
+      if (stillMissing.length > 0) {
+        this.bot('ocr-results', {
+          invoiceNo: result.invoiceNo, invoiceDate: result.invoiceDate,
+          quantity: result.quantity, importer: result.importer, port: result.port,
+          hsCode: result.hsCode, countryOrigin: result.countryOrigin,
+          lotNo: result.lotNo, uNo: result.uNo,
+        } satisfies OcrResultsData);
+        this.withTyping(() => {
+          this.bot('missing-fields', {
+            missingFields: stillMissing,
+            existingData: { ...this.formData() },
+            round: round + 1,
+          } satisfies MissingFieldsData);
+        }, 400);
+      } else {
+        this.bot('ocr-results', {
+          invoiceNo: result.invoiceNo, invoiceDate: result.invoiceDate,
+          quantity: result.quantity, importer: result.importer, port: result.port,
+          hsCode: result.hsCode, countryOrigin: result.countryOrigin,
+          lotNo: result.lotNo, uNo: result.uNo,
+        } satisfies OcrResultsData);
+        this.withTyping(() => this.continueAfterOCR(), 600);
+      }
+    } else {
+      // No extra file — check if now complete
+      const stillMissing = this.getMissingFields(this.formData());
+      if (stillMissing.length > 0) {
+        this.withTyping(() => {
+          this.bot('missing-fields', {
+            missingFields: stillMissing,
+            existingData: { ...this.formData() },
+            round: round + 1,
+          } satisfies MissingFieldsData);
+        }, 400);
+      } else {
+        this.continueAfterOCR();
+      }
     }
   }
 
@@ -357,6 +451,11 @@ export class ChatService {
     }
   }
 
+  /** Called from "แก้ไขเอกสาร" in proceed/post-email choice — re-upload skips missing check */
+  openReEditUpload(): void {
+    this.withTyping(() => this.showFullUpload(true), 400);
+  }
+
   // ── Email draft flow ───────────────────────────────────────────────────────
   private showEmailDraft(): void {
     const gen = ++this.emailGen;
@@ -394,7 +493,7 @@ export class ChatService {
       this.withTyping(() => this.showPreview(), 600);
     } else {
       this.user('แก้ไขเอกสาร');
-      this.withTyping(() => this.showFullUpload(), 400);
+      this.withTyping(() => this.showFullUpload(true), 400);
     }
   }
 
@@ -419,7 +518,7 @@ export class ChatService {
       this.withTyping(() => this.submit(), 1200);
     } else {
       this.user('แก้ไขเพิ่มเติม');
-      this.withTyping(() => this.showFullUpload(), 400);
+      this.withTyping(() => this.showFullUpload(true), 400);
     }
   }
 

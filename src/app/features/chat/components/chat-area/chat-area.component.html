@@ -176,6 +176,11 @@
               <app-form-preview [data]="asAny(msg.data)" />
             }
 
+            <!-- Missing fields after OCR -->
+            @case ('missing-fields') {
+              <app-missing-fields [data]="$any(msg.data)" />
+            }
+
           }
         </div>
 

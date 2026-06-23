@@ -26,7 +26,20 @@ export type MessageType =
   | 'spn-connect'        // multi-step SPN company → URL → login flow
   | 'single-upload'      // single-slot upload (ใบขนสินค้า path)
   | 'hs-analysis'        // AI HS Code classification result
-  | 'form-preview';      // pre-submit data review table
+  | 'form-preview'       // pre-submit data review table
+  | 'missing-fields';   // incomplete OCR → fill remaining fields
+
+export interface MissingField {
+  key: keyof LicenseFormData;
+  label: string;
+  placeholder: string;
+}
+
+export interface MissingFieldsData {
+  missingFields: MissingField[];
+  existingData: LicenseFormData;
+  round: number;
+}
 
 export interface ChatMessage {
   id: string;
