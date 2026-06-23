@@ -123,7 +123,7 @@ src/
 │   │   ├── queue/
 │   │   │   └── queue-page/            ← ListView + ShipmentChatView
 │   │   ├── settings/
-│   │   │   └── settings-page/         ← 2-panel settings (nav sidebar + content)
+│   │   │   └── settings-page/         ← 2-panel settings (nav sidebar + content); sections: เชื่อมต่อ ShippingNet, ตั้งชื่อ SPN URL
 │   │   └── print/
 │   │       └── license-print/         ← A4 print page
 │   └── shared/

@@ -26,6 +26,98 @@
     <!-- Content area -->
     <div class="settings-content">
 
+      <!-- ── SPN Connect Section ── -->
+      @if (activeSection() === 'spn-connect') {
+
+        <div class="content-header">
+          <p class="content-title">เชื่อมต่อ ShippingNet</p>
+          <p class="content-desc">เชื่อมต่อบัญชี ShippingNet เพื่อดึงข้อมูลใบขนสินค้าอัตโนมัติ</p>
+        </div>
+
+        <section class="settings-section">
+
+          @if (chat.isConnected()) {
+            <!-- Connected state -->
+            <div class="spn-status spn-status--connected">
+              <div class="spn-status__icon">
+                <lucide-icon [img]="Wifi" [size]="18" color="#0D8F61" />
+              </div>
+              <div class="spn-status__body">
+                <p class="spn-status__label">เชื่อมต่อแล้ว</p>
+                <p class="spn-status__company">{{ chat.spnSession()?.companyName }}</p>
+                <p class="spn-status__url">{{ chat.spnSession()?.url }}</p>
+                <p class="spn-status__user">ผู้ใช้: {{ chat.spnSession()?.username }}</p>
+              </div>
+              <div class="spn-status__dot"></div>
+            </div>
+
+            <div class="spn-actions">
+              <button class="spn-disconnect-btn" (click)="disconnect()">
+                <lucide-icon [img]="LogOut" [size]="13" color="#EF4444" />
+                ยกเลิกการเชื่อมต่อ
+              </button>
+            </div>
+
+          } @else {
+            <!-- Disconnected state -->
+            <div class="spn-status spn-status--disconnected">
+              <div class="spn-status__icon spn-status__icon--off">
+                <lucide-icon [img]="WifiOff" [size]="18" color="#9CA3AF" />
+              </div>
+              <div class="spn-status__body">
+                <p class="spn-status__label spn-status__label--off">ยังไม่ได้เชื่อมต่อ</p>
+                <p class="spn-status__desc">เชื่อมต่อเพื่อดึงข้อมูลใบขนสินค้าจาก ShippingNet โดยอัตโนมัติ</p>
+              </div>
+            </div>
+
+            @if (!showLoginForm()) {
+              <div class="spn-actions">
+                <button class="spn-connect-btn" (click)="openLoginForm()">
+                  <lucide-icon [img]="Wifi" [size]="13" color="#fff" />
+                  เชื่อมต่อ ShippingNet
+                </button>
+              </div>
+            } @else {
+              <div class="spn-login-form">
+                <p class="spn-login-form__title">เข้าสู่ระบบ ShippingNet</p>
+                <div class="spn-login-form__fields">
+                  <div class="spn-login-field">
+                    <label>ชื่อผู้ใช้ (Username)</label>
+                    <nz-input-group [nzPrefix]="userIcon" nzSize="default">
+                      <input nz-input placeholder="กรอก Username"
+                        [value]="loginUser()" (input)="loginUser.set($any($event.target).value)"
+                        [disabled]="loginLoading()" />
+                    </nz-input-group>
+                    <ng-template #userIcon><lucide-icon [img]="User" [size]="13" color="#AAAAAA" /></ng-template>
+                  </div>
+                  <div class="spn-login-field">
+                    <label>รหัสผ่าน (Password)</label>
+                    <nz-input-group [nzPrefix]="lockIcon" nzSize="default">
+                      <input nz-input type="password" placeholder="กรอก Password"
+                        [value]="loginPass()" (input)="loginPass.set($any($event.target).value)"
+                        [disabled]="loginLoading()"
+                        (keydown.enter)="doLogin()" />
+                    </nz-input-group>
+                    <ng-template #lockIcon><lucide-icon [img]="Lock" [size]="13" color="#AAAAAA" /></ng-template>
+                  </div>
+                </div>
+                @if (loginError()) {
+                  <p class="spn-login-error">{{ loginError() }}</p>
+                }
+                <div class="spn-login-form__actions">
+                  <button class="spn-cancel-btn" (click)="cancelLogin()" [disabled]="loginLoading()">ยกเลิก</button>
+                  <button class="spn-connect-btn" [disabled]="!loginValid() || loginLoading()" (click)="doLogin()">
+                    <lucide-icon [img]="Wifi" [size]="13" color="#fff" />
+                    {{ loginLoading() ? 'กำลังเชื่อมต่อ...' : 'เชื่อมต่อ' }}
+                  </button>
+                </div>
+              </div>
+            }
+          }
+
+        </section>
+      }
+
       <!-- ── SPN URL Section ── -->
       @if (activeSection() === 'spn-url') {
 
