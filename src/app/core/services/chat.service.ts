@@ -512,6 +512,20 @@ export class ChatService {
     }, 600);
   }
 
+  /** Rewind to the last choice-card so user can re-select */
+  rewindToLastChoice(): void {
+    const msgs = this.messages();
+    // Find last choice-card (reverse search)
+    const reversed = [...msgs].reverse();
+    const revIdx = reversed.findIndex(m => m.type === 'choice-card');
+    if (revIdx === -1) return;
+    const actualIdx = msgs.length - 1 - revIdx;
+    const choiceMsg = msgs[actualIdx];
+    // Keep everything before the choice-card, re-add it with a fresh id so component re-instantiates
+    const before = msgs.slice(0, actualIdx);
+    this.messages.set([...before, { ...choiceMsg, id: choiceMsg.id + '_r' + Date.now() }]);
+  }
+
   onPreviewChoice(value: string): void {
     if (value === 'submit') {
       this.user('ยืนยันส่งกรม');

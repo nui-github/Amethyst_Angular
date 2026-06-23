@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { LucideAngularModule, FileText, ScrollText, Award, ShieldCheck, Upload, X } from 'lucide-angular';
@@ -21,7 +21,8 @@ interface Slot {
   styleUrl: './full-upload.component.scss',
 })
 export class FullUploadComponent {
-  readonly chat   = inject(ChatService);
+  readonly chat = inject(ChatService);
+  readonly cdr  = inject(ChangeDetectorRef);
   readonly Upload = Upload;
   readonly X      = X;
 
@@ -37,6 +38,7 @@ export class FullUploadComponent {
   onFileChange(key: string, event: Event): void {
     const file = (event.target as HTMLInputElement).files?.[0] ?? null;
     this.slots.update(slots => slots.map(s => s.key === key ? { ...s, file } : s));
+    this.cdr.markForCheck();
   }
 
   clearSlot(key: string): void {

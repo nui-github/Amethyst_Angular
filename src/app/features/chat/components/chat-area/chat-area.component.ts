@@ -78,6 +78,12 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked {
   asEmailDraft(data: unknown)  { return data as EmailDraftData; }
   asChoiceCard(data: unknown)  { return data as ChoiceCardData; }
   asAny(data: unknown)         { return data as Record<string, unknown>; }
+  hasRewindableChoice(): boolean {
+    const msgs = this.messages;
+    const done = msgs.some(m => m.type === 'status-card');
+    return !done && msgs.some(m => m.type === 'choice-card');
+  }
+
   uploadMode(msg: ChatMessage): 'customs' | 'invoice' {
     const d = msg.data as Record<string, unknown> | undefined;
     return (d?.['mode'] === 'invoice') ? 'invoice' : 'customs';
