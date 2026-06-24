@@ -1,7 +1,6 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Output, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzButtonModule } from 'ng-zorro-antd/button';
-import { NzTagModule } from 'ng-zorro-antd/tag';
 import { ChatService } from '@app/core/services/chat.service';
 
 const PAGE_SIZE = 5;
@@ -9,49 +8,43 @@ const PAGE_SIZE = 5;
 @Component({
   selector: 'app-spn-card',
   standalone: true,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, NzButtonModule, NzTagModule],
+  changeDetection: ChangeDetectionStrategy.Default,
+  imports: [CommonModule, NzButtonModule],
   templateUrl: './spn-card.component.html',
   styleUrl: './spn-card.component.scss',
 })
 export class SpnCardComponent {
-  @Output() requestPermit = new EventEmitter<string[]>();
-
   readonly chat = inject(ChatService);
-  readonly pageSize = PAGE_SIZE;
+  readonly cdr  = inject(ChangeDetectorRef);
 
   page     = signal(1);
-  selected = signal<Set<string>>(new Set());
+  selected = signal<string | null>(null);
+  done     = signal(false);
 
-  readonly entries      = computed(() => this.chat.spnEntries());
-  readonly total        = computed(() => this.entries().length);
-  readonly totalPages   = computed(() => Math.ceil(this.total() / PAGE_SIZE));
-  readonly selectedCount = computed(() => this.selected().size);
+  readonly entries    = computed(() => this.chat.spnEntries());
+  readonly total      = computed(() => this.entries().length);
+  readonly totalPages = computed(() => Math.ceil(this.total() / PAGE_SIZE));
 
   readonly pageEntries = computed(() => {
     const start = (this.page() - 1) * PAGE_SIZE;
     return this.entries().slice(start, start + PAGE_SIZE);
   });
 
-  isSelected(ref: string): boolean { return this.selected().has(ref); }
-
-  toggle(ref: string, queued: boolean): void {
-    if (queued) return;
-    this.selected.update(s => {
-      const next = new Set(s);
-      next.has(ref) ? next.delete(ref) : next.add(ref);
-      return next;
-    });
+  select(ref: string, queued: boolean): void {
+    if (queued || this.done()) return;
+    this.selected.set(this.selected() === ref ? null : ref);
+    this.cdr.detectChanges();
   }
 
-  requestOne(ref: string): void { this.requestPermit.emit([ref]); }
-
-  requestSelected(): void {
-    if (this.selected().size > 0) this.requestPermit.emit(Array.from(this.selected()));
+  confirm(): void {
+    const ref = this.selected();
+    if (!ref || this.done()) return;
+    this.done.set(true);
+    this.cdr.detectChanges();
+    this.chat.selectSpnEntry(ref);
   }
 
   prevPage(): void { if (this.page() > 1) this.page.update(p => p - 1); }
   nextPage(): void { if (this.page() < this.totalPages()) this.page.update(p => p + 1); }
-
   pages(): number[] { return Array.from({ length: this.totalPages() }, (_, i) => i + 1); }
 }

@@ -1,30 +1,25 @@
-<div class="spn-card">
+<div class="spn-card" [class.spn-card--done]="done()">
   <div class="spn-card__head">
     <span class="spn-card__title">รายการใบขนสินค้าใน ShippingNet</span>
-    @if (selectedCount() > 0) {
-      <button nz-button nzType="primary" nzSize="small" (click)="requestSelected()">
-        ขอใบอนุญาต ({{ selectedCount() }})
-      </button>
-    }
+    <span class="spn-card__sub">เลือก 1 รายการเพื่อขอใบอนุญาต</span>
   </div>
 
   <div class="spn-table">
     <div class="spn-row spn-row--header">
-      <span class="col-check"></span>
+      <span class="col-radio"></span>
       <span class="col-ref">Ref / ใบขน</span>
       <span class="col-goods">สินค้า · HS Code</span>
       <span class="col-origin">ต้นทาง</span>
-      <span class="col-action"></span>
     </div>
 
     @for (e of pageEntries(); track e.ref) {
-      <div class="spn-row" [class.spn-row--selected]="isSelected(e.ref)"
-        [class.spn-row--queued]="!!e.inQueue">
-        <span class="col-check">
-          <input type="checkbox" class="spn-checkbox"
-            [checked]="isSelected(e.ref)"
-            [disabled]="!!e.inQueue"
-            (change)="toggle(e.ref, !!e.inQueue)" />
+      <div class="spn-row"
+        [class.spn-row--selected]="selected() === e.ref"
+        [class.spn-row--queued]="!!e.inQueue"
+        [class.spn-row--disabled]="done()"
+        (click)="select(e.ref, !!e.inQueue)">
+        <span class="col-radio">
+          <span class="radio-dot" [class.radio-dot--on]="selected() === e.ref"></span>
         </span>
         <span class="col-ref">
           <span class="ref-num">{{ e.ref }}</span>
@@ -35,16 +30,19 @@
           <span class="sub-text">HS {{ e.hs }}</span>
         </span>
         <span class="col-origin sub-text">{{ e.origin }}</span>
-        <span class="col-action">
-          @if (e.inQueue) {
-            <span nz-tag nzColor="processing" style="font-size:10px;line-height:18px">ในคิว</span>
-          } @else {
-            <button nz-button nzSize="small" (click)="requestOne(e.ref)">ขอใบอนุญาต</button>
-          }
-        </span>
       </div>
     }
   </div>
+
+  <!-- Confirm button -->
+  @if (!done()) {
+    <div class="spn-confirm-row">
+      <button class="spn-confirm-btn" [disabled]="!selected()" (click)="confirm()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        ขอใบอนุญาต
+      </button>
+    </div>
+  }
 
   <!-- Pagination -->
   @if (totalPages() > 1) {

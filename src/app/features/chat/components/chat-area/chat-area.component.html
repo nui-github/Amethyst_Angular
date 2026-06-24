@@ -146,7 +146,7 @@
             <!-- SPN multi-select list -->
             @case ('spn-list') {
               @if (!readOnly) {
-                <app-spn-card (requestPermit)="chat.onRequestPermit($event)" />
+                <app-spn-card />
               } @else {
                 <span class="readonly-tag">✓ เลือก SPN แล้ว</span>
               }

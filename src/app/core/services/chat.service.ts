@@ -164,6 +164,12 @@ export class ChatService {
     this.bot('spn-list');
   }
 
+  /** Called from SpnCard when user picks a single entry */
+  selectSpnEntry(ref: string): void {
+    this.user(`เลือก ${ref}`);
+    this.withTyping(() => this.fetchSPN(ref), 400);
+  }
+
   private async fetchSPN(ref: string): Promise<void> {
     this.markFlowStart();
     this.bot('text', undefined, `กำลังดึงข้อมูลจาก ShippingNet สำหรับ ${ref}...`);
@@ -185,6 +191,21 @@ export class ChatService {
       declarationDate: data.declarationDate, hsCode: data.hsCode,
       countryOrigin: data.countryOrigin, licenseType: data.licenseType,
     } satisfies SpnResultData);
+
+    // SPN path: AI analysis → proceed choice (no flags, data already verified)
+    this.withTyping(() => this.continueAfterSPN(), 800);
+  }
+
+  private continueAfterSPN(): void {
+    if (this.formData().hsCode) {
+      this.withTyping(() => {
+        const analysis = analyzeHsCode(this.formData().hsCode!);
+        this.bot('hs-analysis', analysis);
+        setTimeout(() => this.withTyping(() => this.showProceedChoice(), 600), 400);
+      }, 600);
+    } else {
+      this.withTyping(() => this.showProceedChoice(), 800);
+    }
   }
 
   private spnNotFound(ref: string): void {

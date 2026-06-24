@@ -51,7 +51,7 @@ ChatMessage.type → @switch in ChatAreaComponent
   'form'               → FormPanelComponent
   'full-upload'        → FullUploadComponent
   'single-upload'      → SingleUploadComponent
-  'spn-list'           → SpnCardComponent       (emit: requestPermit)
+  'spn-list'           → SpnCardComponent       (single-select → selectSpnEntry → SPN flow)
   'spn-connect'        → SpnConnectComponent    (emit: connected)
   'connect'            → ConnectPanelComponent  (emit: connected, legacy)
   'import-license-menu'→ ImportLicenseMenuComponent

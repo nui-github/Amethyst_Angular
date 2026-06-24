@@ -3,14 +3,17 @@
   flex-direction: column;
   gap: 10px;
 
+  &--done { pointer-events: none; opacity: 0.75; }
+
   &__head {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
   }
 
   &__title { font-size: 12px; font-weight: 700; color: var(--bizx-navy); }
-  &__count  { font-size: 11px; color: var(--bizx-n500); margin-left: auto; }
+  &__sub   { font-size: 11px; color: var(--bizx-n500); }
+  &__count { font-size: 11px; color: var(--bizx-n500); margin-left: auto; }
 }
 
 .spn-table {
@@ -22,42 +25,85 @@
 
 .spn-row {
   display: grid;
-  grid-template-columns: 30px 130px 1fr 70px 90px;
+  grid-template-columns: 28px 130px 1fr 70px;
   align-items: center;
   gap: 8px;
-  padding: 7px 10px;
+  padding: 8px 12px;
   border-bottom: 1px solid var(--bizx-n200);
+  cursor: pointer;
+  transition: background 0.12s;
 
   &:last-child { border-bottom: none; }
 
   &--header {
     background: var(--bizx-n50);
-    font-size: 10px;
-    font-weight: 700;
+    font-size: 10px; font-weight: 700;
     color: var(--bizx-n500);
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    padding: 6px 10px;
+    text-transform: uppercase; letter-spacing: 0.4px;
+    padding: 6px 12px;
+    cursor: default;
   }
 
-  &--selected { background: rgba(4, 99, 239, 0.04); }
-  &--queued   { opacity: 0.55; }
+  &--selected { background: rgba(4, 99, 239, 0.05); }
+  &--queued   { opacity: 0.5; cursor: not-allowed; }
+  &--disabled { cursor: default; }
 
-  &:not(.spn-row--header):not(.spn-row--queued):hover {
+  &:not(.spn-row--header):not(.spn-row--queued):not(.spn-row--disabled):hover {
     background: var(--bizx-n50);
   }
 }
 
-.spn-checkbox {
-  width: 14px; height: 14px; cursor: pointer; accent-color: var(--bizx-blue);
+// Radio dot
+.col-radio { display: flex; justify-content: center; }
+
+.radio-dot {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid #D1D5DB;
+  background: #fff;
+  transition: all 0.14s;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+
+  &--on {
+    border-color: #0463EF;
+    background: #0463EF;
+
+    &::after {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #fff;
+    }
+  }
 }
 
-.col-check  { display: flex; justify-content: center; }
-.col-action { display: flex; justify-content: flex-end; }
+.ref-num    { display: block; font-weight: 700; color: var(--bizx-blue); }
+.goods-name { display: block; color: var(--bizx-navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sub-text   { display: block; font-size: 10px; color: var(--bizx-n500); margin-top: 1px; }
 
-.ref-num   { display: block; font-weight: 700; color: var(--bizx-blue); }
-.goods-name{ display: block; color: var(--bizx-navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sub-text  { display: block; font-size: 10px; color: var(--bizx-n500); margin-top: 1px; }
+// Confirm button
+.spn-confirm-row {
+  padding-top: 2px;
+}
+
+.spn-confirm-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 20px;
+  border-radius: 9px;
+  border: none;
+  background: linear-gradient(135deg, #034DBA, #0463EF);
+  color: #fff;
+  font-size: 13px; font-weight: 700;
+  font-family: inherit; cursor: pointer;
+  transition: opacity 0.15s;
+  width: 100%; justify-content: center;
+
+  &:disabled { opacity: 0.35; cursor: default; }
+  &:not(:disabled):hover { opacity: 0.88; }
+}
 
 // Pagination
 .spn-page {
@@ -67,18 +113,12 @@
 }
 
 .page-btn {
-  min-width: 26px;
-  height: 26px;
+  min-width: 26px; height: 26px;
   border: 1px solid var(--bizx-n200);
-  border-radius: 6px;
-  background: #fff;
-  font-size: 12px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: inherit;
-  transition: all 0.12s;
+  border-radius: 6px; background: #fff;
+  font-size: 12px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-family: inherit; transition: all 0.12s;
 
   &:disabled { opacity: 0.35; cursor: default; }
   &:not(:disabled):hover { border-color: var(--bizx-blue); color: var(--bizx-blue); }
