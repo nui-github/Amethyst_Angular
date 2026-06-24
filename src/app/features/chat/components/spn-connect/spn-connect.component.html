@@ -1,185 +1,46 @@
 <div class="spn-connect">
 
-  <!-- Step indicator -->
-  <div class="steps">
-    @for (s of stepDefs; track s.id; let i = $index) {
-      <div class="step-item" [class.step-item--done]="isStepDone(s.id)" [class.step-item--active]="step() === s.id">
-        <div class="step-circle">
-          @if (isStepDone(s.id)) {
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-          } @else {
-            {{ i + 1 }}
-          }
-        </div>
-        <span class="step-label">{{ s.label }}</span>
-      </div>
-      @if (i < stepDefs.length - 1) {
-        <div class="step-line" [class.step-line--done]="isStepDone(s.id)"></div>
-      }
-    }
+  <div class="spn-header">
+    <p class="spn-header__title">เลือก SPN Profile</p>
+    <p class="spn-header__sub">เลือก profile ที่ต้องการใช้งาน ระบบจะดึงข้อมูลใบขนให้อัตโนมัติ</p>
   </div>
 
-  <!-- ── Step 1: Company + Branch ──────────────────────── -->
-  @if (step() === 'company') {
-    <div class="step-body">
-      <p class="step-title">
-        <lucide-icon [img]="Building2" [size]="15" color="#0463EF" />
-        เลือก Company และสาขา
-      </p>
-      <p class="step-desc">ระบบจะแสดง SPN URLs ที่เชื่อมกับ account ของท่านให้เลือกในขั้นตอนถัดไป</p>
-
-      <div class="form-rows">
-        <div class="form-field">
-          <label>Company</label>
-          <nz-select [ngModel]="selectedCompanyId()" (ngModelChange)="onCompanyChange($event)"
-            nzPlaceHolder="เลือก Company" nzSize="default" class="w-full">
-            @for (c of companies; track c.id) {
-              <nz-option [nzValue]="c.id" [nzLabel]="c.name" />
-            }
-          </nz-select>
-        </div>
-
-        @if (branches().length > 0) {
-          <div class="form-field">
-            <label>สาขา / Branch</label>
-            <nz-select [ngModel]="selectedBranchId()" (ngModelChange)="selectedBranchId.set($event)"
-              nzPlaceHolder="เลือกสาขา" nzSize="default" class="w-full">
-              @for (b of branches(); track b.id) {
-                <nz-option [nzValue]="b.id" [nzLabel]="b.name" />
-              }
-            </nz-select>
+  @if (!done) {
+    <div class="profile-grid">
+      @for (p of profiles; track p.code) {
+        <button class="profile-card"
+          [class.profile-card--selected]="selected === p.code"
+          [disabled]="connecting"
+          (click)="select(p.code)">
+          <div class="profile-card__badge" [style.background]="p.color + '18'" [style.color]="p.color">
+            {{ p.code }}
           </div>
-        }
-      </div>
-
-      <button nz-button nzType="primary" nzBlock [disabled]="!step1Valid()" (click)="goToUrl()" class="next-btn">
-        ถัดไป <lucide-icon [img]="ChevronRight" [size]="14" color="#fff" />
-      </button>
-    </div>
-  }
-
-  <!-- ── Step 2: SPN URL ────────────────────────────────── -->
-  @if (step() === 'url') {
-    <div class="step-body">
-      <p class="step-title">
-        <lucide-icon [img]="Globe" [size]="15" color="#0463EF" />
-        เลือก ShippingNet URL
-      </p>
-      <p class="step-desc">
-        เลือก environment ของ {{ selectedCompany()?.shortName }} ที่ต้องการเชื่อมต่อ
-      </p>
-
-      <div class="url-cards">
-        @for (u of urls(); track u.id) {
-          <div class="url-card" [class.url-card--selected]="selectedUrlId() === u.id"
-            (click)="selectUrl(u.id)">
-            <div class="url-card__left">
-              <span class="env-badge" [style.background]="envColor(u.env) + '18'" [style.color]="envColor(u.env)">
-                {{ envLabel(u.env) }}
-              </span>
-              <div class="url-card__info">
-                @if (editingUrlId() === u.id) {
-                  <div class="url-rename" (click)="$event.stopPropagation()">
-                    <input class="rename-input" [value]="editingValue()"
-                      (input)="editingValue.set($any($event.target).value)"
-                      (keydown.enter)="saveEdit(u.id)"
-                      (keydown.escape)="cancelEdit()"
-                      autofocus />
-                    <button class="rename-btn rename-btn--save" (click)="saveEdit(u.id)" title="บันทึก">
-                      <lucide-icon [img]="Check" [size]="12" color="#0D8F61" />
-                    </button>
-                    <button class="rename-btn" (click)="cancelEdit()" title="ยกเลิก">
-                      <lucide-icon [img]="IconX" [size]="12" color="#9CA3AF" />
-                    </button>
-                  </div>
-                } @else {
-                  <div class="url-label-row">
-                    <p class="url-card__label">{{ displayLabel(u) }}</p>
-                    <button class="edit-label-btn" (click)="startEdit(u, $event)" title="ตั้งชื่อ">
-                      <lucide-icon [img]="Pencil" [size]="11" color="#9CA3AF" />
-                    </button>
-                  </div>
-                }
-                <p class="url-card__url">{{ u.url }}</p>
-              </div>
-            </div>
-            <div class="url-card__check" [class.url-card__check--on]="selectedUrlId() === u.id">
-              @if (selectedUrlId() === u.id) {
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-              }
-            </div>
+          <div class="profile-card__body">
+            <p class="profile-card__name">{{ p.displayName }}</p>
+            <p class="profile-card__url">{{ getUrl(p) }}</p>
           </div>
-        }
-      </div>
-
-      <div class="btn-row">
-        <button nz-button (click)="back()">← กลับ</button>
-        <button nz-button nzType="primary" [disabled]="!selectedUrlId()" (click)="goToLogin()">
-          เข้าสู่ระบบ <lucide-icon [img]="ChevronRight" [size]="14" color="#fff" />
+          @if (selected === p.code) {
+            <div class="profile-card__check">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            </div>
+          }
         </button>
-      </div>
-    </div>
-  }
-
-  <!-- ── Step 3: Login ──────────────────────────────────── -->
-  @if (step() === 'login') {
-    <div class="step-body">
-      <p class="step-title">
-        <lucide-icon [img]="Lock" [size]="15" color="#0463EF" />
-        เข้าสู่ระบบ ShippingNet
-      </p>
-      <div class="login-url-badge">
-        <lucide-icon [img]="Globe" [size]="12" color="#6B7280" />
-        {{ selectedUrl()?.url }}
-      </div>
-
-      <div class="form-rows">
-        <div class="form-field">
-          <label>ชื่อผู้ใช้ (Username)</label>
-          <nz-input-group [nzPrefix]="userIcon" nzSize="default">
-            <input nz-input
-              [value]="username()"
-              (input)="username.set($any($event.target).value)"
-              placeholder="กรอก Username" [disabled]="loading()" />
-          </nz-input-group>
-          <ng-template #userIcon><lucide-icon [img]="User" [size]="14" color="#AAAAAA" /></ng-template>
-        </div>
-        <div class="form-field">
-          <label>รหัสผ่าน (Password)</label>
-          <nz-input-group [nzPrefix]="lockIcon" nzSize="default">
-            <input nz-input type="password"
-              [value]="password()"
-              (input)="password.set($any($event.target).value)"
-              placeholder="กรอก Password" [disabled]="loading()" />
-          </nz-input-group>
-          <ng-template #lockIcon><lucide-icon [img]="Lock" [size]="14" color="#AAAAAA" /></ng-template>
-        </div>
-      </div>
-
-      @if (loginError()) {
-        <p class="login-error">{{ loginError() }}</p>
       }
-
-      <div class="btn-row">
-        <button nz-button (click)="back()" [disabled]="loading()">← กลับ</button>
-        <button nz-button nzType="primary" [disabled]="!loginValid() || loading()" (click)="login()">
-          {{ loading() ? 'กำลังเชื่อมต่อ...' : 'เชื่อมต่อ' }}
-        </button>
-      </div>
     </div>
-  }
 
-  <!-- ── Step 4: Success ────────────────────────────────── -->
-  @if (step() === 'success') {
-    <div class="step-body success-body">
-      <div class="success-icon">
-        <lucide-icon [img]="CheckCircle" [size]="32" color="#0D8F61" />
-      </div>
-      <p class="success-title">เชื่อมต่อสำเร็จแล้ว!</p>
-      <p class="success-sub">
-        {{ selectedCompany()?.shortName }} · {{ selectedUrl()?.url }}
-      </p>
-      <p class="success-note">กำลังดึงรายการใบขนสินค้าจาก ShippingNet...</p>
+    <button class="confirm-btn" [disabled]="!selected || connecting" (click)="confirm()">
+      @if (connecting) {
+        <span>กำลังเชื่อมต่อ...</span>
+      } @else {
+        <lucide-icon [img]="ChevronRight" [size]="14" color="#fff" />
+        <span>ใช้ Profile นี้</span>
+      }
+    </button>
+
+  } @else {
+    <div class="spn-done">
+      <lucide-icon [img]="CheckCircle" [size]="20" color="#0D8F61" />
+      <span>เชื่อมต่อ Profile <strong>{{ selected }}</strong> สำเร็จแล้ว — กำลังดึงข้อมูล...</span>
     </div>
   }
 

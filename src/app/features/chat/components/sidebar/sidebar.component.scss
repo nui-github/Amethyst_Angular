@@ -261,3 +261,15 @@
   font-size: 11px; font-weight: 600; color: #0D8F61;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
+
+.spn-badge__code {
+  font-size: 10px; font-weight: 900; color: #0D8F61;
+  background: rgba(13, 143, 97, 0.12);
+  padding: 1px 5px; border-radius: 4px;
+  letter-spacing: 0.5px; flex-shrink: 0;
+}
+
+.spn-badge__code-only {
+  font-size: 9px; font-weight: 900; color: #0D8F61;
+  letter-spacing: 0.5px;
+}

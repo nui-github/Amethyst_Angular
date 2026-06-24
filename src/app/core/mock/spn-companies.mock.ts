@@ -60,3 +60,20 @@ export const MOCK_SPN_COMPANIES: SpnCompany[] = [
     ],
   },
 ];
+
+export interface SpnProfile {
+  code: string;         // 4-letter uppercase, e.g. "NETB"
+  displayName: string;  // full name
+  companyId: string;
+  urlId: string;
+  username: string;
+  color: string;
+}
+
+export const MOCK_SPN_PROFILES: SpnProfile[] = [
+  { code: 'NETB', displayName: 'Netbay Production',     companyId: 'netbay',      urlId: 'netbay-prod', username: 'netbay.user',  color: '#0463EF' },
+  { code: 'NETU', displayName: 'Netbay UAT',            companyId: 'netbay',      urlId: 'netbay-uat',  username: 'netbay.test',  color: '#7C3AED' },
+  { code: 'HLTH', displayName: 'HealthPharma PROD',     companyId: 'healthpharma',urlId: 'hp-prod',     username: 'hp.admin',     color: '#0D8F61' },
+  { code: 'AGRI', displayName: 'AgriPlus Production',   companyId: 'agriplus',    urlId: 'ap-prod',     username: 'agri.user',    color: '#B45309' },
+  { code: 'AGRD', displayName: 'AgriPlus Dev',          companyId: 'agriplus',    urlId: 'ap-dev',      username: 'agri.dev',     color: '#6B7280' },
+];

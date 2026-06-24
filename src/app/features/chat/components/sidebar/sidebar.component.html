@@ -91,10 +91,15 @@
 
     <!-- SPN connection badge -->
     @if (chat.isConnected()) {
-      <div class="spn-badge" [title]="chat.spnSession()?.url ?? ''">
+      <div class="spn-badge" [title]="(chat.spnSession()?.profile ?? '') + ' · ' + (chat.spnSession()?.url ?? '')">
         <span class="spn-dot"></span>
         @if (!collapsed) {
+          @if (chat.spnSession()?.profile) {
+            <span class="spn-badge__code">{{ chat.spnSession()!.profile }}</span>
+          }
           <span class="spn-badge__text">{{ chat.spnSession()?.companyName ?? 'เชื่อมต่อ SPN แล้ว' }}</span>
+        } @else {
+          <span class="spn-badge__code-only">{{ chat.spnSession()?.profile }}</span>
         }
       </div>
     }

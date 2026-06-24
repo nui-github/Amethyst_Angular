@@ -24,7 +24,7 @@ export class ChatService {
   // ── State ──────────────────────────────────────────────────────────────────
   readonly messages        = signal<ChatMessage[]>([WELCOME]);
   readonly isTyping        = signal(false);
-  readonly spnSession      = signal<{ companyName: string; url: string; username: string } | null>(null);
+  readonly spnSession      = signal<{ companyName: string; url: string; username: string; profile?: string } | null>(null);
   readonly step            = signal<ChatStep>('idle');
   readonly isConnected     = signal(false);
   readonly pendingRef      = signal('');
@@ -128,9 +128,9 @@ export class ChatService {
   }
 
   /** Called by SpnConnectComponent after successful login */
-  onSpnConnected(companyName: string, url: string, username: string): void {
+  onSpnConnected(companyName: string, url: string, username: string, profile?: string): void {
     this.isConnected.set(true);
-    this.spnSession.set({ companyName, url, username });
+    this.spnSession.set({ companyName, url, username, profile });
     // After success, fetch the SPN list
     this.withTyping(() => {
       this.bot('text', undefined, `เชื่อมต่อ ${companyName} สำเร็จแล้วครับ — กำลังดึงรายการใบขนสินค้า...`);

@@ -1,184 +1,108 @@
 .spn-connect {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
-// ── Step indicator ─────────────────────────────────────────────────────────────
-
-.steps {
-  display: flex;
-  align-items: center;
-  gap: 0;
+.spn-header {
+  &__title { font-size: 13px; font-weight: 700; color: #010136; margin: 0; }
+  &__sub   { font-size: 12px; color: #6B7280; margin: 4px 0 0; line-height: 1.5; }
 }
 
-.step-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  flex-shrink: 0;
-}
+// ── Profile grid ──────────────────────────────────────────────────────────────
 
-.step-circle {
-  width: 24px; height: 24px;
-  border-radius: 50%;
-  background: #E8EAF2;
-  color: #9CA3AF;
-  font-size: 11px; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.2s;
-
-  .step-item--active & { background: #0463EF; color: #fff; }
-  .step-item--done &   { background: #0D8F61; color: #fff; }
-}
-
-.step-label {
-  font-size: 10px; color: #9CA3AF; white-space: nowrap;
-  .step-item--active & { color: #0463EF; font-weight: 700; }
-  .step-item--done &   { color: #0D8F61; }
-}
-
-.step-line {
-  flex: 1; height: 1.5px; background: #E8EAF2; margin: 0 6px 14px;
-  min-width: 20px; transition: background 0.2s;
-  &--done { background: #0D8F61; }
-}
-
-// ── Step body ─────────────────────────────────────────────────────────────────
-
-.step-body {
+.profile-grid {
   display: flex;
   flex-direction: column;
+  gap: 8px;
+}
+
+.profile-card {
+  display: flex;
+  align-items: center;
   gap: 12px;
-}
-
-.step-title {
-  display: flex; align-items: center; gap: 7px;
-  font-size: 13px; font-weight: 700; color: var(--bizx-navy); margin: 0;
-}
-
-.step-desc {
-  font-size: 12px; color: #6B7280; margin: 0; line-height: 1.5;
-}
-
-.form-rows { display: flex; flex-direction: column; gap: 10px; }
-
-.form-field {
-  display: flex; flex-direction: column; gap: 4px;
-
-  label { font-size: 11px; font-weight: 600; color: #6B7280; }
-
-  .w-full { width: 100%; }
-}
-
-.next-btn { margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 6px; }
-
-// ── URL cards ──────────────────────────────────────────────────────────────────
-
-.url-cards { display: flex; flex-direction: column; gap: 8px; }
-
-.url-card {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 14px;
+  padding: 11px 14px;
   border: 1.5px solid #E8EAF2;
-  border-radius: 8px;
+  border-radius: 10px;
   background: #FAFAFA;
   cursor: pointer;
   font-family: inherit;
-  transition: all 0.15s;
   text-align: left;
   width: 100%;
+  transition: all 0.15s;
+  position: relative;
 
-  &:hover { border-color: #0463EF; background: #fff; }
+  &:hover:not([disabled]) { border-color: #0463EF; background: #fff; }
 
   &--selected {
     border-color: #0463EF;
     background: rgba(4, 99, 239, 0.04);
   }
 
-  &__left { display: flex; align-items: center; gap: 10px; }
+  &:disabled { opacity: 0.6; cursor: default; }
 
-  &__info  { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  &__label { font-size: 13px; font-weight: 600; color: var(--bizx-navy); margin: 0; }
-  &__url   { font-size: 11px; color: #6B7280; margin: 0; font-family: monospace; }
+  &__badge {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    font-size: 13px; font-weight: 900;
+    letter-spacing: 0.5px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  &__body { flex: 1; min-width: 0; }
+
+  &__name {
+    font-size: 13px; font-weight: 600; color: #010136; margin: 0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  &__url {
+    font-size: 11px; color: #9CA3AF; margin: 2px 0 0;
+    font-family: monospace; white-space: nowrap;
+  }
 
   &__check {
-    width: 20px; height: 20px; border-radius: 50%;
-    border: 1.5px solid #D1D5DB;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: #0463EF;
     display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; transition: all 0.15s;
-
-    &--on { background: #0463EF; border-color: #0463EF; }
+    flex-shrink: 0;
   }
 }
 
-.url-label-row {
-  display: flex; align-items: center; gap: 4px;
-}
+// ── Confirm button ────────────────────────────────────────────────────────────
 
-.edit-label-btn {
-  background: none; border: none; padding: 2px; cursor: pointer; border-radius: 4px;
-  display: flex; align-items: center; opacity: 0; transition: opacity 0.15s;
-  flex-shrink: 0;
-  .url-card:hover & { opacity: 1; }
-}
-
-.url-rename {
-  display: flex; align-items: center; gap: 4px;
-}
-
-.rename-input {
-  font-size: 12px; font-weight: 600; color: var(--bizx-navy);
-  border: 1px solid #0463EF; border-radius: 4px;
-  padding: 2px 6px; outline: none; min-width: 0; flex: 1;
+.confirm-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #034DBA, #0463EF);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
   font-family: inherit;
-  &:focus { box-shadow: 0 0 0 2px rgba(4,99,239,0.15); }
+  cursor: pointer;
+  transition: opacity 0.15s;
+  margin-top: 4px;
+
+  &:disabled { opacity: 0.35; cursor: default; }
+  &:not(:disabled):hover { opacity: 0.88; }
 }
 
-.rename-btn {
-  background: none; border: none; padding: 3px; cursor: pointer;
-  border-radius: 4px; display: flex; align-items: center;
-  &:hover { background: #F3F4F6; }
-  &--save:hover { background: rgba(13,143,97,0.08); }
+// ── Done state ────────────────────────────────────────────────────────────────
+
+.spn-done {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 4px;
+  font-size: 13px;
+  color: #0D8F61;
+
+  strong { font-weight: 800; }
 }
-
-.env-badge {
-  font-size: 10px; font-weight: 800; letter-spacing: 0.5px;
-  padding: 2px 7px; border-radius: 4px;
-  flex-shrink: 0;
-}
-
-// ── Login ─────────────────────────────────────────────────────────────────────
-
-.login-url-badge {
-  display: inline-flex; align-items: center; gap: 5px;
-  font-size: 11px; color: #6B7280;
-  padding: 4px 10px; border-radius: 4px;
-  background: #F3F4F6; width: fit-content;
-  font-family: monospace;
-}
-
-.login-error {
-  font-size: 12px; color: #EF4444; margin: 0;
-  padding: 8px 12px; background: rgba(239,68,68,0.06);
-  border-radius: 4px; border: 1px solid rgba(239,68,68,0.2);
-}
-
-// ── Success ───────────────────────────────────────────────────────────────────
-
-.success-body { align-items: center; text-align: center; padding: 8px 0 4px; }
-
-.success-icon {
-  width: 64px; height: 64px; border-radius: 50%;
-  background: rgba(13, 143, 97, 0.08);
-  display: flex; align-items: center; justify-content: center;
-}
-
-.success-title { font-size: 15px; font-weight: 800; color: var(--bizx-navy); margin: 0; }
-.success-sub   { font-size: 12px; color: #6B7280; margin: 0; }
-.success-note  { font-size: 12px; color: #0D8F61; margin: 0; }
-
-// ── Button row ────────────────────────────────────────────────────────────────
-
-.btn-row { display: flex; gap: 8px; margin-top: 4px; justify-content: flex-end; }
