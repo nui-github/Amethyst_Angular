@@ -181,6 +181,24 @@
               <app-missing-fields [data]="$any(msg.data)" />
             }
 
+            <!-- Profile selection / confirmation before submission -->
+            @case ('profile-select') {
+              @if (!readOnly) {
+                <app-profile-select [data]="$any(msg.data)" />
+              } @else {
+                <span class="readonly-tag">✓ เลือกโปรไฟล์แล้ว</span>
+              }
+            }
+
+            <!-- Agency-specific document upload slots -->
+            @case ('agency-upload') {
+              @if (!readOnly) {
+                <app-agency-upload [agency]="$any(msg.data)?.agency ?? 'อย.'" />
+              } @else {
+                <span class="readonly-tag">✓ อัปโหลดเอกสารประกอบแล้ว</span>
+              }
+            }
+
           }
         </div>
 

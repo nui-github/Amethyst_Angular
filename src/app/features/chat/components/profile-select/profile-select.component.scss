@@ -1,0 +1,128 @@
+.ps-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  &--done { pointer-events: none; }
+}
+
+.ps-header {
+  .ps-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--bizx-navy);
+    margin: 0 0 2px;
+  }
+  .ps-sub {
+    font-size: 11px;
+    color: var(--bizx-n500);
+    margin: 0;
+  }
+}
+
+.ps-profiles {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ps-profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--bizx-n200);
+  background: #fff;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  transition: all 0.14s;
+  width: 100%;
+
+  &:not(:disabled):hover {
+    border-color: var(--bizx-blue);
+    background: rgba(4, 99, 239, 0.03);
+  }
+
+  &--selected {
+    border-color: var(--bizx-blue);
+    background: rgba(4, 99, 239, 0.05);
+  }
+
+  &--change {
+    border-style: dashed;
+    color: var(--bizx-n500);
+
+    &:not(:disabled):hover {
+      border-color: var(--bizx-n400);
+      background: var(--bizx-n50);
+    }
+  }
+
+  &:disabled { opacity: 0.5; cursor: default; }
+}
+
+.ps-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  flex-shrink: 0;
+
+  &--gray {
+    background: var(--bizx-n100) !important;
+    color: var(--bizx-n500) !important;
+    font-size: 16px;
+  }
+}
+
+.ps-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+
+  &__name {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--bizx-navy);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__user {
+    font-size: 10px;
+    color: var(--bizx-n500);
+  }
+}
+
+.ps-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 5px;
+  flex-shrink: 0;
+
+  &--current {
+    background: rgba(13, 143, 97, 0.1);
+    color: var(--bizx-teal);
+  }
+}
+
+.ps-check {
+  font-size: 13px;
+  color: var(--bizx-blue);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.ps-confirm-btn {
+  margin-top: 2px;
+}

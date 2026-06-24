@@ -1,0 +1,131 @@
+.au-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.au-header {
+  .au-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--bizx-navy);
+    margin: 0 0 2px;
+  }
+  .au-sub {
+    font-size: 11px;
+    color: var(--bizx-n500);
+    margin: 0;
+    strong { color: var(--bizx-blue); }
+  }
+}
+
+.au-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.au-slot {
+  border: 1.5px dashed var(--bizx-n200);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #fff;
+  transition: border-color 0.15s, background 0.15s;
+
+  &--drag  { border-color: var(--bizx-blue); background: rgba(4, 99, 239, 0.04); }
+  &--filled { border-style: solid; border-color: #D1FAE5; background: #F0FDF4; }
+
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 2px;
+  }
+
+  &__label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--bizx-navy);
+    flex: 1;
+  }
+
+  &__hint {
+    font-size: 11px;
+    color: var(--bizx-n500);
+    margin: 0 0 8px;
+  }
+}
+
+.au-required {
+  font-size: 10px;
+  font-weight: 700;
+  color: #B45309;
+  background: rgba(180, 83, 9, 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.au-optional {
+  font-size: 10px;
+  color: var(--bizx-n400);
+  background: var(--bizx-n50);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.au-drop {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 7px;
+  border: 1px solid var(--bizx-n200);
+  background: var(--bizx-n50);
+  color: var(--bizx-blue);
+  font-size: 11px;
+  font-family: inherit;
+  width: fit-content;
+  transition: background 0.12s;
+
+  &:hover { background: rgba(4, 99, 239, 0.06); }
+}
+
+.au-file-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.au-file-name {
+  flex: 1;
+  color: var(--bizx-navy);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.au-file-size {
+  color: var(--bizx-n400);
+  flex-shrink: 0;
+}
+
+.au-clear {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--bizx-n400);
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  border-radius: 4px;
+  &:hover { background: var(--bizx-n100); color: var(--bizx-n600); }
+}
+
+.au-btn {
+  margin-top: 2px;
+
+  &[disabled] { opacity: 0.4; }
+}

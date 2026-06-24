@@ -25,6 +25,8 @@ import { EmailDraftComponent } from '../email-draft/email-draft.component';
 import { FormPanelComponent } from '../form-panel/form-panel.component';
 import { FormPreviewComponent } from '../form-preview/form-preview.component';
 import { MissingFieldsComponent } from '../missing-fields/missing-fields.component';
+import { AgencyUploadComponent } from '../agency-upload/agency-upload.component';
+import { ProfileSelectComponent } from '../profile-select/profile-select.component';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 
 /**
@@ -48,7 +50,7 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
     SpnCardComponent, ChoiceCardComponent, OcrResultsComponent,
     StatusCardComponent, OcrProgressComponent, ImportLicenseMenuComponent,
     ConnectPanelComponent, FullUploadComponent, SingleUploadComponent, EmailDraftComponent, FormPanelComponent,
-    SpnConnectComponent, HsAnalysisComponent, FormPreviewComponent, MissingFieldsComponent,
+    SpnConnectComponent, HsAnalysisComponent, FormPreviewComponent, MissingFieldsComponent, AgencyUploadComponent, ProfileSelectComponent,
   ],
   templateUrl: './chat-area.component.html',
   styleUrl: './chat-area.component.scss',
@@ -84,9 +86,11 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked {
     return !done && msgs.some(m => m.type === 'choice-card');
   }
 
-  uploadMode(msg: ChatMessage): 'customs' | 'invoice' {
+  uploadMode(msg: ChatMessage): 'customs' | 'invoice' | 'agency-docs' {
     const d = msg.data as Record<string, unknown> | undefined;
-    return (d?.['mode'] === 'invoice') ? 'invoice' : 'customs';
+    if (d?.['mode'] === 'invoice') return 'invoice';
+    if (d?.['mode'] === 'agency-docs') return 'agency-docs';
+    return 'customs';
   }
 
   onChoice(msg: ChatMessage, value: string): void {
@@ -99,8 +103,11 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked {
     const hasSpn    = data.options.some(o => o.value === 'spn');
     const hasImport = data.options.some(o => o.value === 'import');
 
+    const hasMulti  = data.options.some(o => o.value === 'multi');
+
     if (hasImport)  return this.chat.onDocTypeChoice(value);
     if (hasSpn)     return this.chat.onCustomsDocsChoice(value);
+    if (hasMulti)   return this.chat.onAgencyChoice(value);
     if (hasEmail)   return this.chat.onProceedChoice(value);
     if (hasSubmit)  return this.chat.onPreviewChoice(value);
     if (hasConfirm) return this.chat.onPostEmailChoice(value);

@@ -27,7 +27,9 @@ export type MessageType =
   | 'single-upload'      // single-slot upload (ใบขนสินค้า path)
   | 'hs-analysis'        // AI HS Code classification result
   | 'form-preview'       // pre-submit data review table
-  | 'missing-fields';   // incomplete OCR → fill remaining fields
+  | 'missing-fields'    // incomplete OCR → fill remaining fields
+  | 'agency-upload'     // multi-slot upload for agency-required docs
+  | 'profile-select';   // pick or confirm ShippingNet profile before submission
 
 export interface MissingField {
   key: keyof LicenseFormData;

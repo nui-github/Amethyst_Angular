@@ -1,7 +1,15 @@
 <div class="su-wrap">
 
-  <p class="su-title">{{ mode === 'invoice' ? 'อัปโหลดใบ Invoice' : 'อัปโหลดใบขนสินค้า' }}</p>
-  <p class="su-sub">{{ mode === 'invoice' ? 'AI จะ OCR ดึงข้อมูลจากไฟล์ที่อัปโหลด รองรับ PDF, JPG, PNG' : 'AI จะ OCR ดึงข้อมูลจากไฟล์ที่อัปโหลด รองรับทั้งไฟล์รูปภาพและ XML จากระบบ' }}</p>
+  <p class="su-title">
+    @if (mode === 'invoice') { อัปโหลดใบ Invoice }
+    @else if (mode === 'agency-docs') { อัปโหลดเอกสารประกอบเพิ่มเติม }
+    @else { อัปโหลดใบขนสินค้า }
+  </p>
+  <p class="su-sub">
+    @if (mode === 'invoice') { AI จะ OCR ดึงข้อมูลจากไฟล์ที่อัปโหลด รองรับ PDF, JPG, PNG }
+    @else if (mode === 'agency-docs') { อัปโหลดเอกสารเพิ่มเติมที่กรมต้องการ เช่น ใบรับรอง GMP, COA รองรับ PDF, JPG, PNG }
+    @else { AI จะ OCR ดึงข้อมูลจากไฟล์ที่อัปโหลด รองรับทั้งไฟล์รูปภาพและ XML จากระบบ }
+  </p>
 
   <!-- Drop zone -->
   <label class="drop-zone" for="su_file"
@@ -33,6 +41,9 @@
         @if (mode === 'customs') {
           <p class="drop-zone__note">XML จากระบบศุลกากร — ดึงข้อมูลได้โดยตรงโดยไม่ต้อง OCR</p>
         }
+        @if (mode === 'agency-docs') {
+          <p class="drop-zone__note">ระบบจะ OCR รวมกับข้อมูลจากใบ Invoice เพื่อตรวจสอบความถูกต้อง</p>
+        }
       </div>
     } @else {
       <!-- File selected -->
@@ -54,7 +65,7 @@
       </div>
     }
 
-    <input id="su_file" type="file" [accept]="mode === 'invoice' ? '.pdf,.jpg,.jpeg,.png' : '.pdf,.jpg,.jpeg,.png,.xml'" style="display:none"
+    <input id="su_file" type="file" [accept]="mode === 'customs' ? '.pdf,.jpg,.jpeg,.png,.xml' : '.pdf,.jpg,.jpeg,.png'" style="display:none"
       (change)="onFileChange($event)" />
   </label>
 

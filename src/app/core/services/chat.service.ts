@@ -9,6 +9,7 @@ import { OcrService } from './ocr.service';
 import { QueueService } from './queue.service';
 import { analyzeHsCode } from '@mock/hs-analysis.mock';
 import { KNOWN_REFS, MOCK_FORM_DATA, MOCK_SPN_LIST } from '@mock/spn.mock';
+import { MOCK_SPN_PROFILES } from '@mock/spn-companies.mock';
 import { environment } from '@env/environment';
 
 let _idCounter = 0;
@@ -201,11 +202,20 @@ export class ChatService {
       this.withTyping(() => {
         const analysis = analyzeHsCode(this.formData().hsCode!);
         this.bot('hs-analysis', analysis);
-        setTimeout(() => this.withTyping(() => this.showProceedChoice(), 600), 400);
+        setTimeout(() => this.withTyping(() => this.showProfileSelectForProceed(), 600), 400);
       }, 600);
     } else {
-      this.withTyping(() => this.showProceedChoice(), 800);
+      this.withTyping(() => this.showProfileSelectForProceed(), 800);
     }
+  }
+
+  private showProfileSelectForProceed(): void {
+    const currentCode = this.spnSession()?.profile;
+    this.bot('profile-select', {
+      mode: currentCode ? 'confirm' : 'select',
+      currentProfileCode: currentCode,
+      afterFlow: 'proceed',
+    });
   }
 
   private spnNotFound(ref: string): void {
@@ -262,16 +272,18 @@ export class ChatService {
     }
   }
 
-  /** ใบขนสินค้า from menu → single-upload (XML) */
+  /** ใบขนสินค้า from menu → single-upload (XML) — no flag review needed */
   chooseCustomsDocs(): void {
     this.user('ใบขนสินค้า');
     this.markFlowStart();
+    this.isCustomsOnlyUpload = true;
     this.withTyping(() => { this.step.set('invoice_upload'); this.bot('single-upload'); }, 400);
   }
 
   chooseInvoiceFirst(): void {
     this.user('ใบ Invoice');
     this.markFlowStart();
+    this.isInvoicePath = true;
     this.withTyping(() => { this.step.set('invoice_upload'); this.bot('single-upload', { mode: 'invoice' }); }, 400);
   }
 
@@ -283,6 +295,9 @@ export class ChatService {
   }
 
   private isReEditOCR = false;
+  private isCustomsOnlyUpload = false;
+  private isInvoicePath = false;
+  private isAgencyDocsUpload = false;
 
   private showFullUpload(reEdit = false): void {
     this.isReEditOCR = reEdit;
@@ -345,6 +360,33 @@ export class ChatService {
   }
 
   private continueAfterOCR(): void {
+    // Agency docs upload (2nd doc in invoice path): skip hs-analysis, go straight to flags
+    if (this.isAgencyDocsUpload) {
+      this.isAgencyDocsUpload = false;
+      this.withTyping(() => this.showFlags(), 600);
+      return;
+    }
+    // Customs single-upload: one doc only — skip flags, go straight to hs-analysis → proceed
+    if (this.isCustomsOnlyUpload) {
+      this.isCustomsOnlyUpload = false;
+      this.continueAfterSPN();
+      return;
+    }
+    // Invoice path: hs-analysis → agency choice → second upload → flags
+    if (this.isInvoicePath) {
+      this.isInvoicePath = false;
+      if (this.formData().hsCode) {
+        this.withTyping(() => {
+          const analysis = analyzeHsCode(this.formData().hsCode!);
+          this.bot('hs-analysis', analysis);
+          setTimeout(() => this.withTyping(() => this.showAgencyChoice(analysis.agency), 600), 400);
+        }, 600);
+      } else {
+        this.withTyping(() => this.showAgencyChoice('—'), 800);
+      }
+      return;
+    }
+    // Full-upload path: hs-analysis → flags
     if (this.formData().hsCode) {
       this.withTyping(() => {
         const analysis = analyzeHsCode(this.formData().hsCode!);
@@ -353,6 +395,54 @@ export class ChatService {
       }, 600);
     } else {
       this.withTyping(() => this.showFlags(), 800);
+    }
+  }
+
+  private showAgencyChoice(agency: string): void {
+    const agencyLabel = agency === '—' ? 'ทั่วไป' : agency;
+    this.bot('choice-card', {
+      question: `ต้องการขอใบอนุญาตจากกรมใดบ้าง?`,
+      options: [
+        { label: `${agencyLabel} (แนะนำ)`, value: agency, description: `ขอใบอนุญาตนำเข้าจาก${agencyLabel} ตามที่ AI วิเคราะห์` },
+        { label: 'กรมอื่น / หลายกรม', value: 'multi', description: 'ระบุกรมเพิ่มเติม หรือขอใบอนุญาตหลายหน่วยงาน' },
+      ],
+    } satisfies ChoiceCardData);
+  }
+
+  onAgencyChoice(agency: string): void {
+    const label = agency === 'multi' ? 'กรมอื่น / หลายกรม' : agency;
+    this.user(`เลือก ${label}`);
+    this.withTyping(() => {
+      // Upload path — no prior profile → pick one before showing agency docs
+      this.bot('profile-select', {
+        mode: 'select',
+        afterFlow: 'agency-docs',
+        agency,
+      });
+    }, 600);
+  }
+
+  /** Called from ProfileSelectComponent when user confirms a profile */
+  onProfileSelected(profile: { code: string; displayName: string; username: string }, afterFlow: 'agency-docs' | 'proceed', agency?: string): void {
+    this.user(`ใช้โปรไฟล์ ${profile.displayName}`);
+    // Store profile in session (keep existing company/url if already connected)
+    const existing = this.spnSession();
+    this.spnSession.set({
+      companyName: existing?.companyName ?? profile.displayName,
+      url:         existing?.url         ?? '',
+      username:    profile.username,
+      profile:     profile.code,
+    });
+    if (afterFlow === 'agency-docs') {
+      this.withTyping(() => {
+        this.bot('text', undefined, `กรุณาอัปโหลดเอกสารประกอบที่${agency === 'multi' ? 'แต่ละกรม' : agency}ต้องการครับ เช่น ใบรับรอง GMP, COA`);
+        setTimeout(() => this.withTyping(() => {
+          this.isAgencyDocsUpload = true;
+          this.bot('agency-upload', { agency: agency ?? 'อย.' });
+        }, 400), 600);
+      }, 500);
+    } else {
+      this.withTyping(() => this.showProceedChoice(), 500);
     }
   }
 

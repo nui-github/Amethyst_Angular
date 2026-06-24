@@ -5,6 +5,7 @@ export const MOCK_OCR_RESULT = {
   lotNo:         'LOT-2024-567',
   uNo:           'U-2568-00123',
   importer:      'บริษัท เฮลท์ฟาร์มา จำกัด',
+  goodsDesc:     'วัตถุดิบยา (Active Pharmaceutical Ingredient)',
   port:          'ท่าเรือแหลมฉบัง',
   hsCode:        '2941.10.00',
   countryOrigin: 'อินเดีย',
