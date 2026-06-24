@@ -22,6 +22,24 @@ export interface ProfileSelectData {
   template: `
     <div class="ps-wrap" [class.ps-wrap--done]="done">
 
+      <!-- Confirmed state: show selected profile as a compact badge -->
+      @if (done && selectedProfile) {
+        <div class="ps-confirmed">
+          <span class="ps-confirmed__label">โปรไฟล์ที่ใช้</span>
+          <span class="ps-confirmed__profile">
+            <span class="ps-confirmed__avatar"
+              [style.background]="selectedProfile.color + '22'"
+              [style.color]="selectedProfile.color">
+              {{ selectedProfile.code }}
+            </span>
+            <span class="ps-confirmed__name">{{ selectedProfile.displayName }}</span>
+            <span class="ps-confirmed__code">{{ selectedProfile.code }}</span>
+          </span>
+          <span class="ps-confirmed__tick">✓</span>
+        </div>
+      }
+
+      @if (!done) {
       <div class="ps-header">
         @if (data.mode === 'confirm' && !showAll) {
           <p class="ps-title">ใช้โปรไฟล์ที่เชื่อมต่ออยู่?</p>
@@ -41,7 +59,7 @@ export interface ProfileSelectData {
               [disabled]="done"
               (click)="select(currentProfile.code)">
               <span class="ps-avatar" [style.background]="currentProfile.color + '22'" [style.color]="currentProfile.color">
-                {{ currentProfile.code.slice(0, 2) }}
+                {{ currentProfile.code }}
               </span>
               <span class="ps-info">
                 <span class="ps-info__name">{{ currentProfile.displayName }}</span>
@@ -70,7 +88,7 @@ export interface ProfileSelectData {
               [disabled]="done"
               (click)="select(p.code)">
               <span class="ps-avatar" [style.background]="p.color + '22'" [style.color]="p.color">
-                {{ p.code.slice(0, 2) }}
+                {{ p.code }}
               </span>
               <span class="ps-info">
                 <span class="ps-info__name">{{ p.displayName }}</span>
@@ -84,12 +102,11 @@ export interface ProfileSelectData {
         </div>
       }
 
-      @if (!done) {
-        <button nz-button nzType="primary" nzBlock class="ps-confirm-btn"
-          [disabled]="!selected" (click)="confirm()">
-          ยืนยันโปรไฟล์และดำเนินการต่อ
-        </button>
-      }
+      <button nz-button nzType="primary" nzBlock class="ps-confirm-btn"
+        [disabled]="!selected" (click)="confirm()">
+        ยืนยันโปรไฟล์และดำเนินการต่อ
+      </button>
+      } <!-- end @if (!done) -->
     </div>
   `,
   styleUrl: './profile-select.component.scss',
@@ -108,6 +125,10 @@ export class ProfileSelectComponent {
 
   get currentProfile(): SpnProfile | undefined {
     return MOCK_SPN_PROFILES.find(p => p.code === this.data?.currentProfileCode);
+  }
+
+  get selectedProfile(): SpnProfile | undefined {
+    return MOCK_SPN_PROFILES.find(p => p.code === this.selected);
   }
 
   ngOnInit(): void {
