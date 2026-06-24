@@ -425,8 +425,9 @@ export class ChatService {
   /** Called from ProfileSelectComponent when user confirms a profile */
   onProfileSelected(profile: { code: string; displayName: string; username: string }, afterFlow: 'agency-docs' | 'proceed', agency?: string): void {
     this.user(`ใช้โปรไฟล์ ${profile.displayName}`);
-    // Store profile in session (keep existing company/url if already connected)
+    // Store profile in session + mark connected so sidebar badge appears
     const existing = this.spnSession();
+    this.isConnected.set(true);
     this.spnSession.set({
       companyName: existing?.companyName ?? profile.displayName,
       url:         existing?.url         ?? '',
