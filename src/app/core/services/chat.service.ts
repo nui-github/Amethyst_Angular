@@ -202,19 +202,16 @@ export class ChatService {
   }
 
   private continueAfterSPN(): void {
+    // SPN path: agency choice → profile → proceed
+    this.pendingAfterFlow = 'proceed';
+    this.submittedAgencies = [];
     if (this.formData().hsCode) {
       this.withTyping(() => {
         const analysis = analyzeHsCode(this.formData().hsCode!);
         this.bot('hs-analysis', analysis);
-        // Set up agency tracking so multi-agency next-step works after submit
-        if (analysis.agencies?.length) {
-          this.ALL_AGENCIES = analysis.agencies.map(a => a.code);
-        } else {
-          this.ALL_AGENCIES = analysis.agency !== '—' ? [analysis.agency] : [];
-        }
-        this.currentAgency = analysis.agency !== '—' ? analysis.agency : '';
-        this.submittedAgencies = [];
-        setTimeout(() => this.withTyping(() => this.showProfileSelectForProceed(), 600), 400);
+        if (analysis.agencies?.length) { this.ALL_AGENCIES = analysis.agencies.map(a => a.code); }
+        else { this.ALL_AGENCIES = analysis.agency !== '—' ? [analysis.agency] : []; }
+        setTimeout(() => this.withTyping(() => this.showAgencyChoice(analysis.agency), 600), 400);
       }, 600);
     } else {
       this.withTyping(() => this.showProfileSelectForProceed(), 800);
@@ -222,18 +219,16 @@ export class ChatService {
   }
 
   private continueAfterCustomsOCR(): void {
-    this.isCustomsDocPath = true; // flag: skip agency-upload after agency choice
+    // Customs path: agency choice → profile → form-preview (no extra upload)
+    this.pendingAfterFlow = 'form-preview';
+    this.submittedAgencies = [];
     if (this.formData().hsCode) {
       this.withTyping(() => {
         const analysis = analyzeHsCode(this.formData().hsCode!);
         this.bot('hs-analysis', analysis);
-        if (analysis.agencies?.length) {
-          this.ALL_AGENCIES = analysis.agencies.map(a => a.code);
-        } else {
-          this.ALL_AGENCIES = analysis.agency !== '—' ? [analysis.agency] : [];
-        }
-        this.submittedAgencies = [];
-        setTimeout(() => this.withTyping(() => this.showProfileSelectForAgency(analysis.agency), 600), 400);
+        if (analysis.agencies?.length) { this.ALL_AGENCIES = analysis.agencies.map(a => a.code); }
+        else { this.ALL_AGENCIES = analysis.agency !== '—' ? [analysis.agency] : []; }
+        setTimeout(() => this.withTyping(() => this.showAgencyChoice(analysis.agency), 600), 400);
       }, 600);
     } else {
       this.withTyping(() => this.showProfileSelectForProceed(), 800);
@@ -296,7 +291,9 @@ export class ChatService {
   onCustomsDocsChoice(value: string): void {
     if (value === 'spn') {
       this.user('ดึงข้อมูลจาก ShippingNet');
-      this.withTyping(() => this.showSpnConnect(), 400);
+      this.markFlowStart();
+      // Skip profile picker — show SPN list directly; profile selection comes after agency choice
+      this.withTyping(() => this.showSPNList(), 400);
     } else {
       this.user('อัปโหลดเอกสารเอง');
       this.openImportLicenseMenu();
@@ -330,7 +327,9 @@ export class ChatService {
   private isCustomsOnlyUpload = false;
   private isInvoicePath = false;
   private isAgencyDocsUpload = false;
-  private isCustomsDocPath = false; // customs path: skip agency-upload after agency choice
+  private isCustomsDocPath = false;
+  // What to do after agency+profile selection
+  private pendingAfterFlow: 'agency-docs' | 'form-preview' | 'proceed' = 'proceed';
 
   private showFullUpload(reEdit = false): void {
     this.isReEditOCR = reEdit;
@@ -425,14 +424,14 @@ export class ChatService {
         this.withTyping(() => {
           const analysis = analyzeHsCode(this.formData().hsCode!);
           this.bot('hs-analysis', analysis);
-          // Use agencies list from analysis if available
-          if (analysis.agencies?.length) {
-            this.ALL_AGENCIES = analysis.agencies.map(a => a.code);
-          }
-          setTimeout(() => this.withTyping(() => this.showProfileSelectForAgency(analysis.agency), 600), 400);
+          if (analysis.agencies?.length) { this.ALL_AGENCIES = analysis.agencies.map(a => a.code); }
+          // Invoice path: agency choice → profile → agency-upload
+          this.pendingAfterFlow = 'agency-docs';
+          setTimeout(() => this.withTyping(() => this.showAgencyChoice(analysis.agency), 600), 400);
         }, 600);
       } else {
-        this.withTyping(() => this.showProfileSelectForAgency('—'), 800);
+        this.pendingAfterFlow = 'agency-docs';
+        this.withTyping(() => this.showAgencyChoice('—'), 800);
       }
       return;
     }
@@ -474,23 +473,17 @@ export class ChatService {
   onAgencyChoice(rawValue: string): void {
     const agency = rawValue.startsWith('dept:') ? rawValue.replace('dept:', '') : rawValue;
     this.currentAgency = agency;
-    const label = agency;
-    this.user(`เลือก ${label}`);
-
-    // Customs path: ใบขนสินค้าครบอยู่แล้ว — preview ข้อมูลก่อน แล้วค่อย proceed
-    if (this.isCustomsDocPath) {
-      this.isCustomsDocPath = false;
-      this.withTyping(() => this.showPreview(), 500);
-      return;
-    }
-
+    this.user(`เลือก ${agency}`);
+    // After agency choice: show profile-select, then continue based on pendingAfterFlow
     this.withTyping(() => {
-      this.bot('text', undefined, `กรุณาอัปโหลดเอกสารประกอบที่${agency}ต้องการครับ เช่น ใบรับรอง GMP, COA`);
-      setTimeout(() => this.withTyping(() => {
-        this.isAgencyDocsUpload = true;
-        this.bot('agency-upload', { agency });
-      }, 400), 600);
-    }, 600);
+      const currentCode = this.spnSession()?.profile;
+      this.bot('profile-select', {
+        mode: currentCode ? 'confirm' : 'select',
+        currentProfileCode: currentCode,
+        afterFlow: this.pendingAfterFlow === 'proceed' ? 'proceed' : 'agency-docs',
+        agency,
+      });
+    }, 500);
   }
 
   private showProfileSelectForAgency(agency: string): void {
@@ -502,9 +495,8 @@ export class ChatService {
   }
 
   /** Called from ProfileSelectComponent when user confirms a profile */
-  onProfileSelected(profile: { code: string; displayName: string; username: string }, afterFlow: 'agency-choice' | 'proceed', agency?: string): void {
+  onProfileSelected(profile: { code: string; displayName: string; username: string }, afterFlow: 'agency-choice' | 'agency-docs' | 'proceed', agency?: string): void {
     this.user(`ใช้โปรไฟล์ ${profile.displayName}`);
-    // Store profile in session + mark connected so sidebar badge appears
     const existing = this.spnSession();
     this.isConnected.set(true);
     this.spnSession.set({
@@ -513,9 +505,21 @@ export class ChatService {
       username:    profile.username,
       profile:     profile.code,
     });
-    if (afterFlow === 'agency-choice') {
-      this.withTyping(() => this.showAgencyChoice(agency ?? '—'), 500);
+    // Determine what to do based on pendingAfterFlow (set before agency choice)
+    if (this.pendingAfterFlow === 'agency-docs') {
+      // Invoice path: show agency-upload
+      this.withTyping(() => {
+        this.bot('text', undefined, `กรุณาอัปโหลดเอกสารประกอบที่${agency}ต้องการครับ เช่น ใบรับรอง GMP, COA`);
+        setTimeout(() => this.withTyping(() => {
+          this.isAgencyDocsUpload = true;
+          this.bot('agency-upload', { agency });
+        }, 400), 600);
+      }, 500);
+    } else if (this.pendingAfterFlow === 'form-preview') {
+      // Customs path: show form-preview
+      this.withTyping(() => this.showPreview(), 500);
     } else {
+      // SPN / proceed path
       this.withTyping(() => this.showProceedChoice(), 500);
     }
   }

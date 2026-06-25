@@ -10,7 +10,7 @@ export interface ProfileSelectData {
   mode: 'select' | 'confirm';
   currentProfileCode?: string;
   /** Which flow to continue after profile confirmed */
-  afterFlow: 'agency-choice' | 'proceed';
+  afterFlow: 'agency-choice' | 'agency-docs' | 'proceed';
   agency?: string; // needed when afterFlow='agency-docs'
 }
 

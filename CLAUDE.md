@@ -160,25 +160,24 @@ ChatService.send(text)
   │           └─ not found → type:'import-license-menu'
   └─ unknown → fallback + chips
 
+Universal agency+profile order (all paths after hs-analysis): เลือกกรม (dept:) → เลือกโปรไฟล์ → continue
+  pendingAfterFlow: 'agency-docs' (invoice) | 'form-preview' (customs) | 'proceed' (SPN)
+
 import-license-menu → 3 choices:
-  ├─ chooseCustomsDocs()   → single-upload → OCR → hs-analysis → profile-select(proceed) → proceed choice
-  ├─ chooseInvoiceFirst()  → single-upload(invoice) → OCR → hs-analysis
-  │     → profile-select(agency-choice) → agency choice card (dept:อย./dept:กษ.)
-  │     → agency-upload (per-agency slots: upload file OR manual entry)
-  │     → OCR (agency docs) → flags → form-preview (editable) → "ดำเนินการต่อ"
+  ├─ chooseCustomsDocs()   → single-upload → OCR → hs-analysis → เลือกกรม → เลือกโปรไฟล์ → form-preview → submit → next-agency
+  ├─ chooseInvoiceFirst()  → single-upload(invoice) → OCR → hs-analysis → เลือกกรม → เลือกโปรไฟล์
+  │     → agency-upload (per-agency file slots) → OCR → flags → form-preview (editable) → "ดำเนินการต่อ"
   │     → choice-card(submit/edit) → submit → showNextAgencyIfAny()
   │           ├─ remaining agencies? → "ขอใบอนุญาตเพิ่ม / เสร็จสิ้น"
   │           └─ ขอใบอนุญาตเพิ่ม → agency selector → repeat agency flow
   └─ chooseFullUpload()    → full-upload → OCR → hs-analysis → flags → form-preview → submit
 
-Customs path (chooseCustomsDocs): single-upload → OCR → hs-analysis → profile-select → agency choice → agency-upload → (OCR or skip if manual) → flags → form-preview → submit → next-agency if multi
-
 After flags confirmed (full-upload path) → 2-choice (ChoiceCard):
   ├─ 'email'   → type:'email-draft' → onEmailSent() → post-email choice
   └─ 'preview' → form-preview (editable) → "ดำเนินการต่อ" → choice-card(submit/edit) → submit
 
-SPN path: spn-connect → spn-list → selectSpnEntry → spn-result
-  → hs-analysis → profile-select(confirm/change) → proceed choice → submit
+SPN path: "ดึงข้อมูลจาก SPN" → spn-list (skip profile picker) → selectSpnEntry → spn-result
+  → hs-analysis → เลือกกรม → เลือกโปรไฟล์ (confirm/change) → proceed choice → submit
 ```
 
 ### ChatStep states
