@@ -37,18 +37,20 @@ interface DocSlot {
             </div>
             <p class="au-slot__hint">{{ slot.doc.hint }}</p>
 
-            <!-- Mode toggle -->
-            <div class="au-toggle">
-              <button class="au-toggle-btn" [class.au-toggle-btn--active]="slot.mode === 'upload'"
-                (click)="setMode(slot, 'upload')">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <!-- Mode radio -->
+            <div class="au-mode-row">
+              <label class="au-mode-card" [class.au-mode-card--active]="slot.mode === 'upload'">
+                <input type="radio" [name]="'mode_' + slot.doc.key" value="upload"
+                  [checked]="slot.mode === 'upload'" (change)="setMode(slot, 'upload')" />
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                 อัปโหลดไฟล์
-              </button>
-              <button class="au-toggle-btn" [class.au-toggle-btn--active]="slot.mode === 'manual'"
-                (click)="setMode(slot, 'manual')">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+              </label>
+              <label class="au-mode-card" [class.au-mode-card--active]="slot.mode === 'manual'">
+                <input type="radio" [name]="'mode_' + slot.doc.key" value="manual"
+                  [checked]="slot.mode === 'manual'" (change)="setMode(slot, 'manual')" />
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="M15 5 9 11l-4 1 1-4 6-6"/></svg>
                 กรอกข้อมูลเอง
-              </button>
+              </label>
             </div>
 
             <!-- Upload mode -->
