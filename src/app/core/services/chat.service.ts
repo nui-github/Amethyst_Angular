@@ -399,9 +399,14 @@ export class ChatService {
           round,
         } satisfies MissingFieldsData);
       }, 600);
-    } else {
-      this.continueAfterOCR();
     }
+    // else: user clicks "ดำเนินการต่อ" in OcrResultsComponent → onOcrResultsProceed()
+  }
+
+  /** Called from OcrResultsComponent "ดำเนินการต่อ" button */
+  onOcrResultsProceed(): void {
+    this.user('ดำเนินการต่อ');
+    this.withTyping(() => this.continueAfterOCR(), 400);
   }
 
   private continueAfterOCR(): void {

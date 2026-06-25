@@ -46,7 +46,7 @@ ChatMessage.type → @switch in ChatAreaComponent
   'choice-card'        → ChoiceCardComponent    (emit: chosen)
   'email-draft'        → EmailDraftComponent    (emit: sent)
   'ocr-progress'       → OcrProgressComponent
-  'ocr-results'        → OcrResultsComponent
+  'ocr-results'        → OcrResultsComponent   (editable inline; "ดำเนินการต่อ" triggers hs-analysis)
   'hs-analysis'        → HsAnalysisComponent
   'form'               → FormPanelComponent
   'full-upload'        → FullUploadComponent
