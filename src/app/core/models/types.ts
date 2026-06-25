@@ -135,6 +135,7 @@ export interface StatusCardData {
   refNo: string;            // RG-2568-XXXXX
   customsRef: string;       // HTHM or invoice ref
   submittedAt: string;
+  isPending?: boolean;      // true = sent but awaiting payment; false/absent = fully successful
 }
 
 export interface PaymentQrData {

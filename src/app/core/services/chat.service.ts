@@ -744,17 +744,27 @@ export class ChatService {
     this.submittedRefNo.set(refNo);
     this.pendingSubmitRefNo = refNo;
 
+    const fd2 = this.formData();
+    const pendingCardData: StatusCardData = {
+      refNo, customsRef: fd2.ref ?? fd2.invoiceNo ?? '—',
+      submittedAt: new Date().toLocaleDateString('th-TH'),
+      isPending: true,
+    };
+
     const payConfig = getAgencyPayment(this.currentAgency);
     if (payConfig.requiresFee) {
+      this.bot('status-card', pendingCardData);
       const payRefNo = `PAY-${Math.floor(Math.random() * 900000 + 100000)}`;
       const expire = new Date(Date.now() + 15 * 60 * 1000);
       const expireStr = expire.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
-      this.bot('payment-qr', {
-        agency: this.currentAgency,
-        amount: payConfig.amount,
-        refNo: payRefNo,
-        expiresAt: expireStr,
-      } satisfies PaymentQrData);
+      this.withTyping(() => {
+        this.bot('payment-qr', {
+          agency: this.currentAgency,
+          amount: payConfig.amount,
+          refNo: payRefNo,
+          expiresAt: expireStr,
+        } satisfies PaymentQrData);
+      }, 600);
       return;
     }
 
@@ -774,10 +784,7 @@ export class ChatService {
 
   onSlipUploaded(data: PaymentSlipData): void {
     this.user('อัปโหลด Slip เรียบร้อยแล้ว');
-    this.withTyping(() => {
-      this.bot('text', undefined, '✓ ได้รับ Slip แล้วครับ กำลังดำเนินการส่งข้อมูลเข้ากรม...');
-      this.withTyping(() => this.finalizeSubmit(this.pendingSubmitRefNo), 1200);
-    }, 800);
+    this.withTyping(() => this.finalizeSubmit(this.pendingSubmitRefNo), 800);
   }
 
   private finalizeSubmit(refNo: string): void {
