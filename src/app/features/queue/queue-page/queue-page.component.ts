@@ -107,7 +107,11 @@ export class QueuePageComponent {
   isDone(step: number, stage: number)   { return step < stage; }
   isActive(step: number, stage: number) { return step === stage; }
 
-  toggleSidebar(): void       { this.collapsed.update(v => !v); }
+  toggleSidebar(): void { this.collapsed.update(v => !v); }
+  setTabFilter(key: ShipmentStatus): void {
+    const tv = key as unknown as TabValue;
+    this.activeTab.set(this.activeTab() === tv ? 'all' : tv);
+  }
   selectRow(id: string): void { this.q.open(id); }
   closeDetail(): void         { this.q.open(''); }
 
