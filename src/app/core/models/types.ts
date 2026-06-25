@@ -75,6 +75,7 @@ export interface OcrResultsData {
   countryOrigin: string;
   lotNo: string;
   uNo: string;
+  isManual?: boolean; // true = data came from manual entry, not OCR
 }
 
 export interface FlagItem {
@@ -106,14 +107,22 @@ export interface EmailDraftData {
   isSent: boolean;
 }
 
+export interface HsAgency {
+  code: string;      // e.g. 'อย.'
+  full: string;      // full name
+  licenseType?: string;
+  legalRef?: string;
+}
+
 export interface HsAnalysisData {
   hsCode: string;
   description: string;
   goodsName: string;
   requiresPermit: boolean;
   direction: 'import' | 'export' | 'both';
-  agency: string;
-  agencyFull: string;
+  agency: string;       // primary agency code (kept for backward compat)
+  agencyFull: string;   // primary agency full name
+  agencies?: HsAgency[]; // all agencies when multiple required
   licenseType?: string;
   legalRef?: string;
   confidence: number;

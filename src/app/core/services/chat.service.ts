@@ -204,7 +204,33 @@ export class ChatService {
       this.withTyping(() => {
         const analysis = analyzeHsCode(this.formData().hsCode!);
         this.bot('hs-analysis', analysis);
+        // Set up agency tracking so multi-agency next-step works after submit
+        if (analysis.agencies?.length) {
+          this.ALL_AGENCIES = analysis.agencies.map(a => a.code);
+        } else {
+          this.ALL_AGENCIES = analysis.agency !== '—' ? [analysis.agency] : [];
+        }
+        this.currentAgency = analysis.agency !== '—' ? analysis.agency : '';
+        this.submittedAgencies = [];
         setTimeout(() => this.withTyping(() => this.showProfileSelectForProceed(), 600), 400);
+      }, 600);
+    } else {
+      this.withTyping(() => this.showProfileSelectForProceed(), 800);
+    }
+  }
+
+  private continueAfterCustomsOCR(): void {
+    if (this.formData().hsCode) {
+      this.withTyping(() => {
+        const analysis = analyzeHsCode(this.formData().hsCode!);
+        this.bot('hs-analysis', analysis);
+        if (analysis.agencies?.length) {
+          this.ALL_AGENCIES = analysis.agencies.map(a => a.code);
+        } else {
+          this.ALL_AGENCIES = analysis.agency !== '—' ? [analysis.agency] : [];
+        }
+        this.submittedAgencies = [];
+        setTimeout(() => this.withTyping(() => this.showProfileSelectForAgency(analysis.agency), 600), 400);
       }, 600);
     } else {
       this.withTyping(() => this.showProfileSelectForProceed(), 800);
@@ -318,6 +344,19 @@ export class ChatService {
     this.showOCRResults(result);
   }
 
+  /** Called when agency-upload uses only manual entry — skip OCR progress, show manual summary */
+  skipOCRManualOnly(): void {
+    const fd = this.formData();
+    this.bot('ocr-results', {
+      invoiceNo: fd.invoiceNo ?? '', invoiceDate: fd.invoiceDate ?? '',
+      quantity: fd.quantity ?? '', importer: fd.importer ?? '', port: fd.port ?? '',
+      hsCode: fd.hsCode ?? '', countryOrigin: fd.countryOrigin ?? '',
+      lotNo: fd.lotNo ?? '', uNo: fd.uNo ?? '',
+      isManual: true,
+    } satisfies OcrResultsData);
+    this.withTyping(() => this.continueAfterOCR(), 600);
+  }
+
   // Required fields to be considered "complete" for manual upload paths
   private readonly REQUIRED_FIELDS: MissingField[] = [
     { key: 'invoiceNo',   label: 'Invoice No.',         placeholder: 'เช่น INV-2024-8834' },
@@ -369,10 +408,10 @@ export class ChatService {
       this.withTyping(() => this.showFlags(), 600);
       return;
     }
-    // Customs single-upload: one doc only — skip flags, go straight to hs-analysis → proceed
+    // Customs single-upload: skip flags, hs-analysis → profile → agency choice (same as invoice)
     if (this.isCustomsOnlyUpload) {
       this.isCustomsOnlyUpload = false;
-      this.continueAfterSPN();
+      this.continueAfterCustomsOCR();
       return;
     }
     // Invoice path: hs-analysis → profile select → agency choice → second upload → flags
@@ -382,6 +421,10 @@ export class ChatService {
         this.withTyping(() => {
           const analysis = analyzeHsCode(this.formData().hsCode!);
           this.bot('hs-analysis', analysis);
+          // Use agencies list from analysis if available
+          if (analysis.agencies?.length) {
+            this.ALL_AGENCIES = analysis.agencies.map(a => a.code);
+          }
           setTimeout(() => this.withTyping(() => this.showProfileSelectForAgency(analysis.agency), 600), 400);
         }, 600);
       } else {
@@ -641,8 +684,8 @@ export class ChatService {
       this.bot('choice-card', {
         question: 'ข้อมูลครบถ้วนแล้วครับ — ต้องการดำเนินการต่ออย่างไร?',
         options: [
-          { label: 'ยืนยันส่งกรม',        value: 'submit', description: 'ส่งคำขออนุญาตไปยังหน่วยงานที่เกี่ยวข้อง' },
           { label: 'แก้ไขเอกสารเพิ่มเติม', value: 'edit',   description: 'กลับไปแก้ไขหรืออัปโหลดเอกสารใหม่' },
+          { label: 'ยืนยันส่งกรม',        value: 'submit', description: 'ส่งคำขออนุญาตไปยังหน่วยงานที่เกี่ยวข้อง' },
         ],
       } satisfies ChoiceCardData);
     }, 400);
@@ -716,7 +759,7 @@ export class ChatService {
     }
   }
 
-  private readonly ALL_AGENCIES = ['อย.', 'กษ.'];
+  private ALL_AGENCIES = ['อย.', 'กษ.'];
 
   private showNextAgencyIfAny(): void {
     const remaining = this.ALL_AGENCIES.filter(a => !this.submittedAgencies.includes(a));

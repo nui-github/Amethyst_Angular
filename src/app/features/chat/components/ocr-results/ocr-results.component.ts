@@ -12,10 +12,10 @@ import { OcrResultsData } from '@app/core/models/types';
     <div class="ocr-results">
       <p class="ocr-results__title">
         <lucide-icon [img]="CheckCircle" [size]="15" color="#0D8F61" />
-        OCR อ่านข้อมูลได้แล้วครับ
+        {{ isManual ? 'บันทึกข้อมูลเรียบร้อยแล้วครับ' : 'OCR อ่านข้อมูลได้แล้วครับ' }}
       </p>
       <div class="info-card" style="margin-top:0">
-        <div class="info-card__head">ข้อมูลที่ได้จากเอกสาร</div>
+        <div class="info-card__head">{{ isManual ? 'ข้อมูลที่กรอก' : 'ข้อมูลที่ได้จากเอกสาร' }}</div>
         <div class="info-card__body">
           @for (row of rows; track row.label) {
             @if (row.value) {
@@ -35,6 +35,8 @@ import { OcrResultsData } from '@app/core/models/types';
 export class OcrResultsComponent {
   @Input({ required: true }) data!: Record<string, unknown>;
   readonly CheckCircle = CheckCircle;
+
+  get isManual(): boolean { return !!(this.data as Partial<OcrResultsData>).isManual; }
 
   get rows() {
     const d = this.data as Partial<OcrResultsData>;

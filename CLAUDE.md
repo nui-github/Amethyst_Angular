@@ -171,6 +171,8 @@ import-license-menu → 3 choices:
   │           └─ ขอใบอนุญาตเพิ่ม → agency selector → repeat agency flow
   └─ chooseFullUpload()    → full-upload → OCR → hs-analysis → flags → form-preview → submit
 
+Customs path (chooseCustomsDocs): single-upload → OCR → hs-analysis → profile-select → agency choice → agency-upload → (OCR or skip if manual) → flags → form-preview → submit → next-agency if multi
+
 After flags confirmed (full-upload path) → 2-choice (ChoiceCard):
   ├─ 'email'   → type:'email-draft' → onEmailSent() → post-email choice
   └─ 'preview' → form-preview (editable) → "ดำเนินการต่อ" → choice-card(submit/edit) → submit
@@ -230,6 +232,8 @@ apiUrl: 'https://your-api.com',
 Replace in `src/app/core/mock/`:
 - `spn.mock.ts` → `KNOWN_REFS` + `MOCK_FORM_DATA` → `GET /spn/:ref`
 - `ocr.mock.ts` → `MOCK_OCR_RESULT` → `POST /ocr` (multipart)
+- `hs-analysis.mock.ts` → `analyzeHsCode()` → supports `agencies[]` for multi-agency HS codes
+- `agency-docs.mock.ts` → `getAgencyDocs(agency)` → required docs + manualFields per agency
 
 ---
 

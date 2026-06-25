@@ -176,7 +176,11 @@ export class AgencyUploadComponent {
     this.submitted.set(true);
     this.cdr.detectChanges();
     const files = this.slots.filter(s => s.mode === 'upload' && s.file).map(s => s.file!);
-    // For manual-only slots, pass empty array — service will skip OCR and proceed directly
-    this.chat.startOCR(files.length ? files : undefined);
+    if (files.length) {
+      this.chat.startOCR(files);
+    } else {
+      // All manual — skip OCR progress/results entirely
+      this.chat.skipOCRManualOnly();
+    }
   }
 }

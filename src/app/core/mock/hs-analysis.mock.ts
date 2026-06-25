@@ -4,13 +4,17 @@ import { HsAnalysisData } from '@app/core/models/types';
 const HS_RULES: Record<string, Omit<HsAnalysisData, 'hsCode' | 'confidence'>> = {
   '2941': {
     goodsName: 'ยาปฏิชีวนะ / วัตถุดิบยา',
-    description: 'จัดเป็นวัตถุดิบยาปฏิชีวนะ → ต้องขออนุญาตนำเข้าวัตถุดิบยา (RGoods) จาก อย. ตาม พ.ร.บ. ยา พ.ศ. 2510 มาตรา 15',
+    description: 'จัดเป็นวัตถุดิบยาปฏิชีวนะ → ต้องขออนุญาตนำเข้าจาก 2 หน่วยงาน: อย. (ใบอนุญาตวัตถุดิบยา RGoods) และ กษ. (ใบรับรองสุขอนามัยพืช)',
     requiresPermit: true,
     direction: 'import',
     agency: 'อย.',
     agencyFull: 'สำนักงานคณะกรรมการอาหารและยา (อย.)',
     licenseType: 'RGoods',
     legalRef: 'พ.ร.บ. ยา พ.ศ. 2510 มาตรา 15',
+    agencies: [
+      { code: 'อย.', full: 'สำนักงานคณะกรรมการอาหารและยา', licenseType: 'RGoods', legalRef: 'พ.ร.บ. ยา พ.ศ. 2510 มาตรา 15' },
+      { code: 'กษ.', full: 'กรมวิชาการเกษตร', licenseType: 'ใบรับรองสุขอนามัยพืช', legalRef: 'พ.ร.บ. กักพืช พ.ศ. 2507' },
+    ],
   },
   '3004': {
     goodsName: 'ยาสำเร็จรูป',

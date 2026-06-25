@@ -94,6 +94,84 @@
   &--type  { background: rgba(124,58,237,0.1);  color: #7C3AED; }
   &--dir   { background: rgba(107,114,128,0.1); color: #4B5563; }
   &--conf  { /* dynamic via [style] binding */ font-weight: 700; }
+  &--multi { background: rgba(180,83,9,0.1);    color: #B45309; font-weight: 700; }
+}
+
+// ── Multi-agency breakdown ────────────────────────────────────────────────────
+
+.hs-agencies {
+  border: 1px solid rgba(4, 99, 239, 0.14);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 2px;
+
+  &__title {
+    font-size: 10px;
+    font-weight: 700;
+    color: #9CA3AF;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 6px 12px;
+    background: rgba(4, 99, 239, 0.04);
+    border-bottom: 1px solid rgba(4, 99, 239, 0.1);
+    margin: 0;
+  }
+}
+
+.hs-agency-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px 4px;
+  font-size: 12px;
+}
+
+.hs-agency-num {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(4, 99, 239, 0.1);
+  color: var(--bizx-blue);
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.hs-agency-code {
+  font-weight: 800;
+  color: var(--bizx-blue);
+  min-width: 32px;
+}
+
+.hs-agency-full {
+  flex: 1;
+  color: var(--bizx-navy);
+  font-weight: 500;
+}
+
+.hs-agency-type {
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(124, 58, 237, 0.1);
+  color: #7C3AED;
+  padding: 2px 7px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.hs-agency-legal {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: #9CA3AF;
+  margin: 0 0 6px 38px;
+  padding: 0 12px 0 0;
+  line-height: 1.4;
+  svg { flex-shrink: 0; color: #9CA3AF; }
 }
 
 // ── Legal ref ─────────────────────────────────────────────────────────────────
