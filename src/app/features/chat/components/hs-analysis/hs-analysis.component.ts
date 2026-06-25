@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HsAnalysisData } from '@app/core/models/types';
+import { getAgencyPayment } from '@mock/payment.mock';
 
 @Component({
   selector: 'app-hs-analysis',
@@ -29,5 +30,9 @@ export class HsAnalysisComponent {
 
   get directionLabel(): string {
     return { import: 'ขาเข้า', export: 'ขาออก', both: 'ขาเข้า/ออก' }[this.d.direction];
+  }
+
+  agencyFee(agencyCode: string): { requiresFee: boolean; amount: number } {
+    return getAgencyPayment(agencyCode);
   }
 }

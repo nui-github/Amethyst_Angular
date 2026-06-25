@@ -162,6 +162,21 @@
   flex-shrink: 0;
 }
 
+.hs-agency-fee {
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(245, 158, 11, 0.12);
+  color: #B45309;
+  padding: 2px 7px;
+  border-radius: 4px;
+  flex-shrink: 0;
+
+  &--free {
+    background: rgba(13, 143, 97, 0.1);
+    color: #0D8F61;
+  }
+}
+
 .hs-agency-legal {
   display: flex;
   align-items: center;

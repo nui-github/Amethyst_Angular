@@ -97,6 +97,11 @@
           @if (ag.licenseType) {
             <span class="hs-agency-type">{{ ag.licenseType }}</span>
           }
+          @if (agencyFee(ag.code).requiresFee) {
+            <span class="hs-agency-fee">฿ {{ agencyFee(ag.code).amount | number:'1.0-0' }}</span>
+          } @else {
+            <span class="hs-agency-fee hs-agency-fee--free">ฟรี</span>
+          }
         </div>
         @if (ag.legalRef) {
           <p class="hs-agency-legal">
