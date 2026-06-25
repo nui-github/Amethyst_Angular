@@ -10,7 +10,7 @@ export interface ProfileSelectData {
   mode: 'select' | 'confirm';
   currentProfileCode?: string;
   /** Which flow to continue after profile confirmed */
-  afterFlow: 'agency-docs' | 'proceed';
+  afterFlow: 'agency-choice' | 'proceed';
   agency?: string; // needed when afterFlow='agency-docs'
 }
 
@@ -45,7 +45,7 @@ export interface ProfileSelectData {
           <p class="ps-title">ใช้โปรไฟล์ที่เชื่อมต่ออยู่?</p>
           <p class="ps-sub">เลือกโปรไฟล์ที่ต้องการใช้ในการส่งข้อมูลไปยังกรม</p>
         } @else {
-          <p class="ps-title">เลือกโปรไฟล์ ShippingNet</p>
+          <p class="ps-title">เลือกโปรไฟล์ของท่าน</p>
           <p class="ps-sub">เลือกโปรไฟล์ที่ต้องการใช้ในการส่งข้อมูลไปยังกรม</p>
         }
       </div>

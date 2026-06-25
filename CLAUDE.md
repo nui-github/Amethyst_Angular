@@ -57,8 +57,10 @@ ChatMessage.type → @switch in ChatAreaComponent
   'import-license-menu'→ ImportLicenseMenuComponent
   'status-card'        → StatusCardComponent
   'spn-result'         → SpnResultComponent
-  'form-preview'       → FormPreviewComponent   (pre-submit data review table)
+  'form-preview'       → FormPreviewComponent   (editable pre-submit data review; "ดำเนินการต่อ" triggers choice-card)
   'missing-fields'     → MissingFieldsComponent (incomplete OCR → fill + optional re-upload)
+  'agency-upload'      → AgencyUploadComponent  (per-agency doc slots; upload file OR manual entry per slot)
+  'profile-select'     → ProfileSelectComponent (pick/confirm ShippingNet profile; mode: 'select'|'confirm')
 ```
 
 ### Services (inject, never constructor)
@@ -89,7 +91,8 @@ src/
 │   │   │   ├── ocr.mock.ts
 │   │   │   ├── queue.mock.ts
 │   │   │   ├── spn-companies.mock.ts
-│   │   │   └── hs-analysis.mock.ts
+│   │   │   ├── hs-analysis.mock.ts
+│   │   │   └── agency-docs.mock.ts    ← required docs per agency (อย./กษ.) + manualFields
 │   │   ├── models/types.ts            ← ALL interfaces + MessageType union
 │   │   └── services/
 │   │       ├── chat.service.ts        ← all chat state + flow logic
@@ -117,8 +120,10 @@ src/
 │   │   │       ├── email-draft/       ← email composer
 │   │   │       ├── status-card/       ← submission success (inline template)
 │   │   │       ├── import-license-menu/ ← 3-card doc type selector (inline template)
-│   │   │       ├── form-preview/      ← pre-submit data review table (4 sections)
+│   │   │       ├── form-preview/      ← editable pre-submit data review; "ดำเนินการต่อ" triggers proceed
 │   │   │       ├── missing-fields/    ← incomplete OCR form + optional re-upload
+│   │   │       ├── agency-upload/     ← per-agency doc slots (upload file OR manual entry per slot)
+│   │   │       ├── profile-select/    ← pick/confirm ShippingNet profile (select|confirm mode)
 │   │   │       └── typing-indicator/  ← 3-dot bounce (inline template)
 │   │   ├── queue/
 │   │   │   └── queue-page/            ← ListView + ShipmentChatView
@@ -156,13 +161,22 @@ ChatService.send(text)
   └─ unknown → fallback + chips
 
 import-license-menu → 3 choices:
-  ├─ chooseCustomsDocs()   → type:'single-upload' → OCR → flags → choice → preview
-  ├─ chooseInvoiceFirst()  → type:'single-upload' (invoice) → OCR → flags → choice → preview
-  └─ chooseFullUpload()    → type:'full-upload' → OCR → flags → choice → preview
+  ├─ chooseCustomsDocs()   → single-upload → OCR → hs-analysis → profile-select(proceed) → proceed choice
+  ├─ chooseInvoiceFirst()  → single-upload(invoice) → OCR → hs-analysis
+  │     → profile-select(agency-choice) → agency choice card (dept:อย./dept:กษ.)
+  │     → agency-upload (per-agency slots: upload file OR manual entry)
+  │     → OCR (agency docs) → flags → form-preview (editable) → "ดำเนินการต่อ"
+  │     → choice-card(submit/edit) → submit → showNextAgencyIfAny()
+  │           ├─ remaining agencies? → "ขอใบอนุญาตเพิ่ม / เสร็จสิ้น"
+  │           └─ ขอใบอนุญาตเพิ่ม → agency selector → repeat agency flow
+  └─ chooseFullUpload()    → full-upload → OCR → hs-analysis → flags → form-preview → submit
 
-After flags confirmed → 2-choice (ChoiceCard):
+After flags confirmed (full-upload path) → 2-choice (ChoiceCard):
   ├─ 'email'   → type:'email-draft' → onEmailSent() → post-email choice
-  └─ 'preview' → type:'choice-card' (submit/edit) → handleSubmit()
+  └─ 'preview' → form-preview (editable) → "ดำเนินการต่อ" → choice-card(submit/edit) → submit
+
+SPN path: spn-connect → spn-list → selectSpnEntry → spn-result
+  → hs-analysis → profile-select(confirm/change) → proceed choice → submit
 ```
 
 ### ChatStep states

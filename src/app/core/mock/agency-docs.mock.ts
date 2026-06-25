@@ -1,29 +1,117 @@
+export interface ManualField {
+  key: string;
+  label: string;
+  placeholder: string;
+}
+
 export interface AgencyDoc {
   key: string;
   label: string;
   hint: string;
   required: boolean;
+  manualFields: ManualField[];
 }
 
 export const AGENCY_REQUIRED_DOCS: Record<string, AgencyDoc[]> = {
   'อย.': [
-    { key: 'gmp',        label: 'ใบรับรอง GMP',                    hint: 'Good Manufacturing Practice Certificate จากผู้ผลิต', required: true },
-    { key: 'coa',        label: 'Certificate of Analysis (COA)',    hint: 'ผลการวิเคราะห์คุณภาพและความบริสุทธิ์ของสินค้า',       required: true },
-    { key: 'import_app', label: 'คำขออนุญาตนำเข้าวัตถุดิบยา',       hint: 'แบบฟอร์ม นย.1 จาก อย. — กรอกแล้วสแกนแนบ',          required: true },
-    { key: 'msds',       label: 'Safety Data Sheet (MSDS/SDS)',     hint: 'เอกสารข้อมูลความปลอดภัยของสาร (ถ้ามี)',              required: false },
+    {
+      key: 'gmp', label: 'ใบรับรอง GMP', required: true,
+      hint: 'Good Manufacturing Practice Certificate จากผู้ผลิต',
+      manualFields: [
+        { key: 'gmpNo',     label: 'เลขที่ใบรับรอง GMP', placeholder: 'เช่น GMP-2024-00123' },
+        { key: 'gmpIssuer', label: 'ผู้ออกใบรับรอง',      placeholder: 'ชื่อหน่วยงานที่ออกใบรับรอง' },
+        { key: 'gmpExpiry', label: 'วันหมดอายุ',           placeholder: 'dd/mm/yyyy' },
+      ],
+    },
+    {
+      key: 'coa', label: 'Certificate of Analysis (COA)', required: true,
+      hint: 'ผลการวิเคราะห์คุณภาพและความบริสุทธิ์ของสินค้า',
+      manualFields: [
+        { key: 'coaBatch',    label: 'Batch No.',        placeholder: 'เช่น LOT-2024-567' },
+        { key: 'coaTestDate', label: 'วันที่ทดสอบ',      placeholder: 'dd/mm/yyyy' },
+        { key: 'coaPurity',   label: 'ความบริสุทธิ์ (%)', placeholder: 'เช่น 99.5' },
+      ],
+    },
+    {
+      key: 'import_app', label: 'คำขออนุญาตนำเข้าวัตถุดิบยา', required: true,
+      hint: 'แบบฟอร์ม นย.1 จาก อย. — กรอกแล้วสแกนแนบ',
+      manualFields: [
+        { key: 'appNo',      label: 'เลขที่คำขอ',   placeholder: 'เช่น นย.1-2568-00456' },
+        { key: 'appDate',    label: 'วันที่ยื่นคำขอ', placeholder: 'dd/mm/yyyy' },
+        { key: 'appPurpose', label: 'วัตถุประสงค์',  placeholder: 'เช่น นำเข้าเพื่อการผลิต' },
+      ],
+    },
+    {
+      key: 'msds', label: 'Safety Data Sheet (MSDS/SDS)', required: false,
+      hint: 'เอกสารข้อมูลความปลอดภัยของสาร (ถ้ามี)',
+      manualFields: [
+        { key: 'msdsVersion', label: 'Version / Rev.',   placeholder: 'เช่น Rev. 3' },
+        { key: 'msdsDate',    label: 'วันที่ออกเอกสาร', placeholder: 'dd/mm/yyyy' },
+      ],
+    },
   ],
   'กษ.': [
-    { key: 'phyto',  label: 'ใบรับรองสุขอนามัยพืช',    hint: 'Phytosanitary Certificate จากประเทศต้นทาง', required: true },
-    { key: 'origin', label: 'หนังสือรับรองแหล่งกำเนิด', hint: 'Certificate of Origin (C/O)',               required: true },
-    { key: 'permit', label: 'ใบอนุญาตนำเข้าพืช',       hint: 'กรมวิชาการเกษตรออกให้ก่อนนำเข้า',          required: true },
+    {
+      key: 'phyto', label: 'ใบรับรองสุขอนามัยพืช', required: true,
+      hint: 'Phytosanitary Certificate จากประเทศต้นทาง',
+      manualFields: [
+        { key: 'phytoNo',   label: 'เลขที่ใบรับรอง', placeholder: 'Phytosanitary Certificate No.' },
+        { key: 'phytoDate', label: 'วันที่ออก',       placeholder: 'dd/mm/yyyy' },
+      ],
+    },
+    {
+      key: 'origin', label: 'หนังสือรับรองแหล่งกำเนิด', required: true,
+      hint: 'Certificate of Origin (C/O)',
+      manualFields: [
+        { key: 'originNo',      label: 'เลขที่ C/O',       placeholder: 'Certificate No.' },
+        { key: 'originCountry', label: 'ประเทศต้นกำเนิด',   placeholder: 'เช่น อินเดีย' },
+        { key: 'originDate',    label: 'วันที่ออกเอกสาร',  placeholder: 'dd/mm/yyyy' },
+      ],
+    },
+    {
+      key: 'permit', label: 'ใบอนุญาตนำเข้าพืช', required: true,
+      hint: 'กรมวิชาการเกษตรออกให้ก่อนนำเข้า',
+      manualFields: [
+        { key: 'permitNo',   label: 'เลขที่ใบอนุญาต', placeholder: 'เช่น กษ.-2568-000789' },
+        { key: 'permitDate', label: 'วันที่อนุมัติ',    placeholder: 'dd/mm/yyyy' },
+      ],
+    },
   ],
   'multi': [
-    { key: 'license_app', label: 'คำขออนุญาตนำเข้า',      hint: 'แบบฟอร์มคำขอจากหน่วยงานที่เกี่ยวข้อง', required: true },
-    { key: 'origin',      label: 'หนังสือรับรองแหล่งกำเนิด', hint: 'Certificate of Origin (C/O)',         required: true },
-    { key: 'extra',       label: 'เอกสารอื่นๆ ที่เกี่ยวข้อง', hint: 'ตามที่แต่ละกรมกำหนดเพิ่มเติม',      required: false },
+    {
+      key: 'license_app', label: 'คำขออนุญาตนำเข้า', required: true,
+      hint: 'แบบฟอร์มคำขอจากหน่วยงานที่เกี่ยวข้อง',
+      manualFields: [
+        { key: 'licAppNo',   label: 'เลขที่คำขอ', placeholder: 'เลขที่อ้างอิงคำขอ' },
+        { key: 'licAppDate', label: 'วันที่ยื่น',  placeholder: 'dd/mm/yyyy' },
+      ],
+    },
+    {
+      key: 'origin', label: 'หนังสือรับรองแหล่งกำเนิด', required: true,
+      hint: 'Certificate of Origin (C/O)',
+      manualFields: [
+        { key: 'originNo',   label: 'เลขที่ C/O',      placeholder: 'Certificate No.' },
+        { key: 'originDate', label: 'วันที่ออกเอกสาร', placeholder: 'dd/mm/yyyy' },
+      ],
+    },
+    {
+      key: 'extra', label: 'เอกสารอื่นๆ ที่เกี่ยวข้อง', required: false,
+      hint: 'ตามที่แต่ละกรมกำหนดเพิ่มเติม',
+      manualFields: [
+        { key: 'extraDesc', label: 'รายละเอียดเอกสาร', placeholder: 'ระบุชื่อและเนื้อหาเอกสาร' },
+      ],
+    },
   ],
   '—': [
-    { key: 'doc1', label: 'เอกสารประกอบการขออนุญาต', hint: 'ตามที่หน่วยงานที่เกี่ยวข้องกำหนด', required: true },
+    {
+      key: 'doc1', label: 'เอกสารประกอบการขออนุญาต', required: true,
+      hint: 'ตามที่หน่วยงานที่เกี่ยวข้องกำหนด',
+      manualFields: [
+        { key: 'docNo',   label: 'เลขที่เอกสาร', placeholder: 'เลขที่อ้างอิง' },
+        { key: 'docDate', label: 'วันที่เอกสาร',  placeholder: 'dd/mm/yyyy' },
+        { key: 'docDesc', label: 'รายละเอียด',    placeholder: 'ข้อมูลที่เกี่ยวข้อง' },
+      ],
+    },
   ],
 };
 

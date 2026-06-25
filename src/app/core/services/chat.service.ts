@@ -40,6 +40,8 @@ export class ChatService {
   private flowStartIdx = 0;
   private flagGen = 0;
   private emailGen = 0;
+  private currentAgency = '';
+  private submittedAgencies: string[] = [];
 
   constructor(
     private readonly ocr: OcrService,
@@ -284,6 +286,7 @@ export class ChatService {
     this.user('ใบ Invoice');
     this.markFlowStart();
     this.isInvoicePath = true;
+    this.submittedAgencies = [];
     this.withTyping(() => { this.step.set('invoice_upload'); this.bot('single-upload', { mode: 'invoice' }); }, 400);
   }
 
@@ -372,17 +375,17 @@ export class ChatService {
       this.continueAfterSPN();
       return;
     }
-    // Invoice path: hs-analysis → agency choice → second upload → flags
+    // Invoice path: hs-analysis → profile select → agency choice → second upload → flags
     if (this.isInvoicePath) {
       this.isInvoicePath = false;
       if (this.formData().hsCode) {
         this.withTyping(() => {
           const analysis = analyzeHsCode(this.formData().hsCode!);
           this.bot('hs-analysis', analysis);
-          setTimeout(() => this.withTyping(() => this.showAgencyChoice(analysis.agency), 600), 400);
+          setTimeout(() => this.withTyping(() => this.showProfileSelectForAgency(analysis.agency), 600), 400);
         }, 600);
       } else {
-        this.withTyping(() => this.showAgencyChoice('—'), 800);
+        this.withTyping(() => this.showProfileSelectForAgency('—'), 800);
       }
       return;
     }
@@ -398,32 +401,53 @@ export class ChatService {
     }
   }
 
-  private showAgencyChoice(agency: string): void {
-    const agencyLabel = agency === '—' ? 'ทั่วไป' : agency;
-    this.bot('choice-card', {
-      question: `ต้องการขอใบอนุญาตจากกรมใดบ้าง?`,
-      options: [
-        { label: `${agencyLabel} (แนะนำ)`, value: agency, description: `ขอใบอนุญาตนำเข้าจาก${agencyLabel} ตามที่ AI วิเคราะห์` },
-        { label: 'กรมอื่น / หลายกรม', value: 'multi', description: 'ระบุกรมเพิ่มเติม หรือขอใบอนุญาตหลายหน่วยงาน' },
-      ],
-    } satisfies ChoiceCardData);
+  private readonly AGENCY_DESC: Record<string, string> = {
+    'อย.': 'สำนักงานคณะกรรมการอาหารและยา (อย.)',
+    'กษ.': 'กรมวิชาการเกษตร (กษ.)',
+    '—':   'ขอใบอนุญาตนำเข้าทั่วไป',
+  };
+
+  private showAgencyChoice(recommendedAgency: string): void {
+    const others = this.ALL_AGENCIES.filter(a => a !== recommendedAgency);
+    const options: ChoiceCardData['options'] = [
+      {
+        label: `${recommendedAgency} (แนะนำ)`,
+        value: `dept:${recommendedAgency}`,
+        description: this.AGENCY_DESC[recommendedAgency] ?? recommendedAgency,
+      },
+      ...others.map(a => ({
+        label: a,
+        value: `dept:${a}`,
+        description: this.AGENCY_DESC[a] ?? a,
+      })),
+    ];
+    this.bot('choice-card', { question: 'ต้องการขอใบอนุญาตจากกรมใดบ้าง?', options } satisfies ChoiceCardData);
   }
 
-  onAgencyChoice(agency: string): void {
+  onAgencyChoice(rawValue: string): void {
+    const agency = rawValue.startsWith('dept:') ? rawValue.replace('dept:', '') : rawValue;
+    this.currentAgency = agency;
     const label = agency === 'multi' ? 'กรมอื่น / หลายกรม' : agency;
     this.user(`เลือก ${label}`);
     this.withTyping(() => {
-      // Upload path — no prior profile → pick one before showing agency docs
-      this.bot('profile-select', {
-        mode: 'select',
-        afterFlow: 'agency-docs',
-        agency,
-      });
+      this.bot('text', undefined, `กรุณาอัปโหลดเอกสารประกอบที่${agency === 'multi' ? 'แต่ละกรม' : agency}ต้องการครับ เช่น ใบรับรอง GMP, COA`);
+      setTimeout(() => this.withTyping(() => {
+        this.isAgencyDocsUpload = true;
+        this.bot('agency-upload', { agency });
+      }, 400), 600);
     }, 600);
   }
 
+  private showProfileSelectForAgency(agency: string): void {
+    this.bot('profile-select', {
+      mode: 'select',
+      afterFlow: 'agency-choice',
+      agency,
+    });
+  }
+
   /** Called from ProfileSelectComponent when user confirms a profile */
-  onProfileSelected(profile: { code: string; displayName: string; username: string }, afterFlow: 'agency-docs' | 'proceed', agency?: string): void {
+  onProfileSelected(profile: { code: string; displayName: string; username: string }, afterFlow: 'agency-choice' | 'proceed', agency?: string): void {
     this.user(`ใช้โปรไฟล์ ${profile.displayName}`);
     // Store profile in session + mark connected so sidebar badge appears
     const existing = this.spnSession();
@@ -434,14 +458,8 @@ export class ChatService {
       username:    profile.username,
       profile:     profile.code,
     });
-    if (afterFlow === 'agency-docs') {
-      this.withTyping(() => {
-        this.bot('text', undefined, `กรุณาอัปโหลดเอกสารประกอบที่${agency === 'multi' ? 'แต่ละกรม' : agency}ต้องการครับ เช่น ใบรับรอง GMP, COA`);
-        setTimeout(() => this.withTyping(() => {
-          this.isAgencyDocsUpload = true;
-          this.bot('agency-upload', { agency: agency ?? 'อย.' });
-        }, 400), 600);
-      }, 500);
+    if (afterFlow === 'agency-choice') {
+      this.withTyping(() => this.showAgencyChoice(agency ?? '—'), 500);
     } else {
       this.withTyping(() => this.showProceedChoice(), 500);
     }
@@ -613,6 +631,12 @@ export class ChatService {
   private showPreview(): void {
     this.step.set('preview');
     this.bot('form-preview', { ...this.formData() });
+    // choice-card appears only after user clicks "ดำเนินการต่อ" inside form-preview
+  }
+
+  /** Called from FormPreviewComponent when user finishes editing and clicks "ดำเนินการต่อ" */
+  onFormPreviewProceed(): void {
+    this.user('ดำเนินการต่อ');
     this.withTyping(() => {
       this.bot('choice-card', {
         question: 'ข้อมูลครบถ้วนแล้วครับ — ต้องการดำเนินการต่ออย่างไร?',
@@ -621,7 +645,7 @@ export class ChatService {
           { label: 'แก้ไขเอกสารเพิ่มเติม', value: 'edit',   description: 'กลับไปแก้ไขหรืออัปโหลดเอกสารใหม่' },
         ],
       } satisfies ChoiceCardData);
-    }, 600);
+    }, 400);
   }
 
   /** Rewind to the last choice-card so user can re-select */
@@ -685,6 +709,68 @@ export class ChatService {
       refNo, customsRef: fd.ref ?? fd.invoiceNo ?? '—',
       submittedAt: new Date().toLocaleDateString('th-TH'),
     } satisfies StatusCardData);
+
+    if (this.currentAgency) {
+      this.submittedAgencies.push(this.currentAgency);
+      this.withTyping(() => this.showNextAgencyIfAny(), 800);
+    }
+  }
+
+  private readonly ALL_AGENCIES = ['อย.', 'กษ.'];
+
+  private showNextAgencyIfAny(): void {
+    const remaining = this.ALL_AGENCIES.filter(a => !this.submittedAgencies.includes(a));
+    if (remaining.length === 0) return;
+
+    const remainingLabel = remaining.join(', ');
+    this.bot('choice-card', {
+      question: 'ต้องการขอใบอนุญาตเพิ่มเติมไหมครับ?',
+      options: [
+        {
+          label: 'ขอใบอนุญาตเพิ่ม',
+          value: 'more-agencies',
+          description: `ยังมีกรมที่ยังไม่ได้ยื่นขอ: ${remainingLabel}`,
+        },
+        {
+          label: 'เสร็จสิ้น',
+          value: 'no-more-agency',
+          description: 'ไม่ต้องการขอใบอนุญาตเพิ่มเติม',
+        },
+      ],
+    } satisfies ChoiceCardData);
+  }
+
+  onNextAgencyChoice(value: string): void {
+    if (value === 'no-more-agency') {
+      this.user('เสร็จสิ้น');
+      this.withTyping(() => this.bot('text', undefined, 'ดำเนินการเสร็จสิ้นแล้วครับ ✓'), 400);
+      return;
+    }
+    if (value === 'more-agencies') {
+      this.user('ขอใบอนุญาตเพิ่ม');
+      // Show remaining agency selector card
+      this.withTyping(() => this.showRemainingAgencySelector(), 500);
+      return;
+    }
+    // Specific agency selected from selector — go straight to upload, skip agency choice card
+    const agency = value.replace('agency:', '');
+    this.onAgencyChoice(agency);
+  }
+
+  private showRemainingAgencySelector(): void {
+    const remaining = this.ALL_AGENCIES.filter(a => !this.submittedAgencies.includes(a));
+    const AGENCY_DESC: Record<string, string> = {
+      'อย.': 'สำนักงานคณะกรรมการอาหารและยา',
+      'กษ.': 'กรมวิชาการเกษตร',
+    };
+    this.bot('choice-card', {
+      question: 'เลือกกรมที่ต้องการยื่นขอใบอนุญาต',
+      options: remaining.map(a => ({
+        label: a,
+        value: `agency:${a}`,
+        description: AGENCY_DESC[a] ?? a,
+      })),
+    } satisfies ChoiceCardData);
   }
 
   // ── SPN list permit request ────────────────────────────────────────────────

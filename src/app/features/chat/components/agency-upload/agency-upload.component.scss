@@ -129,3 +129,68 @@
 
   &[disabled] { opacity: 0.4; }
 }
+
+// Mode toggle
+.au-toggle {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.au-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1.5px solid var(--bizx-n200);
+  background: #fff;
+  font-size: 11px;
+  font-family: inherit;
+  color: var(--bizx-n500);
+  cursor: pointer;
+  transition: all 0.12s;
+
+  &:hover { border-color: var(--bizx-blue); color: var(--bizx-blue); }
+
+  &--active {
+    border-color: var(--bizx-blue);
+    background: rgba(4, 99, 239, 0.07);
+    color: var(--bizx-blue);
+    font-weight: 700;
+  }
+}
+
+// Manual entry form
+.au-manual {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  &__label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--bizx-n600);
+  }
+
+  &__input {
+    font-size: 12px;
+    font-family: inherit;
+    color: var(--bizx-navy);
+    border: 1.5px solid var(--bizx-n200);
+    border-radius: 7px;
+    padding: 6px 10px;
+    outline: none;
+    background: #fff;
+    transition: border-color 0.12s;
+
+    &:focus { border-color: var(--bizx-blue); }
+    &::placeholder { color: var(--bizx-n300); }
+  }
+}

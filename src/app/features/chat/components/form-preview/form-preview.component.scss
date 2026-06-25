@@ -62,34 +62,113 @@
 
 .fp-row {
   display: grid;
-  grid-template-columns: 160px 1fr;
+  grid-template-columns: 150px 1fr;
   gap: 8px;
-  padding: 5px 0;
+  padding: 4px 0;
   border-bottom: 1px solid #F8F9FB;
-  align-items: baseline;
+  align-items: center;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.12s;
 
   &:last-child { border-bottom: none; }
   &--empty { opacity: 0.45; }
 
+  &:not(.fp-row--readonly):not(.fp-row--editing):hover {
+    background: #F5F8FF;
+    .fp-edit-icon { opacity: 1; }
+  }
+
+  &--editing {
+    background: #F0F5FF;
+    cursor: text;
+  }
+
+  &--readonly { cursor: default; }
+
   &__label {
     font-size: 12px; color: #6B7280; font-weight: 500; white-space: nowrap;
+    padding-left: 4px;
+  }
+
+  &__value-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
   }
 
   &__value {
     font-size: 12px; color: #010136; font-weight: 500;
-    word-break: break-word;
+    word-break: break-word; flex: 1;
 
-    &--highlight {
-      color: #0463EF;
-      font-weight: 700;
-    }
-
-    &--empty {
-      color: #CCCCCC;
-      font-style: italic;
-      font-weight: 400;
-    }
+    &--highlight { color: #0463EF; font-weight: 700; }
+    &--empty { color: #CCCCCC; font-style: italic; font-weight: 400; }
   }
+}
+
+.fp-edit-icon {
+  color: #9CA3AF;
+  opacity: 0;
+  transition: opacity 0.12s;
+  flex-shrink: 0;
+  display: flex;
+}
+
+.fp-input {
+  flex: 1;
+  font-size: 12px;
+  font-family: inherit;
+  font-weight: 500;
+  color: #010136;
+  border: 1.5px solid #0463EF;
+  border-radius: 6px;
+  padding: 3px 7px;
+  outline: none;
+  background: #fff;
+  min-width: 0;
+  width: 100%;
+}
+
+.fp-save-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 16px;
+  border-top: 1px solid #F0F1F8;
+  background: #FAFBFF;
+  font-size: 12px;
+
+  &--saved {
+    color: #0D8F61;
+    font-weight: 600;
+    justify-content: flex-start;
+  }
+}
+
+.fp-save-hint {
+  font-size: 11px;
+  color: #9CA3AF;
+  margin-right: auto;
+}
+
+.fp-save-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(135deg, #034DBA, #0463EF);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 0.15s;
+
+  &:hover { opacity: 0.88; }
 }
 
 // ── Footer note ───────────────────────────────────────────────────────────────
