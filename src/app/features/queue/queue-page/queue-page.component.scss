@@ -401,6 +401,38 @@
 
 .dv-chat { height: 100%; overflow-y: auto; }
 
+// Next-action chips
+.dv-next-action {
+  padding: 10px 16px 8px;
+  border-top: 1px solid #F0F1F5;
+  background: #FAFBFF;
+  flex-shrink: 0;
+}
+
+.dv-next-action__label {
+  font-size: 10px; font-weight: 600; color: #C4C9D6;
+  text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 8px;
+}
+
+.dv-next-action__chips {
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+
+.dv-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 7px 14px; border-radius: 8px;
+  border: 1.5px solid #E5E7EB; background: #fff;
+  font-size: 12px; font-weight: 600; color: #374151;
+  cursor: pointer; font-family: inherit; transition: all 0.12s;
+
+  &:hover { border-color: #0463EF; color: #0463EF; background: #EFF6FF; }
+
+  &--primary {
+    background: #0463EF; border-color: #0463EF; color: #fff;
+    &:hover { background: #034DBA; border-color: #034DBA; color: #fff; }
+  }
+}
+
 // Chat input bar
 .dv-input-bar {
   background: #fff;

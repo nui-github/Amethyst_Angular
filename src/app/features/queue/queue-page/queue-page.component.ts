@@ -132,11 +132,11 @@ export class QueuePageComponent {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.queueSend(); }
   }
 
-  queueSend(): void {
-    const text = this.queueInputText().trim();
+  queueSend(preset?: string): void {
+    const text = preset ?? this.queueInputText().trim();
     const ship = this.openShipment();
     if (!text || !ship) return;
-    this.queueInputText.set('');
+    if (!preset) this.queueInputText.set('');
 
     const userMsg: ChatMessage = { id: generateId(), role: 'user', type: 'text', content: text, time: getTime() };
     this.q.update(ship.id, { messages: [...(ship.messages ?? []), userMsg] });

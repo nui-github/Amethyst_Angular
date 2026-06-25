@@ -246,6 +246,42 @@
             class="dv-chat" />
         </div>
 
+        <!-- Contextual next-action chips -->
+        @if (openShipment()!.statusKey !== 'submitted' && openShipment()!.statusKey !== 'no_permit') {
+          <div class="dv-next-action">
+            @if (openShipment()!.statusKey === 'needs_you') {
+              <p class="dv-next-action__label">ขั้นตอนถัดไป</p>
+              <div class="dv-next-action__chips">
+                <button class="dv-chip dv-chip--primary" (click)="queueSend('ยืนยันและดำเนินการต่อ')">
+                  ยืนยันร่างใบอนุญาต →
+                </button>
+                <button class="dv-chip" (click)="queueSend('ส่งกลับ AI เพื่อตรวจสอบใหม่')">
+                  ส่งกลับ AI ตรวจสอบ
+                </button>
+              </div>
+            }
+            @if (openShipment()!.statusKey === 'email_outbox') {
+              <p class="dv-next-action__label">ขั้นตอนถัดไป</p>
+              <div class="dv-next-action__chips">
+                <button class="dv-chip dv-chip--primary" (click)="queueSend('ส่งอีเมลหาลูกค้า')">
+                  <lucide-icon [img]="icMail" [size]="12" /> ส่งอีเมลหาลูกค้า
+                </button>
+              </div>
+            }
+            @if (openShipment()!.statusKey === 'await_customer') {
+              <p class="dv-next-action__label">ขั้นตอนถัดไป</p>
+              <div class="dv-next-action__chips">
+                <button class="dv-chip dv-chip--primary" (click)="queueSend('ยื่นกรม')">
+                  ยื่นกรม ✓
+                </button>
+                <button class="dv-chip" (click)="queueSend('ลูกค้ายืนยันเอกสารแล้ว')">
+                  ลูกค้ายืนยันแล้ว
+                </button>
+              </div>
+            }
+          </div>
+        }
+
         <!-- Chat input bar -->
         <div class="dv-input-bar">
           <div class="dv-input-wrap">
