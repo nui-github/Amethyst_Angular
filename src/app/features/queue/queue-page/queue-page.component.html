@@ -1,148 +1,269 @@
 <div class="queue-page">
 
-  <!-- ── Header ────────────────────────────────────────────── -->
-  <div class="qp-header">
-    <button class="back-btn" (click)="back()">
-      <lucide-icon [img]="icBack" [size]="15" /> กลับ
-    </button>
-    <div>
-      <h1 class="qp-title">คิวงานขอใบอนุญาต</h1>
-      <p class="qp-sub">{{ q.queue().length }} รายการ · รอคุณยืนยัน {{ countByStatus('needs_you') }}</p>
-    </div>
-    <div class="qp-stats">
-      @for (s of statCards; track s.key) {
-        <button class="stat-card" [class.stat-card--active]="statusFilter() === s.key"
-          [style.borderColor]="statusFilter() === s.key ? s.dot : '#E5E7EB'"
-          (click)="statusFilter.set(statusFilter() === s.key ? 'all' : s.key)">
-          <span class="stat-dot" [style.background]="s.dot"></span>
-          <span class="stat-label">{{ s.label }}</span>
-          <span class="stat-count" [style.color]="s.dot">{{ countByStatus(s.key) }}</span>
-        </button>
-      }
-    </div>
-  </div>
+  <!-- ════════════════════════════════════════════════════
+       LIST VIEW
+  ════════════════════════════════════════════════════ -->
+  @if (!openShipment()) {
 
-  <!-- ── Body ──────────────────────────────────────────────── -->
-  <div class="qp-body">
-
-    <!-- ListView -->
-    <div class="list-panel" [class.list-panel--narrow]="!!openShipment()">
-      <div class="list-search">
-        <input nz-input nzSize="small" [ngModel]="searchTerm()"
-          (ngModelChange)="searchTerm.set($event)"
-          placeholder="ค้นหา ref, ผู้นำเข้า, สินค้า..." />
+    <!-- Header -->
+    <div class="lv-header">
+      <div class="lv-header__left">
+        <h1 class="lv-title">คิวงาน</h1>
+        <p class="lv-date">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          วันนี้ · {{ today }}
+        </p>
       </div>
-
-      <div class="list-rows">
-        @for (s of filteredQueue(); track s.id) {
-          <button class="list-row" [class.list-row--active]="q.openId() === s.id"
-            (click)="selectRow(s.id)">
-            <div class="list-row__main">
-              <span class="list-row__name">
-                {{ s.chatName ?? s.customsNo }}
-                @if (s.isNew) { <span class="badge-new">ใหม่</span> }
-              </span>
-              <span class="list-row__goods">{{ s.goods }}</span>
-              @if (s.chatName) {
-                <span class="list-row__customs">{{ s.customsNo }}</span>
-              }
+      <div class="lv-stat-cards">
+        @for (s of statCards; track s.key) {
+          <button class="lv-stat" [class.lv-stat--active]="statusFilter() === s.key"
+            (click)="statusFilter.set(statusFilter() === s.key ? 'all' : s.key)">
+            <div class="lv-stat__icon" [style.background]="s.iconBg">
+              <ng-container [ngSwitch]="s.key">
+                <lucide-icon *ngSwitchCase="'needs_you'"    [img]="icWarn"  [size]="14" [color]="s.dot" />
+                <lucide-icon *ngSwitchCase="'email_outbox'" [img]="icClock" [size]="14" [color]="s.dot" />
+                <lucide-icon *ngSwitchCase="'await_customer'" [img]="icClock" [size]="14" [color]="s.dot" />
+                <lucide-icon *ngSwitchCase="'submitted'"    [img]="icCheck" [size]="14" [color]="s.dot" />
+              </ng-container>
             </div>
-            <div class="list-row__badges">
-              <span class="status-badge"
-                [style.background]="statusMeta(s.statusKey).bg"
-                [style.color]="statusMeta(s.statusKey).text">
-                {{ statusMeta(s.statusKey).label }}
-              </span>
-              <span class="agency-badge">{{ agencyShort(s.agency) }}</span>
+            <div class="lv-stat__body">
+              <p class="lv-stat__label">{{ s.label }}</p>
+              <p class="lv-stat__count" [style.color]="s.dot">{{ countByStatus(s.key) }} <span>รายการ</span></p>
+              <p class="lv-stat__sub">{{ s.sub }}</p>
             </div>
           </button>
         }
-
-        @if (filteredQueue().length === 0) {
-          <div class="list-empty">ไม่มีรายการ</div>
-        }
       </div>
     </div>
 
-    <!-- ShipmentChatView -->
-    @if (openShipment(); as ship) {
-      <div class="detail-panel">
+    <!-- Tabs + Search -->
+    <div class="lv-toolbar">
+      <div class="lv-tabs">
+        @for (t of tabs; track t.value) {
+          <button class="lv-tab" [class.lv-tab--active]="activeTab() === t.value"
+            (click)="activeTab.set(t.value)">
+            {{ t.label }}
+            <span class="lv-tab-badge">{{ tabCount(t.value) }}</span>
+          </button>
+        }
+      </div>
+      <div class="lv-search">
+        <lucide-icon [img]="icSearch" [size]="13" style="color:#9CA3AF;flex-shrink:0" />
+        <input [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)"
+          placeholder="ค้นหา ref, สินค้า, ลูกค้า..." />
+      </div>
+    </div>
 
-        <!-- Detail header -->
-        <div class="detail-header">
-          <div class="detail-header__top">
+    <!-- Table -->
+    <div class="lv-table-wrap">
+      <table class="lv-table">
+        <thead>
+          <tr>
+            <th class="col-ref">ใบขนสินค้า / ลูกค้า</th>
+            <th class="col-goods">สินค้า</th>
+            <th class="col-assess">AI ประเมิน</th>
+            <th class="col-conf">ความมั่นใจ AI</th>
+            <th class="col-status">สถานะ</th>
+            <th class="col-action">การทำงาน</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (s of filteredQueue(); track s.id) {
+            <tr class="lv-row" [class.lv-row--urgent]="s.statusKey === 'needs_you'"
+              (click)="selectRow(s.id)">
+
+              <!-- Ref + customer -->
+              <td class="col-ref">
+                <div class="ref-wrap">
+                  @if (s.statusKey === 'needs_you') { <div class="ref-urgency-bar"></div> }
+                  <span class="ref-type-badge" [class.ref-type-badge--exp]="s.type === 'EXP'">
+                    {{ s.type }}
+                  </span>
+                  <div>
+                    <p class="ref-no">
+                      {{ s.customsNo }}
+                      @if (s.isNew) { <span class="badge-new">ใหม่</span> }
+                    </p>
+                    <p class="ref-customer">{{ s.customer || s.chatName || '—' }}</p>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Goods -->
+              <td class="col-goods">
+                <p class="goods-name">{{ s.goods }}</p>
+                <p class="goods-hs">HS {{ s.hs }}</p>
+              </td>
+
+              <!-- AI assessment -->
+              <td class="col-assess">
+                @if (s.permitNeeded) {
+                  <p class="assess-permit">● ต้องขอใบอนุญาต</p>
+                  <p class="assess-detail">{{ agencyShort(s.agency) }} · {{ s.formCode }}</p>
+                } @else {
+                  <p class="assess-no-permit">● ไม่ต้องขอใบอนุญาต</p>
+                  <p class="assess-detail">ผ่านพิธีการปกติ</p>
+                }
+              </td>
+
+              <!-- Confidence -->
+              <td class="col-conf">
+                <div class="conf-wrap">
+                  <span class="conf-pct" [style.color]="confColor(s.conf)">{{ s.conf }}%</span>
+                  <span class="conf-label" [style.color]="confColor(s.conf)">{{ confLabel(s.conf) }}</span>
+                </div>
+                <div class="conf-bar-track">
+                  <div class="conf-bar-fill"
+                    [style.width.%]="s.conf"
+                    [style.background]="confColor(s.conf)"></div>
+                </div>
+              </td>
+
+              <!-- Status -->
+              <td class="col-status">
+                <span class="status-pill"
+                  [style.background]="statusMeta(s.statusKey).bg"
+                  [style.color]="statusMeta(s.statusKey).text">
+                  <span class="status-dot" [style.background]="statusMeta(s.statusKey).dot"></span>
+                  {{ statusMeta(s.statusKey).label }}
+                </span>
+              </td>
+
+              <!-- Action -->
+              <td class="col-action" (click)="$event.stopPropagation()">
+                @if (s.statusKey === 'needs_you') {
+                  <button class="action-btn action-btn--primary" (click)="selectRow(s.id)">
+                    ตรวจสอบ <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+                  </button>
+                } @else if (s.statusKey === 'no_permit') {
+                  <button class="action-btn" (click)="selectRow(s.id)">ดูใบขน <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></button>
+                } @else if (s.statusKey === 'await_customer') {
+                  <button class="action-btn" (click)="selectRow(s.id)">ดูสถานะ <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></button>
+                } @else if (s.statusKey === 'submitted') {
+                  <button class="action-btn" (click)="selectRow(s.id)">ดูผลยื่น <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></button>
+                } @else {
+                  <button class="action-btn" (click)="selectRow(s.id)">ดูรายละเอียด <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></button>
+                }
+              </td>
+
+            </tr>
+          }
+          @if (filteredQueue().length === 0) {
+            <tr><td colspan="6" class="lv-empty">ไม่มีรายการ</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+  <!-- ════════════════════════════════════════════════════
+       DETAIL VIEW
+  ════════════════════════════════════════════════════ -->
+  } @else {
+    <div class="dv-wrap">
+
+      <!-- Detail header -->
+      <div class="dv-header">
+        <button class="dv-back" (click)="closeDetail()">
+          <lucide-icon [img]="icBack" [size]="14" /> กลับไปคิวงาน
+        </button>
+
+        <div class="dv-header__info">
+          <div class="dv-header__left">
+            <span class="ref-type-badge" [class.ref-type-badge--exp]="openShipment()!.type === 'EXP'">{{ openShipment()!.type }}</span>
             <div>
-              <h2 class="detail-title">{{ ship.chatName ?? ship.customsNo }}</h2>
-              <p class="detail-sub">{{ ship.goods }} · {{ ship.customer }}</p>
+              <h2 class="dv-title">{{ openShipment()!.customsNo }}</h2>
+              <p class="dv-sub">{{ openShipment()!.goods }} · HS {{ openShipment()!.hs }} · {{ openShipment()!.customer }}</p>
             </div>
-            <span class="status-badge status-badge--lg"
-              [style.background]="statusMeta(ship.statusKey).bg"
-              [style.color]="statusMeta(ship.statusKey).text">
-              {{ statusMeta(ship.statusKey).label }}
-            </span>
           </div>
-
-          <!-- 8-step progress bar -->
-          <div class="steps-bar">
-            @for (label of stageLabels.slice(1); track label; let i = $index) {
-              <div class="step" [class.step--done]="isDone(i+1, ship.stage)"
-                [class.step--active]="isActive(i+1, ship.stage)">
-                <div class="step__dot">{{ isDone(i+1, ship.stage) ? '✓' : i+1 }}</div>
-                <span class="step__label">{{ label }}</span>
-              </div>
-              @if (i < 7) { <div class="step__line" [class.step__line--done]="isDone(i+1, ship.stage)"></div> }
-            }
-          </div>
+          <span class="status-pill"
+            [style.background]="statusMeta(openShipment()!.statusKey).bg"
+            [style.color]="statusMeta(openShipment()!.statusKey).text">
+            <span class="status-dot" [style.background]="statusMeta(openShipment()!.statusKey).dot"></span>
+            {{ statusMeta(openShipment()!.statusKey).label }}
+          </span>
         </div>
 
-        <!-- Chat history -->
-        <app-chat-area [messages]="ship.messages ?? []" [readOnly]="true" class="detail-chat" />
-
-        <!-- Action bars -->
-        @if (ship.statusKey === 'needs_you') {
-          <div class="action-bar">
-            <button nz-button nzSize="default" style="flex-shrink:0">
-              <lucide-icon [img]="icReset" [size]="13" /> ส่งกลับ AI
-            </button>
-            <button nz-button nzType="primary" nzSize="default" nzBlock (click)="confirm()">
-              ยืนยันและดำเนินการต่อ →
-            </button>
-          </div>
-        }
-
-        @if (ship.statusKey === 'email_outbox') {
-          <div class="action-bar">
-            <button nz-button nzType="primary" nzSize="default" nzBlock (click)="sendEmail()">
-              <lucide-icon [img]="icMail" [size]="13" /> ส่งอีเมลหาลูกค้า
-            </button>
-          </div>
-        }
-
-        @if (ship.statusKey === 'await_customer') {
-          <div class="action-bar">
-            <button nz-button nzSize="default" style="flex-shrink:0">แก้ไขเอกสาร</button>
-            <button nz-button nzType="primary" nzSize="default" (click)="customerConfirmed()" style="flex:1">
-              ลูกค้ายืนยันเอกสารแล้ว
-            </button>
-            <button nz-button nzType="primary" nzSize="default"
-              style="background:linear-gradient(135deg,#11BB7F,#16EA9E);border:none;flex:1"
-              (click)="submit()">
-              ยื่นกรม ✓
-            </button>
-          </div>
-        }
-
-        @if (ship.statusKey === 'submitted') {
-          <div class="action-bar action-bar--done">
-            <lucide-icon [img]="icCheck" [size]="15" color="#065F46" />
-            <span>ยื่นเอกสารถึงกรมเรียบร้อยแล้ว</span>
-          </div>
-        }
-
+        <!-- Steps bar -->
+        <div class="steps-bar">
+          @for (label of stageLabels.slice(1); track label; let i = $index) {
+            <div class="step" [class.step--done]="isDone(i+1, openShipment()!.stage)"
+              [class.step--active]="isActive(i+1, openShipment()!.stage)">
+              <div class="step__dot">{{ isDone(i+1, openShipment()!.stage) ? '✓' : i+1 }}</div>
+              <span class="step__label">{{ label }}</span>
+            </div>
+            @if (i < 7) {
+              <div class="step__line" [class.step__line--done]="isDone(i+1, openShipment()!.stage)"></div>
+            }
+          }
+        </div>
       </div>
-    } @else {
-      <div class="detail-empty">เลือกรายการเพื่อดูประวัติและดำเนินการ</div>
-    }
 
-  </div>
+      <!-- Summary cards -->
+      <div class="dv-summary">
+        <div class="summary-card">
+          <p class="summary-card__label">ลูกค้า</p>
+          <p class="summary-card__value">{{ openShipment()!.customer || '—' }}</p>
+        </div>
+        <div class="summary-card">
+          <p class="summary-card__label">สินค้า / HS Code</p>
+          <p class="summary-card__value">{{ openShipment()!.goods }}</p>
+          <p class="summary-card__sub">{{ openShipment()!.hs }}</p>
+        </div>
+        <div class="summary-card">
+          <p class="summary-card__label">หน่วยงาน / แบบฟอร์ม</p>
+          <p class="summary-card__value">{{ agencyShort(openShipment()!.agency) }}</p>
+          <p class="summary-card__sub">{{ openShipment()!.formCode }} — {{ openShipment()!.formName }}</p>
+        </div>
+        <div class="summary-card">
+          <p class="summary-card__label">ความมั่นใจ AI</p>
+          <p class="summary-card__value" [style.color]="confColor(openShipment()!.conf)">{{ openShipment()!.conf }}%</p>
+          <p class="summary-card__sub">{{ confLabel(openShipment()!.conf) }}</p>
+        </div>
+        <div class="summary-card">
+          <p class="summary-card__label">นำเข้าเมื่อ</p>
+          <p class="summary-card__value">{{ openShipment()!.importedAt }}</p>
+        </div>
+      </div>
+
+      <!-- Chat history label -->
+      <div class="dv-section-label">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        ประวัติการสนทนา
+      </div>
+
+      <!-- Chat history -->
+      <div class="dv-chat-wrap">
+        <app-chat-area [messages]="openShipment()!.messages ?? []" [readOnly]="true" class="dv-chat" />
+      </div>
+
+      <!-- Action bar -->
+      @if (openShipment()!.statusKey === 'needs_you') {
+        <div class="dv-action-bar">
+          <button class="dv-action-btn" (click)="confirm()">ยืนยันและดำเนินการต่อ →</button>
+          <button class="dv-action-btn dv-action-btn--ghost">ส่งกลับ AI</button>
+        </div>
+      }
+      @if (openShipment()!.statusKey === 'email_outbox') {
+        <div class="dv-action-bar">
+          <button class="dv-action-btn" (click)="sendEmail()">
+            <lucide-icon [img]="icMail" [size]="13" /> ส่งอีเมลหาลูกค้า
+          </button>
+        </div>
+      }
+      @if (openShipment()!.statusKey === 'await_customer') {
+        <div class="dv-action-bar">
+          <button class="dv-action-btn dv-action-btn--ghost" (click)="customerConfirmed()">ลูกค้ายืนยันแล้ว</button>
+          <button class="dv-action-btn" (click)="submit()">ยื่นกรม ✓</button>
+        </div>
+      }
+      @if (openShipment()!.statusKey === 'submitted') {
+        <div class="dv-action-bar dv-action-bar--done">
+          <lucide-icon [img]="icCheck" [size]="15" color="#065F46" />
+          <span>ยื่นเอกสารถึงกรมเรียบร้อยแล้ว</span>
+        </div>
+      }
+
+    </div>
+  }
+
 </div>
