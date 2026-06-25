@@ -4,6 +4,8 @@
 Web-based AI chatbot สำหรับสร้างใบอนุญาตนำเข้า (RGoods) และจัดการเอกสารศุลกากร  
 Built with **Angular 17** · ng-zorro-antd · BizX Design System · IBM Plex Sans Thai
 
+**Target users:** importers/exporters (im/ex) จัดการเอกสารเอง — ไม่ใช่ broker เป็นกลุ่มหลัก
+
 ---
 
 ## Tech Stack
@@ -40,6 +42,8 @@ Key rules:
 ### Phase 2: No window.__chat bridge
 Every bot message has a `type` field. `ChatAreaComponent` uses `@switch` to render the right Angular component. **No innerHTML for interactive content. All events via `@Output()`.**
 
+Interactive components check **both** `!readOnly` (global) **and** `!msg.isReadOnly` (per-message) before rendering interactive mode. This allows queue session history to show rich card designs but stay non-interactive.
+
 ```
 ChatMessage.type → @switch in ChatAreaComponent
   'flag-card'          → FlagCardComponent      (emit: flagConfirmed, allConfirmed)
@@ -47,7 +51,7 @@ ChatMessage.type → @switch in ChatAreaComponent
   'email-draft'        → EmailDraftComponent    (emit: sent)
   'ocr-progress'       → OcrProgressComponent
   'ocr-results'        → OcrResultsComponent   (editable inline; "ดำเนินการต่อ" triggers hs-analysis)
-  'hs-analysis'        → HsAnalysisComponent
+  'hs-analysis'        → HsAnalysisComponent   (shows fee badge per agency from payment.mock.ts)
   'form'               → FormPanelComponent
   'full-upload'        → FullUploadComponent
   'single-upload'      → SingleUploadComponent
@@ -55,19 +59,23 @@ ChatMessage.type → @switch in ChatAreaComponent
   'spn-connect'        → SpnConnectComponent    (emit: connected)
   'connect'            → ConnectPanelComponent  (emit: connected, legacy)
   'import-license-menu'→ ImportLicenseMenuComponent
-  'status-card'        → StatusCardComponent
+  'status-card'        → StatusCardComponent    (isPending=true: รอชำระ / false: สำเร็จ)
   'spn-result'         → SpnResultComponent
   'form-preview'       → FormPreviewComponent   (editable pre-submit data review; "ดำเนินการต่อ" triggers choice-card)
   'missing-fields'     → MissingFieldsComponent (incomplete OCR → fill + optional re-upload)
   'agency-upload'      → AgencyUploadComponent  (per-agency doc slots; upload file OR manual entry per slot)
   'profile-select'     → ProfileSelectComponent (pick/confirm ShippingNet profile; mode: 'select'|'confirm')
+  'payment-qr'         → PaymentQrComponent     (QR PromptPay สำหรับกรมที่มีค่าธรรมเนียม)
+  'payment-slip'       → PaymentSlipComponent   (อัปโหลด slip หลังชำระ; disabled after upload via msg.isReadOnly)
 ```
 
 ### Services (inject, never constructor)
 ```ts
-// All state — inject in components with inject(ChatService)
 ChatService      → src/app/core/services/chat.service.ts
+  - queueShipmentId: signal<string|null>  ← set when loading a queue session
+  - loadQueueSession(ship)                ← seals existing messages as isReadOnly, loads into chat
 QueueService     → src/app/core/services/queue.service.ts
+  - open(id) seals ship.messages as isReadOnly=true before setting openId
 OcrService       → src/app/core/services/ocr.service.ts
 UrlLabelService  → src/app/core/services/url-label.service.ts  ← custom SPN URL names (localStorage)
 ```
@@ -89,46 +97,51 @@ src/
 │   │   ├── mock/                      ← replace with real API (see docs/API.md)
 │   │   │   ├── spn.mock.ts
 │   │   │   ├── ocr.mock.ts
-│   │   │   ├── queue.mock.ts
+│   │   │   ├── queue.mock.ts          ← shipments with realistic chatbot-flow messages
 │   │   │   ├── spn-companies.mock.ts
 │   │   │   ├── hs-analysis.mock.ts
-│   │   │   └── agency-docs.mock.ts    ← required docs per agency (อย./กษ.) + manualFields
+│   │   │   ├── agency-docs.mock.ts    ← required docs per agency (อย./กษ.) + manualFields
+│   │   │   └── payment.mock.ts        ← fee config per agency (requiresFee, amount)
 │   │   ├── models/types.ts            ← ALL interfaces + MessageType union
 │   │   └── services/
-│   │       ├── chat.service.ts        ← all chat state + flow logic
-│   │       ├── queue.service.ts       ← queue state
+│   │       ├── chat.service.ts        ← all chat state + flow logic + queue session loading
+│   │       ├── queue.service.ts       ← queue state; open() seals messages as isReadOnly
 │   │       └── ocr.service.ts         ← OCR stages + progress
 │   ├── features/
 │   │   ├── chat/
-│   │   │   ├── chat-page/             ← shell: ChatHeader + Sidebar + router-outlet
+│   │   │   ├── chat-page/             ← shell: Sidebar + ChatArea + input bar
+│   │   │   │                             shows "กลับไปคิวงาน" banner when chat.queueShipmentId() is set
 │   │   │   └── components/
-│   │   │       ├── chat-area/         ← @switch renderer (ChatAreaComponent)
-│   │   │       ├── chat-header/       ← top bar
+│   │   │       ├── chat-area/         ← @switch renderer; checks !readOnly && !msg.isReadOnly
 │   │   │       ├── sidebar/           ← collapsible 224px/48px rail
-│   │   │       ├── flag-card/         ← flag review interactive card
-│   │   │       ├── choice-card/       ← 2-option decision (rich cards or simple cards)
-│   │   │       ├── spn-result/        ← SPN data card (inline template)
-│   │   │       ├── spn-card/          ← SPN multi-select list + pagination
-│   │   │       ├── spn-connect/       ← multi-step ShippingNet login
-│   │   │       ├── connect/           ← simple legacy login (type: 'connect')
-│   │   │       ├── ocr-progress/      ← 4-stage grid + % counter
-│   │   │       ├── ocr-results/       ← OCR data display (inline template)
-│   │   │       ├── hs-analysis/       ← AI HS code analysis card
-│   │   │       ├── form-panel/        ← editable license form
-│   │   │       ├── full-upload/       ← 4-slot document upload
-│   │   │       ├── single-upload/     ← single-slot upload (ใบขนสินค้า flow)
-│   │   │       ├── email-draft/       ← email composer
-│   │   │       ├── status-card/       ← submission success (inline template)
-│   │   │       ├── import-license-menu/ ← 3-card doc type selector (inline template)
-│   │   │       ├── form-preview/      ← editable pre-submit data review; "ดำเนินการต่อ" triggers proceed
-│   │   │       ├── missing-fields/    ← incomplete OCR form + optional re-upload
-│   │   │       ├── agency-upload/     ← per-agency doc slots (upload file OR manual entry per slot)
-│   │   │       ├── profile-select/    ← pick/confirm ShippingNet profile (select|confirm mode)
-│   │   │       └── typing-indicator/  ← 3-dot bounce (inline template)
+│   │   │       │                         footer order: SPN badge → ตั้งค่า → Account → BizX logo
+│   │   │       ├── flag-card/
+│   │   │       ├── choice-card/
+│   │   │       ├── spn-result/
+│   │   │       ├── spn-card/
+│   │   │       ├── spn-connect/
+│   │   │       ├── connect/
+│   │   │       ├── ocr-progress/
+│   │   │       ├── ocr-results/
+│   │   │       ├── hs-analysis/       ← shows fee badge per agency (from payment.mock)
+│   │   │       ├── form-panel/
+│   │   │       ├── full-upload/
+│   │   │       ├── single-upload/
+│   │   │       ├── email-draft/
+│   │   │       ├── status-card/       ← isPending support (amber = รอชำระ, green = สำเร็จ)
+│   │   │       ├── import-license-menu/
+│   │   │       ├── form-preview/      ← "ดำเนินการต่อ" button uses flat var(--bizx-blue)
+│   │   │       ├── missing-fields/
+│   │   │       ├── agency-upload/
+│   │   │       ├── profile-select/
+│   │   │       ├── payment-qr/        ← QR payment card (disabled after paid via isReadOnly)
+│   │   │       ├── payment-slip/      ← slip upload (disabled after upload via isReadOnly)
+│   │   │       └── typing-indicator/
 │   │   ├── queue/
-│   │   │   └── queue-page/            ← ListView + ShipmentChatView
+│   │   │   └── queue-page/            ← full-width tracking table + sidebar
+│   │   │                                 click row → loadQueueSession() → navigate to /
 │   │   ├── settings/
-│   │   │   └── settings-page/         ← 2-panel settings (nav sidebar + content); sections: เชื่อมต่อ ShippingNet, ตั้งชื่อ SPN URL
+│   │   │   └── settings-page/         ← 2-panel settings; sections: เชื่อมต่อ ShippingNet, ตั้งชื่อ SPN URL
 │   │   └── print/
 │   │       └── license-print/         ← A4 print page
 │   └── shared/
@@ -180,12 +193,41 @@ SPN path: "ดึงข้อมูลจาก SPN" → spn-list (skip profile 
   → hs-analysis → เลือกกรม → เลือกโปรไฟล์ (confirm/change) → proceed choice → submit
 ```
 
+### Payment flow (after ยืนยันส่งกรม)
+```
+submit()
+  ├─ getAgencyPayment(agency).requiresFee === true
+  │     → status-card (isPending=true, สีเหลือง "รอชำระค่าธรรมเนียม")
+  │     → payment-qr  (QR + expiry; กด "ชำระเงินแล้ว" → marks isReadOnly=true)
+  │     → payment-slip (อัปโหลด slip; กด "ยืนยัน" → marks isReadOnly=true)
+  │     → finalizeSubmit() → status-card (isPending=false, สีเขียว สำเร็จ)
+  └─ requiresFee === false
+        → finalizeSubmit() → status-card (สีเขียว) immediately
+
+Agency fee config (payment.mock.ts):
+  อย.  → ฟรี (LPI ไม่มีค่าธรรมเนียม)
+  กษ.  → ฿500 (ค่าตรวจสอบสุขอนามัย)
+```
+
 ### ChatStep states
 `idle` → `upload` / `not_found` → `ocr` → `form` → `preview` → `done`
 
 ### Queue Shipment lifecycle
 `needs_you` → `email_outbox` → `await_customer` → `submitted`  
 `no_permit` = no license needed
+
+### Queue → Chatbot session handoff
+```
+QueuePage.selectRow(id)
+  → chat.loadQueueSession(ship)   ← seals existing messages as isReadOnly=true
+  → router.navigate(['/'])        ← opens chatbot page with that session
+
+ChatPage (in queue mode):
+  - shows "กลับไปคิวงาน" banner (when chat.queueShipmentId() is set)
+  - chat history shows rich card designs (non-interactive, isReadOnly per message)
+  - new messages via chat.send() use full ChatService flow normally
+  - "กลับไปคิวงาน" calls chat.newChat() + router.navigate(['/queue'])
+```
 
 ---
 
@@ -205,17 +247,33 @@ SPN path: "ดึงข้อมูลจาก SPN" → spn-list (skip profile 
 1. Add type string to `MessageType` union in `src/app/core/models/types.ts`
 2. Add data interface in `types.ts`
 3. Create component in `src/app/features/chat/components/`
-4. Add `@case` in `chat-area.component.html`
+4. Add `@case` in `chat-area.component.html` using `@if (!readOnly && !msg.isReadOnly)`
 5. Wire output events in `ChatAreaComponent`
 
 ### How to add a new sidebar item
 Add to `mainItems` array in `sidebar.component.ts`
+
+### isReadOnly per message
+- Set `msg.isReadOnly = true` to disable a specific card without affecting others
+- `ChatAreaComponent` checks `!readOnly && !msg.isReadOnly` for all interactive cases
+- `QueueService.open()` automatically seals all existing messages as `isReadOnly: true`
+- Used for: payment-qr after paid, payment-slip after uploaded, all history in queue sessions
 
 ### Design rules
 6. **BizX colors** — `var(--bizx-blue)` in SCSS, `style="color: var(--bizx-blue)"` in templates. Never hardcode hex
 7. **ng-zorro imports** — import only the module needed (`NzInputModule`, `NzButtonModule`, etc.)
 8. **No Tailwind** — all layout/spacing in component `.scss` files
 9. **lucide-angular** — `readonly MyIcon = MyIcon` as class field, bind with `[img]="MyIcon"`
+
+---
+
+## Queue Page Layout
+- **List view**: full-width table with stat cards, tabs (ทั้งหมด/ต้องดำเนินการ/รอลูกค้า/ยื่นแล้ว), search
+  - Columns: ref/customer · สินค้า/HS · AI ประเมิน · ความมั่นใจ (bar) · สถานะ · action button
+  - `needs_you` rows have amber urgency bar on left edge
+- **Card wrapper**: 16px outer padding, border-radius 16px white card, `background: #EDEEF2` page bg
+- **Detail**: clicking any row → `loadQueueSession()` → navigate to `/` (chatbot page)
+- Step 7 "แจ้งลูกค้า" only shown when `ship.email.to` is set (email flow was triggered)
 
 ---
 
@@ -233,6 +291,7 @@ Replace in `src/app/core/mock/`:
 - `ocr.mock.ts` → `MOCK_OCR_RESULT` → `POST /ocr` (multipart)
 - `hs-analysis.mock.ts` → `analyzeHsCode()` → supports `agencies[]` for multi-agency HS codes
 - `agency-docs.mock.ts` → `getAgencyDocs(agency)` → required docs + manualFields per agency
+- `payment.mock.ts` → `getAgencyPayment(agency)` → `{ requiresFee, amount }` per agency
 
 ---
 
