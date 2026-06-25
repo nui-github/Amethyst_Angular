@@ -771,7 +771,16 @@ export class ChatService {
     this.finalizeSubmit(refNo);
   }
 
+  private markLastReadOnly(type: MessageType): void {
+    const msgs = this.messages();
+    const idx = [...msgs].reverse().findIndex(m => m.type === type);
+    if (idx === -1) return;
+    const actual = msgs.length - 1 - idx;
+    this.messages.update(list => list.map((m, i) => i === actual ? { ...m, isReadOnly: true } : m));
+  }
+
   onQrPaid(data: PaymentQrData): void {
+    this.markLastReadOnly('payment-qr');
     this.user(`ชำระเงินแล้ว ${data.amount.toLocaleString('th-TH')} บาท`);
     this.withTyping(() => {
       this.bot('payment-slip', {
@@ -783,6 +792,7 @@ export class ChatService {
   }
 
   onSlipUploaded(data: PaymentSlipData): void {
+    this.markLastReadOnly('payment-slip');
     this.user('อัปโหลด Slip เรียบร้อยแล้ว');
     this.withTyping(() => this.finalizeSubmit(this.pendingSubmitRefNo), 800);
   }
