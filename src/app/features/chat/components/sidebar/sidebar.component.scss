@@ -145,8 +145,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 12px;
-  border-top: 1px solid #F0F1F5;
+  padding: 6px 12px 8px;
   cursor: pointer;
   transition: background 0.15s;
   &:hover { background: #F5F6FA; }
@@ -193,8 +192,7 @@
 
 .sb-footer {
   flex-shrink: 0;
-  border-top: 1px solid #F0F1F5;
-  padding: 0;
+  padding: 4px 0 0;
 }
 
 .bizx-logo-btn {
@@ -244,7 +242,7 @@
 // SPN connection badge
 .spn-badge {
   display: flex; align-items: center; gap: 7px;
-  margin: 0 8px 4px;
+  margin: 4px 8px 4px;
   padding: 6px 10px; border-radius: 6px;
   background: rgba(13, 143, 97, 0.08);
   border: 1px solid rgba(13, 143, 97, 0.2);
