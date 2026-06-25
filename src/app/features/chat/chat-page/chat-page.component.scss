@@ -234,3 +234,33 @@
   font-size: 10.5px; color: #C8CAD8; margin: 0;
   text-align: center; letter-spacing: 0.1px;
 }
+
+.queue-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: #EFF6FF;
+  border-bottom: 1px solid #DBEAFE;
+  flex-shrink: 0;
+}
+
+.queue-banner__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: #0463EF;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+  &:hover { opacity: 0.75; }
+}
+
+.queue-banner__label {
+  font-size: 11px;
+  color: #93C5FD;
+}

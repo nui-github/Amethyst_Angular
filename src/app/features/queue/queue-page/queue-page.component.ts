@@ -4,16 +4,15 @@ import { FormsModule } from '@angular/forms';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzTagModule } from 'ng-zorro-antd/tag';
-import { LucideAngularModule, AlertTriangle, Mail, Clock, CheckCircle2, Ban, Search, ChevronLeft, Send } from 'lucide-angular';
+import { LucideAngularModule, AlertTriangle, Clock, CheckCircle2, Search } from 'lucide-angular';
+import { Router } from '@angular/router';
 import { QueueService, STATUS_META, AGENCY_SHORT } from '@app/core/services/queue.service';
-import { ChatAreaComponent } from '../../chat/components/chat-area/chat-area.component';
+import { ChatService } from '@app/core/services/chat.service';
 import { SidebarComponent } from '../../chat/components/sidebar/sidebar.component';
-import { Shipment, ShipmentStatus, ChatMessage } from '@app/core/models/types';
-import { generateId, getTime } from '@app/shared/utils/helpers';
+import { ShipmentStatus } from '@app/core/models/types';
 
 export { STATUS_META, AGENCY_SHORT };
 
-const STAGE_LABELS = ['','ตรวจรับใบขน','วิเคราะห์ HS','จัดประเภท','ร่างใบอนุญาต','ตรวจ flag','ยืนยันร่าง','แจ้งลูกค้า','ยื่นกรม'];
 
 type TabValue = 'all' | 'needs_you' | 'await_customer' | 'submitted';
 
@@ -21,31 +20,25 @@ type TabValue = 'all' | 'needs_you' | 'await_customer' | 'submitted';
   selector: 'app-queue-page',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, NzInputModule, NzButtonModule, NzTagModule, LucideAngularModule, ChatAreaComponent, SidebarComponent],
+  imports: [CommonModule, FormsModule, NzInputModule, NzButtonModule, NzTagModule, LucideAngularModule, SidebarComponent],
   templateUrl: './queue-page.component.html',
   styleUrl:    './queue-page.component.scss',
 })
 export class QueuePageComponent {
-  readonly q = inject(QueueService);
+  readonly q      = inject(QueueService);
+  readonly chat   = inject(ChatService);
+  readonly router = inject(Router);
 
   // Icons
-  readonly icWarn  = AlertTriangle;
-  readonly icMail  = Mail;
-  readonly icClock = Clock;
-  readonly icCheck = CheckCircle2;
-  readonly icBan   = Ban;
+  readonly icWarn   = AlertTriangle;
+  readonly icClock  = Clock;
+  readonly icCheck  = CheckCircle2;
   readonly icSearch = Search;
-  readonly icBack  = ChevronLeft;
-  readonly icSend  = Send;
 
   // State
-  collapsed       = signal(false);
-  searchTerm      = signal('');
-  statusFilter    = signal<ShipmentStatus | 'all'>('all');
-  activeTab       = signal<TabValue>('all');
-  queueInputText  = signal('');
-  queueIsTyping   = signal(false);
-  stageLabels     = STAGE_LABELS;
+  collapsed   = signal(false);
+  searchTerm  = signal('');
+  activeTab   = signal<TabValue>('all');
 
   readonly today = new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
 
@@ -77,11 +70,6 @@ export class QueuePageComponent {
     });
   });
 
-  readonly openShipment = computed<Shipment | null>(() => {
-    const id = this.q.openId();
-    return id ? (this.q.get(id) ?? null) : null;
-  });
-
   tabCount(tab: TabValue): number {
     if (tab === 'all') return this.q.queue().length;
     return this.q.queue().filter(s => s.statusKey === tab).length;
@@ -107,64 +95,16 @@ export class QueuePageComponent {
     return conf >= 90 ? 'สูง' : conf >= 75 ? 'ปานกลาง' : 'ต่ำ — ควรตรวจ';
   }
 
-  isDone(step: number, stage: number)   { return step < stage; }
-  isActive(step: number, stage: number) { return step === stage; }
-
-  visibleSteps(ship: Shipment): { label: string; idx: number }[] {
-    const hasEmail = !!(ship.email?.to);
-    return STAGE_LABELS.slice(1).reduce<{ label: string; idx: number }[]>((acc, label, i) => {
-      const stepNum = i + 1;
-      if (stepNum === 7 && !hasEmail) return acc;
-      acc.push({ label, idx: stepNum });
-      return acc;
-    }, []);
-  }
-
   toggleSidebar(): void { this.collapsed.update(v => !v); }
   setTabFilter(key: ShipmentStatus): void {
     const tv = key as unknown as TabValue;
     this.activeTab.set(this.activeTab() === tv ? 'all' : tv);
   }
-  selectRow(id: string): void { this.q.open(id); }
-  closeDetail(): void         { this.q.open(''); }
 
-  onQueueKeydown(e: KeyboardEvent): void {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.queueSend(); }
-  }
-
-  queueSend(preset?: string): void {
-    const text = preset ?? this.queueInputText().trim();
-    const ship = this.openShipment();
-    if (!text || !ship) return;
-    if (!preset) this.queueInputText.set('');
-
-    const userMsg: ChatMessage = { id: generateId(), role: 'user', type: 'text', content: text, time: getTime() };
-    this.q.update(ship.id, { messages: [...(ship.messages ?? []), userMsg] });
-
-    this.queueIsTyping.set(true);
-    setTimeout(() => {
-      this.queueIsTyping.set(false);
-      const s = this.openShipment();
-      if (!s) return;
-
-      let botContent = '';
-      let patch: Partial<Shipment> = {};
-
-      if (s.statusKey === 'needs_you') {
-        botContent = `ยืนยันแล้ว ✓ ดำเนินการส่งอีเมลถึง ${s.email.toName} เรียบร้อยครับ`;
-        patch = { statusKey: 'email_outbox', stage: 6 };
-      } else if (s.statusKey === 'email_outbox') {
-        botContent = `ส่งอีเมลถึง ${s.email.toName} (${s.email.to}) เรียบร้อยแล้ว — รอลูกค้ายืนยันครับ`;
-        patch = { statusKey: 'await_customer', stage: 7 };
-      } else if (s.statusKey === 'await_customer') {
-        botContent = `ยื่นเอกสารถึงกรมเรียบร้อยแล้ว ✓\nแบบฟอร์ม: ${s.formCode} — ${s.customsNo}`;
-        patch = { statusKey: 'submitted', stage: 8 };
-      } else {
-        botContent = 'รับทราบครับ';
-      }
-
-      const botMsg: ChatMessage = { id: generateId(), role: 'bot', type: 'text', content: botContent, time: getTime() };
-      this.q.update(s.id, { messages: [...(s.messages ?? []), botMsg], ...patch });
-    }, 900);
+  selectRow(id: string): void {
+    const ship = this.q.get(id);
+    if (!ship) return;
+    this.chat.loadQueueSession(ship);
+    this.router.navigate(['/']);
   }
 }

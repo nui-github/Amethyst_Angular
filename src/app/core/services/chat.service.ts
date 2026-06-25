@@ -33,8 +33,9 @@ export class ChatService {
   readonly formData        = signal<LicenseFormData>({});
   readonly submittedRefNo  = signal('');
   readonly spnEntries      = signal(MOCK_SPN_LIST);
-  readonly sidebarActive   = signal<'chatbot' | 'queue'>('chatbot');
+  readonly sidebarActive    = signal<'chatbot' | 'queue'>('chatbot');
   readonly sidebarCollapsed = signal(false);
+  readonly queueShipmentId  = signal<string | null>(null);
 
   readonly needsYouCount = computed(() => this.queue.needsYouCount());
 
@@ -949,7 +950,21 @@ export class ChatService {
     this.formData.set({});
     this.submittedRefNo.set('');
     this.flowStartIdx = 0;
+    this.queueShipmentId.set(null);
     this.ocr.reset();
+  }
+
+  loadQueueSession(ship: { id: string; messages?: import('@app/core/models/types').ChatMessage[]; statusKey: string; formCode?: string; hs?: string; goods?: string; }): void {
+    const sealed = (ship.messages ?? []).map(m => ({ ...m, isReadOnly: true }));
+    this.messages.set(sealed.length ? sealed : [WELCOME]);
+    this.flowStartIdx = sealed.length;
+    this.queueShipmentId.set(ship.id);
+    // Restore step from statusKey so send() context is correct
+    const stepMap: Record<string, import('@app/core/models/types').ChatStep> = {
+      needs_you: 'preview', email_outbox: 'preview', await_customer: 'preview',
+      submitted: 'done', no_permit: 'done',
+    };
+    this.step.set((stepMap[ship.statusKey] as import('@app/core/models/types').ChatStep) ?? 'idle');
   }
 
   private delay(ms: number): Promise<void> {
