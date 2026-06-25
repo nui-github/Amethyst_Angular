@@ -2,161 +2,139 @@
   <app-sidebar [collapsed]="collapsed()" (toggleCollapse)="toggleSidebar()" />
 
   <div class="qp-outer">
-
-    <!-- ════════════ LIST VIEW ════════════ -->
     <div class="qp-card">
 
-        <!-- Top bar -->
-        <div class="qp-topbar">
-          <div class="qp-topbar__left">
-            <h1 class="qp-title">คิวงาน</h1>
-            <p class="qp-date">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
-                <line x1="3" y1="10" x2="21" y2="10"/>
-              </svg>
-              {{ today }}
-            </p>
-          </div>
-
-          <!-- Stat cards -->
-          <div class="qp-stats">
-            @for (s of statCards; track s.key) {
-              <button class="stat-card" [class.stat-card--active]="activeTab() === s.key"
-                (click)="setTabFilter(s.key)">
-                <div class="stat-card__icon" [style.background]="s.iconBg">
-                  <ng-container [ngSwitch]="s.key">
-                    <lucide-icon *ngSwitchCase="'needs_you'"      [img]="icWarn"  [size]="13" [color]="s.dot" />
-                    <lucide-icon *ngSwitchCase="'await_customer'" [img]="icClock" [size]="13" [color]="s.dot" />
-                    <lucide-icon *ngSwitchCase="'submitted'"      [img]="icCheck" [size]="13" [color]="s.dot" />
-                  </ng-container>
-                </div>
-                <div class="stat-card__body">
-                  <span class="stat-card__num" [style.color]="s.dot">{{ countByStatus(s.key) }}</span>
-                  <span class="stat-card__label">{{ s.label }}</span>
-                </div>
-              </button>
-            }
-          </div>
+      <!-- ── Header ─────────────────────────────────────────────────────── -->
+      <div class="qh">
+        <div class="qh-left">
+          <h1 class="qh-title">คิวงาน</h1>
+          <span class="qh-date">{{ today }}</span>
         </div>
 
-        <!-- Divider -->
-        <div class="qp-divider"></div>
-
-        <!-- Toolbar: tabs + search -->
-        <div class="qp-toolbar">
-          <div class="qp-tabs">
-            @for (t of tabs; track t.value) {
-              <button class="qp-tab" [class.qp-tab--active]="activeTab() === t.value"
-                (click)="activeTab.set(t.value)">
-                {{ t.label }}
-                <span class="qp-tab__badge" [class.qp-tab__badge--active]="activeTab() === t.value">
-                  {{ tabCount(t.value) }}
-                </span>
-              </button>
-            }
-          </div>
-          <div class="qp-search">
-            <lucide-icon [img]="icSearch" [size]="13" style="color:#C4C9D6;flex-shrink:0" />
-            <input [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)"
-              placeholder="ค้นหา ref, สินค้า, ลูกค้า..." />
-          </div>
+        <div class="qh-kpis">
+          @for (s of statCards; track s.key) {
+            <button class="kpi" [class.kpi--active]="activeTab() === s.key"
+              (click)="setTabFilter(s.key)">
+              <div class="kpi__bar" [style.background]="s.dot"></div>
+              <div class="kpi__num" [style.color]="s.dot">{{ countByStatus(s.key) }}</div>
+              <div class="kpi__label">{{ s.label }}</div>
+            </button>
+          }
         </div>
+      </div>
 
-        <!-- Table -->
-        <div class="qp-table-wrap">
-          <table class="qp-table">
-            <thead>
-              <tr>
-                <th class="col-ref">ใบขนสินค้า / ลูกค้า</th>
-                <th class="col-goods">สินค้า</th>
-                <th class="col-assess">AI ประเมิน</th>
-                <th class="col-conf">ความมั่นใจ</th>
-                <th class="col-status">สถานะ</th>
-                <th class="col-action"></th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (s of filteredQueue(); track s.id) {
-                <tr class="qp-row" [class.qp-row--urgent]="s.statusKey === 'needs_you'"
-                  (click)="selectRow(s.id)">
+      <!-- ── Toolbar ────────────────────────────────────────────────────── -->
+      <div class="qt">
+        <div class="qt-tabs">
+          @for (t of tabs; track t.value) {
+            <button class="qt-tab" [class.qt-tab--active]="activeTab() === t.value"
+              (click)="activeTab.set(t.value)">
+              {{ t.label }}
+              <span class="qt-badge" [class.qt-badge--active]="activeTab() === t.value">
+                {{ tabCount(t.value) }}
+              </span>
+            </button>
+          }
+        </div>
+        <div class="qt-search">
+          <lucide-icon [img]="icSearch" [size]="12" style="color:#BEC3D0;flex-shrink:0" />
+          <input [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)"
+            placeholder="ค้นหา ref, สินค้า, ลูกค้า..." />
+        </div>
+      </div>
 
-                  <td class="col-ref">
-                    <div class="ref-cell">
-                      @if (s.statusKey === 'needs_you') {
-                        <div class="urgency-bar"></div>
-                      }
-                      <span class="type-badge" [class.type-badge--exp]="s.type === 'EXP'">{{ s.type }}</span>
-                      <div>
-                        <div class="ref-no">
-                          {{ s.customsNo }}
-                          @if (s.isNew) { <span class="new-badge">ใหม่</span> }
-                        </div>
-                        <div class="ref-customer">{{ s.customer || s.chatName || '—' }}</div>
-                      </div>
-                    </div>
-                  </td>
+      <!-- ── Column headers ─────────────────────────────────────────────── -->
+      <div class="ql-head">
+        <div class="lh-ref">ใบขนสินค้า</div>
+        <div class="lh-goods">สินค้า</div>
+        <div class="lh-assess">AI ประเมิน</div>
+        <div class="lh-conf">ความมั่นใจ</div>
+        <div class="lh-status">สถานะ</div>
+        <div class="lh-action"></div>
+      </div>
 
-                  <td class="col-goods">
-                    <div class="goods-name">{{ s.goods }}</div>
-                    <div class="goods-hs">HS {{ s.hs }}</div>
-                  </td>
+      <!-- ── Rows ───────────────────────────────────────────────────────── -->
+      <div class="ql-rows">
+        @for (s of filteredQueue(); track s.id) {
+          <div class="ql-row" [class.ql-row--urgent]="s.statusKey === 'needs_you'"
+            (click)="selectRow(s.id)">
 
-                  <td class="col-assess">
-                    @if (s.permitNeeded) {
-                      <div class="assess-permit">ต้องขออนุญาต</div>
-                      <div class="assess-detail">{{ agencyShort(s.agency) }} · {{ s.formCode }}</div>
-                    } @else {
-                      <div class="assess-free">ไม่ต้องขออนุญาต</div>
-                      <div class="assess-detail">ผ่านพิธีการปกติ</div>
-                    }
-                  </td>
+            <!-- accent bar -->
+            <div class="ql-row__accent" [style.background]="statusMeta(s.statusKey).dot"></div>
 
-                  <td class="col-conf">
-                    <div class="conf-row">
-                      <span class="conf-pct" [style.color]="confColor(s.conf)">{{ s.conf }}%</span>
-                      <span class="conf-lbl" [style.color]="confColor(s.conf)">{{ confLabel(s.conf) }}</span>
-                    </div>
-                    <div class="conf-track">
-                      <div class="conf-fill" [style.width.%]="s.conf" [style.background]="confColor(s.conf)"></div>
-                    </div>
-                  </td>
+            <!-- ref + customer -->
+            <div class="lc-ref">
+              <div class="lc-ref__top">
+                <span class="type-badge" [class.type-badge--exp]="s.type === 'EXP'">{{ s.type }}</span>
+                <span class="ref-no">{{ s.customsNo }}</span>
+                @if (s.isNew) { <span class="new-dot"></span> }
+              </div>
+              <div class="ref-customer">{{ s.customer || s.chatName || '—' }}</div>
+            </div>
 
-                  <td class="col-status">
-                    <span class="status-pill"
-                      [style.background]="statusMeta(s.statusKey).bg"
-                      [style.color]="statusMeta(s.statusKey).text">
-                      <span class="status-dot" [style.background]="statusMeta(s.statusKey).dot"></span>
-                      {{ statusMeta(s.statusKey).label }}
-                    </span>
-                  </td>
+            <!-- goods -->
+            <div class="lc-goods">
+              <div class="goods-name">{{ s.goods }}</div>
+              <div class="goods-hs">{{ s.hs }}</div>
+            </div>
 
-                  <td class="col-action" (click)="$event.stopPropagation()">
-                    @if (s.statusKey === 'needs_you') {
-                      <button class="act-btn act-btn--primary" (click)="selectRow(s.id)">
-                        ตรวจสอบ
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
-                      </button>
-                    } @else {
-                      <button class="act-btn" (click)="selectRow(s.id)">
-                        ดูรายการ
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
-                      </button>
-                    }
-                  </td>
-
-                </tr>
+            <!-- AI assessment -->
+            <div class="lc-assess">
+              @if (s.permitNeeded) {
+                <span class="assess-tag assess-tag--warn">ต้องขออนุญาต</span>
+                <div class="assess-sub">{{ agencyShort(s.agency) }} · {{ s.formCode }}</div>
+              } @else {
+                <span class="assess-tag assess-tag--ok">ไม่ต้องขออนุญาต</span>
+                <div class="assess-sub">ผ่านพิธีการปกติ</div>
               }
-              @if (filteredQueue().length === 0) {
-                <tr><td colspan="6" class="qp-empty">ไม่มีรายการ</td></tr>
-              }
-            </tbody>
-          </table>
-        </div>
+            </div>
 
-      </div><!-- /qp-card -->
+            <!-- confidence -->
+            <div class="lc-conf">
+              <div class="conf-top">
+                <span class="conf-pct" [style.color]="confColor(s.conf)">{{ s.conf }}%</span>
+                <span class="conf-lbl" [style.color]="confColor(s.conf)">{{ confLabel(s.conf) }}</span>
+              </div>
+              <div class="conf-track">
+                <div class="conf-fill" [style.width.%]="s.conf" [style.background]="confColor(s.conf)"></div>
+              </div>
+            </div>
 
+            <!-- status -->
+            <div class="lc-status">
+              <span class="status-pill"
+                [style.background]="statusMeta(s.statusKey).bg"
+                [style.color]="statusMeta(s.statusKey).text">
+                <span class="status-dot" [style.background]="statusMeta(s.statusKey).dot"></span>
+                {{ statusMeta(s.statusKey).label }}
+              </span>
+            </div>
+
+            <!-- action arrow -->
+            <div class="lc-action" (click)="$event.stopPropagation()">
+              <button class="row-arrow" [class.row-arrow--primary]="s.statusKey === 'needs_you'"
+                (click)="selectRow(s.id)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m9 18 6-6-6-6"/>
+                </svg>
+              </button>
+            </div>
+
+          </div>
+        }
+
+        @if (filteredQueue().length === 0) {
+          <div class="ql-empty">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB"
+              stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+            </svg>
+            <p>ไม่มีรายการในกลุ่มนี้</p>
+          </div>
+        }
+      </div>
+
+    </div><!-- /qp-card -->
   </div><!-- /qp-outer -->
 </div><!-- /shell -->
