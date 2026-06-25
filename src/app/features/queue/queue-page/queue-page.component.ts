@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzTagModule } from 'ng-zorro-antd/tag';
-import { LucideAngularModule, AlertTriangle, Mail, Clock, CheckCircle2, Ban, Search, ChevronLeft } from 'lucide-angular';
+import { LucideAngularModule, AlertTriangle, Mail, Clock, CheckCircle2, Ban, Search, ChevronLeft, Send } from 'lucide-angular';
 import { QueueService, STATUS_META, AGENCY_SHORT } from '@app/core/services/queue.service';
 import { ChatAreaComponent } from '../../chat/components/chat-area/chat-area.component';
 import { SidebarComponent } from '../../chat/components/sidebar/sidebar.component';
@@ -36,13 +36,16 @@ export class QueuePageComponent {
   readonly icBan   = Ban;
   readonly icSearch = Search;
   readonly icBack  = ChevronLeft;
+  readonly icSend  = Send;
 
   // State
-  collapsed    = signal(false);
-  searchTerm   = signal('');
-  statusFilter = signal<ShipmentStatus | 'all'>('all');
-  activeTab    = signal<TabValue>('all');
-  stageLabels  = STAGE_LABELS;
+  collapsed       = signal(false);
+  searchTerm      = signal('');
+  statusFilter    = signal<ShipmentStatus | 'all'>('all');
+  activeTab       = signal<TabValue>('all');
+  queueInputText  = signal('');
+  queueIsTyping   = signal(false);
+  stageLabels     = STAGE_LABELS;
 
   readonly today = new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
 
@@ -125,35 +128,43 @@ export class QueuePageComponent {
   selectRow(id: string): void { this.q.open(id); }
   closeDetail(): void         { this.q.open(''); }
 
-  confirm(): void {
-    const ship = this.openShipment();
-    if (!ship) return;
-    const bot: ChatMessage = { id: generateId(), role: 'bot', type: 'text',
-      content: `ยืนยันแล้ว ✓ ร่างอีเมลถึง ${ship.email.toName} พร้อมส่ง`, time: getTime() };
-    this.q.update(ship.id, { messages: [...(ship.messages ?? []), bot], statusKey: 'email_outbox', stage: 6 });
+  onQueueKeydown(e: KeyboardEvent): void {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.queueSend(); }
   }
 
-  sendEmail(): void {
+  queueSend(): void {
+    const text = this.queueInputText().trim();
     const ship = this.openShipment();
-    if (!ship) return;
-    const bot: ChatMessage = { id: generateId(), role: 'bot', type: 'text',
-      content: `ส่งอีเมลถึง ${ship.email.toName} (${ship.email.to}) เรียบร้อยแล้ว — รอลูกค้ายืนยัน`, time: getTime() };
-    this.q.update(ship.id, { messages: [...(ship.messages ?? []), bot], statusKey: 'await_customer', stage: 7 });
-  }
+    if (!text || !ship) return;
+    this.queueInputText.set('');
 
-  customerConfirmed(): void {
-    const ship = this.openShipment();
-    if (!ship) return;
-    const bot: ChatMessage = { id: generateId(), role: 'bot', type: 'text',
-      content: 'ลูกค้ายืนยันเอกสารแล้ว ✓ — กดยื่นกรมเมื่อพร้อม', time: getTime() };
-    this.q.update(ship.id, { messages: [...(ship.messages ?? []), bot] });
-  }
+    const userMsg: ChatMessage = { id: generateId(), role: 'user', type: 'text', content: text, time: getTime() };
+    this.q.update(ship.id, { messages: [...(ship.messages ?? []), userMsg] });
 
-  submit(): void {
-    const ship = this.openShipment();
-    if (!ship) return;
-    const bot: ChatMessage = { id: generateId(), role: 'bot', type: 'text',
-      content: `ยื่นเอกสารถึงกรมเรียบร้อยแล้ว ✓\n\nแบบฟอร์ม: ${ship.formCode} — ${ship.customsNo}`, time: getTime() };
-    this.q.update(ship.id, { messages: [...(ship.messages ?? []), bot], statusKey: 'submitted', stage: 8 });
+    this.queueIsTyping.set(true);
+    setTimeout(() => {
+      this.queueIsTyping.set(false);
+      const s = this.openShipment();
+      if (!s) return;
+
+      let botContent = '';
+      let patch: Partial<Shipment> = {};
+
+      if (s.statusKey === 'needs_you') {
+        botContent = `ยืนยันแล้ว ✓ ดำเนินการส่งอีเมลถึง ${s.email.toName} เรียบร้อยครับ`;
+        patch = { statusKey: 'email_outbox', stage: 6 };
+      } else if (s.statusKey === 'email_outbox') {
+        botContent = `ส่งอีเมลถึง ${s.email.toName} (${s.email.to}) เรียบร้อยแล้ว — รอลูกค้ายืนยันครับ`;
+        patch = { statusKey: 'await_customer', stage: 7 };
+      } else if (s.statusKey === 'await_customer') {
+        botContent = `ยื่นเอกสารถึงกรมเรียบร้อยแล้ว ✓\nแบบฟอร์ม: ${s.formCode} — ${s.customsNo}`;
+        patch = { statusKey: 'submitted', stage: 8 };
+      } else {
+        botContent = 'รับทราบครับ';
+      }
+
+      const botMsg: ChatMessage = { id: generateId(), role: 'bot', type: 'text', content: botContent, time: getTime() };
+      this.q.update(s.id, { messages: [...(s.messages ?? []), botMsg], ...patch });
+    }, 900);
   }
 }

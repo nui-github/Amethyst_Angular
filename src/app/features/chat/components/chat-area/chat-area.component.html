@@ -28,7 +28,7 @@
 
             <!-- Welcome card -->
             @case ('welcome') {
-              @if (!readOnly) {
+              @if (!readOnly && !msg.isReadOnly) {
                 <p class="welcome-title">สวัสดีครับ! ผมคือ <strong>Netbay Agent</strong></p>
                 <p class="welcome-sub">ช่วยท่านจัดการเอกสารนำเข้า-ส่งออก และพิธีการศุลกากรได้ครับ</p>
                 <p class="welcome-q">ต้องการทำอะไรวันนี้?</p>
@@ -39,7 +39,7 @@
 
             <!-- Import license menu (3 doc-type cards) -->
             @case ('import-license-menu') {
-              @if (!readOnly) {
+              @if (!readOnly && !msg.isReadOnly) {
                 <app-import-license-menu />
               } @else {
                 <span class="readonly-tag">เลือกประเภทเอกสารแล้ว</span>
@@ -53,7 +53,7 @@
 
             <!-- SPN not found → import license menu -->
             @case ('spn-not-found') {
-              @if (!readOnly) {
+              @if (!readOnly && !msg.isReadOnly) {
                 <p class="welcome-sub" style="margin-bottom:10px">ไม่พบข้อมูลใบขนใน SPN — กรุณาเลือกประเภทเอกสารที่มีครับ</p>
                 <app-import-license-menu />
               } @else {
@@ -63,7 +63,7 @@
 
             <!-- OCR progress animation -->
             @case ('ocr-progress') {
-              @if (!readOnly) {
+              @if (!readOnly && !msg.isReadOnly) {
                 <app-ocr-progress [progress]="ocr.progress()" [stages]="ocr.stages()" />
               } @else {
                 <span class="readonly-tag">✓ OCR เสร็จสิ้นแล้ว</span>
@@ -77,7 +77,7 @@
 
             <!-- Flag confirmation (interactive) -->
             @case ('flag-card') {
-              @if (!readOnly) {
+              @if (!readOnly && !msg.isReadOnly) {
                 <app-flag-card
                   [data]="asFlagCard(msg.data)"
                   (flagConfirmed)="chat.confirmFlag(msg.id, $event.flagId, $event.value)"
@@ -89,7 +89,7 @@
 
             <!-- 2-choice decision card -->
             @case ('choice-card') {
-              @if (!readOnly) {
+              @if (!readOnly && !msg.isReadOnly) {
                 <app-choice-card
                   [data]="asChoiceCard(msg.data)"
                   (chosen)="onChoice(msg, $event)" />
@@ -100,7 +100,7 @@
 
             <!-- Email draft (interactive) -->
             @case ('email-draft') {
-              @if (!readOnly) {
+              @if (!readOnly && !msg.isReadOnly) {
                 <app-email-draft [data]="asEmailDraft(msg.data)" [msgId]="msg.id" />
               } @else {
                 <span class="readonly-tag">✓ ส่งอีเมลแล้ว</span>
@@ -109,7 +109,7 @@
 
             <!-- Form fill panel -->
             @case ('form') {
-              @if (!readOnly) {
+              @if (!readOnly && !msg.isReadOnly) {
                 <app-form-panel />
               } @else {
                 <span class="readonly-tag">✓ กรอกข้อมูลแล้ว</span>
@@ -118,7 +118,7 @@
 
             <!-- Single-slot upload (ใบขนสินค้า path) -->
             @case ('single-upload') {
-              @if (!readOnly) {
+              @if (!readOnly && !msg.isReadOnly) {
                 <app-single-upload [mode]="uploadMode(msg)" />
               } @else {
                 <span class="readonly-tag">✓ อัปโหลดเอกสารแล้ว</span>
@@ -127,7 +127,7 @@
 
             <!-- Multi-slot upload panel -->
             @case ('full-upload') {
-              @if (!readOnly) {
+              @if (!readOnly && !msg.isReadOnly) {
                 <app-full-upload />
               } @else {
                 <span class="readonly-tag">✓ อัปโหลดเอกสารแล้ว</span>
@@ -136,7 +136,7 @@
 
             <!-- ShippingNet connect -->
             @case ('connect') {
-              @if (!readOnly) {
+              @if (!readOnly && !msg.isReadOnly) {
                 <app-connect-panel />
               } @else {
                 <span class="readonly-tag">✓ เชื่อมต่อแล้ว</span>
@@ -145,7 +145,7 @@
 
             <!-- SPN multi-select list -->
             @case ('spn-list') {
-              @if (!readOnly) {
+              @if (!readOnly && !msg.isReadOnly) {
                 <app-spn-card />
               } @else {
                 <span class="readonly-tag">✓ เลือก SPN แล้ว</span>
@@ -159,7 +159,7 @@
 
             <!-- SPN multi-step connect -->
             @case ('spn-connect') {
-              @if (!readOnly) {
+              @if (!readOnly && !msg.isReadOnly) {
                 <app-spn-connect />
               } @else {
                 <span class="readonly-tag">✓ เชื่อมต่อ ShippingNet แล้ว</span>
@@ -183,7 +183,7 @@
 
             <!-- Profile selection / confirmation before submission -->
             @case ('profile-select') {
-              @if (!readOnly) {
+              @if (!readOnly && !msg.isReadOnly) {
                 <app-profile-select [data]="$any(msg.data)" />
               } @else {
                 <span class="readonly-tag">✓ เลือกโปรไฟล์แล้ว</span>
@@ -215,7 +215,7 @@
 
             <!-- Agency-specific document upload slots -->
             @case ('agency-upload') {
-              @if (!readOnly) {
+              @if (!readOnly && !msg.isReadOnly) {
                 <app-agency-upload [agency]="$any(msg.data)?.agency ?? 'อย.'" />
               } @else {
                 <span class="readonly-tag">✓ อัปโหลดเอกสารประกอบแล้ว</span>

@@ -21,8 +21,13 @@ export class QueueService {
   }
 
   open(id: string): void {
+    if (!id) { this.openId.set(null); return; }
     this.openId.set(id);
-    this.update(id, { isNew: false });
+    const ship = this.get(id);
+    if (ship) {
+      const sealed = (ship.messages ?? []).map(m => ({ ...m, isReadOnly: true }));
+      this.update(id, { isNew: false, messages: sealed });
+    }
   }
 
   close(): void {

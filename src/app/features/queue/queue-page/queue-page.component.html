@@ -239,35 +239,30 @@
           ประวัติการสนทนา
         </div>
         <div class="dv-chat-wrap">
-          <app-chat-area [messages]="openShipment()!.messages ?? []" [readOnly]="true" class="dv-chat" />
+          <app-chat-area
+            [messages]="openShipment()!.messages ?? []"
+            [isTyping]="queueIsTyping()"
+            [readOnly]="false"
+            class="dv-chat" />
         </div>
 
-        <!-- Action bar -->
-        @if (openShipment()!.statusKey === 'needs_you') {
-          <div class="dv-actions">
-            <button class="act-btn" (click)="confirm()">ส่งกลับ AI</button>
-            <button class="act-btn act-btn--primary" (click)="confirm()">ยืนยันและดำเนินการต่อ →</button>
-          </div>
-        }
-        @if (openShipment()!.statusKey === 'email_outbox') {
-          <div class="dv-actions">
-            <button class="act-btn act-btn--primary" (click)="sendEmail()">
-              <lucide-icon [img]="icMail" [size]="13" /> ส่งอีเมลหาลูกค้า
+        <!-- Chat input bar -->
+        <div class="dv-input-bar">
+          <div class="dv-input-wrap">
+            <textarea
+              [ngModel]="queueInputText()"
+              (ngModelChange)="queueInputText.set($event)"
+              (keydown)="onQueueKeydown($event)"
+              placeholder="พิมพ์ข้อความหรือคำสั่ง..."
+              rows="1"
+              class="dv-textarea">
+            </textarea>
+            <button class="dv-send-btn" (click)="queueSend()" [disabled]="!queueInputText().trim()">
+              <lucide-icon [img]="icSend" [size]="14" [color]="queueInputText().trim() ? '#fff' : '#9CA3AF'" />
             </button>
           </div>
-        }
-        @if (openShipment()!.statusKey === 'await_customer') {
-          <div class="dv-actions">
-            <button class="act-btn" (click)="customerConfirmed()">ลูกค้ายืนยันแล้ว</button>
-            <button class="act-btn act-btn--primary" (click)="submit()">ยื่นกรม ✓</button>
-          </div>
-        }
-        @if (openShipment()!.statusKey === 'submitted') {
-          <div class="dv-actions dv-actions--done">
-            <lucide-icon [img]="icCheck" [size]="15" color="#059669" />
-            <span>ยื่นเอกสารถึงกรมเรียบร้อยแล้ว</span>
-          </div>
-        }
+          <p class="dv-input-hint">Enter ส่ง · Shift+Enter ขึ้นบรรทัดใหม่</p>
+        </div>
 
       </div><!-- /qp-card--detail -->
     }

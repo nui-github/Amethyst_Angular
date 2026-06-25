@@ -401,7 +401,59 @@
 
 .dv-chat { height: 100%; overflow-y: auto; }
 
-// Actions
+// Chat input bar
+.dv-input-bar {
+  background: #fff;
+  border-top: 1px solid #F0F1F5;
+  padding: 10px 16px 8px;
+  flex-shrink: 0;
+}
+
+.dv-input-wrap {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  background: #F9FAFB;
+  border: 1.5px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 8px 10px;
+  transition: border-color 0.15s;
+
+  &:focus-within { border-color: #0463EF; background: #fff; }
+}
+
+.dv-textarea {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-family: 'IBM Plex Sans Thai', sans-serif;
+  color: #1F2937;
+  resize: none;
+  outline: none;
+  line-height: 1.5;
+  max-height: 120px;
+  overflow-y: auto;
+
+  &::placeholder { color: #C4C9D6; }
+}
+
+.dv-send-btn {
+  width: 32px; height: 32px; border-radius: 8px;
+  border: none; background: #0463EF;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0; transition: opacity 0.15s;
+
+  &:hover { opacity: 0.85; }
+  &:disabled { background: #F3F4F6; cursor: default; }
+}
+
+.dv-input-hint {
+  font-size: 10px; color: #C4C9D6; margin: 4px 0 0;
+  text-align: center;
+}
+
+// Actions (legacy — kept for safety)
 .dv-actions {
   display: flex; gap: 8px;
   padding: 12px 20px;
