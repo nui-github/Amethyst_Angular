@@ -72,17 +72,6 @@
   <!-- Footer: settings + BizX logo -->
   <div class="sb-footer">
 
-    <!-- Profile -->
-    <div class="sb-profile" [title]="collapsed ? 'Mr. John Doe' : ''">
-      <div class="sb-profile__avatar">J</div>
-      @if (!collapsed) {
-        <div class="sb-profile__info">
-          <p class="sb-profile__name">Mr. John Doe</p>
-          <p class="sb-profile__role">Admin</p>
-        </div>
-      }
-    </div>
-
     <!-- SPN connection badge -->
     @if (chat.isConnected()) {
       <div class="spn-badge" [title]="(chat.spnSession()?.profile ?? '') + ' · ' + (chat.spnSession()?.url ?? '')">
@@ -103,6 +92,17 @@
       <lucide-icon [img]="icSettings" [size]="14" />
       @if (!collapsed) { <span>ตั้งค่า</span> }
     </button>
+
+    <!-- Profile -->
+    <div class="sb-profile" [title]="collapsed ? 'Mr. John Doe' : ''">
+      <div class="sb-profile__avatar">J</div>
+      @if (!collapsed) {
+        <div class="sb-profile__info">
+          <p class="sb-profile__name">Mr. John Doe</p>
+          <p class="sb-profile__role">Admin</p>
+        </div>
+      }
+    </div>
 
     <!-- BizX logo — full or icon only -->
     <a href="https://bizx-uat.devnetbay.com/" target="_blank" rel="noopener" class="bizx-logo-btn">
