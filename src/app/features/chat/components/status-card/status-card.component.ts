@@ -49,9 +49,7 @@ import { ChatService } from '@app/core/services/chat.service';
         <button class="quick-chip" (click)="chat.send('ตรวจสอบสถานะใบอนุญาต')">
           <lucide-icon [img]="Search" [size]="12" /> ตรวจสอบสถานะ
         </button>
-        <button class="quick-chip" (click)="chat.newChat()">
-          <lucide-icon [img]="Plus" [size]="12" /> สร้างใบใหม่
-        </button>
+
         <button class="quick-chip" (click)="chat.send('พิมพ์ใบอนุญาต')">
           <lucide-icon [img]="Printer" [size]="12" /> พิมพ์ใบอนุญาต
         </button>

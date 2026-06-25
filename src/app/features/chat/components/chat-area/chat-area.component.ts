@@ -27,6 +27,7 @@ import { FormPreviewComponent } from '../form-preview/form-preview.component';
 import { MissingFieldsComponent } from '../missing-fields/missing-fields.component';
 import { AgencyUploadComponent } from '../agency-upload/agency-upload.component';
 import { ProfileSelectComponent } from '../profile-select/profile-select.component';
+import { PermitStatusComponent } from '../permit-status/permit-status.component';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 
 /**
@@ -50,7 +51,7 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
     SpnCardComponent, ChoiceCardComponent, OcrResultsComponent,
     StatusCardComponent, OcrProgressComponent, ImportLicenseMenuComponent,
     ConnectPanelComponent, FullUploadComponent, SingleUploadComponent, EmailDraftComponent, FormPanelComponent,
-    SpnConnectComponent, HsAnalysisComponent, FormPreviewComponent, MissingFieldsComponent, AgencyUploadComponent, ProfileSelectComponent,
+    SpnConnectComponent, HsAnalysisComponent, FormPreviewComponent, MissingFieldsComponent, AgencyUploadComponent, ProfileSelectComponent, PermitStatusComponent,
   ],
   templateUrl: './chat-area.component.html',
   styleUrl: './chat-area.component.scss',

@@ -29,7 +29,8 @@ export type MessageType =
   | 'form-preview'       // pre-submit data review table
   | 'missing-fields'    // incomplete OCR → fill remaining fields
   | 'agency-upload'     // multi-slot upload for agency-required docs
-  | 'profile-select';   // pick or confirm ShippingNet profile before submission
+  | 'profile-select'    // pick or confirm ShippingNet profile before submission
+  | 'permit-status';    // status overview of all submitted permit requests
 
 export interface MissingField {
   key: keyof LicenseFormData;

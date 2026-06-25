@@ -190,6 +190,11 @@
               }
             }
 
+            <!-- Permit status overview -->
+            @case ('permit-status') {
+              <app-permit-status />
+            }
+
             <!-- Agency-specific document upload slots -->
             @case ('agency-upload') {
               @if (!readOnly) {

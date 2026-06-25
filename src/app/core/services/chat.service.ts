@@ -105,6 +105,8 @@ export class ChatService {
       } else {
         this.withTyping(() => this.showSPNList(), 400);
       }
+    } else if (lower.includes('ตรวจสอบสถานะ')) {
+      this.withTyping(() => this.bot('permit-status'), 500);
     } else if (lower.includes('พิมพ์ใบอนุญาต')) {
       this.openPrintPage();
     } else if (lower.includes('อัปโหลด') || lower.includes('upload')) {
@@ -220,6 +222,7 @@ export class ChatService {
   }
 
   private continueAfterCustomsOCR(): void {
+    this.isCustomsDocPath = true; // flag: skip agency-upload after agency choice
     if (this.formData().hsCode) {
       this.withTyping(() => {
         const analysis = analyzeHsCode(this.formData().hsCode!);
@@ -327,6 +330,7 @@ export class ChatService {
   private isCustomsOnlyUpload = false;
   private isInvoicePath = false;
   private isAgencyDocsUpload = false;
+  private isCustomsDocPath = false; // customs path: skip agency-upload after agency choice
 
   private showFullUpload(reEdit = false): void {
     this.isReEditOCR = reEdit;
@@ -470,10 +474,18 @@ export class ChatService {
   onAgencyChoice(rawValue: string): void {
     const agency = rawValue.startsWith('dept:') ? rawValue.replace('dept:', '') : rawValue;
     this.currentAgency = agency;
-    const label = agency === 'multi' ? 'กรมอื่น / หลายกรม' : agency;
+    const label = agency;
     this.user(`เลือก ${label}`);
+
+    // Customs path: ใบขนสินค้าครบอยู่แล้ว — preview ข้อมูลก่อน แล้วค่อย proceed
+    if (this.isCustomsDocPath) {
+      this.isCustomsDocPath = false;
+      this.withTyping(() => this.showPreview(), 500);
+      return;
+    }
+
     this.withTyping(() => {
-      this.bot('text', undefined, `กรุณาอัปโหลดเอกสารประกอบที่${agency === 'multi' ? 'แต่ละกรม' : agency}ต้องการครับ เช่น ใบรับรอง GMP, COA`);
+      this.bot('text', undefined, `กรุณาอัปโหลดเอกสารประกอบที่${agency}ต้องการครับ เช่น ใบรับรอง GMP, COA`);
       setTimeout(() => this.withTyping(() => {
         this.isAgencyDocsUpload = true;
         this.bot('agency-upload', { agency });
