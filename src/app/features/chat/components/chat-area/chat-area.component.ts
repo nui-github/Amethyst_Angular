@@ -28,6 +28,8 @@ import { MissingFieldsComponent } from '../missing-fields/missing-fields.compone
 import { AgencyUploadComponent } from '../agency-upload/agency-upload.component';
 import { ProfileSelectComponent } from '../profile-select/profile-select.component';
 import { PermitStatusComponent } from '../permit-status/permit-status.component';
+import { PaymentQrComponent } from '../payment-qr/payment-qr.component';
+import { PaymentSlipComponent } from '../payment-slip/payment-slip.component';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 
 /**
@@ -52,6 +54,7 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
     StatusCardComponent, OcrProgressComponent, ImportLicenseMenuComponent,
     ConnectPanelComponent, FullUploadComponent, SingleUploadComponent, EmailDraftComponent, FormPanelComponent,
     SpnConnectComponent, HsAnalysisComponent, FormPreviewComponent, MissingFieldsComponent, AgencyUploadComponent, ProfileSelectComponent, PermitStatusComponent,
+    PaymentQrComponent, PaymentSlipComponent,
   ],
   templateUrl: './chat-area.component.html',
   styleUrl: './chat-area.component.scss',

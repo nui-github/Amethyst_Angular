@@ -3,11 +3,12 @@ import {
   ChatMessage, ChatStep, LicenseFormData, MessageType,
   FlagCardData, FlagItem, ChoiceCardData, EmailDraftData,
   StatusCardData, OcrResultsData, SpnResultData, Shipment,
-  MissingField, MissingFieldsData,
+  MissingField, MissingFieldsData, PaymentQrData, PaymentSlipData,
 } from '@app/core/models/types';
 import { OcrService } from './ocr.service';
 import { QueueService } from './queue.service';
 import { analyzeHsCode } from '@mock/hs-analysis.mock';
+import { getAgencyPayment } from '@mock/payment.mock';
 import { KNOWN_REFS, MOCK_FORM_DATA, MOCK_SPN_LIST } from '@mock/spn.mock';
 import { MOCK_SPN_PROFILES } from '@mock/spn-companies.mock';
 import { environment } from '@env/environment';
@@ -736,10 +737,50 @@ export class ChatService {
     }
   }
 
+  private pendingSubmitRefNo = '';
+
   private submit(): void {
     const refNo = `RG-2568-${Math.floor(Math.random() * 90000 + 10000)}`;
     this.submittedRefNo.set(refNo);
+    this.pendingSubmitRefNo = refNo;
 
+    const payConfig = getAgencyPayment(this.currentAgency);
+    if (payConfig.requiresFee) {
+      const payRefNo = `PAY-${Math.floor(Math.random() * 900000 + 100000)}`;
+      const expire = new Date(Date.now() + 15 * 60 * 1000);
+      const expireStr = expire.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+      this.bot('payment-qr', {
+        agency: this.currentAgency,
+        amount: payConfig.amount,
+        refNo: payRefNo,
+        expiresAt: expireStr,
+      } satisfies PaymentQrData);
+      return;
+    }
+
+    this.finalizeSubmit(refNo);
+  }
+
+  onQrPaid(data: PaymentQrData): void {
+    this.user(`ชำระเงินแล้ว ${data.amount.toLocaleString('th-TH')} บาท`);
+    this.withTyping(() => {
+      this.bot('payment-slip', {
+        agency: data.agency,
+        amount: data.amount,
+        refNo: data.refNo,
+      } satisfies PaymentSlipData);
+    }, 600);
+  }
+
+  onSlipUploaded(data: PaymentSlipData): void {
+    this.user('อัปโหลด Slip เรียบร้อยแล้ว');
+    this.withTyping(() => {
+      this.bot('text', undefined, '✓ ได้รับ Slip แล้วครับ กำลังดำเนินการส่งข้อมูลเข้ากรม...');
+      this.withTyping(() => this.finalizeSubmit(this.pendingSubmitRefNo), 1200);
+    }, 800);
+  }
+
+  private finalizeSubmit(refNo: string): void {
     const flowMsgs = this.messages().slice(this.flowStartIdx);
     const fd = this.formData();
 

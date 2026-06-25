@@ -195,6 +195,24 @@
               <app-permit-status />
             }
 
+            <!-- Payment QR for agencies with fee -->
+            @case ('payment-qr') {
+              @if (!readOnly) {
+                <app-payment-qr [data]="$any(msg.data)" />
+              } @else {
+                <span class="readonly-tag">✓ QR ชำระเงินแล้ว</span>
+              }
+            }
+
+            <!-- Upload payment slip -->
+            @case ('payment-slip') {
+              @if (!readOnly) {
+                <app-payment-slip [data]="$any(msg.data)" />
+              } @else {
+                <span class="readonly-tag">✓ อัปโหลด Slip แล้ว</span>
+              }
+            }
+
             <!-- Agency-specific document upload slots -->
             @case ('agency-upload') {
               @if (!readOnly) {

@@ -30,7 +30,9 @@ export type MessageType =
   | 'missing-fields'    // incomplete OCR → fill remaining fields
   | 'agency-upload'     // multi-slot upload for agency-required docs
   | 'profile-select'    // pick or confirm ShippingNet profile before submission
-  | 'permit-status';    // status overview of all submitted permit requests
+  | 'permit-status'     // status overview of all submitted permit requests
+  | 'payment-qr'       // QR payment card (fee required by agency)
+  | 'payment-slip';    // upload payment slip after scanning QR
 
 export interface MissingField {
   key: keyof LicenseFormData;
@@ -133,6 +135,19 @@ export interface StatusCardData {
   refNo: string;            // RG-2568-XXXXX
   customsRef: string;       // HTHM or invoice ref
   submittedAt: string;
+}
+
+export interface PaymentQrData {
+  agency: string;           // e.g. 'อย.'
+  amount: number;           // THB
+  refNo: string;            // payment ref
+  expiresAt: string;        // display string
+}
+
+export interface PaymentSlipData {
+  agency: string;
+  amount: number;
+  refNo: string;
 }
 
 // ─── Form / OCR ──────────────────────────────────────────────────────────────
