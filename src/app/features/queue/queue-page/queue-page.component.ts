@@ -7,6 +7,7 @@ import { NzTagModule } from 'ng-zorro-antd/tag';
 import { LucideAngularModule, AlertTriangle, Mail, Clock, CheckCircle2, Ban, Search, ChevronLeft } from 'lucide-angular';
 import { QueueService, STATUS_META, AGENCY_SHORT } from '@app/core/services/queue.service';
 import { ChatAreaComponent } from '../../chat/components/chat-area/chat-area.component';
+import { SidebarComponent } from '../../chat/components/sidebar/sidebar.component';
 import { Shipment, ShipmentStatus, ChatMessage } from '@app/core/models/types';
 import { generateId, getTime } from '@app/shared/utils/helpers';
 
@@ -20,7 +21,7 @@ type TabValue = 'all' | 'needs_you' | 'await_customer' | 'submitted';
   selector: 'app-queue-page',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, NzInputModule, NzButtonModule, NzTagModule, LucideAngularModule, ChatAreaComponent],
+  imports: [CommonModule, FormsModule, NzInputModule, NzButtonModule, NzTagModule, LucideAngularModule, ChatAreaComponent, SidebarComponent],
   templateUrl: './queue-page.component.html',
   styleUrl:    './queue-page.component.scss',
 })
@@ -37,6 +38,7 @@ export class QueuePageComponent {
   readonly icBack  = ChevronLeft;
 
   // State
+  collapsed    = signal(false);
   searchTerm   = signal('');
   statusFilter = signal<ShipmentStatus | 'all'>('all');
   activeTab    = signal<TabValue>('all');
@@ -105,6 +107,7 @@ export class QueuePageComponent {
   isDone(step: number, stage: number)   { return step < stage; }
   isActive(step: number, stage: number) { return step === stage; }
 
+  toggleSidebar(): void       { this.collapsed.update(v => !v); }
   selectRow(id: string): void { this.q.open(id); }
   closeDetail(): void         { this.q.open(''); }
 

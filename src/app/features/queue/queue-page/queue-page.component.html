@@ -1,4 +1,6 @@
-<div class="queue-page">
+<div class="shell">
+  <app-sidebar [collapsed]="collapsed()" (toggleCollapse)="toggleSidebar()" />
+  <div class="queue-page">
 
   <!-- ════════════════════════════════════════════════════
        LIST VIEW
@@ -266,4 +268,5 @@
     </div>
   }
 
+  </div>
 </div>

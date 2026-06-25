@@ -1,6 +1,13 @@
+.shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
 .queue-page {
   display: flex;
   flex-direction: column;
+  flex: 1;
   height: 100vh;
   overflow: hidden;
   background: #F5F6FA;
@@ -197,7 +204,7 @@
 }
 
 // ── Column: Ref ─────────────────────────────────
-.col-ref { min-width: 180px; }
+.col-ref { min-width: 160px; width: 22%; }
 
 .ref-wrap {
   display: flex;
@@ -223,7 +230,7 @@
 }
 
 // ── Column: Goods ────────────────────────────────
-.col-goods { min-width: 160px; }
+.col-goods { min-width: 140px; width: 24%; }
 
 .goods-name {
   font-size: 12px; font-weight: 500; color: #1F2937; margin: 0;
@@ -235,7 +242,7 @@
 }
 
 // ── Column: Assess ──────────────────────────────
-.col-assess { min-width: 160px; }
+.col-assess { min-width: 130px; width: 20%; }
 
 .assess-permit {
   font-size: 11px; font-weight: 600; color: #B45309; margin: 0;
@@ -250,7 +257,7 @@
 }
 
 // ── Column: Conf ─────────────────────────────────
-.col-conf { min-width: 110px; }
+.col-conf { min-width: 90px; width: 12%; }
 
 .conf-wrap {
   display: flex;
@@ -283,7 +290,7 @@
 }
 
 // ── Column: Status ──────────────────────────────
-.col-status { min-width: 130px; }
+.col-status { min-width: 110px; width: 14%; }
 
 .status-pill {
   display: inline-flex;
@@ -301,7 +308,7 @@
 }
 
 // ── Column: Action ──────────────────────────────
-.col-action { min-width: 120px; }
+.col-action { min-width: 100px; width: 8%; }
 
 .action-btn {
   display: inline-flex;
