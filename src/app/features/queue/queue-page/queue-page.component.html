@@ -2,139 +2,328 @@
   <app-sidebar [collapsed]="collapsed()" (toggleCollapse)="toggleSidebar()" />
 
   <div class="qp-outer">
-    <div class="qp-card">
 
-      <!-- ── Header ─────────────────────────────────────────────────────── -->
-      <div class="qh">
-        <div class="qh-left">
-          <h1 class="qh-title">คิวงาน</h1>
-          <span class="qh-date">{{ today }}</span>
+    <!-- ════════ LIST VIEW ════════ -->
+    @if (!openShipment()) {
+      <div class="qp-card">
+
+        <div class="qh">
+          <div class="qh-left">
+            <h1 class="qh-title">คิวงาน</h1>
+            <span class="qh-date">{{ today }}</span>
+          </div>
+          <div class="qh-kpis">
+            @for (s of statCards; track s.key) {
+              <button class="kpi" [class.kpi--active]="activeTab() === s.key" (click)="setTabFilter(s.key)">
+                <div class="kpi__bar" [style.background]="s.dot"></div>
+                <div class="kpi__num" [style.color]="s.dot">{{ countByStatus(s.key) }}</div>
+                <div class="kpi__label">{{ s.label }}</div>
+              </button>
+            }
+          </div>
         </div>
 
-        <div class="qh-kpis">
-          @for (s of statCards; track s.key) {
-            <button class="kpi" [class.kpi--active]="activeTab() === s.key"
-              (click)="setTabFilter(s.key)">
-              <div class="kpi__bar" [style.background]="s.dot"></div>
-              <div class="kpi__num" [style.color]="s.dot">{{ countByStatus(s.key) }}</div>
-              <div class="kpi__label">{{ s.label }}</div>
-            </button>
-          }
+        <div class="qt">
+          <div class="qt-tabs">
+            @for (t of tabs; track t.value) {
+              <button class="qt-tab" [class.qt-tab--active]="activeTab() === t.value"
+                (click)="activeTab.set(t.value)">
+                {{ t.label }}
+                <span class="qt-badge" [class.qt-badge--active]="activeTab() === t.value">{{ tabCount(t.value) }}</span>
+              </button>
+            }
+          </div>
+          <div class="qt-search">
+            <lucide-icon [img]="icSearch" [size]="12" style="color:#BEC3D0;flex-shrink:0" />
+            <input [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" placeholder="ค้นหา ref, สินค้า, ลูกค้า..." />
+          </div>
         </div>
-      </div>
 
-      <!-- ── Toolbar ────────────────────────────────────────────────────── -->
-      <div class="qt">
-        <div class="qt-tabs">
-          @for (t of tabs; track t.value) {
-            <button class="qt-tab" [class.qt-tab--active]="activeTab() === t.value"
-              (click)="activeTab.set(t.value)">
-              {{ t.label }}
-              <span class="qt-badge" [class.qt-badge--active]="activeTab() === t.value">
-                {{ tabCount(t.value) }}
-              </span>
-            </button>
-          }
+        <div class="ql-head">
+          <div class="lh-ref">ใบขนสินค้า</div>
+          <div class="lh-goods">สินค้า</div>
+          <div class="lh-assess">AI ประเมิน</div>
+          <div class="lh-conf">ความมั่นใจ</div>
+          <div class="lh-status">สถานะ</div>
+          <div class="lh-action"></div>
         </div>
-        <div class="qt-search">
-          <lucide-icon [img]="icSearch" [size]="12" style="color:#BEC3D0;flex-shrink:0" />
-          <input [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)"
-            placeholder="ค้นหา ref, สินค้า, ลูกค้า..." />
-        </div>
-      </div>
 
-      <!-- ── Column headers ─────────────────────────────────────────────── -->
-      <div class="ql-head">
-        <div class="lh-ref">ใบขนสินค้า</div>
-        <div class="lh-goods">สินค้า</div>
-        <div class="lh-assess">AI ประเมิน</div>
-        <div class="lh-conf">ความมั่นใจ</div>
-        <div class="lh-status">สถานะ</div>
-        <div class="lh-action"></div>
-      </div>
-
-      <!-- ── Rows ───────────────────────────────────────────────────────── -->
-      <div class="ql-rows">
-        @for (s of filteredQueue(); track s.id) {
-          <div class="ql-row" [class.ql-row--urgent]="s.statusKey === 'needs_you'"
-            (click)="selectRow(s.id)">
-
-            <!-- accent bar -->
-            <div class="ql-row__accent" [style.background]="statusMeta(s.statusKey).dot"></div>
-
-            <!-- ref + customer -->
-            <div class="lc-ref">
-              <div class="lc-ref__top">
-                <span class="type-badge" [class.type-badge--exp]="s.type === 'EXP'">{{ s.type }}</span>
-                <span class="ref-no">{{ s.customsNo }}</span>
-                @if (s.isNew) { <span class="new-dot"></span> }
+        <div class="ql-rows">
+          @for (s of filteredQueue(); track s.id) {
+            <div class="ql-row" [class.ql-row--urgent]="s.statusKey === 'needs_you'" (click)="selectRow(s.id)">
+              <div class="ql-row__accent" [style.background]="statusMeta(s.statusKey).dot"></div>
+              <div class="lc-ref">
+                <div class="lc-ref__top">
+                  <span class="type-badge" [class.type-badge--exp]="s.type === 'EXP'">{{ s.type }}</span>
+                  <span class="ref-no">{{ s.customsNo }}</span>
+                  @if (s.isNew) { <span class="new-dot"></span> }
+                </div>
+                <div class="ref-customer">{{ s.customer || s.chatName || '—' }}</div>
               </div>
-              <div class="ref-customer">{{ s.customer || s.chatName || '—' }}</div>
+              <div class="lc-goods">
+                <div class="goods-name">{{ s.goods }}</div>
+                <div class="goods-hs">{{ s.hs }}</div>
+              </div>
+              <div class="lc-assess">
+                @if (s.permitNeeded) {
+                  <span class="assess-tag assess-tag--warn">ต้องขออนุญาต</span>
+                  <div class="assess-sub">{{ agencyShort(s.agency) }} · {{ s.formCode }}</div>
+                } @else {
+                  <span class="assess-tag assess-tag--ok">ไม่ต้องขออนุญาต</span>
+                  <div class="assess-sub">ผ่านพิธีการปกติ</div>
+                }
+              </div>
+              <div class="lc-conf">
+                <div class="conf-top">
+                  <span class="conf-pct" [style.color]="confColor(s.conf)">{{ s.conf }}%</span>
+                  <span class="conf-lbl" [style.color]="confColor(s.conf)">{{ confLabel(s.conf) }}</span>
+                </div>
+                <div class="conf-track">
+                  <div class="conf-fill" [style.width.%]="s.conf" [style.background]="confColor(s.conf)"></div>
+                </div>
+              </div>
+              <div class="lc-status">
+                <span class="status-pill"
+                  [style.background]="statusMeta(s.statusKey).bg"
+                  [style.color]="statusMeta(s.statusKey).text">
+                  <span class="status-dot" [style.background]="statusMeta(s.statusKey).dot"></span>
+                  {{ statusMeta(s.statusKey).label }}
+                </span>
+              </div>
+              <div class="lc-action" (click)="$event.stopPropagation()">
+                <button class="row-arrow" [class.row-arrow--primary]="s.statusKey === 'needs_you'" (click)="selectRow(s.id)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+              </div>
             </div>
-
-            <!-- goods -->
-            <div class="lc-goods">
-              <div class="goods-name">{{ s.goods }}</div>
-              <div class="goods-hs">{{ s.hs }}</div>
+          }
+          @if (filteredQueue().length === 0) {
+            <div class="ql-empty">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+              <p>ไม่มีรายการในกลุ่มนี้</p>
             </div>
+          }
+        </div>
 
-            <!-- AI assessment -->
-            <div class="lc-assess">
-              @if (s.permitNeeded) {
-                <span class="assess-tag assess-tag--warn">ต้องขออนุญาต</span>
-                <div class="assess-sub">{{ agencyShort(s.agency) }} · {{ s.formCode }}</div>
+      </div>
+
+    <!-- ════════ DETAIL VIEW ════════ -->
+    } @else {
+      <div class="dv">
+
+        <!-- Header -->
+        <div class="dv-header">
+          <button class="dv-back" (click)="closeDetail()">
+            <lucide-icon [img]="icBack" [size]="13" /> กลับไปคิวงาน
+          </button>
+
+          <div class="dv-hrow">
+            <div class="dv-hrow__left">
+              <span class="type-badge" [class.type-badge--exp]="openShipment()!.type === 'EXP'">{{ openShipment()!.type }}</span>
+              <h2 class="dv-ref">{{ openShipment()!.customsNo }}</h2>
+              <span class="status-pill"
+                [style.background]="statusMeta(openShipment()!.statusKey).bg"
+                [style.color]="statusMeta(openShipment()!.statusKey).text">
+                <span class="status-dot" [style.background]="statusMeta(openShipment()!.statusKey).dot"></span>
+                {{ statusMeta(openShipment()!.statusKey).label }}
+              </span>
+            </div>
+            @if (openShipment()!.owner) {
+              <div class="dv-owner">
+                <div class="dv-owner__avatar">{{ openShipment()!.owner.charAt(0) }}</div>
+                <span class="dv-owner__name">{{ openShipment()!.owner }}</span>
+              </div>
+            }
+          </div>
+
+          <p class="dv-sub">
+            {{ openShipment()!.goods }} · HS {{ openShipment()!.hs }} · ต้นทาง {{ openShipment()!.origin }}
+          </p>
+          @if (openShipment()!.customer) {
+            <p class="dv-customer">ลูกค้า: {{ openShipment()!.customer }} · นำเข้าระบบ {{ openShipment()!.importedAt }}</p>
+          }
+
+          <!-- Steps -->
+          <div class="steps-bar">
+            @for (s of visibleSteps(openShipment()!); track s.idx; let last = $last) {
+              <div class="step" [class.step--done]="isDone2(s.idx, openShipment()!.stage)"
+                [class.step--active]="isActive2(s.idx, openShipment()!.stage)">
+                <div class="step__dot">{{ isDone2(s.idx, openShipment()!.stage) ? '✓' : s.idx }}</div>
+                <span class="step__label">{{ s.label }}</span>
+              </div>
+              @if (!last) {
+                <div class="step__line" [class.step__line--done]="isDone2(s.idx, openShipment()!.stage)"></div>
+              }
+            }
+          </div>
+        </div>
+
+        <!-- Body: 2-column masonry -->
+        <div class="dv-body">
+
+          <!-- LEFT column -->
+          <div class="dv-col-left">
+
+            <!-- AI assessment card -->
+            <div class="dv-card">
+              <div class="dv-card__hd">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0463EF" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <span>AI ตรวจสอบความจำเป็นในการขออนุญาต</span>
+                <span class="conf-chip" [style.color]="confColor(openShipment()!.assess.conf)">มั่นใจ {{ openShipment()!.assess.conf }}%</span>
+              </div>
+              @if (openShipment()!.permitNeeded) {
+                <p class="dv-permit-label">● ต้องขอใบอนุญาต</p>
               } @else {
-                <span class="assess-tag assess-tag--ok">ไม่ต้องขออนุญาต</span>
-                <div class="assess-sub">ผ่านพิธีการปกติ</div>
+                <p class="dv-nopermit-label">● ไม่ต้องขอใบอนุญาต</p>
+              }
+              @if (openShipment()!.assess.reason) {
+                <div class="dv-reason-box">
+                  <p class="dv-reason-title">เหตุผลจาก AI</p>
+                  <p class="dv-reason-text">{{ openShipment()!.assess.reason }}</p>
+                </div>
               }
             </div>
 
-            <!-- confidence -->
-            <div class="lc-conf">
-              <div class="conf-top">
-                <span class="conf-pct" [style.color]="confColor(s.conf)">{{ s.conf }}%</span>
-                <span class="conf-lbl" [style.color]="confColor(s.conf)">{{ confLabel(s.conf) }}</span>
+            <!-- Agency classification card -->
+            @if (openShipment()!.permitNeeded) {
+              <div class="dv-card">
+                <div class="dv-card__hd">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                  <span>AI จัดประเภท — เลือกหน่วยงานที่ต้องยื่น</span>
+                  <span class="conf-chip" [style.color]="confColor(openShipment()!.classify.conf)">มั่นใจ {{ openShipment()!.classify.conf }}%</span>
+                </div>
+                <div class="dv-agency-selected">
+                  <div class="dv-agency-check">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
+                  </div>
+                  <div>
+                    <p class="dv-agency-name">{{ agencyFull(openShipment()!.classify.agency) }}</p>
+                    <p class="dv-agency-sub">ยื่น {{ openShipment()!.formCode }} — {{ openShipment()!.formName }}</p>
+                  </div>
+                </div>
+                @if (openShipment()!.classify.reason) {
+                  <div class="dv-reason-box" style="margin-top:8px">
+                    <p class="dv-reason-text">{{ openShipment()!.classify.reason }}</p>
+                  </div>
+                }
+                @if (openShipment()!.classify.alt.length > 0) {
+                  <div class="dv-alt-agencies">
+                    @for (alt of openShipment()!.classify.alt; track alt.agency) {
+                      <div class="dv-alt-row">
+                        <span class="dv-alt-name">{{ agencyShort(alt.agency) }}</span>
+                        <span class="dv-alt-conf">{{ alt.conf }}%</span>
+                      </div>
+                    }
+                  </div>
+                }
               </div>
-              <div class="conf-track">
-                <div class="conf-fill" [style.width.%]="s.conf" [style.background]="confColor(s.conf)"></div>
+            }
+
+            <!-- Audit trail -->
+            @if (openShipment()!.audit.length > 0) {
+              <div class="dv-card">
+                <div class="dv-card__hd">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  <span>เส้นทางการดำเนินงาน (Audit trail)</span>
+                </div>
+                <div class="dv-audit">
+                  @for (a of openShipment()!.audit; track a.time) {
+                    <div class="dv-audit-row">
+                      <span class="dv-audit-time">{{ a.time }}</span>
+                      <div class="dv-audit-dot" [class.dv-audit-dot--ai]="a.by === 'AI'" [class.dv-audit-dot--sys]="a.by === 'ระบบ'"></div>
+                      <span class="dv-audit-text">{{ a.text }}</span>
+                      <span class="dv-audit-by">{{ a.by }}</span>
+                    </div>
+                  }
+                  @if (canProceed(openShipment()!)) {
+                    <div class="dv-audit-row dv-audit-row--pending">
+                      <span class="dv-audit-time">—</span>
+                      <div class="dv-audit-dot dv-audit-dot--pending"></div>
+                      <span class="dv-audit-text" style="color:#F59E0B">{{ statusMeta(openShipment()!.statusKey).label }}</span>
+                    </div>
+                  }
+                </div>
               </div>
-            </div>
+            }
 
-            <!-- status -->
-            <div class="lc-status">
-              <span class="status-pill"
-                [style.background]="statusMeta(s.statusKey).bg"
-                [style.color]="statusMeta(s.statusKey).text">
-                <span class="status-dot" [style.background]="statusMeta(s.statusKey).dot"></span>
-                {{ statusMeta(s.statusKey).label }}
-              </span>
-            </div>
+          </div>
 
-            <!-- action arrow -->
-            <div class="lc-action" (click)="$event.stopPropagation()">
-              <button class="row-arrow" [class.row-arrow--primary]="s.statusKey === 'needs_you'"
-                (click)="selectRow(s.id)">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                  stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="m9 18 6-6-6-6"/>
-                </svg>
+          <!-- RIGHT column -->
+          <div class="dv-col-right">
+
+            <!-- Flag alerts -->
+            @if (unresolvedFlags(openShipment()!).length > 0) {
+              <div class="dv-card dv-card--warn">
+                <div class="dv-card__hd">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 00-3.48 0l-8 14A2 2 0 004 21h16a2 2 0 001.73-3"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                  <span style="color:#B45309">พบ {{ unresolvedFlags(openShipment()!).length }} จุดที่ควรตรวจสอบก่อนยืนยัน</span>
+                </div>
+                @for (f of unresolvedFlags(openShipment()!); track f.id) {
+                  <div class="dv-flag">
+                    <div class="dv-flag__hd">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                      <span class="dv-flag__title">{{ f.title }}</span>
+                    </div>
+                    <p class="dv-flag__detail">{{ f.detail }}</p>
+                    <div class="dv-flag__foot">
+                      <span class="dv-flag__conf" [style.color]="confColor(f.conf)">AI มั่นใจเพียง {{ f.conf }}%</span>
+                      <button class="dv-flag__btn">ตรวจแล้ว · ยืนยันค่านี้</button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Draft license summary -->
+            @if (openShipment()!.draft.fields.length > 0) {
+              <div class="dv-card">
+                <div class="dv-card__hd">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  <span>ร่างใบอนุญาต</span>
+                  <span class="dv-ai-badge">AI ร่างอัตโนมัติ</span>
+                </div>
+                <p class="dv-draft-form">{{ openShipment()!.formCode }} — {{ openShipment()!.formName }}</p>
+                <div class="dv-draft-fields">
+                  @for (f of openShipment()!.draft.fields; track f.label) {
+                    <div class="dv-draft-row" [class.dv-draft-row--flag]="!!f.flag">
+                      <span class="dv-draft-label">{{ f.label }}</span>
+                      <span class="dv-draft-value" [class.dv-draft-value--flag]="!!f.flag">{{ f.value }}</span>
+                      @if (f.flag) { <span class="dv-draft-flag-tip">{{ f.flag }}</span> }
+                    </div>
+                  }
+                </div>
+                <div class="dv-draft-actions">
+                  <a class="dv-draft-link">ดูใบอนุญาตฉบับเต็ม</a>
+                  <span class="dv-draft-edit">· แก้ไขได้ทุกช่อง</span>
+                </div>
+              </div>
+            }
+
+          </div>
+        </div>
+
+        <!-- Footer action bar -->
+        <div class="dv-footer">
+          @if (unresolvedFlags(openShipment()!).length > 0) {
+            <p class="dv-footer__warn">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 00-3.48 0l-8 14A2 2 0 004 21h16a2 2 0 001.73-3"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              กรุณาตรวจสอบ {{ unresolvedFlags(openShipment()!).length }} จุด flag ก่อนจึงจะยืนยันได้
+            </p>
+          }
+          <div class="dv-footer__btns">
+            <button class="dv-btn dv-btn--ghost">แก้ไขร่าง</button>
+            @if (canProceed(openShipment()!)) {
+              <button class="dv-btn dv-btn--primary" (click)="proceedToChat(openShipment()!)">
+                ดำเนินการต่อ →
               </button>
-            </div>
-
+            } @else {
+              <button class="dv-btn" disabled>เสร็จสิ้นแล้ว</button>
+            }
           </div>
-        }
+        </div>
 
-        @if (filteredQueue().length === 0) {
-          <div class="ql-empty">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB"
-              stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
-            </svg>
-            <p>ไม่มีรายการในกลุ่มนี้</p>
-          </div>
-        }
-      </div>
+      </div><!-- /dv -->
+    }
 
-    </div><!-- /qp-card -->
   </div><!-- /qp-outer -->
 </div><!-- /shell -->
