@@ -230,7 +230,7 @@
 // Settings — same style as nav items
 .settings-btn {
   display: flex; align-items: center; gap: 9px;
-  width: calc(100% - 16px); margin: 4px 8px 2px;
+  width: calc(100% - 16px); margin: 0 8px 4px;
   padding: 7px 10px; border-radius: 8px;
   border: none; background: transparent;
   color: #6B7280; font-size: 13px; font-weight: 500;
@@ -244,7 +244,7 @@
 // SPN connection badge
 .spn-badge {
   display: flex; align-items: center; gap: 7px;
-  margin: 0 8px 2px;
+  margin: 0 8px 4px;
   padding: 6px 10px; border-radius: 6px;
   background: rgba(13, 143, 97, 0.08);
   border: 1px solid rgba(13, 143, 97, 0.2);

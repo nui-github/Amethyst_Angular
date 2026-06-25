@@ -72,12 +72,6 @@
   <!-- Footer: settings + BizX logo -->
   <div class="sb-footer">
 
-    <!-- Settings -->
-    <button class="settings-btn" [title]="collapsed ? 'ตั้งค่า' : ''" (click)="router.navigate(['/settings'])">
-      <lucide-icon [img]="icSettings" [size]="14" />
-      @if (!collapsed) { <span>ตั้งค่า</span> }
-    </button>
-
     <!-- Profile -->
     <div class="sb-profile" [title]="collapsed ? 'Mr. John Doe' : ''">
       <div class="sb-profile__avatar">J</div>
@@ -103,6 +97,12 @@
         }
       </div>
     }
+
+    <!-- Settings -->
+    <button class="settings-btn" [title]="collapsed ? 'ตั้งค่า' : ''" (click)="router.navigate(['/settings'])">
+      <lucide-icon [img]="icSettings" [size]="14" />
+      @if (!collapsed) { <span>ตั้งค่า</span> }
+    </button>
 
     <!-- BizX logo — full or icon only -->
     <a href="https://bizx-uat.devnetbay.com/" target="_blank" rel="noopener" class="bizx-logo-btn">
