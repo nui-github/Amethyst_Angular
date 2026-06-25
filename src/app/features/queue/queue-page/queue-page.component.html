@@ -187,14 +187,14 @@
 
           <!-- Steps -->
           <div class="steps-bar">
-            @for (label of stageLabels.slice(1); track label; let i = $index) {
-              <div class="step" [class.step--done]="isDone(i+1, openShipment()!.stage)"
-                [class.step--active]="isActive(i+1, openShipment()!.stage)">
-                <div class="step__dot">{{ isDone(i+1, openShipment()!.stage) ? '✓' : i+1 }}</div>
-                <span class="step__label">{{ label }}</span>
+            @for (s of visibleSteps(openShipment()!); track s.idx; let i = $index; let last = $last) {
+              <div class="step" [class.step--done]="isDone(s.idx, openShipment()!.stage)"
+                [class.step--active]="isActive(s.idx, openShipment()!.stage)">
+                <div class="step__dot">{{ isDone(s.idx, openShipment()!.stage) ? '✓' : s.idx }}</div>
+                <span class="step__label">{{ s.label }}</span>
               </div>
-              @if (i < 7) {
-                <div class="step__line" [class.step__line--done]="isDone(i+1, openShipment()!.stage)"></div>
+              @if (!last) {
+                <div class="step__line" [class.step__line--done]="isDone(s.idx, openShipment()!.stage)"></div>
               }
             }
           </div>

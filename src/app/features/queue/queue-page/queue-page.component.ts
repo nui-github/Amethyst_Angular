@@ -107,6 +107,16 @@ export class QueuePageComponent {
   isDone(step: number, stage: number)   { return step < stage; }
   isActive(step: number, stage: number) { return step === stage; }
 
+  visibleSteps(ship: Shipment): { label: string; idx: number }[] {
+    const hasEmail = !!(ship.email?.to);
+    return STAGE_LABELS.slice(1).reduce<{ label: string; idx: number }[]>((acc, label, i) => {
+      const stepNum = i + 1;
+      if (stepNum === 7 && !hasEmail) return acc;
+      acc.push({ label, idx: stepNum });
+      return acc;
+    }, []);
+  }
+
   toggleSidebar(): void { this.collapsed.update(v => !v); }
   setTabFilter(key: ShipmentStatus): void {
     const tv = key as unknown as TabValue;
