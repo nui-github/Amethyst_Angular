@@ -41,6 +41,6 @@ export class SidebarComponent {
   isQueue = () => this.router.url === '/queue';
 
   goChat()  { this.router.navigate(['/']); }
-  goQueue() { this.router.navigate(['/queue']); }
+  goQueue() { this.queue.open(''); this.router.navigate(['/queue']); }
   newChat() { this.chat.newChat(); this.goChat(); }
 }
