@@ -45,9 +45,6 @@
       <button class="nav-item" [class.nav-item--active]="isQueue()" (click)="goQueue()" [title]="collapsed ? 'คิวงาน' : ''">
         <lucide-icon [img]="icList" [size]="15" />
         @if (!collapsed) { <span>คิวงาน</span> }
-        @if (queue.needsYouCount() > 0) {
-          <span class="nav-badge">{{ queue.needsYouCount() }}</span>
-        }
       </button>
       <button class="nav-item nav-item--expand" [title]="collapsed ? 'Dashboard' : ''">
         <lucide-icon [img]="icDash" [size]="15" />
