@@ -335,20 +335,28 @@
 // ── Column: Action ────────────────────────────────────────────────────────────
 .lc-action { display: flex; justify-content: flex-end; }
 
+.td-action { text-align: right; }
+
 .row-arrow {
   width: 30px; height: 30px; border-radius: 8px;
-  border: 1.5px solid #E8EAF0; background: #fff;
+  border: 1.5px solid #E8EAF0; background: #F9FAFB;
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer; color: #9CA3AF;
+  cursor: pointer; color: #C4C9D6;
   transition: all 0.15s;
-  opacity: 0.5; transform: translateX(-2px);
 
-  &:hover { border-color: #0463EF; color: #0463EF; background: #EFF6FF; opacity: 1; transform: translateX(0); }
+  &:hover { border-color: #0463EF; color: #0463EF; background: #EFF6FF; }
 
   &--primary {
-    border-color: #0463EF; background: #0463EF; color: #fff; opacity: 1;
+    border-color: #0463EF; background: #0463EF; color: #fff;
     &:hover { background: #034DBA; border-color: #034DBA; }
   }
+}
+
+// Show arrow with blue tint on row hover (via ng-deep since nz-table owns the tr)
+::ng-deep .ant-table-tbody .qt-row:hover .row-arrow:not(.row-arrow--primary) {
+  border-color: #CBD5F8;
+  color: #0463EF;
+  background: #EFF6FF;
 }
 
 // ── Column header alignment helpers ──────────────────────────────────────────
