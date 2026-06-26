@@ -128,12 +128,6 @@
                 {{ statusMeta(openShipment()!.statusKey).label }}
               </span>
             </div>
-            @if (openShipment()!.owner) {
-              <div class="dv-owner">
-                <div class="dv-owner__avatar">{{ openShipment()!.owner.charAt(0) }}</div>
-                <span class="dv-owner__name">{{ openShipment()!.owner }}</span>
-              </div>
-            }
           </div>
 
           <p class="dv-sub">
