@@ -330,6 +330,8 @@ export class ChatService {
   private isInvoicePath = false;
   private isAgencyDocsUpload = false;
   private isCustomsDocPath = false;
+  private checkMissingAfterFlags = false;          // invoice path: check missing fields after flags
+  private pendingAfterMissingFields: 'ocr' | 'proceed-choice' = 'ocr';
   // What to do after agency+profile selection
   private pendingAfterFlow: 'agency-docs' | 'form-preview' | 'proceed' = 'proceed';
 
@@ -415,6 +417,7 @@ export class ChatService {
     // Agency docs upload (2nd doc in invoice path): skip hs-analysis, go straight to flags
     if (this.isAgencyDocsUpload) {
       this.isAgencyDocsUpload = false;
+      this.checkMissingAfterFlags = true;   // invoice path: check missing fields after flags confirmed
       this.withTyping(() => this.showFlags(), 600);
       return;
     }
@@ -536,6 +539,15 @@ export class ChatService {
     // Merge manually filled fields
     this.formData.update(f => ({ ...f, ...extra }));
 
+    const afterComplete = () => {
+      if (this.pendingAfterMissingFields === 'proceed-choice') {
+        this.pendingAfterMissingFields = 'ocr';
+        this.withTyping(() => this.showProceedChoice(), 600);
+      } else {
+        this.continueAfterOCR();
+      }
+    };
+
     if (file) {
       // OCR the additional file, merge, then re-check
       this.bot('text', undefined, 'กำลัง OCR เอกสารที่อัปโหลดเพิ่ม...');
@@ -545,13 +557,13 @@ export class ChatService {
       const merged = { ...result, ...this.formData(), ...extra };
       this.formData.set(merged);
       const stillMissing = this.getMissingFields(this.formData());
+      this.bot('ocr-results', {
+        invoiceNo: result.invoiceNo, invoiceDate: result.invoiceDate,
+        quantity: result.quantity, importer: result.importer, port: result.port,
+        hsCode: result.hsCode, countryOrigin: result.countryOrigin,
+        lotNo: result.lotNo, uNo: result.uNo,
+      } satisfies OcrResultsData);
       if (stillMissing.length > 0) {
-        this.bot('ocr-results', {
-          invoiceNo: result.invoiceNo, invoiceDate: result.invoiceDate,
-          quantity: result.quantity, importer: result.importer, port: result.port,
-          hsCode: result.hsCode, countryOrigin: result.countryOrigin,
-          lotNo: result.lotNo, uNo: result.uNo,
-        } satisfies OcrResultsData);
         this.withTyping(() => {
           this.bot('missing-fields', {
             missingFields: stillMissing,
@@ -560,13 +572,7 @@ export class ChatService {
           } satisfies MissingFieldsData);
         }, 400);
       } else {
-        this.bot('ocr-results', {
-          invoiceNo: result.invoiceNo, invoiceDate: result.invoiceDate,
-          quantity: result.quantity, importer: result.importer, port: result.port,
-          hsCode: result.hsCode, countryOrigin: result.countryOrigin,
-          lotNo: result.lotNo, uNo: result.uNo,
-        } satisfies OcrResultsData);
-        this.withTyping(() => this.continueAfterOCR(), 600);
+        this.withTyping(() => afterComplete(), 600);
       }
     } else {
       // No extra file — check if now complete
@@ -580,7 +586,7 @@ export class ChatService {
           } satisfies MissingFieldsData);
         }, 400);
       } else {
-        this.continueAfterOCR();
+        afterComplete();
       }
     }
   }
@@ -625,6 +631,21 @@ export class ChatService {
 
   onAllFlagsConfirmed(): void {
     this.user('ยืนยันข้อมูลทั้งหมดแล้ว');
+    if (this.checkMissingAfterFlags) {
+      this.checkMissingAfterFlags = false;
+      const missing = this.getMissingFields(this.formData());
+      if (missing.length > 0) {
+        this.pendingAfterMissingFields = 'proceed-choice';
+        this.withTyping(() => {
+          this.bot('missing-fields', {
+            missingFields: missing,
+            existingData: { ...this.formData() },
+            round: 1,
+          } satisfies MissingFieldsData);
+        }, 700);
+        return;
+      }
+    }
     this.withTyping(() => this.showProceedChoice(), 700);
   }
 
