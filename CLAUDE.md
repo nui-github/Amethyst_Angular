@@ -268,12 +268,21 @@ Add to `mainItems` array in `sidebar.component.ts`
 ---
 
 ## Queue Page Layout
-- **List view**: full-width table with stat cards, tabs (ทั้งหมด/ต้องดำเนินการ/รอลูกค้า/ยื่นแล้ว), search
+- **List view**: single white card (`border-radius: 18px`) containing:
+  1. **Header** — title + date (left), KPI stat cards clickable as filters (right)
+  2. **Toolbar** — pill-style tabs + search input (`padding: 16px`)
+  3. **Table wrapper** — `nz-table` wrapped in `.qt-table-wrap` (`margin: 16px`, `border-radius: 16px`, border)
+  4. **Pagination** — right-aligned, `10 / หน้า` size changer + `< 1 2 >` page buttons; default 10/page, options 10/20/50
   - Columns: ref/customer · สินค้า/HS · AI ประเมิน · ความมั่นใจ (bar) · สถานะ · action button
-  - `needs_you` rows have amber urgency bar on left edge
-- **Card wrapper**: 16px outer padding, border-radius 16px white card, `background: #EDEEF2` page bg
+  - `needs_you` rows have amber left accent bar + amber background tint
+  - Table uses `#queueTable` reference + iterates `queueTable.data` (not `filteredQueue()`) to respect client-side pagination
+  - `pageSize = signal(10)` / `pageIndex = signal(1)` in component — bound as `[nzPageSize]="pageSize()"` with `(nzPageSizeChange)="pageSize.set($event)"`
+- **KPI cards** — top accent bar (3px color), large number, label; clickable to filter by status
+- **Tabs** — pill-style (active = white bg + shadow on gray pill group background)
+- **Background**: `#EDEEF4` page bg, `16px` outer padding
 - **Detail**: clicking any row → `loadQueueSession()` → navigate to `/` (chatbot page)
 - Step 7 "แจ้งลูกค้า" only shown when `ship.email.to` is set (email flow was triggered)
+- Mock data: 12 shipments in `queue.mock.ts` (enough for 2 pages at 10/page)
 
 ---
 

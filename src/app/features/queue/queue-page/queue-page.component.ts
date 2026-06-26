@@ -42,6 +42,8 @@ export class QueuePageComponent {
   collapsed   = signal(false);
   searchTerm  = signal('');
   activeTab   = signal<TabValue>('all');
+  pageSize  = signal(10);
+  pageIndex = signal(1);
 
   readonly today = new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
 

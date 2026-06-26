@@ -7,6 +7,7 @@
     @if (!openShipment()) {
       <div class="qp-card">
 
+        <!-- Header -->
         <div class="qh">
           <div class="qh-left">
             <h1 class="qh-title">คิวงาน</h1>
@@ -15,7 +16,7 @@
           <div class="qh-kpis">
             @for (s of statCards; track s.key) {
               <button class="kpi" [class.kpi--active]="activeTab() === s.key" (click)="setTabFilter(s.key)">
-                <div class="kpi__bar" [style.background]="s.dot"></div>
+                <div class="kpi__top-bar" [style.background]="s.dot"></div>
                 <div class="kpi__num" [style.color]="s.dot">{{ countByStatus(s.key) }}</div>
                 <div class="kpi__label">{{ s.label }}</div>
               </button>
@@ -23,6 +24,7 @@
           </div>
         </div>
 
+        <!-- Toolbar: tabs + search -->
         <div class="qt">
           <div class="qt-tabs">
             @for (t of tabs; track t.value) {
@@ -34,16 +36,24 @@
             }
           </div>
           <div class="qt-search">
-            <lucide-icon [img]="icSearch" [size]="12" style="color:#BEC3D0;flex-shrink:0" />
-            <input [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" placeholder="ค้นหา ref, สินค้า, ลูกค้า..." />
+            <lucide-icon [img]="icSearch" [size]="14" style="color:#BEC3D0;flex-shrink:0" />
+            <input [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" placeholder="ค้นหา..." />
           </div>
         </div>
 
-        <!-- nz-table -->
+        <!-- Table -->
+        <div class="qt-table-wrap">
         <nz-table
+          #queueTable
           class="queue-table"
           [nzData]="filteredQueue()"
-          [nzShowPagination]="false"
+          [nzShowPagination]="true"
+          [nzPageSize]="pageSize()"
+          (nzPageSizeChange)="pageSize.set($event)"
+          [nzPageIndex]="pageIndex()"
+          (nzPageIndexChange)="pageIndex.set($event)"
+          [nzShowSizeChanger]="true"
+          [nzPageSizeOptions]="[10, 20, 50]"
           [nzBordered]="false"
           [nzSize]="'middle'"
           [nzNoResult]="emptyTpl"
@@ -52,16 +62,16 @@
           <thead>
             <tr>
               <th nzWidth="22%">ใบขนสินค้า</th>
-              <th nzWidth="27%">สินค้า</th>
-              <th nzWidth="18%">AI ประเมิน</th>
+              <th nzWidth="25%">สินค้า</th>
+              <th nzWidth="17%">AI ประเมิน</th>
               <th nzWidth="13%">ความมั่นใจ</th>
-              <th nzWidth="14%">สถานะ</th>
-              <th nzWidth="6%"></th>
+              <th nzWidth="16%">สถานะ</th>
+              <th nzWidth="7%"></th>
             </tr>
           </thead>
 
           <tbody>
-            @for (s of filteredQueue(); track s.id) {
+            @for (s of queueTable.data; track s.id) {
               <tr class="qt-row" [class.qt-row--urgent]="s.statusKey === 'needs_you'"
                 (click)="selectRow(s.id)">
 
@@ -69,12 +79,12 @@
                 <td>
                   <div class="tc-ref">
                     <div class="tc-accent" [style.background]="statusMeta(s.statusKey).dot"></div>
-                    <div>
+                    <div class="tc-ref__info">
                       <div class="tc-ref__top">
                         <span class="type-badge" [class.type-badge--exp]="s.type === 'EXP'">{{ s.type }}</span>
                         <span class="ref-no">{{ s.customsNo }}</span>
                         @if (s.isNew) {
-                          <nz-badge [nzCount]="0" nzStatus="processing" nzColor="#0463EF" nzText="" class="new-badge-dot" />
+                          <span class="new-dot-pulse"></span>
                         }
                       </div>
                       <div class="ref-customer">{{ s.customer || '—' }}</div>
@@ -101,7 +111,7 @@
 
                 <!-- Confidence -->
                 <td>
-                  <div class="conf-top">
+                  <div class="conf-row">
                     <span class="conf-pct" [style.color]="confColor(s.conf)">{{ s.conf }}%</span>
                     <span class="conf-lbl" [style.color]="confColor(s.conf)">{{ confLabel(s.conf) }}</span>
                   </div>
@@ -121,10 +131,10 @@
                 </td>
 
                 <!-- Action -->
-                <td (click)="$event.stopPropagation()" class="td-action">
+                <td class="td-action" (click)="$event.stopPropagation()">
                   <button class="row-arrow" [class.row-arrow--primary]="s.statusKey === 'needs_you'"
                     (click)="selectRow(s.id)">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
                   </button>
                 </td>
 
@@ -135,12 +145,12 @@
 
         <ng-template #emptyTpl>
           <div class="ql-empty">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
             <p>ไม่มีรายการในกลุ่มนี้</p>
           </div>
         </ng-template>
-
-      </div>
+        </div><!-- /qt-table-wrap -->
+      </div><!-- /qp-card -->
 
     <!-- ════════ DETAIL VIEW ════════ -->
     } @else {
