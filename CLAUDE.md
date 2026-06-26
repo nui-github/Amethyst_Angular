@@ -189,6 +189,10 @@ After flags confirmed (full-upload path) → 2-choice (ChoiceCard):
   ├─ 'email'   → type:'email-draft' → onEmailSent() → post-email choice
   └─ 'preview' → form-preview (editable) → "ดำเนินการต่อ" → choice-card(submit/edit) → submit
 
+onPreviewChoice 'edit' behaviour:
+  ├─ isCustomsOnlyUpload === true  → single-upload (ใบขนสินค้าเท่านั้น, ไม่ใช่ full-upload)
+  └─ otherwise                    → full-upload (multi-doc, เหมือนเดิม)
+
 SPN path: "ดึงข้อมูลจาก SPN" → spn-list (skip profile picker) → selectSpnEntry → spn-result
   → hs-analysis → เลือกกรม → เลือกโปรไฟล์ (confirm/change) → proceed choice → submit
 ```

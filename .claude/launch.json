@@ -4,8 +4,9 @@
     {
       "name": "ShippingNet-Angular",
       "runtimeExecutable": "/Users/nui.kunawut/.nvm/versions/node/v20.12.0/bin/node",
-      "runtimeArgs": ["node_modules/.bin/ng", "serve", "--port", "4200"],
-      "port": 4200
+      "runtimeArgs": ["node_modules/.bin/ng", "serve"],
+      "port": 4200,
+      "autoPort": true
     }
   ]
 }

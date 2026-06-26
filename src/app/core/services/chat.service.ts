@@ -734,7 +734,16 @@ export class ChatService {
       this.withTyping(() => this.submit(), 1200);
     } else {
       this.user('แก้ไขเพิ่มเติม');
-      this.withTyping(() => this.showFullUpload(true), 400);
+      if (this.isCustomsOnlyUpload) {
+        this.withTyping(() => {
+          this.isReEditOCR = true;
+          this.markFlowStart();
+          this.step.set('invoice_upload');
+          this.bot('single-upload');
+        }, 400);
+      } else {
+        this.withTyping(() => this.showFullUpload(true), 400);
+      }
     }
   }
 
