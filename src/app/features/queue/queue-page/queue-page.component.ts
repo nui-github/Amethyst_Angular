@@ -4,6 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzTagModule } from 'ng-zorro-antd/tag';
+import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
+import { NzBadgeModule } from 'ng-zorro-antd/badge';
 import { LucideAngularModule, AlertTriangle, Clock, CheckCircle2, Search, ChevronLeft } from 'lucide-angular';
 import { Router } from '@angular/router';
 import { QueueService, STATUS_META, AGENCY_SHORT, AGENCY_LABEL } from '@app/core/services/queue.service';
@@ -21,7 +24,7 @@ const STAGE_LABELS = ['','ตรวจรับใบขน','วิเครา
   selector: 'app-queue-page',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, NzInputModule, NzButtonModule, NzTagModule, LucideAngularModule, SidebarComponent],
+  imports: [CommonModule, FormsModule, NzInputModule, NzButtonModule, NzTagModule, NzTableModule, NzToolTipModule, NzBadgeModule, LucideAngularModule, SidebarComponent],
   templateUrl: './queue-page.component.html',
   styleUrl:    './queue-page.component.scss',
 })

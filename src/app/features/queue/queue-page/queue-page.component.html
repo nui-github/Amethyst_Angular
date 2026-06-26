@@ -39,71 +39,106 @@
           </div>
         </div>
 
-        <div class="ql-head">
-          <div class="lh-ref">ใบขนสินค้า</div>
-          <div class="lh-goods">สินค้า</div>
-          <div class="lh-assess">AI ประเมิน</div>
-          <div class="lh-conf">ความมั่นใจ</div>
-          <div class="lh-status">สถานะ</div>
-          <div class="lh-action"></div>
-        </div>
+        <!-- nz-table -->
+        <nz-table
+          class="queue-table"
+          [nzData]="filteredQueue()"
+          [nzShowPagination]="false"
+          [nzBordered]="false"
+          [nzSize]="'middle'"
+          [nzNoResult]="emptyTpl"
+          nzTableLayout="fixed">
 
-        <div class="ql-rows">
-          @for (s of filteredQueue(); track s.id) {
-            <div class="ql-row" [class.ql-row--urgent]="s.statusKey === 'needs_you'" (click)="selectRow(s.id)">
-              <div class="ql-row__accent" [style.background]="statusMeta(s.statusKey).dot"></div>
-              <div class="lc-ref">
-                <div class="lc-ref__top">
-                  <span class="type-badge" [class.type-badge--exp]="s.type === 'EXP'">{{ s.type }}</span>
-                  <span class="ref-no">{{ s.customsNo }}</span>
-                  @if (s.isNew) { <span class="new-dot"></span> }
-                </div>
-                <div class="ref-customer">{{ s.customer || s.chatName || '—' }}</div>
-              </div>
-              <div class="lc-goods">
-                <div class="goods-name">{{ s.goods }}</div>
-                <div class="goods-hs">{{ s.hs }}</div>
-              </div>
-              <div class="lc-assess">
-                @if (s.permitNeeded) {
-                  <span class="assess-tag assess-tag--warn">ต้องขออนุญาต</span>
-                  <div class="assess-sub">{{ agencyShort(s.agency) }} · {{ s.formCode }}</div>
-                } @else {
-                  <span class="assess-tag assess-tag--ok">ไม่ต้องขออนุญาต</span>
-                  <div class="assess-sub">ผ่านพิธีการปกติ</div>
-                }
-              </div>
-              <div class="lc-conf">
-                <div class="conf-top">
-                  <span class="conf-pct" [style.color]="confColor(s.conf)">{{ s.conf }}%</span>
-                  <span class="conf-lbl" [style.color]="confColor(s.conf)">{{ confLabel(s.conf) }}</span>
-                </div>
-                <div class="conf-track">
-                  <div class="conf-fill" [style.width.%]="s.conf" [style.background]="confColor(s.conf)"></div>
-                </div>
-              </div>
-              <div class="lc-status">
-                <span class="status-pill"
-                  [style.background]="statusMeta(s.statusKey).bg"
-                  [style.color]="statusMeta(s.statusKey).text">
-                  <span class="status-dot" [style.background]="statusMeta(s.statusKey).dot"></span>
-                  {{ statusMeta(s.statusKey).label }}
-                </span>
-              </div>
-              <div class="lc-action" (click)="$event.stopPropagation()">
-                <button class="row-arrow" [class.row-arrow--primary]="s.statusKey === 'needs_you'" (click)="selectRow(s.id)">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
-                </button>
-              </div>
-            </div>
-          }
-          @if (filteredQueue().length === 0) {
-            <div class="ql-empty">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-              <p>ไม่มีรายการในกลุ่มนี้</p>
-            </div>
-          }
-        </div>
+          <thead>
+            <tr>
+              <th nzWidth="22%">ใบขนสินค้า</th>
+              <th nzWidth="27%">สินค้า</th>
+              <th nzWidth="18%">AI ประเมิน</th>
+              <th nzWidth="13%">ความมั่นใจ</th>
+              <th nzWidth="14%">สถานะ</th>
+              <th nzWidth="6%"></th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (s of filteredQueue(); track s.id) {
+              <tr class="qt-row" [class.qt-row--urgent]="s.statusKey === 'needs_you'"
+                (click)="selectRow(s.id)">
+
+                <!-- Ref + customer -->
+                <td>
+                  <div class="tc-ref">
+                    <div class="tc-accent" [style.background]="statusMeta(s.statusKey).dot"></div>
+                    <div>
+                      <div class="tc-ref__top">
+                        <span class="type-badge" [class.type-badge--exp]="s.type === 'EXP'">{{ s.type }}</span>
+                        <span class="ref-no">{{ s.customsNo }}</span>
+                        @if (s.isNew) {
+                          <nz-badge [nzCount]="0" nzStatus="processing" nzColor="#0463EF" nzText="" class="new-badge-dot" />
+                        }
+                      </div>
+                      <div class="ref-customer">{{ s.customer || '—' }}</div>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Goods -->
+                <td>
+                  <div class="goods-name">{{ s.goods }}</div>
+                  <div class="goods-hs">HS {{ s.hs }}</div>
+                </td>
+
+                <!-- AI assess -->
+                <td>
+                  @if (s.permitNeeded) {
+                    <span class="assess-tag assess-tag--warn">ต้องขออนุญาต</span>
+                    <div class="assess-sub">{{ agencyShort(s.agency) }} · {{ s.formCode }}</div>
+                  } @else {
+                    <span class="assess-tag assess-tag--ok">ไม่ต้องขออนุญาต</span>
+                    <div class="assess-sub">ผ่านพิธีการปกติ</div>
+                  }
+                </td>
+
+                <!-- Confidence -->
+                <td>
+                  <div class="conf-top">
+                    <span class="conf-pct" [style.color]="confColor(s.conf)">{{ s.conf }}%</span>
+                    <span class="conf-lbl" [style.color]="confColor(s.conf)">{{ confLabel(s.conf) }}</span>
+                  </div>
+                  <div class="conf-track">
+                    <div class="conf-fill" [style.width.%]="s.conf" [style.background]="confColor(s.conf)"></div>
+                  </div>
+                </td>
+
+                <!-- Status -->
+                <td>
+                  <span class="status-pill"
+                    [style.background]="statusMeta(s.statusKey).bg"
+                    [style.color]="statusMeta(s.statusKey).text">
+                    <span class="status-dot" [style.background]="statusMeta(s.statusKey).dot"></span>
+                    {{ statusMeta(s.statusKey).label }}
+                  </span>
+                </td>
+
+                <!-- Action -->
+                <td (click)="$event.stopPropagation()" class="td-action">
+                  <button class="row-arrow" [class.row-arrow--primary]="s.statusKey === 'needs_you'"
+                    (click)="selectRow(s.id)">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+                  </button>
+                </td>
+
+              </tr>
+            }
+          </tbody>
+        </nz-table>
+
+        <ng-template #emptyTpl>
+          <div class="ql-empty">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+            <p>ไม่มีรายการในกลุ่มนี้</p>
+          </div>
+        </ng-template>
 
       </div>
 

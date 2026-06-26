@@ -147,82 +147,104 @@
   }
 }
 
-// ── Column headers ────────────────────────────────────────────────────────────
-.ql-head {
-  display: grid;
-  grid-template-columns: 22% 27% 18% 13% 14% 6%;
-  padding: 9px 20px 9px 24px;
-  background: #FAFBFD;
-  border-bottom: 1px solid #F0F2F7;
-  flex-shrink: 0;
-
-  > div {
-    font-size: 10.5px; font-weight: 700; color: #B0B4C4;
-    text-transform: uppercase; letter-spacing: 0.6px;
-  }
-}
-
-// ── Rows ──────────────────────────────────────────────────────────────────────
-.ql-rows {
+// ── nz-table overrides ────────────────────────────────────────────────────────
+.queue-table {
   flex: 1;
-  overflow-y: auto;
-  padding: 8px 12px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  overflow: hidden;
 
-  &::-webkit-scrollbar { width: 4px; }
-  &::-webkit-scrollbar-thumb { background: #E0E2EA; border-radius: 4px; }
-}
-
-.ql-row {
-  display: grid;
-  grid-template-columns: 22% 27% 18% 13% 14% 6%;
-  align-items: center;
-  padding: 14px 8px 14px 16px;
-  border-radius: 10px;
-  border: 1.5px solid transparent;
-  background: #fff;
-  cursor: pointer;
-  transition: all 0.12s;
-  position: relative;
-
-  &:hover {
-    border-color: #E0E4F4;
-    background: #FAFBFF;
-    box-shadow: 0 2px 12px rgba(4,99,239,0.06);
-
-    .row-arrow { opacity: 1; transform: translateX(0); }
+  // Table wrapper scrollable
+  ::ng-deep .ant-table-container {
+    overflow-y: auto;
+    max-height: calc(100vh - 220px);
+    &::-webkit-scrollbar { width: 4px; }
+    &::-webkit-scrollbar-thumb { background: #E0E2EA; border-radius: 4px; }
   }
 
-  &--urgent {
-    border-color: #FDE68A;
-    background: #FFFDF5;
-    &:hover { border-color: #F59E0B; background: #FFFBEB; box-shadow: 0 2px 12px rgba(245,158,11,0.08); }
+  // Header cells
+  ::ng-deep .ant-table-thead > tr > th {
+    background: #FAFBFD !important;
+    border-bottom: 1.5px solid #ECEEF5 !important;
+    color: #B0B4C4 !important;
+    font-size: 10.5px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 10px 16px !important;
+    white-space: nowrap;
+
+    &::before { display: none !important; } // remove column dividers
+  }
+
+  // Body rows
+  ::ng-deep .ant-table-tbody > tr > td {
+    border-bottom: 1px solid #F5F6FB !important;
+    padding: 14px 16px !important;
+    background: transparent !important;
+    vertical-align: middle;
+  }
+
+  ::ng-deep .ant-table-tbody > tr {
+    cursor: pointer;
+    transition: background 0.12s, box-shadow 0.12s;
+    position: relative;
+
+    &:hover > td {
+      background: #F8F9FF !important;
+    }
+
+    &:hover .row-arrow {
+      opacity: 1;
+      transform: translateX(0);
+      border-color: #0463EF;
+      color: #0463EF;
+    }
+
+    &:last-child > td { border-bottom: none !important; }
+  }
+
+  // Urgent rows
+  ::ng-deep .qt-row--urgent > td {
+    background: #FFFDF7 !important;
+  }
+
+  ::ng-deep .qt-row--urgent:hover > td {
+    background: #FFFBEB !important;
+  }
+
+  ::ng-deep .ant-table { background: transparent !important; }
+  ::ng-deep .ant-spin-nested-loading,
+  ::ng-deep .ant-spin-container,
+  ::ng-deep .ant-table-wrapper { height: 100%; }
+
+  // Empty state
+  ::ng-deep .ant-table-placeholder {
+    border: none !important;
+    background: transparent !important;
   }
 }
 
-// left accent bar (positioned absolutely)
-.ql-row__accent {
-  position: absolute;
-  left: 0; top: 8px; bottom: 8px;
-  width: 3px; border-radius: 0 3px 3px 0;
+// Accent bar in td (uses left border on the tr)
+.tc-ref {
+  display: flex; align-items: center; gap: 10px;
+}
+
+.tc-accent {
+  width: 3px; height: 36px; border-radius: 3px; flex-shrink: 0;
 }
 
 .ql-empty {
   display: flex; flex-direction: column; align-items: center;
   justify-content: center; gap: 10px;
-  padding: 60px 20px;
+  padding: 48px 20px;
   color: #C4C9D6; font-size: 13px;
-  flex: 1;
 }
 
 // ── Column: Ref ───────────────────────────────────────────────────────────────
-.lc-ref { padding-left: 4px; }
-
-.lc-ref__top {
+.tc-ref__top {
   display: flex; align-items: center; gap: 6px; margin-bottom: 3px;
 }
+
+.new-badge-dot { margin-left: 2px; }
 
 .type-badge {
   font-size: 9px; font-weight: 800; letter-spacing: 0.4px;
