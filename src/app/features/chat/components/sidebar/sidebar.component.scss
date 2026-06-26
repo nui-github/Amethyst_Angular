@@ -20,7 +20,7 @@
     .new-chat-btn { justify-content: center; padding: 8px; }
     .new-chat-btn span { display: none; }
     .nav-item span { display: none; }
-    .nav-item { justify-content: center; padding: 8px; gap: 0; }
+    .nav-item { justify-content: center; padding: 8px; gap: 0; overflow: visible; }
     .nav-chevron { display: none; }
     .nav-badge { display: none; }
     .sb-label { display: none; }
@@ -36,10 +36,24 @@
       position: relative;
       overflow: visible;
 
+      &::before {
+        content: '';
+        position: absolute;
+        left: calc(100% + 4px);
+        top: 50%;
+        transform: translateY(-50%);
+        border: 5px solid transparent;
+        border-right-color: #1F2937;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.12s;
+        z-index: 999;
+      }
+
       &::after {
         content: attr(data-tip);
         position: absolute;
-        left: calc(100% + 10px);
+        left: calc(100% + 14px);
         top: 50%;
         transform: translateY(-50%);
         background: #1F2937;
@@ -56,6 +70,7 @@
         font-family: inherit;
       }
 
+      &:hover::before,
       &:hover::after { opacity: 1; }
     }
   }

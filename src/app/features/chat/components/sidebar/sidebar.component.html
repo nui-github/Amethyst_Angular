@@ -38,9 +38,9 @@
     <!-- เครื่องมือ -->
     <div class="sb-section">
       @if (!collapsed) { <p class="sb-label">เครื่องมือ</p> }
-      <button class="nav-item" [class.nav-item--active]="isChat()" (click)="goChat()" [attr.data-tip]="collapsed ? 'Chatbot' : null">
+      <button class="nav-item" [class.nav-item--active]="isChat()" (click)="goChat()" [attr.data-tip]="collapsed ? 'คุยกับ Agent' : null">
         <lucide-icon [img]="icMessage" [size]="15" />
-        @if (!collapsed) { <span>Chatbot</span> }
+        @if (!collapsed) { <span>คุยกับ Agent</span> }
       </button>
       <button class="nav-item" [class.nav-item--active]="isQueue()" (click)="goQueue()" [attr.data-tip]="collapsed ? 'คิวงาน' : null">
         <lucide-icon [img]="icList" [size]="15" />
