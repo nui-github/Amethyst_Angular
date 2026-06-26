@@ -78,7 +78,8 @@ export interface OcrResultsData {
   countryOrigin: string;
   lotNo: string;
   uNo: string;
-  isManual?: boolean; // true = data came from manual entry, not OCR
+  isManual?: boolean;       // true = data came from manual entry, not OCR
+  autoProceeded?: boolean;  // true = flow auto-proceeded, hide the button immediately
 }
 
 export interface FlagItem {

@@ -387,6 +387,12 @@ export class ChatService {
     // Skip missing fields check for re-edit paths (post-email, post-flag edit)
     if (this.isReEditOCR) {
       this.isReEditOCR = false;
+      // Mark the card as auto-proceeded so the button hides immediately
+      this.messages.update(ms => {
+        const last = [...ms].reverse().find(m => m.type === 'ocr-results');
+        if (!last) return ms;
+        return ms.map(m => m.id === last.id ? { ...m, data: { ...(m.data as OcrResultsData), autoProceeded: true } } : m);
+      });
       this.continueAfterOCR();
       return;
     }

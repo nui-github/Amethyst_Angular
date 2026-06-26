@@ -103,6 +103,9 @@ export class OcrResultsComponent {
   @Input({ required: true }) set data(val: Record<string, unknown>) {
     this._data = val;
     this.local = { ...(val as Partial<OcrResultsData>) };
+    if ((val as Partial<OcrResultsData>).autoProceeded) {
+      this.proceeded.set(true);
+    }
   }
   get data(): Record<string, unknown> { return this._data; }
   private _data!: Record<string, unknown>;
