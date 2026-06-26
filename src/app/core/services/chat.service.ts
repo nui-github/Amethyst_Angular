@@ -994,11 +994,43 @@ export class ChatService {
     this.ocr.reset();
   }
 
+  private buildSessionTitle(): string {
+    const fd = this.formData();
+    const ref = this.submittedRefNo() || fd.ref || fd.invoiceNo || fd.hsCode
+      ? (this.submittedRefNo() || fd.ref || fd.invoiceNo || (fd.hsCode ? `HS ${fd.hsCode}` : ''))
+      : '';
+
+    const msgs = this.messages();
+    const hasType = (t: string) => msgs.some(m => m.type === t);
+
+    let status = 'เริ่มต้น';
+    if (this.submittedRefNo()) {
+      const hasPending = msgs.some(m => m.type === 'status-card' && !!(m.data as Record<string, unknown>)['isPending']);
+      status = hasPending ? `รอชำระ ${this.currentAgency}`.trim() : `ส่งกรมแล้ว ${this.currentAgency}`.trim();
+    } else if (hasType('form-preview')) {
+      status = 'ตรวจสอบก่อนส่งกรม';
+    } else if (hasType('flag-card')) {
+      status = 'ยืนยัน flags';
+    } else if (hasType('hs-analysis')) {
+      status = 'วิเคราะห์ HS Code';
+    } else if (hasType('ocr-results')) {
+      status = 'OCR เสร็จแล้ว';
+    } else if (hasType('ocr-progress')) {
+      status = 'กำลัง OCR';
+    } else if (hasType('agency-upload') || hasType('single-upload') || hasType('full-upload')) {
+      status = 'อัปโหลดเอกสาร';
+    } else if (hasType('choice-card') || hasType('import-license-menu')) {
+      status = 'เลือกขั้นตอน';
+    }
+
+    return ref ? `${ref} · ${status}` : status;
+  }
+
   private saveCurrentSession(): void {
     const msgs = this.messages();
     const userMsgs = msgs.filter(m => m.role === 'user');
     if (!userMsgs.length) return;
-    const title = (userMsgs[0].content ?? '').slice(0, 40) || 'การสนทนา';
+    const title = this.buildSessionTitle();
     const id = this.activeSessionId() ?? ('sess_' + Date.now());
     const session: ChatHistorySession = { id, title, timestamp: Date.now(), messages: msgs };
     this.sessions.update(ss => {
