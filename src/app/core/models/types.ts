@@ -259,6 +259,7 @@ export interface Shipment {
 export interface ChatHistorySession {
   id: string;
   title: string;
+  baseRef: string;   // preserved doc reference — never overwritten after first save
   timestamp: number;
   messages: ChatMessage[];
 }

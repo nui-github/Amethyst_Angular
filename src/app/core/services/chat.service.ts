@@ -350,6 +350,7 @@ export class ChatService {
     this.bot('ocr-progress');
     const result = await this.ocr.startOCR(_files);
     this.formData.update(f => ({ ...f, ...result }));
+    this.promoteActiveSession();
     this.showOCRResults(result);
   }
 
@@ -639,6 +640,7 @@ export class ChatService {
 
   onAllFlagsConfirmed(): void {
     this.user('ยืนยันข้อมูลทั้งหมดแล้ว');
+    this.promoteActiveSession();
     if (this.checkMissingAfterFlags) {
       this.checkMissingAfterFlags = false;
       const missing = this.getMissingFields(this.formData());
@@ -731,6 +733,7 @@ export class ChatService {
 
   /** Called from FormPreviewComponent when user finishes editing and clicks "ดำเนินการต่อ" */
   onFormPreviewProceed(): void {
+    this.promoteActiveSession();
     this.user('ดำเนินการต่อ');
     this.withTyping(() => {
       this.bot('choice-card', {
@@ -837,6 +840,7 @@ export class ChatService {
   }
 
   private finalizeSubmit(refNo: string): void {
+    this.promoteActiveSession();
     const flowMsgs = this.messages().slice(this.flowStartIdx);
     const fd = this.formData();
 
@@ -994,55 +998,70 @@ export class ChatService {
     this.ocr.reset();
   }
 
-  private buildSessionTitle(): string {
+  private buildBaseRef(): string {
     const fd = this.formData();
-    const ref = this.submittedRefNo() || fd.ref || fd.invoiceNo || fd.hsCode
-      ? (this.submittedRefNo() || fd.ref || fd.invoiceNo || (fd.hsCode ? `HS ${fd.hsCode}` : ''))
-      : '';
-
-    const msgs = this.messages();
-    const hasType = (t: string) => msgs.some(m => m.type === t);
-
-    let status = 'เริ่มต้น';
-    if (this.submittedRefNo()) {
-      const hasPending = msgs.some(m => m.type === 'status-card' && !!(m.data as Record<string, unknown>)['isPending']);
-      status = hasPending ? `รอชำระ ${this.currentAgency}`.trim() : `ส่งกรมแล้ว ${this.currentAgency}`.trim();
-    } else if (hasType('form-preview')) {
-      status = 'ตรวจสอบก่อนส่งกรม';
-    } else if (hasType('flag-card')) {
-      status = 'ยืนยัน flags';
-    } else if (hasType('hs-analysis')) {
-      status = 'วิเคราะห์ HS Code';
-    } else if (hasType('ocr-results')) {
-      status = 'OCR เสร็จแล้ว';
-    } else if (hasType('ocr-progress')) {
-      status = 'กำลัง OCR';
-    } else if (hasType('agency-upload') || hasType('single-upload') || hasType('full-upload')) {
-      status = 'อัปโหลดเอกสาร';
-    } else if (hasType('choice-card') || hasType('import-license-menu')) {
-      status = 'เลือกขั้นตอน';
-    }
-
-    return ref ? `${ref} · ${status}` : status;
+    return this.submittedRefNo() || fd.ref || fd.invoiceNo
+      || (fd.hsCode ? `HS ${fd.hsCode}` : '');
   }
 
+  private buildStatusLabel(): string {
+    const msgs = this.messages();
+    const hasType = (t: string) => msgs.some(m => m.type === t);
+    if (this.submittedRefNo()) {
+      const hasPending = msgs.some(m => m.type === 'status-card' && !!(m.data as Record<string, unknown>)['isPending']);
+      return hasPending ? `รอชำระ ${this.currentAgency}`.trim() : `ส่งกรมแล้ว ${this.currentAgency}`.trim();
+    }
+    if (hasType('form-preview'))   return 'ตรวจสอบก่อนส่งกรม';
+    if (hasType('flag-card'))      return 'ยืนยัน flags';
+    if (hasType('hs-analysis'))    return 'วิเคราะห์ HS Code';
+    if (hasType('ocr-results'))    return 'OCR เสร็จแล้ว';
+    if (hasType('ocr-progress'))   return 'กำลัง OCR';
+    if (hasType('agency-upload') || hasType('single-upload') || hasType('full-upload'))
+                                   return 'อัปโหลดเอกสาร';
+    if (hasType('choice-card') || hasType('import-license-menu')) return 'เลือกขั้นตอน';
+    return 'เริ่มต้น';
+  }
+
+  private buildTitle(baseRef: string): string {
+    const status = this.buildStatusLabel();
+    return baseRef ? `${baseRef} · ${status}` : status;
+  }
+
+  /** Save current session in-place (no reorder). Creates new entry if no activeSessionId. */
   private saveCurrentSession(): void {
     const msgs = this.messages();
-    const userMsgs = msgs.filter(m => m.role === 'user');
-    if (!userMsgs.length) return;
-    const title = this.buildSessionTitle();
-    const id = this.activeSessionId() ?? ('sess_' + Date.now());
-    const session: ChatHistorySession = { id, title, timestamp: Date.now(), messages: msgs };
+    if (!msgs.filter(m => m.role === 'user').length) return;
+    const activeId = this.activeSessionId();
+    const existing = activeId ? this.sessions().find(s => s.id === activeId) : undefined;
+    const baseRef = existing?.baseRef ?? this.buildBaseRef();
+    const id = activeId ?? ('sess_' + Date.now());
+    const session: ChatHistorySession = { id, baseRef, title: this.buildTitle(baseRef), timestamp: Date.now(), messages: msgs };
     this.sessions.update(ss => {
-      const others = ss.filter(s => s.id !== id);
-      return [session, ...others].slice(0, 30);
+      if (existing) {
+        // update in-place — keep position
+        return ss.map(s => s.id === id ? session : s);
+      }
+      // new session — prepend
+      return [session, ...ss.filter(s => s.id !== id)].slice(0, 30);
     });
+  }
+
+  /** Called after a significant action: update title + promote session to top. */
+  promoteActiveSession(): void {
+    const activeId = this.activeSessionId();
+    if (!activeId) return;
+    const existing = this.sessions().find(s => s.id === activeId);
+    if (!existing) return;
+    const msgs = this.messages();
+    const baseRef = existing.baseRef || this.buildBaseRef();
+    const session: ChatHistorySession = { ...existing, baseRef, title: this.buildTitle(baseRef), timestamp: Date.now(), messages: msgs };
+    this.sessions.update(ss => [session, ...ss.filter(s => s.id !== activeId)]);
   }
 
   loadSession(id: string): void {
     const session = this.sessions().find(s => s.id === id);
     if (!session) return;
-    this.saveCurrentSession();
+    this.saveCurrentSession();   // save previous in-place (no reorder)
     this.activeSessionId.set(session.id);
     this.messages.set(session.messages);
     this.step.set('idle');
