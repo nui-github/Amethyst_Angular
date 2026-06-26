@@ -86,8 +86,8 @@
       @if (!allDone()) { ยืนยันให้ครบทุกจุด เพื่อดำเนินการต่อ }
       @else { ✓ ยืนยันครบทุกจุดแล้ว }
     </p>
-    <button class="flag-proceed-btn" [class.flag-proceed-btn--ready]="allDone()"
-      [disabled]="!allDone()" (click)="proceed()">
+    <button class="flag-proceed-btn" [class.flag-proceed-btn--ready]="allDone() && !proceeded()"
+      [disabled]="!allDone() || proceeded()" (click)="proceed()">
       ดำเนินการต่อ
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
     </button>

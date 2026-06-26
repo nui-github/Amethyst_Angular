@@ -32,6 +32,8 @@ export class FlagCardComponent implements OnInit {
   pendingValues = signal<Record<string, string>>({});
   localFlags    = signal<FlagItem[]>([]);
 
+  proceeded = signal(false);
+
   readonly allDone         = () => this.localFlags().every(f => f.isConfirmed);
   readonly confirmedCount  = () => this.localFlags().filter(f => f.isConfirmed).length;
 
@@ -67,7 +69,10 @@ export class FlagCardComponent implements OnInit {
   }
 
   proceed(): void {
-    if (this.allDone()) this.allConfirmed.emit();
+    if (this.allDone() && !this.proceeded()) {
+      this.proceeded.set(true);
+      this.allConfirmed.emit();
+    }
   }
 
   getPending(flagId: string): string {
