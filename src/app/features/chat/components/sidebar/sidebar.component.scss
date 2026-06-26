@@ -169,16 +169,54 @@
 
   &--session {
     padding: 5px 10px;
+    overflow: visible;
     lucide-icon { flex-shrink: 0; opacity: 0.5; }
     .session-title {
       flex: 1; overflow: hidden; text-overflow: ellipsis;
       white-space: nowrap; font-size: 12.5px; font-weight: 400;
     }
+
+    &[data-tip] {
+      &::before {
+        content: '';
+        position: absolute;
+        left: calc(100% + 4px);
+        top: 50%;
+        transform: translateY(-50%);
+        border: 5px solid transparent;
+        border-right-color: #1F2937;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.12s;
+        z-index: 1000;
+      }
+      &::after {
+        content: attr(data-tip);
+        position: absolute;
+        left: calc(100% + 14px);
+        top: 50%;
+        transform: translateY(-50%);
+        background: #1F2937;
+        color: #fff;
+        font-size: 11.5px;
+        font-weight: 500;
+        white-space: nowrap;
+        padding: 4px 9px;
+        border-radius: 6px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.12s;
+        z-index: 1000;
+        font-family: inherit;
+      }
+      &:hover::before,
+      &:hover::after { opacity: 1; }
+    }
   }
 }
 
 .sb-section--history {
-  flex: 1; overflow-y: auto; min-height: 0;
+  flex: 1; overflow-y: auto; overflow-x: visible; min-height: 0;
   &::-webkit-scrollbar { width: 3px; }
   &::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 99px; }
 }
