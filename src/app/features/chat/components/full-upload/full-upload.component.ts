@@ -34,6 +34,7 @@ export class FullUploadComponent {
   ]);
 
   readonly hasAny = () => this.slots().some(s => s.file !== null);
+  readonly started = signal(false);
 
   onFileChange(key: string, event: Event): void {
     const file = (event.target as HTMLInputElement).files?.[0] ?? null;
@@ -46,6 +47,8 @@ export class FullUploadComponent {
   }
 
   startOCR(): void {
+    if (this.started()) return;
+    this.started.set(true);
     const files = this.slots().filter(s => s.file).map(s => s.file!);
     this.chat.startOCR(files);
   }

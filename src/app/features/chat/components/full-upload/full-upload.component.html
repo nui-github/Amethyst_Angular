@@ -37,7 +37,7 @@
   </div>
 
   <button nz-button nzType="primary" nzBlock
-    [disabled]="!hasAny()" (click)="startOCR()"
+    [disabled]="!hasAny() || started()" (click)="startOCR()"
     class="ocr-btn">
     <lucide-icon [img]="Upload" [size]="14" color="#fff" />
     เริ่ม OCR และวิเคราะห์เอกสาร
