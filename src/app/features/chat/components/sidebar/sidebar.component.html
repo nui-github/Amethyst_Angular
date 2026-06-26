@@ -29,7 +29,7 @@
 
     <!-- New Chat -->
     <div class="sb-section">
-      <button class="new-chat-btn" (click)="newChat()" [title]="collapsed ? 'New Chat' : ''">
+      <button class="new-chat-btn" (click)="newChat()" [attr.data-tip]="collapsed ? 'New Chat' : null">
         <lucide-icon [img]="icPlus" [size]="14" />
         @if (!collapsed) { <span>New Chat</span> }
       </button>
@@ -38,11 +38,11 @@
     <!-- เครื่องมือ -->
     <div class="sb-section">
       @if (!collapsed) { <p class="sb-label">เครื่องมือ</p> }
-      <button class="nav-item" [class.nav-item--active]="isChat()" (click)="goChat()" [title]="collapsed ? 'Chatbot' : ''">
+      <button class="nav-item" [class.nav-item--active]="isChat()" (click)="goChat()" [attr.data-tip]="collapsed ? 'Chatbot' : null">
         <lucide-icon [img]="icMessage" [size]="15" />
         @if (!collapsed) { <span>Chatbot</span> }
       </button>
-      <button class="nav-item" [class.nav-item--active]="isQueue()" (click)="goQueue()" [title]="collapsed ? 'คิวงาน' : ''">
+      <button class="nav-item" [class.nav-item--active]="isQueue()" (click)="goQueue()" [attr.data-tip]="collapsed ? 'คิวงาน' : null">
         <lucide-icon [img]="icList" [size]="15" />
         @if (!collapsed) { <span>คิวงาน</span> }
       </button>
@@ -84,13 +84,13 @@
     }
 
     <!-- Settings -->
-    <button class="settings-btn" [title]="collapsed ? 'ตั้งค่า' : ''" (click)="router.navigate(['/settings'])">
+    <button class="settings-btn" [attr.data-tip]="collapsed ? 'ตั้งค่า' : null" (click)="router.navigate(['/settings'])">
       <lucide-icon [img]="icSettings" [size]="14" />
       @if (!collapsed) { <span>ตั้งค่า</span> }
     </button>
 
     <!-- Profile -->
-    <div class="sb-profile" [title]="collapsed ? 'Mr. John Doe' : ''">
+    <div class="sb-profile" [attr.data-tip]="collapsed ? 'Mr. John Doe' : null">
       <div class="sb-profile__avatar">J</div>
       @if (!collapsed) {
         <div class="sb-profile__info">

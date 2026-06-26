@@ -9,6 +9,8 @@
   overflow: hidden;
   transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1);
 
+  &--collapsed { overflow: visible; }
+
   &--collapsed {
     width: 52px;
 
@@ -26,6 +28,36 @@
     .settings-btn { justify-content: center; padding: 8px; margin: 4px auto 2px; width: 36px; }
     .bizx-logo-btn { justify-content: center; margin: 2px auto 4px; width: 36px; padding: 7px 0; }
     .sb-collapse-toggle { display: flex; justify-content: center; padding: 6px 0 2px; }
+    .sb-nav { overflow: visible; }
+    .sb-footer { overflow: visible; }
+
+    // CSS tooltips for all elements with data-tip
+    [data-tip] {
+      position: relative;
+      overflow: visible;
+
+      &::after {
+        content: attr(data-tip);
+        position: absolute;
+        left: calc(100% + 10px);
+        top: 50%;
+        transform: translateY(-50%);
+        background: #1F2937;
+        color: #fff;
+        font-size: 11.5px;
+        font-weight: 500;
+        white-space: nowrap;
+        padding: 4px 9px;
+        border-radius: 6px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.12s;
+        z-index: 999;
+        font-family: inherit;
+      }
+
+      &:hover::after { opacity: 1; }
+    }
   }
 }
 
