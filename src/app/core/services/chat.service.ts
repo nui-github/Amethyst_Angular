@@ -12,6 +12,7 @@ import { getAgencyPayment } from '@mock/payment.mock';
 import { KNOWN_REFS, MOCK_FORM_DATA, MOCK_SPN_LIST } from '@mock/spn.mock';
 import { MOCK_SPN_PROFILES } from '@mock/spn-companies.mock';
 import { environment } from '@env/environment';
+import { MOCK_SESSIONS } from '@mock/sessions.mock';
 
 let _idCounter = 0;
 const genId = () => `msg_${Date.now()}_${_idCounter++}`;
@@ -25,7 +26,7 @@ const WELCOME: ChatMessage = {
 export class ChatService {
   // ── State ──────────────────────────────────────────────────────────────────
   readonly messages        = signal<ChatMessage[]>([WELCOME]);
-  readonly sessions        = signal<ChatHistorySession[]>([]);
+  readonly sessions        = signal<ChatHistorySession[]>(MOCK_SESSIONS);
   readonly activeSessionId = signal<string | null>(null);
   readonly isTyping        = signal(false);
   readonly spnSession      = signal<{ companyName: string; url: string; username: string; profile?: string } | null>(null);
