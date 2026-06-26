@@ -1,6 +1,6 @@
 import { Injectable, computed, signal } from '@angular/core';
 import {
-  ChatMessage, ChatStep, LicenseFormData, MessageType,
+  ChatMessage, ChatHistorySession, ChatStep, LicenseFormData, MessageType,
   FlagCardData, FlagItem, ChoiceCardData, EmailDraftData,
   StatusCardData, OcrResultsData, SpnResultData, Shipment,
   MissingField, MissingFieldsData, PaymentQrData, PaymentSlipData,
@@ -25,6 +25,8 @@ const WELCOME: ChatMessage = {
 export class ChatService {
   // ── State ──────────────────────────────────────────────────────────────────
   readonly messages        = signal<ChatMessage[]>([WELCOME]);
+  readonly sessions        = signal<ChatHistorySession[]>([]);
+  readonly activeSessionId = signal<string | null>(null);
   readonly isTyping        = signal(false);
   readonly spnSession      = signal<{ companyName: string; url: string; username: string; profile?: string } | null>(null);
   readonly step            = signal<ChatStep>('idle');
@@ -981,6 +983,8 @@ export class ChatService {
 
   // ── New chat ───────────────────────────────────────────────────────────────
   newChat(): void {
+    this.saveCurrentSession();
+    this.activeSessionId.set(null);
     this.messages.set([WELCOME]);
     this.step.set('idle');
     this.formData.set({});
@@ -988,6 +992,32 @@ export class ChatService {
     this.flowStartIdx = 0;
     this.queueShipmentId.set(null);
     this.ocr.reset();
+  }
+
+  private saveCurrentSession(): void {
+    const msgs = this.messages();
+    const userMsgs = msgs.filter(m => m.role === 'user');
+    if (!userMsgs.length) return;
+    const title = (userMsgs[0].content ?? '').slice(0, 40) || 'การสนทนา';
+    const id = this.activeSessionId() ?? ('sess_' + Date.now());
+    const session: ChatHistorySession = { id, title, timestamp: Date.now(), messages: msgs };
+    this.sessions.update(ss => {
+      const others = ss.filter(s => s.id !== id);
+      return [session, ...others].slice(0, 30);
+    });
+  }
+
+  loadSession(id: string): void {
+    const session = this.sessions().find(s => s.id === id);
+    if (!session) return;
+    this.saveCurrentSession();
+    this.activeSessionId.set(session.id);
+    this.messages.set(session.messages);
+    this.step.set('idle');
+    this.formData.set({});
+    this.submittedRefNo.set('');
+    this.flowStartIdx = session.messages.length;
+    this.queueShipmentId.set(null);
   }
 
   loadQueueSession(ship: { id: string; messages?: import('@app/core/models/types').ChatMessage[]; statusKey: string; formCode?: string; hs?: string; goods?: string; }): void {

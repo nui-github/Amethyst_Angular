@@ -256,6 +256,13 @@ export interface Shipment {
 
 // ─── Print ───────────────────────────────────────────────────────────────────
 
+export interface ChatHistorySession {
+  id: string;
+  title: string;
+  timestamp: number;
+  messages: ChatMessage[];
+}
+
 export interface PrintLicenseData {
   ref: string;
   refNo: string;

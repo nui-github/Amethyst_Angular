@@ -119,6 +119,21 @@
   }
 
   &--expand .nav-chevron { margin-left: auto; color: #D1D5DB; flex-shrink: 0; }
+
+  &--session {
+    padding: 5px 10px;
+    lucide-icon { flex-shrink: 0; opacity: 0.5; }
+    .session-title {
+      flex: 1; overflow: hidden; text-overflow: ellipsis;
+      white-space: nowrap; font-size: 12.5px; font-weight: 400;
+    }
+  }
+}
+
+.sb-section--history {
+  flex: 1; overflow-y: auto; min-height: 0;
+  &::-webkit-scrollbar { width: 3px; }
+  &::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 99px; }
 }
 
 .nav-badge {

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { LucideAngularModule, MessageSquareText, LayoutDashboard, FileCheck2, Package, FileText, BarChart2, Settings, Plus, ChevronRight, PanelLeftClose, PanelLeftOpen, MoreHorizontal, List, Bot } from 'lucide-angular';
+import { LucideAngularModule, MessageSquareText, MessageSquare, Settings, Plus, ChevronRight, PanelLeftClose, PanelLeftOpen, List, Bot } from 'lucide-angular';
 import { ChatService } from '@app/core/services/chat.service';
 import { QueueService } from '@app/core/services/queue.service';
 
@@ -22,20 +22,15 @@ export class SidebarComponent {
   readonly router = inject(Router);
 
   // Icons
-  readonly icMessage  = MessageSquareText;
-  readonly icDash     = LayoutDashboard;
-  readonly icLicense  = FileCheck2;
-  readonly icRGoods   = Package;
-  readonly icCustoms  = FileText;
-  readonly icAnalytics= BarChart2;
-  readonly icSettings = Settings;
-  readonly icPlus     = Plus;
+  readonly icMessage     = MessageSquareText;
+  readonly icSessionItem = MessageSquare;
+  readonly icSettings    = Settings;
+  readonly icPlus        = Plus;
   readonly icChevR       = ChevronRight;
   readonly icPanelClose  = PanelLeftClose;
   readonly icPanelOpen   = PanelLeftOpen;
-  readonly icMore     = MoreHorizontal;
-  readonly icList     = List;
-  readonly icBot      = Bot;
+  readonly icList        = List;
+  readonly icBot         = Bot;
 
   isChat  = () => this.router.url === '/' || this.router.url === '';
   isQueue = () => this.router.url === '/queue';

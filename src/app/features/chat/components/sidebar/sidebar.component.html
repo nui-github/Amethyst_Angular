@@ -46,21 +46,20 @@
         <lucide-icon [img]="icList" [size]="15" />
         @if (!collapsed) { <span>คิวงาน</span> }
       </button>
-      <button class="nav-item nav-item--expand" [title]="collapsed ? 'Dashboard' : ''">
-        <lucide-icon [img]="icDash" [size]="15" />
-        @if (!collapsed) { <span>Dashboard</span><lucide-icon [img]="icChevR" [size]="13" class="nav-chevron" /> }
-      </button>
     </div>
 
-    <!-- เอกสาร -->
-    @if (!collapsed) {
-      <div class="sb-section">
-        <p class="sb-label">เอกสาร</p>
-        <button class="nav-item nav-item--expand"><lucide-icon [img]="icLicense" [size]="15" /><span>ใบอนุญาต</span><lucide-icon [img]="icChevR" [size]="13" class="nav-chevron" /></button>
-        <button class="nav-item nav-item--expand"><lucide-icon [img]="icRGoods" [size]="15" /><span>RGoods</span><lucide-icon [img]="icChevR" [size]="13" class="nav-chevron" /></button>
-        <button class="nav-item nav-item--expand"><lucide-icon [img]="icCustoms" [size]="15" /><span>ใบขน</span><lucide-icon [img]="icChevR" [size]="13" class="nav-chevron" /></button>
-        <button class="nav-item nav-item--expand"><lucide-icon [img]="icAnalytics" [size]="15" /><span>Analytics</span><lucide-icon [img]="icChevR" [size]="13" class="nav-chevron" /></button>
-        <button class="nav-item"><lucide-icon [img]="icMore" [size]="15" /><span>More</span></button>
+    <!-- การสนทนา (chat history) -->
+    @if (!collapsed && chat.sessions().length) {
+      <div class="sb-section sb-section--history">
+        <p class="sb-label">การสนทนา</p>
+        @for (session of chat.sessions(); track session.id) {
+          <button class="nav-item nav-item--session"
+            [class.nav-item--active]="chat.activeSessionId() === session.id"
+            (click)="chat.loadSession(session.id); goChat()">
+            <lucide-icon [img]="icSessionItem" [size]="14" />
+            <span class="session-title">{{ session.title }}</span>
+          </button>
+        }
       </div>
     }
 
