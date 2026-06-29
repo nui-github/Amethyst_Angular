@@ -232,7 +232,7 @@ export const MOCK_QUEUE: Shipment[] = [
       }),
     ],
     documents: [
-      doc('d4a', 'Invoice CN-2024-0601', 'invoice'),
+      doc('d4a', 'ใบขนสินค้าขาเข้า A012-25680617-00923', 'customs'),
       doc('d4b', 'Packing List', 'packing_list'),
       doc('d4c', 'Material Safety Data Sheet (MSDS)', 'other', 'pdf', 'doa'),
     ],
@@ -264,6 +264,10 @@ export const MOCK_QUEUE: Shipment[] = [
         requiresPermit: false, direction: 'import', agency: 'none', agencyFull: '—', confidence: 94,
       }),
       bot('08:03', 'HS Code 9027.90.90 — ไม่ต้องขออนุญาตนำเข้า ความมั่นใจ 94% ครับ ผ่านพิธีการศุลกากรปกติได้เลย'),
+    ],
+    documents: [
+      doc('d5a', 'Invoice US-2024-0802', 'invoice'),
+      doc('d5b', 'Packing List', 'packing_list'),
     ],
   },
 
@@ -302,7 +306,7 @@ export const MOCK_QUEUE: Shipment[] = [
       }),
     ],
     documents: [
-      doc('d6a', 'Invoice EU-2024-0730', 'invoice'),
+      doc('d6a', 'ใบขนสินค้าขาเข้า A012-25680617-00931', 'customs'),
       doc('d6b', 'Certificate of Analysis (CoA)', 'coa'),
       doc('d6c', 'MSDS — Ethanol 99.5%', 'other', 'pdf', 'diw'),
     ],
@@ -460,6 +464,10 @@ export const MOCK_QUEUE: Shipment[] = [
       }),
       bot('10:02', 'HS Code 2501.00.10 — ไม่ต้องขออนุญาตนำเข้า ความมั่นใจ 98% ครับ'),
     ],
+    documents: [
+      doc('d10a', 'ใบขนสินค้าขาเข้า A012-25680617-01000', 'customs'),
+      doc('d10b', 'Invoice AU-2024-1000', 'invoice'),
+    ],
   },
 
   // ── 11. needs_you: Calcium Carbonate – รอ OCR + hs-analysis ──────────────────
@@ -498,7 +506,7 @@ export const MOCK_QUEUE: Shipment[] = [
       }),
     ],
     documents: [
-      doc('d11a', 'Invoice MY-2024-1320', 'invoice'),
+      doc('d11a', 'ใบขนสินค้าขาเข้า A012-25680617-01100', 'customs'),
       doc('d11b', 'Packing List', 'packing_list'),
     ],
   },
