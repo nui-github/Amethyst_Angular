@@ -48,6 +48,10 @@ export class ChatService {
   private currentAgency = '';
   private submittedAgencies: string[] = [];
 
+  // Public: tracks all agencies needed + which have been submitted
+  readonly allPermitAgencies  = signal<string[]>([]);
+  readonly submittedPermits   = signal<{ agency: string; refNo: string; submittedAt: string; licenseType: string; invoiceRef: string }[]>([]);
+
   constructor(
     private readonly ocr: OcrService,
     private readonly queue: QueueService,
@@ -214,8 +218,8 @@ export class ChatService {
       this.withTyping(() => {
         const analysis = analyzeHsCode(this.formData().hsCode!);
         this.bot('hs-analysis', analysis);
-        if (analysis.agencies?.length) { this.ALL_AGENCIES = analysis.agencies.map(a => a.code); }
-        else { this.ALL_AGENCIES = analysis.agency !== '—' ? [analysis.agency] : []; }
+        if (analysis.agencies?.length) { this.ALL_AGENCIES = analysis.agencies.map(a => a.code); this.allPermitAgencies.set(this.ALL_AGENCIES); }
+        else { this.ALL_AGENCIES = analysis.agency !== '—' ? [analysis.agency] : []; this.allPermitAgencies.set(this.ALL_AGENCIES); }
         setTimeout(() => this.withTyping(() => this.showAgencyChoice(analysis.agency), 600), 400);
       }, 600);
     } else {
@@ -231,8 +235,8 @@ export class ChatService {
       this.withTyping(() => {
         const analysis = analyzeHsCode(this.formData().hsCode!);
         this.bot('hs-analysis', analysis);
-        if (analysis.agencies?.length) { this.ALL_AGENCIES = analysis.agencies.map(a => a.code); }
-        else { this.ALL_AGENCIES = analysis.agency !== '—' ? [analysis.agency] : []; }
+        if (analysis.agencies?.length) { this.ALL_AGENCIES = analysis.agencies.map(a => a.code); this.allPermitAgencies.set(this.ALL_AGENCIES); }
+        else { this.ALL_AGENCIES = analysis.agency !== '—' ? [analysis.agency] : []; this.allPermitAgencies.set(this.ALL_AGENCIES); }
         setTimeout(() => this.withTyping(() => this.showAgencyChoice(analysis.agency), 600), 400);
       }, 600);
     } else {
@@ -444,7 +448,7 @@ export class ChatService {
         this.withTyping(() => {
           const analysis = analyzeHsCode(this.formData().hsCode!);
           this.bot('hs-analysis', analysis);
-          if (analysis.agencies?.length) { this.ALL_AGENCIES = analysis.agencies.map(a => a.code); }
+          if (analysis.agencies?.length) { this.ALL_AGENCIES = analysis.agencies.map(a => a.code); this.allPermitAgencies.set(this.ALL_AGENCIES); }
           // Invoice path: agency choice → profile → agency-upload
           this.pendingAfterFlow = 'agency-docs';
           setTimeout(() => this.withTyping(() => this.showAgencyChoice(analysis.agency), 600), 400);
@@ -860,6 +864,13 @@ export class ChatService {
 
     if (this.currentAgency) {
       this.submittedAgencies.push(this.currentAgency);
+      this.submittedPermits.update(ps => [...ps, {
+        agency: this.currentAgency,
+        refNo,
+        submittedAt: new Date().toLocaleDateString('th-TH'),
+        licenseType: fd.licenseType ?? 'RGoods',
+        invoiceRef: fd.ref ?? fd.invoiceNo ?? '—',
+      }]);
       this.withTyping(() => this.showNextAgencyIfAny(), 800);
     }
   }
@@ -978,6 +989,8 @@ export class ChatService {
     this.submittedRefNo.set('');
     this.flowStartIdx = 0;
     this.queueShipmentId.set(null);
+    this.allPermitAgencies.set([]);
+    this.submittedPermits.set([]);
     this.ocr.reset();
   }
 

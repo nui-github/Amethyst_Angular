@@ -59,8 +59,9 @@
   background: #fff;
   transition: border-color 0.14s;
 
-  &--approved { border-color: #D1FAE5; background: #F0FDF4; }
-  &--rejected  { border-color: #FEE2E2; background: #FFF5F5; }
+  &--approved     { border-color: #D1FAE5; background: #F0FDF4; }
+  &--rejected     { border-color: #FEE2E2; background: #FFF5F5; }
+  &--not-applied  { border-color: #E5E7EB; background: #FAFAFA; opacity: 0.8; }
 
   &__top {
     display: flex;
@@ -109,9 +110,10 @@
   padding: 3px 8px;
   border-radius: 5px;
 
-  &--approved { background: rgba(13, 143, 97, 0.1); color: #0D8F61; }
-  &--pending  { background: rgba(180, 83, 9, 0.1);  color: #B45309; }
-  &--rejected { background: rgba(239, 68, 68, 0.1);  color: #EF4444; }
+  &--approved     { background: rgba(13, 143, 97, 0.1); color: #0D8F61; }
+  &--pending      { background: rgba(180, 83, 9, 0.1);  color: #B45309; }
+  &--not-applied  { background: #F3F4F6; color: #9CA3AF; }
+  &--rejected     { background: rgba(239, 68, 68, 0.1);  color: #EF4444; }
 }
 
 .ps-detail-row {

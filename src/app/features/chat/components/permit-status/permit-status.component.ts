@@ -1,42 +1,16 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ChatService } from '@app/core/services/chat.service';
 
 export interface PermitItem {
-  refNo: string;         // RG-2568-XXXXX
-  invoiceRef: string;    // INV-XXXX or HTHM ref
-  agency: string;        // อย. / กษ.
+  refNo: string;
+  invoiceRef: string;
+  agency: string;
   licenseType: string;
   submittedAt: string;
-  status: 'pending' | 'approved' | 'rejected';
-  licenseNo?: string;    // returned by agency when approved
-  requiresPayment: boolean;
-  paymentStatus?: 'paid' | 'unpaid';
+  status: 'not_applied' | 'pending' | 'approved' | 'rejected';
+  licenseNo?: string;
 }
-
-// Mock permit list — in production, fetch from API
-const MOCK_PERMITS: PermitItem[] = [
-  {
-    refNo: 'RG-2568-59008',
-    invoiceRef: 'INV-2024-8834',
-    agency: 'อย.',
-    licenseType: 'RGoods',
-    submittedAt: '25/06/2568',
-    status: 'approved',
-    licenseNo: 'อย.0002/2568-001',
-    requiresPayment: false, // อย. ไม่มีค่าธรรมเนียมการขออนุญาต
-  },
-  {
-    refNo: 'RG-2568-68099',
-    invoiceRef: 'INV-2024-8834',
-    agency: 'กษ.',
-    licenseType: 'ใบรับรองสุขอนามัยพืช',
-    submittedAt: '25/06/2568',
-    status: 'pending',     // ยังไม่ชำระ → ยังไม่อนุมัติ
-    requiresPayment: true,
-    paymentStatus: 'unpaid',
-  },
-];
 
 @Component({
   selector: 'app-permit-status',
@@ -58,7 +32,7 @@ const MOCK_PERMITS: PermitItem[] = [
 
       <div class="ps-list">
         @for (item of permits(); track item.refNo) {
-          <div class="ps-item" [class.ps-item--approved]="item.status === 'approved'" [class.ps-item--rejected]="item.status === 'rejected'">
+          <div class="ps-item" [class.ps-item--approved]="item.status === 'approved'" [class.ps-item--rejected]="item.status === 'rejected'" [class.ps-item--not-applied]="item.status === 'not_applied'">
 
             <div class="ps-item__top">
               <span class="ps-agency">{{ item.agency }}</span>
@@ -67,6 +41,7 @@ const MOCK_PERMITS: PermitItem[] = [
               <span class="ps-status-badge"
                 [class.ps-status-badge--approved]="item.status === 'approved'"
                 [class.ps-status-badge--pending]="item.status === 'pending'"
+                [class.ps-status-badge--not-applied]="item.status === 'not_applied'"
                 [class.ps-status-badge--rejected]="item.status === 'rejected'">
                 @if (item.status === 'approved') {
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
@@ -74,6 +49,9 @@ const MOCK_PERMITS: PermitItem[] = [
                 } @else if (item.status === 'pending') {
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                   รออนุมัติ
+                } @else if (item.status === 'not_applied') {
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                  ยังไม่ได้ขอ
                 } @else {
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
                   ไม่อนุมัติ
@@ -81,36 +59,28 @@ const MOCK_PERMITS: PermitItem[] = [
               </span>
             </div>
 
-            <div class="ps-item__details">
-              <span class="ps-detail-row">
-                <span class="ps-detail-label">เลขที่ยื่นขอ</span>
-                <span class="ps-detail-value">{{ item.refNo }}</span>
-              </span>
-              <span class="ps-detail-row">
-                <span class="ps-detail-label">วันที่ยื่น</span>
-                <span class="ps-detail-value">{{ item.submittedAt }}</span>
-              </span>
-              @if (item.licenseNo) {
-                <span class="ps-detail-row ps-detail-row--highlight">
-                  <span class="ps-detail-label">เลขใบอนุญาต</span>
-                  <span class="ps-detail-value ps-license-no">{{ item.licenseNo }}</span>
-                </span>
-              }
-              @if (item.requiresPayment) {
+            @if (item.status !== 'not_applied') {
+              <div class="ps-item__details">
                 <span class="ps-detail-row">
-                  <span class="ps-detail-label">ค่าธรรมเนียม</span>
-                  <span class="ps-payment-badge"
-                    [class.ps-payment-badge--paid]="item.paymentStatus === 'paid'"
-                    [class.ps-payment-badge--unpaid]="item.paymentStatus === 'unpaid'">
-                    @if (item.paymentStatus === 'paid') {
-                      ✓ ชำระแล้ว
-                    } @else {
-                      ⚠ ยังไม่ชำระ
-                    }
-                  </span>
+                  <span class="ps-detail-label">เลขที่ยื่นขอ</span>
+                  <span class="ps-detail-value">{{ item.refNo }}</span>
                 </span>
-              }
-            </div>
+                <span class="ps-detail-row">
+                  <span class="ps-detail-label">วันที่ยื่น</span>
+                  <span class="ps-detail-value">{{ item.submittedAt }}</span>
+                </span>
+                @if (item.licenseNo) {
+                  <span class="ps-detail-row ps-detail-row--highlight">
+                    <span class="ps-detail-label">เลขใบอนุญาต</span>
+                    <span class="ps-detail-value ps-license-no">{{ item.licenseNo }}</span>
+                  </span>
+                }
+              </div>
+            } @else {
+              <div class="ps-item__details ps-item__details--not-applied">
+                <span class="ps-detail-value" style="color:#9CA3AF;font-size:11px">ยังไม่ได้ยื่นขอสำหรับกรมนี้</span>
+              </div>
+            }
 
           </div>
         }
@@ -124,9 +94,19 @@ const MOCK_PERMITS: PermitItem[] = [
 export class PermitStatusComponent {
   readonly chat      = inject(ChatService);
   readonly cdr       = inject(ChangeDetectorRef);
-  readonly refreshing = signal(false);
-  readonly permits    = signal<PermitItem[]>(MOCK_PERMITS);
+  readonly refreshing  = signal(false);
   readonly lastUpdated = signal(new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }));
+
+  readonly permits = computed<PermitItem[]>(() => {
+    const all       = this.chat.allPermitAgencies();
+    const submitted = this.chat.submittedPermits();
+    if (!all.length) return [];
+    return all.map(agency => {
+      const sub = submitted.find(s => s.agency === agency);
+      if (!sub) return { agency, refNo: '—', invoiceRef: '—', licenseType: '—', submittedAt: '—', status: 'not_applied' } as PermitItem;
+      return { agency, refNo: sub.refNo, invoiceRef: sub.invoiceRef, licenseType: sub.licenseType, submittedAt: sub.submittedAt, status: 'pending' } as PermitItem;
+    });
+  });
 
   refresh(): void {
     if (this.refreshing()) return;
