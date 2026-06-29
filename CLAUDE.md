@@ -189,6 +189,10 @@ After flags confirmed (full-upload path) → 2-choice (ChoiceCard):
   ├─ 'email'   → type:'email-draft' → onEmailSent() → post-email choice
   └─ 'preview' → form-preview (editable) → "ดำเนินการต่อ" → choice-card(submit/edit) → submit
 
+After flags confirmed (invoice path) → checkMissingAfterFlags:
+  ├─ missing required fields? → missing-fields form → fill → showProceedChoice()
+  └─ complete → showProceedChoice() directly
+
 onPreviewChoice 'edit' behaviour:
   ├─ isCustomsOnlyUpload === true  → single-upload (ใบขนสินค้าเท่านั้น, ไม่ใช่ full-upload)
   └─ otherwise                    → full-upload (multi-doc, เหมือนเดิม)
@@ -199,14 +203,13 @@ SPN path: "ดึงข้อมูลจาก SPN" → spn-list (skip profile 
 
 ### Payment flow (after ยืนยันส่งกรม)
 ```
-submit()
-  ├─ getAgencyPayment(agency).requiresFee === true
-  │     → status-card (isPending=true, สีเหลือง "รอชำระค่าธรรมเนียม")
-  │     → payment-qr  (QR + expiry; กด "ชำระเงินแล้ว" → marks isReadOnly=true)
-  │     → payment-slip (อัปโหลด slip; กด "ยืนยัน" → marks isReadOnly=true)
-  │     → finalizeSubmit() → status-card (isPending=false, สีเขียว สำเร็จ)
-  └─ requiresFee === false
-        → finalizeSubmit() → status-card (สีเขียว) immediately
+submit() → finalizeSubmit() → status-card (สีเขียว สำเร็จ) immediately
+
+ถ้ากรมมีค่าธรรมเนียม → status-card แสดง feeNote:
+  "ค่าธรรมเนียมกรม ฿{amount} จะรวมในบิลรายเดือน"
+
+ไม่มี QR payment หรือ slip upload อีกต่อไป
+ค่าธรรมเนียมเก็บผ่านค่าใช้งานระบบรายเดือนแทน
 
 Agency fee config (payment.mock.ts):
   อย.  → ฟรี (LPI ไม่มีค่าธรรมเนียม)
@@ -217,8 +220,9 @@ Agency fee config (payment.mock.ts):
 `idle` → `upload` / `not_found` → `ocr` → `form` → `preview` → `done`
 
 ### Queue Shipment lifecycle
-`needs_you` → `email_outbox` → `await_customer` → `submitted`  
-`no_permit` = no license needed
+`needs_you` → `submitted`  
+`no_permit` = no license needed  
+`email_outbox` / `await_customer` ถูกตัดออกจาก flow แล้ว (ไม่ใช้)
 
 ### Queue → Chatbot session handoff
 ```
@@ -261,7 +265,20 @@ Add to `mainItems` array in `sidebar.component.ts`
 - Set `msg.isReadOnly = true` to disable a specific card without affecting others
 - `ChatAreaComponent` checks `!readOnly && !msg.isReadOnly` for all interactive cases
 - `QueueService.open()` automatically seals all existing messages as `isReadOnly: true`
-- Used for: payment-qr after paid, payment-slip after uploaded, all history in queue sessions
+- `autoProceeded: true` on ocr-results data → component auto-sets `proceeded=true` (hides button)
+
+### Sidebar session history
+- `ChatService.sessions` signal — stores up to 30 `ChatHistorySession` with `baseRef` + `title`
+- `saveCurrentSession()` — saves in-place (no reorder) when `activeSessionId` set; prepends when new
+- `promoteActiveSession()` — updates title + moves to top; called on OCR done, flags, form-preview, submit
+- `loadSession(id)` — loads without reordering; only reorders after next significant action
+- Session title format: `{baseRef} · {statusLabel}` — `baseRef` preserved, status derived from message types
+
+### OCR results & form-preview edit UX (D+A pattern)
+- `checkNeeded: true` rows: amber left border + "AI XX%" confidence pill + amber value color
+- Every editable row: soft `ocr-edit-chip` icon (always visible 70% opacity, brightens on hover)
+- After `proceeded()` / `saved`: all edit affordances hidden
+- `flag-card` edit button hidden after `proceeded()`
 
 ### Design rules
 6. **BizX colors** — `var(--bizx-blue)` in SCSS, `style="color: var(--bizx-blue)"` in templates. Never hardcode hex
