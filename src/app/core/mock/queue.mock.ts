@@ -25,7 +25,7 @@ const bot = (time: string, content: string): ChatMessage => t(time, 'bot', 'text
 const usr = (time: string, content: string): ChatMessage => t(time, 'user', 'text', content);
 
 export const MOCK_QUEUE: Shipment[] = [
-  // ── 1. needs_you: Amoxicillin – ค้างที่ form-preview รอยืนยัน ─────────────
+  // ── 1. needs_you: Amoxicillin – รอยืนยัน flags ─────────────────────────────
   {
     id: 'IMP-68-008912', customsNo: 'A012-25680617-00891', hthmRef: 'HTHM000000001',
     isNew: true, type: 'IMP',
@@ -63,28 +63,17 @@ export const MOCK_QUEUE: Shipment[] = [
         requiresPermit: true, direction: 'import', agency: 'อย.', agencyFull: 'สำนักงานคณะกรรมการอาหารและยา',
         licenseType: 'RGoods', confidence: 96,
       }),
-      bot('09:44', 'ร่างคำขออนุญาต RGoods อัตโนมัติเสร็จแล้ว — พบ 2 จุดที่ควรตรวจสอบก่อนส่งกรมครับ'),
+      bot('09:44', 'พบ 2 จุดที่ควรตรวจสอบก่อนดำเนินการต่อครับ — กรุณายืนยันข้อมูลแต่ละจุด'),
       t('09:44', 'bot', 'flag-card', undefined, {
         gen: 1, flags: [
           { id: 'f1', title: 'ปริมาณไม่ตรง', detail: 'Invoice ระบุ 250 กก. แต่ Packing List ระบุ 248.5 กก.', conf: 72, resolved: false },
           { id: 'f2', title: 'เลข GMP อ่านไม่ชัด', detail: '3 ตัวท้ายของเลข GMP ไม่ชัดเจน — AI มั่นใจ 65%', conf: 65, resolved: false },
         ],
       }),
-      bot('09:45', 'กรุณาตรวจสอบและยืนยันข้อมูลก่อนส่งกรมครับ'),
-      t('09:45', 'bot', 'form-preview', undefined, {
-        fields: [
-          { label: 'ผู้นำเข้า', value: 'บริษัท เฮลท์ฟาร์มา จำกัด' },
-          { label: 'HS Code', value: '2941.10.00' },
-          { label: 'สินค้า', value: 'Amoxicillin Trihydrate' },
-          { label: 'ปริมาณ', value: '250 กก.', flag: 'ไม่ตรงกับ Packing List' },
-          { label: 'ประเทศต้นกำเนิด', value: 'อินเดีย' },
-          { label: 'ท่านำเข้า', value: 'ท่าเรือแหลมฉบัง' },
-        ],
-      }),
     ],
   },
 
-  // ── 2. needs_you: Human Insulin – ค้างที่ form-preview ──────────────────────
+  // ── 2. needs_you: Human Insulin – รอยืนยัน flags ────────────────────────────
   {
     id: 'IMP-68-008915', customsNo: 'A012-25680617-00915', hthmRef: 'HTHM000000002',
     isNew: true, type: 'IMP',
@@ -125,19 +114,10 @@ export const MOCK_QUEUE: Shipment[] = [
           { id: 'f3', title: 'วันหมดอายุต่างกัน', detail: 'ใบ CoA ระบุ Exp. 12/2025 แต่ Label ระบุ 11/2025', conf: 78, resolved: false },
         ],
       }),
-      t('09:33', 'bot', 'form-preview', undefined, {
-        fields: [
-          { label: 'ผู้นำเข้า', value: 'บริษัท เฮลท์ฟาร์มา จำกัด' },
-          { label: 'HS Code', value: '2941.10.00' },
-          { label: 'สินค้า', value: 'Human Insulin 100IU/mL' },
-          { label: 'ปริมาณ', value: '100 ไวอัล' },
-          { label: 'วันหมดอายุ (CoA)', value: '12/2025', flag: 'ไม่ตรงกับ Label (11/2025)' },
-        ],
-      }),
     ],
   },
 
-  // ── 3. needs_you: Surgical Gloves – รอยืนยัน form-preview ───────────────────
+  // ── 3. needs_you: Surgical Gloves – รอยืนยัน flag ────────────────────────────
   {
     id: 'IMP-68-008920', customsNo: 'A012-25680617-00920', hthmRef: 'HTHM000000003',
     isNew: false, type: 'IMP',
@@ -171,11 +151,6 @@ export const MOCK_QUEUE: Shipment[] = [
         gen: 1, flags: [
           { id: 'f4', title: 'เลข Lot ไม่ครบ', detail: 'ตัวเลขท้าย Lot ไม่ชัดเจน — AI มั่นใจ 80%', conf: 80, resolved: false },
         ],
-      }),
-      t('08:58', 'bot', 'form-preview', undefined, {
-        invoiceNo: 'MY-2024-0312', quantity: '5,000 ชิ้น',
-        importer: 'บริษัท เฮลท์ฟาร์มา จำกัด', port: 'ท่าเรือแหลมฉบัง',
-        hsCode: '4015.11.00', countryOrigin: 'มาเลเซีย', goodsDesc: 'ถุงมือผ่าตัดปราศจากเชื้อ',
       }),
     ],
   },
