@@ -43,8 +43,7 @@ export const MOCK_QUEUE: Shipment[] = [
       { id: 'f2', title: 'เลข GMP อ่านไม่ชัด', detail: '3 ตัวท้ายไม่ชัดเจน', conf: 65, resolved: false },
     ],
     audit: [{ time: '09:42', text: 'เข้าระบบ', by: 'ระบบ' }],
-    email: { toName: 'คุณสมหญิง วัฒนกุล', to: 'somying@healthpharma.co.th',
-      subject: 'ขอเอกสารประกอบ', body: '', attName: 'draft_license.pdf' },
+    email: { toName: '', to: '', subject: '', body: '', attName: '' },
     messages: [
       bot('09:42', 'ใบขนสินค้า HTHM000000001 เข้าระบบแล้วครับ — Amoxicillin Trihydrate 250 กก. จากอินเดีย ท่าเรือแหลมฉบัง'),
       usr('09:42', 'อัปโหลดเอกสารเรียบร้อยแล้ว'),
@@ -128,7 +127,7 @@ export const MOCK_QUEUE: Shipment[] = [
     ],
   },
 
-  // ── 3. email_outbox: Surgical Gloves – รอส่งอีเมล ──────────────────────────
+  // ── 3. needs_you: Surgical Gloves – รอยืนยัน form-preview ───────────────────
   {
     id: 'IMP-68-008920', customsNo: 'A012-25680617-00920', hthmRef: 'HTHM000000003',
     isNew: false, type: 'IMP',
@@ -138,49 +137,63 @@ export const MOCK_QUEUE: Shipment[] = [
     origin: 'มาเลเซีย', importedAt: '08:55 น. วันนี้', owner: 'ปวีณา ส.',
     agency: 'fda', permitNeeded: true, formCode: 'RGoods',
     formName: 'คำขออนุญาตนำเข้าเครื่องมือแพทย์ — อย.',
-    conf: 88, stage: 6, statusKey: 'email_outbox',
+    conf: 88, stage: 4, statusKey: 'needs_you',
     assess: { conf: 88, reason: 'ต้องใช้ใบอนุญาตเครื่องมือแพทย์' },
     classify: { agency: 'fda', conf: 88, reason: '', alt: [] },
     draft: { fields: [] }, flags: [
-      { id: 'f4', title: 'เลข Lot ไม่ครบ', detail: 'แก้ไขแล้ว', conf: 95, resolved: true },
+      { id: 'f4', title: 'เลข Lot ไม่ครบ', detail: 'ตัวเลขท้ายอ่านไม่ออก — กรุณาตรวจสอบ', conf: 80, resolved: false },
     ],
     audit: [{ time: '08:55', text: 'เข้าระบบ', by: 'ระบบ' }],
-    email: { toName: 'คุณสมหญิง วัฒนกุล', to: 'somying@healthpharma.co.th',
-      subject: 'ขอเอกสารเพิ่มเติม — ถุงมือผ่าตัด', body: 'เรียน คุณสมหญิง\n\nกรุณาส่งใบรับรองมาตรฐาน ISO 13485 เพิ่มเติมครับ',
-      attName: 'request_docs.pdf' },
+    email: { toName: '', to: '', subject: '', body: '', attName: '' },
     messages: [
       bot('08:55', 'ใบขนสินค้า HTHM000000003 เข้าระบบแล้วครับ — Surgical Gloves จากมาเลเซีย'),
-      t('08:56', 'bot', 'email-draft', undefined, {
-        gen: 1, to: 'somying@healthpharma.co.th',
-        subject: 'ขอเอกสารเพิ่มเติม — ถุงมือผ่าตัด',
-        body: 'เรียน คุณสมหญิง\n\nกรุณาส่งใบรับรองมาตรฐาน ISO 13485 เพิ่มเติมครับ',
-        isSent: false,
+      t('08:56', 'bot', 'ocr-results', undefined, {
+        invoiceNo: 'MY-2024-0312', invoiceDate: '01/06/2568', quantity: '5,000 ชิ้น',
+        importer: 'บริษัท เฮลท์ฟาร์มา จำกัด', port: 'ท่าเรือแหลมฉบัง',
+        hsCode: '4015.11.00', countryOrigin: 'มาเลเซีย', lotNo: 'GLV-MY-312', uNo: '',
       }),
-      bot('08:57', 'ร่างอีเมลพร้อมแล้วครับ — กรุณายืนยันก่อนส่งลูกค้า'),
+      t('08:57', 'bot', 'flag-card', undefined, {
+        gen: 1, flags: [
+          { id: 'f4', title: 'เลข Lot ไม่ครบ', detail: 'ตัวเลขท้าย Lot ไม่ชัดเจน — AI มั่นใจ 80%', conf: 80, resolved: false },
+        ],
+      }),
+      t('08:58', 'bot', 'form-preview', undefined, {
+        invoiceNo: 'MY-2024-0312', quantity: '5,000 ชิ้น',
+        importer: 'บริษัท เฮลท์ฟาร์มา จำกัด', port: 'ท่าเรือแหลมฉบัง',
+        hsCode: '4015.11.00', countryOrigin: 'มาเลเซีย', goodsDesc: 'ถุงมือผ่าตัดปราศจากเชื้อ',
+      }),
     ],
   },
 
-  // ── 4. await_customer: Glyphosate – รอลูกค้ายืนยัน ─────────────────────────
+  // ── 4. submitted: Glyphosate – ยื่นกรมแล้ว ──────────────────────────────────
   {
     id: 'IMP-68-008923', customsNo: 'A012-25680617-00923', hthmRef: 'HTHM000000004',
     isNew: false, type: 'IMP',
     goods: 'Glyphosate Technical (สารกำจัดวัชพืช วัตถุอันตราย)', hs: '2931.39.00',
-    customer: 'บริษัท เฮลท์ฟาร์มา จำกัด', contact: 'คุณมานะ รุ่งเรือง',
+    customer: 'บริษัท อะกริพลัส จำกัด', contact: 'คุณมานะ รุ่งเรือง',
     contactEmail: 'mana@agriplus.co.th',
     origin: 'จีน', importedAt: '08:10 น. วันนี้', owner: 'ปวีณา ส.',
     agency: 'doa', permitNeeded: true, formCode: 'RGoods',
     formName: 'ใบอนุญาตนำเข้าวัตถุอันตราย — กษ.',
-    conf: 82, stage: 7, statusKey: 'await_customer',
+    conf: 82, stage: 8, statusKey: 'submitted',
     assess: { conf: 82, reason: 'วัตถุอันตรายประเภท 3 ต้องขออนุญาต' },
     classify: { agency: 'doa', conf: 82, reason: '', alt: [] },
     draft: { fields: [] }, flags: [],
-    audit: [{ time: '08:10', text: 'เข้าระบบ', by: 'ระบบ' }],
-    email: { toName: 'คุณมานะ รุ่งเรือง', to: 'mana@agriplus.co.th',
-      subject: 'ขอเอกสารประกอบ — Glyphosate Technical', body: '', attName: '' },
+    audit: [
+      { time: '08:10', text: 'เข้าระบบ', by: 'ระบบ' },
+      { time: '08:45', text: 'ยื่นกรมสำเร็จ', by: 'ระบบ' },
+    ],
+    email: { toName: '', to: '', subject: '', body: '', attName: '' },
     messages: [
       bot('08:10', 'ใบขนสินค้า HTHM000000004 เข้าระบบแล้วครับ — Glyphosate Technical จากจีน'),
-      usr('08:11', 'ส่งอีเมลหาลูกค้า'),
-      bot('08:11', 'ส่งอีเมลถึง คุณมานะ รุ่งเรือง (mana@agriplus.co.th) เรียบร้อยแล้ว — รอลูกค้ายืนยันเอกสารครับ'),
+      t('08:20', 'bot', 'ocr-results', undefined, {
+        invoiceNo: 'CN-2024-0601', quantity: '1,000 ลิตร', hsCode: '2931.39.00', countryOrigin: 'จีน',
+        importer: 'บริษัท อะกริพลัส จำกัด', port: 'ท่าเรือแหลมฉบัง',
+      }),
+      t('08:45', 'bot', 'status-card', undefined, {
+        refNo: 'RG-2568-20188', customsRef: 'CN-2024-0601',
+        submittedAt: new Date().toLocaleDateString('th-TH'), isPending: false,
+      }),
     ],
   },
 
@@ -273,7 +286,7 @@ export const MOCK_QUEUE: Shipment[] = [
       }),
     ],
   },
-  // ── 8. await_customer: Zinc Oxide ─────────────────────────────────────────
+  // ── 8. submitted: Zinc Oxide – ยื่นกรมแล้ว ───────────────────────────────────
   {
     id: 'IMP-68-008002', customsNo: 'A012-25680617-00800', hthmRef: 'HTHM000000008',
     isNew: false, type: 'IMP',
@@ -283,19 +296,25 @@ export const MOCK_QUEUE: Shipment[] = [
     origin: 'เกาหลีใต้', importedAt: '08:00 น. เมื่อวาน', owner: 'สรวิศ ก.',
     agency: 'fda', permitNeeded: true, formCode: 'RGoods',
     formName: 'คำขออนุญาตนำเข้าวัตถุดิบเครื่องสำอาง — อย.',
-    conf: 91, stage: 5, statusKey: 'await_customer',
+    conf: 91, stage: 8, statusKey: 'submitted',
     assess: { conf: 91, reason: 'Zinc Oxide ระดับ Nano ใช้ในเครื่องสำอาง ต้องขออนุญาต อย.' },
     classify: { agency: 'fda', conf: 91, reason: '', alt: [] },
     draft: { fields: [] }, flags: [],
     audit: [
       { time: '08:00', text: 'เข้าระบบ', by: 'ระบบ' },
-      { time: '08:05', text: 'ส่งอีเมลแจ้งลูกค้าแล้ว', by: 'ระบบ' },
+      { time: '08:30', text: 'ยื่นกรมสำเร็จ', by: 'ระบบ' },
     ],
-    email: { toName: 'คุณพิมพ์ชนก', to: 'pimchanok@beautylab.co.th',
-      subject: 'รอเอกสาร COA', body: '', attName: '' },
+    email: { toName: '', to: '', subject: '', body: '', attName: '' },
     messages: [
-      bot('08:00', 'ใบขนสินค้า Zinc Oxide เข้าระบบแล้ว'),
-      t('08:05', 'bot', 'email-draft', undefined, { to: 'pimchanok@beautylab.co.th', subject: 'ขอเอกสาร COA' }),
+      bot('08:00', 'ใบขนสินค้า Zinc Oxide เข้าระบบแล้ว — Zinc Oxide Nano Grade จากเกาหลีใต้'),
+      t('08:15', 'bot', 'ocr-results', undefined, {
+        invoiceNo: 'KR-2024-0520', quantity: '200 กก.', hsCode: '2817.00.00',
+        importer: 'บริษัท บิวตี้แล็บ จำกัด', port: 'ท่าอากาศยานสุวรรณภูมิ', countryOrigin: 'เกาหลีใต้',
+      }),
+      t('08:30', 'bot', 'status-card', undefined, {
+        refNo: 'RG-2568-18820', customsRef: 'KR-2024-0520',
+        submittedAt: new Date(Date.now() - 86400000).toLocaleDateString('th-TH'), isPending: false,
+      }),
     ],
   },
   // ── 9. submitted: Magnesium Stearate ──────────────────────────────────────
@@ -365,7 +384,7 @@ export const MOCK_QUEUE: Shipment[] = [
       bot('13:20', 'ใบขนสินค้า Calcium Carbonate เข้าระบบแล้ว'),
     ],
   },
-  // ── 12. email_outbox: Titanium Dioxide ────────────────────────────────────
+  // ── 12. needs_you: Titanium Dioxide – รอยืนยัน form-preview ─────────────────
   {
     id: 'IMP-68-012007', customsNo: 'A012-25680617-01200', hthmRef: 'HTHM000000012',
     isNew: false, type: 'IMP',
@@ -375,19 +394,27 @@ export const MOCK_QUEUE: Shipment[] = [
     origin: 'เยอรมนี', importedAt: '09:00 น. เมื่อวาน', owner: 'สรวิศ ก.',
     agency: 'fda', permitNeeded: true, formCode: 'RGoods',
     formName: 'คำขออนุญาตนำเข้าวัตถุดิบเครื่องสำอาง — อย.',
-    conf: 87, stage: 6, statusKey: 'email_outbox',
+    conf: 87, stage: 4, statusKey: 'needs_you',
     assess: { conf: 87, reason: 'Titanium Dioxide ใช้เป็นสีในเครื่องสำอาง ต้องขออนุญาต อย.' },
     classify: { agency: 'fda', conf: 87, reason: '', alt: [] },
     draft: { fields: [] }, flags: [],
     audit: [
       { time: '09:00', text: 'เข้าระบบ', by: 'ระบบ' },
-      { time: '09:30', text: 'ร่างอีเมลเรียบร้อยแล้ว', by: 'AI' },
+      { time: '09:30', text: 'OCR และวิเคราะห์สำเร็จ', by: 'AI' },
     ],
-    email: { toName: 'คุณนิรมล', to: 'niramol@colorpack.co.th',
-      subject: 'ขอเอกสารเพิ่มเติม', body: '', attName: '' },
+    email: { toName: '', to: '', subject: '', body: '', attName: '' },
     messages: [
-      bot('09:00', 'ใบขนสินค้า Titanium Dioxide เข้าระบบแล้ว'),
-      t('09:30', 'bot', 'email-draft', undefined, { to: 'niramol@colorpack.co.th', subject: 'ขอเอกสาร' }),
+      bot('09:00', 'ใบขนสินค้า HTHM000000012 เข้าระบบแล้ว — Titanium Dioxide จากเยอรมนี'),
+      t('09:20', 'bot', 'ocr-results', undefined, {
+        invoiceNo: 'DE-2024-0820', invoiceDate: '30/05/2568', quantity: '300 กก.',
+        importer: 'บริษัท คัลเลอร์แพ็ค จำกัด', port: 'ท่าเรือแหลมฉบัง',
+        hsCode: '3206.11.00', countryOrigin: 'เยอรมนี', lotNo: 'TiO2-DE-0530', uNo: '',
+      }),
+      t('09:30', 'bot', 'form-preview', undefined, {
+        invoiceNo: 'DE-2024-0820', quantity: '300 กก.',
+        importer: 'บริษัท คัลเลอร์แพ็ค จำกัด', port: 'ท่าเรือแหลมฉบัง',
+        hsCode: '3206.11.00', countryOrigin: 'เยอรมนี', goodsDesc: 'Titanium Dioxide สำหรับเครื่องสำอาง',
+      }),
     ],
   },
 ];
