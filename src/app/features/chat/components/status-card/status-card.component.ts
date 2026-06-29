@@ -63,6 +63,12 @@ import { ChatService } from '@app/core/services/chat.service';
           }
         </div>
       </div>
+      @if (d.feeNote) {
+        <p class="status-card__fee-note">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          {{ d.feeNote }}
+        </p>
+      }
       @if (!d.isPending) {
         <p class="status-card__sub">ต้องการดำเนินการอื่นเพิ่มเติมไหมครับ?</p>
         <div class="status-card__chips">
@@ -79,6 +85,7 @@ import { ChatService } from '@app/core/services/chat.service';
   styles: [`
     .status-card__title { display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#0D8F61;margin:0 0 10px }
     .status-card__title--pending { color:#B45309 }
+    .status-card__fee-note { display:flex;align-items:center;gap:5px;font-size:11px;color:#6B7280;margin:8px 0 2px;line-height:1.5 }
     .status-card__sub { font-size:12px;color:var(--bizx-n600);margin:10px 0 6px }
     .status-card__chips { display:flex;flex-wrap:wrap;gap:6px }
     .badge-blue { display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;background:rgba(4,99,239,0.1);color:#0463EF;font-size:11px;font-weight:600 }

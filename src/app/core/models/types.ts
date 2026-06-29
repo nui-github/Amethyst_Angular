@@ -136,7 +136,8 @@ export interface StatusCardData {
   refNo: string;            // RG-2568-XXXXX
   customsRef: string;       // HTHM or invoice ref
   submittedAt: string;
-  isPending?: boolean;      // true = sent but awaiting payment; false/absent = fully successful
+  isPending?: boolean;      // kept for queue mock compatibility; always false in new flow
+  feeNote?: string;         // e.g. "ค่าธรรมเนียมกรม ฿500 จะรวมในบิลรายเดือน"
 }
 
 export interface PaymentQrData {

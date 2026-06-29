@@ -787,31 +787,12 @@ export class ChatService {
     this.submittedRefNo.set(refNo);
     this.pendingSubmitRefNo = refNo;
 
-    const fd2 = this.formData();
-    const pendingCardData: StatusCardData = {
-      refNo, customsRef: fd2.ref ?? fd2.invoiceNo ?? '—',
-      submittedAt: new Date().toLocaleDateString('th-TH'),
-      isPending: true,
-    };
-
     const payConfig = getAgencyPayment(this.currentAgency);
-    if (payConfig.requiresFee) {
-      this.bot('status-card', pendingCardData);
-      const payRefNo = `PAY-${Math.floor(Math.random() * 900000 + 100000)}`;
-      const expire = new Date(Date.now() + 15 * 60 * 1000);
-      const expireStr = expire.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
-      this.withTyping(() => {
-        this.bot('payment-qr', {
-          agency: this.currentAgency,
-          amount: payConfig.amount,
-          refNo: payRefNo,
-          expiresAt: expireStr,
-        } satisfies PaymentQrData);
-      }, 600);
-      return;
-    }
+    const feeNote = payConfig.requiresFee
+      ? `ค่าธรรมเนียมกรม ฿${payConfig.amount.toLocaleString('th-TH')} จะรวมในบิลรายเดือน`
+      : undefined;
 
-    this.finalizeSubmit(refNo);
+    this.finalizeSubmit(refNo, feeNote);
   }
 
   private markLastReadOnly(type: MessageType): void {
@@ -840,7 +821,7 @@ export class ChatService {
     this.withTyping(() => this.finalizeSubmit(this.pendingSubmitRefNo), 800);
   }
 
-  private finalizeSubmit(refNo: string): void {
+  private finalizeSubmit(refNo: string, feeNote?: string): void {
     this.promoteActiveSession();
     const flowMsgs = this.messages().slice(this.flowStartIdx);
     const fd = this.formData();
@@ -874,6 +855,7 @@ export class ChatService {
     this.bot('status-card', {
       refNo, customsRef: fd.ref ?? fd.invoiceNo ?? '—',
       submittedAt: new Date().toLocaleDateString('th-TH'),
+      feeNote,
     } satisfies StatusCardData);
 
     if (this.currentAgency) {
