@@ -16,9 +16,9 @@ import { Shipment, ShipmentStatus } from '@app/core/models/types';
 
 export { STATUS_META, AGENCY_SHORT };
 
-type TabValue = 'all' | 'needs_you' | 'await_customer' | 'submitted';
+type TabValue = 'all' | 'needs_you' | 'no_permit' | 'submitted';
 
-const STAGE_LABELS = ['','ตรวจรับใบขน','วิเคราะห์ HS','จัดประเภท','ร่างใบอนุญาต','ตรวจ flag','ยืนยันร่าง','แจ้งลูกค้า','ยื่นกรม'];
+const STAGE_LABELS = ['','ตรวจรับใบขน','วิเคราะห์ HS','จัดประเภท','แนบเอกสาร','ตรวจ flag','ยืนยันร่าง','ยื่นกรม'];
 
 @Component({
   selector: 'app-queue-page',
@@ -48,16 +48,16 @@ export class QueuePageComponent {
   readonly today = new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
 
   readonly tabs = [
-    { label: 'ทั้งหมด',          value: 'all'            as TabValue },
-    { label: 'ต้องคุณดำเนินการ', value: 'needs_you'      as TabValue },
-    { label: 'รอลูกค้า',         value: 'await_customer' as TabValue },
-    { label: 'ยื่นแล้ว',         value: 'submitted'      as TabValue },
+    { label: 'ทั้งหมด',          value: 'all'       as TabValue },
+    { label: 'รอดำเนินการ',      value: 'needs_you' as TabValue },
+    { label: 'ไม่ต้องขอ',        value: 'no_permit' as TabValue },
+    { label: 'ยื่นแล้ว',         value: 'submitted' as TabValue },
   ];
 
   readonly statCards = [
-    { key: 'needs_you'      as ShipmentStatus, label: 'รอคุณยืนยัน',  dot: '#F59E0B', iconBg: '#FFFBEB' },
-    { key: 'await_customer' as ShipmentStatus, label: 'รอลูกค้า',     dot: '#7C3AED', iconBg: '#F5F3FF' },
-    { key: 'submitted'      as ShipmentStatus, label: 'ยื่นกรมแล้ว',  dot: '#10B981', iconBg: '#ECFDF5' },
+    { key: 'needs_you' as ShipmentStatus, label: 'รอดำเนินการ',       dot: '#F59E0B', iconBg: '#FFFBEB' },
+    { key: 'no_permit' as ShipmentStatus, label: 'ไม่ต้องขอใบอนุญาต', dot: '#9CA3AF', iconBg: '#F3F4F6' },
+    { key: 'submitted' as ShipmentStatus, label: 'ยื่นกรมแล้ว',       dot: '#10B981', iconBg: '#ECFDF5' },
   ];
 
   readonly filteredQueue = computed(() => {
@@ -104,14 +104,8 @@ export class QueuePageComponent {
   isDone(step: number, stage: number)   { return step < stage; }
   isActive(step: number, stage: number) { return step === stage; }
 
-  visibleSteps(ship: Shipment): { label: string; idx: number }[] {
-    const hasEmail = !!(ship.email?.to);
-    return STAGE_LABELS.slice(1).reduce<{ label: string; idx: number }[]>((acc, label, i) => {
-      const n = i + 1;
-      if (n === 7 && !hasEmail) return acc;
-      acc.push({ label, idx: n });
-      return acc;
-    }, []);
+  visibleSteps(): { label: string; idx: number }[] {
+    return STAGE_LABELS.slice(1).map((label, i) => ({ label, idx: i + 1 }));
   }
 
   isDone2(stepIdx: number, stage: number) { return stepIdx < stage; }

@@ -184,7 +184,7 @@
 
           <!-- Steps -->
           <div class="steps-bar">
-            @for (s of visibleSteps(openShipment()!); track s.idx; let last = $last) {
+            @for (s of visibleSteps(); track s.idx; let last = $last) {
               <div class="step" [class.step--done]="isDone2(s.idx, openShipment()!.stage)"
                 [class.step--active]="isActive2(s.idx, openShipment()!.stage)">
                 <div class="step__dot">{{ isDone2(s.idx, openShipment()!.stage) ? '✓' : s.idx }}</div>

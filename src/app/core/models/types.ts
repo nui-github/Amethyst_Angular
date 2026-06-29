@@ -206,8 +206,6 @@ export type AgencyKey = 'dld' | 'fda' | 'dft' | 'doa' | 'diw' | 'none';
 export type ShipmentStatus =
   | 'needs_you'
   | 'no_permit'
-  | 'email_outbox'
-  | 'await_customer'
   | 'submitted';
 
 export interface ShipmentFlag {
@@ -252,7 +250,7 @@ export interface Shipment {
   draft: { fields: { label: string; value: string; flag?: string }[] };
   flags: ShipmentFlag[];
   audit: AuditEntry[];
-  email: { toName: string; to: string; subject: string; body: string; attName: string };
+  email?: { toName: string; to: string; subject: string; body: string; attName: string };
 }
 
 // ─── Print ───────────────────────────────────────────────────────────────────
