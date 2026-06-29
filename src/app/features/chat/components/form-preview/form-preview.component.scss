@@ -76,7 +76,7 @@
 
   &:not(.fp-row--readonly):not(.fp-row--editing):hover {
     background: #F5F8FF;
-    .fp-edit-icon { opacity: 1; }
+    .fp-edit-chip { opacity: 1; color: #0463EF; background: #dbeafe; }
   }
 
   &--editing {
@@ -86,9 +86,17 @@
 
   &--readonly { cursor: default; }
 
+  &--check {
+    background: #FFFDF5;
+    border-left: 2px solid #F59E0B;
+    padding-left: 6px;
+    border-radius: 0;
+    &:not(.fp-row--readonly):not(.fp-row--editing):hover { background: #FEF9EC; }
+  }
+
   &__label {
     font-size: 12px; color: #6B7280; font-weight: 500; white-space: nowrap;
-    padding-left: 4px;
+    padding-left: 4px; display: flex; align-items: center; gap: 6px;
   }
 
   &__value-wrap {
@@ -107,12 +115,17 @@
   }
 }
 
-.fp-edit-icon {
-  color: #9CA3AF;
-  opacity: 0;
-  transition: opacity 0.12s;
-  flex-shrink: 0;
-  display: flex;
+.fp-edit-chip {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px; border-radius: 5px;
+  background: #EEF2FF; color: #94A3B8;
+  opacity: 0.7; flex-shrink: 0; transition: all 0.12s;
+}
+
+.fp-check-pill {
+  font-size: 9.5px; font-weight: 700; color: #92400E;
+  background: #FEF3C7; padding: 1px 6px; border-radius: 99px;
+  letter-spacing: 0.2px; flex-shrink: 0;
 }
 
 .fp-input {
@@ -149,8 +162,17 @@
 
 .fp-save-hint {
   font-size: 11px;
-  color: #9CA3AF;
+  color: #B0B4C4;
   margin-right: auto;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.fp-header__sub {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .fp-save-btn {

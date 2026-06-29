@@ -9,7 +9,10 @@
     </div>
     <div>
       <p class="fp-header__title">ตรวจสอบข้อมูลก่อนส่งกรม</p>
-      <p class="fp-header__sub">กรุณาตรวจสอบข้อมูลทั้งหมดให้ถูกต้องก่อนยืนยัน — คลิกที่ช่องเพื่อแก้ไข</p>
+      <p class="fp-header__sub">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        กดที่ช่องเพื่อแก้ไขข้อมูล
+      </p>
     </div>
   </div>
 
@@ -24,8 +27,14 @@
             [class.fp-row--empty]="!hasValue(row.key)"
             [class.fp-row--editing]="editingKey === row.key"
             [class.fp-row--readonly]="row.key === '_qty' || saved"
+            [class.fp-row--check]="row.highlight && !hasValue(row.key) && !saved"
             (click)="startEdit(row.key)">
-            <span class="fp-row__label">{{ row.label }}</span>
+            <span class="fp-row__label">
+              {{ row.label }}
+              @if (row.highlight && !hasValue(row.key) && !saved) {
+                <span class="fp-check-pill">กรอกข้อมูล</span>
+              }
+            </span>
             <span class="fp-row__value-wrap">
               @if (editingKey === row.key) {
                 <input class="fp-input"
@@ -41,11 +50,8 @@
                   {{ display(row.key) }}
                 </span>
                 @if (row.key !== '_qty' && !saved) {
-                  <span class="fp-edit-icon">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                    </svg>
+                  <span class="fp-edit-chip">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
                   </span>
                 }
               }
@@ -58,7 +64,10 @@
 
   @if (!saved) {
     <div class="fp-save-bar">
-      <span class="fp-save-hint">แก้ไขข้อมูลได้ก่อนดำเนินการต่อ</span>
+      <span class="fp-save-hint">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+      กดที่ช่องเพื่อแก้ไขก่อนดำเนินการต่อ
+    </span>
       <button class="fp-save-btn" (click)="proceed()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
         ดำเนินการต่อ
