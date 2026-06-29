@@ -215,6 +215,7 @@
               } @else {
                 <p class="dv-nopermit-label">● ไม่ต้องขอใบอนุญาต</p>
               }
+              <p class="dv-hs-ref">HS {{ openShipment()!.hs }}</p>
               @if (openShipment()!.assess.reason) {
                 <div class="dv-reason-box">
                   <p class="dv-reason-title">เหตุผลจาก AI</p>
@@ -353,6 +354,46 @@
                 <div class="dv-draft-actions">
                   <a class="dv-draft-link">ดูใบอนุญาตฉบับเต็ม</a>
                   <span class="dv-draft-edit">· แก้ไขได้ทุกช่อง</span>
+                </div>
+              </div>
+            }
+
+            <!-- Submission result card -->
+            @if (openSubmissionResult()) {
+              <div class="dv-card dv-card--submitted">
+                <div class="dv-card__hd">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0D8F61" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+                  <span style="color:#0D8F61">ผลการยื่น</span>
+                </div>
+                <div class="dv-result-rows">
+                  <div class="dv-result-row">
+                    <span class="dv-result-label">เลขอ้างอิงใบอนุญาต</span>
+                    <span class="dv-result-value">{{ openSubmissionResult()!.refNo }}</span>
+                  </div>
+                  <div class="dv-result-row">
+                    <span class="dv-result-label">กรมที่ยื่น</span>
+                    <span class="dv-result-value">{{ agencyFull(openShipment()!.agency) }}</span>
+                  </div>
+                  <div class="dv-result-row">
+                    <span class="dv-result-label">วันที่ยื่น</span>
+                    <span class="dv-result-value">{{ openSubmissionResult()!.submittedAt }}</span>
+                  </div>
+                  @if (openSubmissionResult()!.feeNote) {
+                    <div class="dv-result-row dv-result-row--fee">
+                      <span class="dv-result-label">ค่าธรรมเนียม</span>
+                      <span class="dv-result-value">{{ openSubmissionResult()!.feeNote }}</span>
+                    </div>
+                  }
+                </div>
+                <div class="dv-result-actions">
+                  <button class="dv-result-btn dv-result-btn--outline" (click)="printLicense(openShipment()!)">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                    พิมพ์ใบอนุญาต
+                  </button>
+                  <button class="dv-result-btn dv-result-btn--primary" (click)="downloadLicense(openShipment()!)">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    ดาวน์โหลดใบอนุญาต
+                  </button>
                 </div>
               </div>
             }

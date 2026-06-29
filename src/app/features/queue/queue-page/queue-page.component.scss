@@ -853,6 +853,17 @@
   margin: 0 0 10px;
 }
 
+.dv-hs-ref {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6B7280;
+  background: #F3F4F6;
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin: 0 0 10px;
+}
+
 .dv-reason-box {
   background: #F5F6FA;
   border-radius: 8px;
@@ -1047,6 +1058,80 @@
 
 .dv-draft-link { font-size: 11px; font-weight: 700; color: #0463EF; cursor: pointer; }
 .dv-draft-edit { font-size: 10px; color: #C4C9D6; }
+
+// ── Submission result card ────────────────────────────────────────────────────
+.dv-card--submitted {
+  border-color: #D1FAE5;
+  background: #F0FDF8;
+}
+
+.dv-result-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.dv-result-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.dv-result-row--fee {
+  padding-top: 8px;
+  border-top: 1px solid #D1FAE5;
+}
+
+.dv-result-label {
+  font-size: 11px;
+  color: #6B7280;
+  flex-shrink: 0;
+}
+
+.dv-result-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: #111827;
+  text-align: right;
+}
+
+.dv-result-row--fee .dv-result-value {
+  color: #065F46;
+}
+
+.dv-result-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.dv-result-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+
+  &--outline {
+    background: #fff;
+    border: 1.5px solid #D1D5DB;
+    color: #374151;
+    &:hover { border-color: #9CA3AF; }
+  }
+
+  &--primary {
+    background: #0a7a53;
+    color: #fff;
+    &:hover { background: #086644; }
+  }
+}
 
 // ── Footer ────────────────────────────────────────────────────────────────────
 .dv-footer {

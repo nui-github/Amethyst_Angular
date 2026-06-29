@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
 import { QueueService, STATUS_META, AGENCY_SHORT, AGENCY_LABEL } from '@app/core/services/queue.service';
 import { ChatService } from '@app/core/services/chat.service';
 import { SidebarComponent } from '../../chat/components/sidebar/sidebar.component';
-import { Shipment, ShipmentStatus } from '@app/core/models/types';
+import { ChatMessage, Shipment, ShipmentStatus } from '@app/core/models/types';
 
 export { STATUS_META, AGENCY_SHORT };
 
@@ -136,5 +136,29 @@ export class QueuePageComponent {
   proceedToChat(ship: Shipment): void {
     this.chat.loadQueueSession(ship);
     this.router.navigate(['/']);
+  }
+
+  readonly openSubmissionResult = computed(() => {
+    const ship = this.openShipment();
+    if (!ship || ship.statusKey !== 'submitted') return null;
+    const msgs = ship.messages ?? [];
+    const msg = msgs.filter((m: ChatMessage) => m.type === 'status-card').pop();
+    if (!msg) return null;
+    const d = msg.data as { refNo?: string; submittedAt?: string; feeNote?: string };
+    return { refNo: d.refNo ?? '—', submittedAt: d.submittedAt ?? '—', feeNote: d.feeNote };
+  });
+
+  printLicense(ship: Shipment): void {
+    window.open(`/print?ref=${ship.hthmRef ?? ship.id}`, '_blank');
+  }
+
+  downloadLicense(ship: Shipment): void {
+    const result = this.openSubmissionResult();
+    const filename = `license-${result?.refNo ?? ship.id}.pdf`;
+    const blob = new Blob([`ใบอนุญาต ${result?.refNo}`], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
   }
 }
