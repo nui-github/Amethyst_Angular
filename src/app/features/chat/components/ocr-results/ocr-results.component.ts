@@ -4,7 +4,7 @@ import { LucideAngularModule, CheckCircle } from 'lucide-angular';
 import { OcrResultsData } from '@app/core/models/types';
 import { ChatService } from '@app/core/services/chat.service';
 
-interface OcrRow { label: string; key: string; accent: boolean; checkNeeded?: boolean; }
+interface OcrRow { label: string; key: string; accent: boolean; checkNeeded?: boolean; conf?: number; }
 interface OcrSection { title: string; color: string; rows: OcrRow[]; }
 
 @Component({
@@ -38,7 +38,7 @@ interface OcrSection { title: string; color: string; rows: OcrRow[]; }
                   <span class="ocr-row__lbl">
                     {{ row.label }}
                     @if (row.checkNeeded && !proceeded()) {
-                      <span class="ocr-check-pill">ตรวจสอบ</span>
+                      <span class="ocr-check-pill">AI {{ row.conf }}%</span>
                     }
                   </span>
                   <span class="ocr-row__val-wrap">
@@ -140,7 +140,7 @@ export class OcrResultsComponent {
     { title: 'ข้อมูลเอกสาร', color: '#0463EF', rows: [
       { label: 'Invoice No.',  key: 'invoiceNo',   accent: true  },
       { label: 'Invoice Date', key: 'invoiceDate', accent: false },
-      { label: 'ปริมาณ',       key: '_qty',        accent: true, checkNeeded: true },
+      { label: 'ปริมาณ',       key: '_qty',        accent: true, checkNeeded: true, conf: 72 },
     ]},
     { title: 'ผู้ประกอบการ', color: '#7C3AED', rows: [
       { label: 'ผู้นำเข้า',    key: 'importer',    accent: false },
