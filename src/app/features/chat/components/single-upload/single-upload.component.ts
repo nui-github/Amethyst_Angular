@@ -43,8 +43,13 @@ export class SingleUploadComponent {
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   }
 
+  readonly started = signal(false);
+
   startOCR(): void {
     const f = this.file();
-    if (f) this.chat.startOCR([f]);
+    if (f && !this.started()) {
+      this.started.set(true);
+      this.chat.startOCR([f]);
+    }
   }
 }
