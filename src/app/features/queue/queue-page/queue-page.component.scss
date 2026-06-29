@@ -952,23 +952,41 @@
   background: #fff;
   &:last-child { margin-bottom: 0; }
 
+  &--resolved {
+    border-color: #D1FAE5;
+    background: #F9FDFB;
+    .dv-flag__title { color: #065F46; }
+  }
+
   &__hd { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
   &__title { font-size: 12px; font-weight: 700; color: #92400E; }
   &__detail { font-size: 11px; color: #6B7280; margin: 0 0 8px; line-height: 1.5; }
   &__foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
   &__conf { font-size: 10px; font-weight: 600; }
+
+  &__badge-ok {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 10px; font-weight: 700;
+    color: #0D8F61;
+    background: #D1FAE5;
+    padding: 3px 9px; border-radius: 99px;
+  }
+
   &__btn {
-    font-size: 10px;
-    font-weight: 700;
-    padding: 3px 10px;
-    border-radius: 6px;
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 10px; font-weight: 700;
+    padding: 3px 10px; border-radius: 6px;
     border: 1.5px solid #0463EF;
-    background: #EFF6FF;
-    color: #0463EF;
-    cursor: pointer;
-    font-family: inherit;
+    background: #EFF6FF; color: #0463EF;
+    cursor: pointer; font-family: inherit;
     transition: all 0.12s;
     &:hover { background: #0463EF; color: #fff; }
+
+    &--pending {
+      border-color: #F59E0B;
+      background: #FFFBEB; color: #92400E;
+      &:hover { background: #F59E0B; color: #fff; }
+    }
   }
 }
 
