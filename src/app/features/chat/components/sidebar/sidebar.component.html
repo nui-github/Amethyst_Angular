@@ -55,7 +55,7 @@
         @for (session of chat.sessions(); track session.id) {
           <button class="nav-item nav-item--session"
             [class.nav-item--active]="chat.activeSessionId() === session.id"
-            [attr.data-tip]="session.title"
+            [title]="session.title"
             (click)="chat.loadSession(session.id); goChat()">
             <lucide-icon [img]="icSessionItem" [size]="14" />
             <span class="session-title">{{ session.title }}</span>
