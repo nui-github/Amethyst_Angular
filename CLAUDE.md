@@ -185,9 +185,7 @@ import-license-menu → 3 choices:
   │           └─ ขอใบอนุญาตเพิ่ม → agency selector → repeat agency flow
   └─ chooseFullUpload()    → full-upload → OCR → hs-analysis → flags → form-preview → submit
 
-After flags confirmed (full-upload path) → 2-choice (ChoiceCard):
-  ├─ 'email'   → type:'email-draft' → onEmailSent() → post-email choice
-  └─ 'preview' → form-preview (editable) → "ดำเนินการต่อ" → choice-card(submit/edit) → submit
+After flags confirmed (full-upload path) → form-preview (editable) → "ดำเนินการต่อ" → choice-card(submit/edit) → submit
 
 After flags confirmed (invoice path) → checkMissingAfterFlags:
   ├─ missing required fields? → missing-fields form → fill → showProceedChoice()
@@ -221,7 +219,7 @@ Agency fee config (payment.mock.ts):
 
 ### Queue Shipment lifecycle
 `needs_you` → `submitted`  
-`no_permit` = no license needed  
+`no_permit` = ไม่ต้องขอใบอนุญาต (AI วิเคราะห์ HS Code แล้วผ่านพิธีการปกติ)  
 `email_outbox` / `await_customer` ถูกตัดออกจาก flow แล้ว (ไม่ใช้)
 
 ### Queue → Chatbot session handoff
@@ -298,11 +296,14 @@ Add to `mainItems` array in `sidebar.component.ts`
   - `needs_you` rows have amber left accent bar + amber background tint
   - Table uses `#queueTable` reference + iterates `queueTable.data` (not `filteredQueue()`) to respect client-side pagination
   - `pageSize = signal(10)` / `pageIndex = signal(1)` in component — bound as `[nzPageSize]="pageSize()"` with `(nzPageSizeChange)="pageSize.set($event)"`
-- **KPI cards** — top accent bar (3px color), large number, label; clickable to filter by status
-- **Tabs** — pill-style (active = white bg + shadow on gray pill group background)
+- **KPI cards** (3 อัน): รอดำเนินการ (amber) · ไม่ต้องขอใบอนุญาต (gray) · ยื่นกรมแล้ว (green) — clickable to filter
+- **Tabs** (4 อัน): ทั้งหมด · รอดำเนินการ · ไม่ต้องขอ · ยื่นแล้ว — pill-style
 - **Background**: `#EDEEF4` page bg, `16px` outer padding
-- **Detail**: clicking any row → `loadQueueSession()` → navigate to `/` (chatbot page)
-- Step 7 "แจ้งลูกค้า" only shown when `ship.email.to` is set (email flow was triggered)
+- **Detail**: clicking any row opens inline detail panel (right side of same page)
+  - Left column: AI assess card (HS Code pill + reason) · AI classify card · Audit trail
+  - Right column: Uploaded documents card · Flag alerts · Submission result card (submitted only)
+  - Footer: "ไปยืนยันในแชท" (needs_you) / "เสร็จสิ้นแล้ว" (submitted/no_permit)
+- **Stage labels** (7 stages): ตรวจรับใบขน → วิเคราะห์ HS → จัดประเภท → แนบเอกสาร → ตรวจ flag → ยืนยันร่าง → ยื่นกรม
 - Mock data: 12 shipments in `queue.mock.ts` (enough for 2 pages at 10/page)
 
 ---
@@ -322,6 +323,10 @@ Replace in `src/app/core/mock/`:
 - `hs-analysis.mock.ts` → `analyzeHsCode()` → supports `agencies[]` for multi-agency HS codes
 - `agency-docs.mock.ts` → `getAgencyDocs(agency)` → required docs + manualFields per agency
 - `payment.mock.ts` → `getAgencyPayment(agency)` → `{ requiresFee, amount }` per agency
+- `queue.mock.ts` → `MOCK_QUEUE` → `GET /shipments` + `GET /shipments/:id`
+  - `documents[]` → swap `SAMPLE_PDF` url to signed URLs from `GET /shipments/:id/documents`
+  - `ShipmentDocument.category`: `'invoice' | 'customs' | 'packing_list' | 'coa' | 'coo' | 'other'`
+  - ทุก shipment มี documents อย่างน้อย 1 ไฟล์ (ไฟล์ที่ใช้ OCR วิเคราะห์ HS Code)
 
 ---
 
