@@ -45,7 +45,9 @@
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0D8F61" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
             <span>{{ flag.confirmedValue }}</span>
           </div>
-          <button class="flag-edit-btn" (click)="unconfirmFlag(flag)">แก้ไข</button>
+          @if (!proceeded()) {
+            <button class="flag-edit-btn" (click)="unconfirmFlag(flag)">แก้ไข</button>
+          }
         </div>
 
       <!-- ── Interactive state ── -->
