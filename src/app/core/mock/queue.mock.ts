@@ -1,4 +1,15 @@
-import { Shipment, ShipmentStatus, AgencyKey, ChatMessage } from '@app/core/models/types';
+import { Shipment, ShipmentStatus, AgencyKey, ChatMessage, ShipmentDocument } from '@app/core/models/types';
+
+// sample public PDF for mock — swap to signed URLs from GET /shipments/:id/documents in production
+const SAMPLE_PDF = 'https://www.w3.org/WAI/WCAG21/Techniques/pdf/PDF1.pdf';
+
+const doc = (
+  id: string, name: string,
+  category: ShipmentDocument['category'],
+  fileType: ShipmentDocument['fileType'] = 'pdf',
+  agencyKey?: AgencyKey,
+  uploadedAt = '29/6/2569 09:43',
+): ShipmentDocument => ({ id, name, fileType, category, url: SAMPLE_PDF, uploadedAt, agencyKey });
 
 export const AGENCY_LABEL: Record<AgencyKey, string> = {
   dld: 'กรมปศุสัตว์', fda: 'อย.', dft: 'กรมการค้าต่างประเทศ',
@@ -69,6 +80,10 @@ export const MOCK_QUEUE: Shipment[] = [
         ],
       }),
     ],
+    documents: [
+      doc('d1a', 'Invoice INV-2024-8834', 'invoice'),
+      doc('d1b', 'Packing List', 'packing_list'),
+    ],
   },
 
   // ── 2. needs_you: Human Insulin – รอยืนยัน flag + form-preview ───────────────
@@ -119,6 +134,11 @@ export const MOCK_QUEUE: Shipment[] = [
         hsCode: '2941.10.00', countryOrigin: 'เยอรมนี', goodsDesc: 'Human Insulin สำเร็จรูป',
       }),
     ],
+    documents: [
+      doc('d2a', 'Invoice DE-2024-0615', 'invoice'),
+      doc('d2b', 'Packing List', 'packing_list'),
+      doc('d2c', 'Certificate of Analysis (CoA)', 'coa'),
+    ],
   },
 
   // ── 3. needs_you: Surgical Gloves – รอ agency-upload ──────────────────────────
@@ -164,6 +184,10 @@ export const MOCK_QUEUE: Shipment[] = [
         ],
       }),
     ],
+    documents: [
+      doc('d3a', 'Invoice MY-2024-0312', 'invoice'),
+      doc('d3b', 'Packing List', 'packing_list'),
+    ],
   },
 
   // ── 4. submitted: Glyphosate – ยื่น กษ. แล้ว ────────────────────────────────
@@ -206,6 +230,11 @@ export const MOCK_QUEUE: Shipment[] = [
         submittedAt: new Date().toLocaleDateString('th-TH'), isPending: false,
         feeNote: 'ค่าธรรมเนียมกรม ฿500 จะรวมในบิลรายเดือน',
       }),
+    ],
+    documents: [
+      doc('d4a', 'Invoice CN-2024-0601', 'invoice'),
+      doc('d4b', 'Packing List', 'packing_list'),
+      doc('d4c', 'Material Safety Data Sheet (MSDS)', 'other', 'pdf', 'doa'),
     ],
   },
 
@@ -272,6 +301,11 @@ export const MOCK_QUEUE: Shipment[] = [
         submittedAt: new Date().toLocaleDateString('th-TH'), isPending: false,
       }),
     ],
+    documents: [
+      doc('d6a', 'Invoice EU-2024-0730', 'invoice'),
+      doc('d6b', 'Certificate of Analysis (CoA)', 'coa'),
+      doc('d6c', 'MSDS — Ethanol 99.5%', 'other', 'pdf', 'diw'),
+    ],
   },
 
   // ── 7. needs_you: Vitamin C – รอ agency-upload + OCR ─────────────────────────
@@ -316,6 +350,10 @@ export const MOCK_QUEUE: Shipment[] = [
         ],
       }),
     ],
+    documents: [
+      doc('d7a', 'Invoice INV-2024-0701', 'invoice'),
+      doc('d7b', 'Packing List', 'packing_list'),
+    ],
   },
 
   // ── 8. submitted: Zinc Oxide – ยื่น อย. แล้ว ─────────────────────────────────
@@ -351,6 +389,11 @@ export const MOCK_QUEUE: Shipment[] = [
         submittedAt: new Date(Date.now() - 86400000).toLocaleDateString('th-TH'), isPending: false,
       }),
     ],
+    documents: [
+      doc('d8a', 'Invoice KR-2024-0520', 'invoice'),
+      doc('d8b', 'Certificate of Analysis (CoA)', 'coa', 'pdf', 'fda'),
+      doc('d8c', 'ใบรับรองแหล่งกำเนิดสินค้า (COO)', 'coo', 'pdf', 'fda'),
+    ],
   },
 
   // ── 9. submitted: Magnesium Stearate – ยื่น อย. แล้ว ─────────────────────────
@@ -381,6 +424,10 @@ export const MOCK_QUEUE: Shipment[] = [
         refNo: 'RG-2568-09005', customsRef: 'A012-25680617-00900', isPending: false,
         submittedAt: new Date(Date.now() - 86400000).toLocaleDateString('th-TH'),
       }),
+    ],
+    documents: [
+      doc('d9a', 'Invoice US-2024-1430', 'invoice'),
+      doc('d9b', 'Certificate of Analysis (CoA)', 'coa', 'pdf', 'fda'),
     ],
   },
 
@@ -450,6 +497,10 @@ export const MOCK_QUEUE: Shipment[] = [
         licenseType: 'RGoods', confidence: 93,
       }),
     ],
+    documents: [
+      doc('d11a', 'Invoice MY-2024-1320', 'invoice'),
+      doc('d11b', 'Packing List', 'packing_list'),
+    ],
   },
 
   // ── 12. needs_you: Titanium Dioxide – รอยืนยัน form-preview ─────────────────
@@ -498,6 +549,11 @@ export const MOCK_QUEUE: Shipment[] = [
         importer: 'บริษัท คัลเลอร์แพ็ค จำกัด', port: 'ท่าเรือแหลมฉบัง',
         hsCode: '3206.11.00', countryOrigin: 'เยอรมนี', goodsDesc: 'Titanium Dioxide สำหรับเครื่องสำอาง',
       }),
+    ],
+    documents: [
+      doc('d12a', 'Invoice DE-2024-0820', 'invoice'),
+      doc('d12b', 'Certificate of Analysis (CoA)', 'coa', 'pdf', 'fda'),
+      doc('d12c', 'ใบรับรองแหล่งกำเนิดสินค้า (COO)', 'coo', 'pdf', 'fda'),
     ],
   },
 ];

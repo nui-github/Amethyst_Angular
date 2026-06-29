@@ -133,6 +133,10 @@ export class QueuePageComponent {
     this.q.open('');
   }
 
+  openDoc(url: string): void {
+    window.open(url, '_blank', 'noopener');
+  }
+
   proceedToChat(ship: Shipment): void {
     this.chat.loadQueueSession(ship);
     this.router.navigate(['/']);

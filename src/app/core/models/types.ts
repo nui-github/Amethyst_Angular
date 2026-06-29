@@ -250,7 +250,19 @@ export interface Shipment {
   draft: { fields: { label: string; value: string; flag?: string }[] };
   flags: ShipmentFlag[];
   audit: AuditEntry[];
+  documents?: ShipmentDocument[];
   email?: { toName: string; to: string; subject: string; body: string; attName: string };
+}
+
+// replace url with real signed URL from storage (e.g. GET /shipments/:id/documents)
+export interface ShipmentDocument {
+  id: string;
+  name: string;         // display name, e.g. "Invoice INV-2024-8834"
+  fileType: 'pdf' | 'image' | 'other';
+  category: 'invoice' | 'packing_list' | 'coa' | 'coo' | 'customs' | 'other';
+  url: string;          // signed URL or blob URL — swap to API response in production
+  uploadedAt?: string;  // ISO string or display string
+  agencyKey?: AgencyKey; // set when doc belongs to a specific agency upload slot
 }
 
 // ─── Print ───────────────────────────────────────────────────────────────────
