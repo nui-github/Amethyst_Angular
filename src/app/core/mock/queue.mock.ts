@@ -42,7 +42,12 @@ export const MOCK_QUEUE: Shipment[] = [
       { id: 'f1', title: 'ปริมาณไม่ตรง', detail: 'Invoice: 250 กก. / Packing List: 248.5 กก.', conf: 72, resolved: false },
       { id: 'f2', title: 'เลข GMP อ่านไม่ชัด', detail: '3 ตัวท้ายไม่ชัดเจน', conf: 65, resolved: false },
     ],
-    audit: [{ time: '09:42', text: 'เข้าระบบ', by: 'ระบบ' }],
+    audit: [
+      { time: '09:42', text: 'เข้าระบบ', by: 'ระบบ' },
+      { time: '09:43', text: 'OCR สำเร็จ', by: 'AI' },
+      { time: '09:43', text: 'วิเคราะห์ HS Code: 2941.10.00 → อย. (96%)', by: 'AI' },
+      { time: '09:44', text: 'พบ 2 จุดต้องตรวจสอบ', by: 'AI' },
+    ],
     email: { toName: '', to: '', subject: '', body: '', attName: '' },
     messages: [
       bot('09:42', 'ใบขนสินค้า HTHM000000001 เข้าระบบแล้วครับ — Amoxicillin Trihydrate 250 กก. จากอินเดีย ท่าเรือแหลมฉบัง'),
@@ -95,7 +100,12 @@ export const MOCK_QUEUE: Shipment[] = [
     draft: { fields: [] }, flags: [
       { id: 'f3', title: 'วันหมดอายุต่างกัน', detail: 'CoA vs Label ต่างกัน 1 วัน', conf: 78, resolved: false },
     ],
-    audit: [{ time: '09:31', text: 'เข้าระบบ', by: 'ระบบ' }],
+    audit: [
+      { time: '09:31', text: 'เข้าระบบ', by: 'ระบบ' },
+      { time: '09:32', text: 'OCR สำเร็จ', by: 'AI' },
+      { time: '09:32', text: 'วิเคราะห์ HS Code: 2941.10.00 → อย. (91%)', by: 'AI' },
+      { time: '09:33', text: 'พบ 1 จุดต้องตรวจสอบ', by: 'AI' },
+    ],
     email: { toName: '', to: '', subject: '', body: '', attName: '' },
     messages: [
       bot('09:31', 'ใบขนสินค้า HTHM000000002 เข้าระบบแล้วครับ — Human Insulin 100 ไวอัล จากเยอรมนี'),
@@ -143,7 +153,12 @@ export const MOCK_QUEUE: Shipment[] = [
     draft: { fields: [] }, flags: [
       { id: 'f4', title: 'เลข Lot ไม่ครบ', detail: 'ตัวเลขท้ายอ่านไม่ออก — กรุณาตรวจสอบ', conf: 80, resolved: false },
     ],
-    audit: [{ time: '08:55', text: 'เข้าระบบ', by: 'ระบบ' }],
+    audit: [
+      { time: '08:55', text: 'เข้าระบบ', by: 'ระบบ' },
+      { time: '08:56', text: 'OCR สำเร็จ', by: 'AI' },
+      { time: '08:57', text: 'วิเคราะห์ HS Code: 4015.11.00 → อย. (88%)', by: 'AI' },
+      { time: '08:57', text: 'พบ 1 จุดต้องตรวจสอบ', by: 'AI' },
+    ],
     email: { toName: '', to: '', subject: '', body: '', attName: '' },
     messages: [
       bot('08:55', 'ใบขนสินค้า HTHM000000003 เข้าระบบแล้วครับ — Surgical Gloves จากมาเลเซีย'),
@@ -181,7 +196,10 @@ export const MOCK_QUEUE: Shipment[] = [
     draft: { fields: [] }, flags: [],
     audit: [
       { time: '08:10', text: 'เข้าระบบ', by: 'ระบบ' },
-      { time: '08:45', text: 'ยื่นกรมสำเร็จ', by: 'ระบบ' },
+      { time: '08:20', text: 'OCR สำเร็จ', by: 'AI' },
+      { time: '08:20', text: 'วิเคราะห์ HS Code: 2931.39.00 → กษ. (82%)', by: 'AI' },
+      { time: '08:35', text: 'ตรวจสอบข้อมูลแล้ว', by: 'ปวีณา ส.' },
+      { time: '08:45', text: 'ยื่นกรม กษ. สำเร็จ', by: 'ระบบ' },
     ],
     email: { toName: '', to: '', subject: '', body: '', attName: '' },
     messages: [
@@ -210,7 +228,10 @@ export const MOCK_QUEUE: Shipment[] = [
     assess: { conf: 94, reason: 'ไม่อยู่ในบัญชีสินค้าควบคุม' },
     classify: { agency: 'none', conf: 94, reason: '', alt: [] },
     draft: { fields: [] }, flags: [],
-    audit: [{ time: '08:02', text: 'เข้าระบบ', by: 'ระบบ' }],
+    audit: [
+      { time: '08:02', text: 'เข้าระบบ', by: 'ระบบ' },
+      { time: '08:02', text: 'วิเคราะห์ HS Code: 9027.90.90 → ไม่ต้องขออนุญาต (94%)', by: 'AI' },
+    ],
     email: { toName: '', to: '', subject: '', body: '', attName: '' },
     messages: [
       bot('08:02', 'ใบขนสินค้า HTHM000000005 เข้าระบบแล้วครับ — HPLC Column จากสหรัฐอเมริกา'),
@@ -237,7 +258,13 @@ export const MOCK_QUEUE: Shipment[] = [
     assess: { conf: 97, reason: 'แอลกอฮอล์เข้มข้นสูง ต้องขออนุญาต วอ.' },
     classify: { agency: 'diw', conf: 97, reason: '', alt: [] },
     draft: { fields: [] }, flags: [],
-    audit: [{ time: '07:30', text: 'เข้าระบบ', by: 'ระบบ' }, { time: '07:35', text: 'ยื่นกรมเรียบร้อย', by: 'ระบบ' }],
+    audit: [
+      { time: '07:30', text: 'เข้าระบบ', by: 'ระบบ' },
+      { time: '07:31', text: 'OCR สำเร็จ', by: 'AI' },
+      { time: '07:31', text: 'วิเคราะห์ HS Code: 2207.10.00 → วอ. (97%)', by: 'AI' },
+      { time: '07:33', text: 'ตรวจสอบข้อมูลแล้ว', by: 'ปวีณา ส.' },
+      { time: '07:35', text: 'ยื่นกรม วอ. สำเร็จ', by: 'ระบบ' },
+    ],
     email: { toName: '', to: '', subject: '', body: '', attName: '' },
     messages: [
       bot('07:30', 'ใบขนสินค้า HTHM000000006 เข้าระบบแล้วครับ — Ethanol 99.5% จากยุโรป'),
@@ -272,7 +299,9 @@ export const MOCK_QUEUE: Shipment[] = [
     ],
     audit: [
       { time: '11:15', text: 'เข้าระบบ', by: 'ระบบ' },
-      { time: '11:18', text: 'OCR อ่านเอกสารสำเร็จ', by: 'AI' },
+      { time: '11:18', text: 'OCR สำเร็จ', by: 'AI' },
+      { time: '11:19', text: 'วิเคราะห์ HS Code: 2936.27.00 → อย. (89%)', by: 'AI' },
+      { time: '11:19', text: 'พบ 1 จุดต้องตรวจสอบ', by: 'AI' },
     ],
     email: { toName: '', to: '', subject: '', body: '', attName: '' },
     messages: [
@@ -302,7 +331,10 @@ export const MOCK_QUEUE: Shipment[] = [
     draft: { fields: [] }, flags: [],
     audit: [
       { time: '08:00', text: 'เข้าระบบ', by: 'ระบบ' },
-      { time: '08:30', text: 'ยื่นกรมสำเร็จ', by: 'ระบบ' },
+      { time: '08:15', text: 'OCR สำเร็จ', by: 'AI' },
+      { time: '08:15', text: 'วิเคราะห์ HS Code: 2817.00.00 → อย. (91%)', by: 'AI' },
+      { time: '08:25', text: 'ตรวจสอบข้อมูลแล้ว', by: 'สรวิศ ก.' },
+      { time: '08:30', text: 'ยื่นกรม อย. สำเร็จ', by: 'ระบบ' },
     ],
     email: { toName: '', to: '', subject: '', body: '', attName: '' },
     messages: [
@@ -333,7 +365,10 @@ export const MOCK_QUEUE: Shipment[] = [
     draft: { fields: [] }, flags: [],
     audit: [
       { time: '14:30', text: 'เข้าระบบ', by: 'ระบบ' },
-      { time: '14:45', text: 'ยื่นกรมสำเร็จ', by: 'ระบบ' },
+      { time: '14:32', text: 'OCR สำเร็จ', by: 'AI' },
+      { time: '14:33', text: 'วิเคราะห์ HS Code: 2915.70.21 → อย. (95%)', by: 'AI' },
+      { time: '14:40', text: 'ตรวจสอบข้อมูลแล้ว', by: 'สรวิศ ก.' },
+      { time: '14:45', text: 'ยื่นกรม อย. สำเร็จ', by: 'ระบบ' },
     ],
     email: { toName: '', to: '', subject: '', body: '', attName: '' },
     messages: [
@@ -357,7 +392,8 @@ export const MOCK_QUEUE: Shipment[] = [
     draft: { fields: [] }, flags: [],
     audit: [
       { time: '10:00', text: 'เข้าระบบ', by: 'ระบบ' },
-      { time: '10:02', text: 'ตรวจสอบแล้ว — ไม่ต้องขอใบอนุญาต', by: 'AI' },
+      { time: '10:01', text: 'OCR สำเร็จ', by: 'AI' },
+      { time: '10:02', text: 'วิเคราะห์ HS Code: 2501.00.10 → ไม่ต้องขออนุญาต (98%)', by: 'AI' },
     ],
     email: { toName: '', to: '', subject: '', body: '', attName: '' },
     messages: [
@@ -378,7 +414,11 @@ export const MOCK_QUEUE: Shipment[] = [
     assess: { conf: 93, reason: 'Calcium Carbonate เกรด Pharmaceutical ต้องขออนุญาต อย.' },
     classify: { agency: 'fda', conf: 93, reason: '', alt: [] },
     draft: { fields: [] }, flags: [],
-    audit: [{ time: '13:20', text: 'เข้าระบบ', by: 'ระบบ' }],
+    audit: [
+      { time: '13:20', text: 'เข้าระบบ', by: 'ระบบ' },
+      { time: '13:22', text: 'OCR สำเร็จ', by: 'AI' },
+      { time: '13:22', text: 'วิเคราะห์ HS Code: 2836.50.00 → อย. (93%)', by: 'AI' },
+    ],
     email: { toName: '', to: '', subject: '', body: '', attName: '' },
     messages: [
       bot('13:20', 'ใบขนสินค้า Calcium Carbonate เข้าระบบแล้ว'),
@@ -400,7 +440,8 @@ export const MOCK_QUEUE: Shipment[] = [
     draft: { fields: [] }, flags: [],
     audit: [
       { time: '09:00', text: 'เข้าระบบ', by: 'ระบบ' },
-      { time: '09:30', text: 'OCR และวิเคราะห์สำเร็จ', by: 'AI' },
+      { time: '09:20', text: 'OCR สำเร็จ', by: 'AI' },
+      { time: '09:30', text: 'วิเคราะห์ HS Code: 3206.11.00 → อย. (87%)', by: 'AI' },
     ],
     email: { toName: '', to: '', subject: '', body: '', attName: '' },
     messages: [

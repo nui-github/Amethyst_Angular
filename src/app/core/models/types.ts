@@ -220,7 +220,7 @@ export interface ShipmentFlag {
 export interface AuditEntry {
   time: string;
   text: string;
-  by: 'ระบบ' | 'AI' | 'เจ้าหน้าที่';
+  by: string;
 }
 
 export interface Shipment {
