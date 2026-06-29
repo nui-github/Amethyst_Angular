@@ -369,8 +369,7 @@
             </p>
           }
           <div class="dv-footer__btns">
-            <button class="dv-btn dv-btn--ghost">แก้ไขร่าง</button>
-            @if (canProceed(openShipment()!)) {
+@if (canProceed(openShipment()!)) {
               <button class="dv-btn dv-btn--primary" (click)="proceedToChat(openShipment()!)">
                 {{ unresolvedFlags(openShipment()!).length > 0 ? 'ไปยืนยันในแชท →' : 'ดำเนินการต่อ →' }}
               </button>
