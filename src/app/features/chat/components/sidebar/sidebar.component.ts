@@ -38,4 +38,14 @@ export class SidebarComponent {
   goChat()  { this.router.navigate(['/']); }
   goQueue() { this.queue.open(''); this.router.navigate(['/queue']); }
   newChat() { this.chat.newChat(); this.goChat(); }
+
+  // Fixed-position tooltip (escapes overflow:auto boundary)
+  readonly tooltip = signal<{ text: string; x: number; y: number } | null>(null);
+
+  showTooltip(event: MouseEvent, text: string): void {
+    const r = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    this.tooltip.set({ text, x: r.right + 10, y: r.top + r.height / 2 });
+  }
+
+  hideTooltip(): void { this.tooltip.set(null); }
 }
