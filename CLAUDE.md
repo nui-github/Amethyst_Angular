@@ -33,6 +33,7 @@ Key rules:
   var(--bizx-n600)    // #4B5563  — secondary text
   ```
 - Inline `style="color: #0463EF"` only for one-offs in component `.ts` inline templates
+- Primary buttons use a **flat** `var(--bizx-blue)` background, never a gradient — darken slightly on hover (e.g. `#034DBA`) instead of changing opacity. Gradients are reserved for progress-bar fills and chart fills, not buttons
 - IBM Plex Sans Thai — already loaded globally, use `font-family: inherit` in components
 - No emoji in UI — use lucide-angular icons or inline SVG
 

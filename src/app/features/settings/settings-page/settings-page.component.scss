@@ -431,14 +431,14 @@
   padding: 9px 20px;
   border-radius: 9px;
   border: none;
-  background: linear-gradient(135deg, #034DBA, #0463EF);
+  background: var(--bizx-blue);
   color: #fff;
   font-size: 13px;
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
-  transition: opacity 0.15s;
-  &:hover { opacity: 0.88; }
+  transition: background 0.15s;
+  &:hover { background: #034DBA; }
   &:disabled { opacity: 0.5; cursor: default; }
 }
 
