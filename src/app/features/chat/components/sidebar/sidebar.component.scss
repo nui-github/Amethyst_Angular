@@ -10,6 +10,7 @@
   transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1);
 
   &--collapsed { overflow: visible; }
+  &--menu-open { overflow: visible; }
 
   &--collapsed {
     width: 52px;
@@ -272,7 +273,7 @@
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(16, 24, 64, 0.14);
   padding: 8px;
-  z-index: 50;
+  z-index: 1000;
   animation: profileMenuIn 0.12s ease-out;
 
   &--collapsed { left: 4px; width: 210px; }
