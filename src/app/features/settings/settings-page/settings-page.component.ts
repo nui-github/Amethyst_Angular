@@ -5,12 +5,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
   LucideAngularModule, ArrowLeft, Pencil, Check, ChevronDown,
   Wifi, WifiOff, LogOut, User, Lock, SlidersHorizontal, UserCog, ShieldCheck, CreditCard,
-  BarChart3, Plus, Package, FileText, Download, Receipt, FileCheck2, Wallet, Construction, Zap,
+  BarChart3, Plus, Package, FileText, Download, Receipt, FileCheck2, Wallet, Construction,
 } from 'lucide-angular';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { ChatService } from '@app/core/services/chat.service';
 import { MOCK_SPN_PROFILES, SpnProfile } from '@mock/spn-companies.mock';
-import { CURRENT_PLAN, PAYMENT_METHOD, MOCK_INVOICES, BILLING_ADDRESS, BillingAddress, TOKEN_USAGE } from '@mock/subscription.mock';
+import { CURRENT_PLAN, PAYMENT_METHOD, MOCK_INVOICES, BILLING_ADDRESS, BillingAddress } from '@mock/subscription.mock';
 import { MOCK_USAGE, UsageMonth, monthTotal, monthPaidCount, monthFreeCount } from '@mock/usage.mock';
 
 type SettingsSection = 'general' | 'account' | 'privacy' | 'billing' | 'usage';
@@ -52,7 +52,6 @@ export class SettingsPageComponent {
   readonly FileCheck2   = FileCheck2;
   readonly Wallet       = Wallet;
   readonly Construction = Construction;
-  readonly Zap          = Zap;
 
   // ── Top-level section nav ──────────────────────────────────────────────────
   readonly navItems: { id: SettingsSection; label: string; icon: typeof SlidersHorizontal }[] = [
@@ -198,12 +197,6 @@ export class SettingsPageComponent {
   monthQuotaPct(m: UsageMonth): number {
     return Math.min(100, Math.round((m.items.length / this.plan.licenseQuota) * 100));
   }
-
-  readonly tokenUsage = TOKEN_USAGE;
-  readonly tokenRemaining = computed(() => Math.max(0, this.tokenUsage.quota - this.tokenUsage.used));
-  readonly tokenUsedPct = computed(() =>
-    Math.min(100, Math.round((this.tokenUsage.used / this.tokenUsage.quota) * 100))
-  );
 
   expandedMonths = signal<Set<string>>(new Set(this.months.length ? [this.months[0].monthKey] : []));
 

@@ -819,61 +819,6 @@
   &--pending { color: #B45309; background: #FFFBEB; }
 }
 
-// ── Usage: Token card ─────────────────────────────────────────────────────────
-
-.token-card {
-  background: #fff;
-  border: 1px solid #E8EAF2;
-  border-radius: 14px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.token-card__hd {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.token-card__icon {
-  width: 36px; height: 36px;
-  border-radius: 10px;
-  background: rgba(124, 58, 237, 0.1);
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-
-.token-card__hd-body { flex: 1; min-width: 0; }
-
-.token-card__title {
-  font-size: 13px;
-  font-weight: 700;
-  color: #010136;
-  margin: 0;
-}
-
-.token-card__sub {
-  font-size: 11px;
-  color: #9CA3AF;
-  margin: 2px 0 0;
-}
-
-.token-card__pct {
-  font-size: 14px;
-  font-weight: 700;
-  color: #7C3AED;
-  margin: 0;
-}
-
-.token-card__stats {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  color: #6B7280;
-}
-
 // ── Usage: Summary cards ─────────────────────────────────────────────────────
 
 .summary-row {
