@@ -441,6 +441,27 @@
           </div>
         </div>
 
+        <!-- Token usage -->
+        <div class="token-card">
+          <div class="token-card__hd">
+            <div class="token-card__icon">
+              <lucide-icon [img]="Zap" [size]="16" color="#7C3AED" />
+            </div>
+            <div class="token-card__hd-body">
+              <p class="token-card__title">การใช้งาน Token รายเดือน</p>
+              <p class="token-card__sub">รอบ {{ tokenUsage.monthLabel }} · รีเซ็ตวันที่ {{ tokenUsage.resetsAt }}</p>
+            </div>
+            <p class="token-card__pct">{{ tokenUsedPct() }}%</p>
+          </div>
+          <div class="plan-bar">
+            <div class="plan-bar__fill" [style.width.%]="tokenUsedPct()"></div>
+          </div>
+          <div class="token-card__stats">
+            <span>ใช้ไป {{ tokenUsage.used | number }} token</span>
+            <span>เหลือ {{ tokenRemaining() | number }} / {{ tokenUsage.quota | number }} token</span>
+          </div>
+        </div>
+
         <div class="month-list">
           @for (m of months; track m.monthKey) {
             <div class="month-card">

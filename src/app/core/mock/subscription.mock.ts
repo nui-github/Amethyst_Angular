@@ -60,6 +60,20 @@ export const BILLING_ADDRESS: BillingAddress = {
   postalCode: '10110',
 };
 
+export interface TokenUsage {
+  monthLabel: string;     // "มิถุนายน 2569"
+  quota: number;          // โควต้า token ต่อเดือนตามแพ็กเกจ เช่น 1,000,000
+  used: number;           // ใช้ไปแล้วในเดือนนี้
+  resetsAt: string;       // วันที่โควต้ารีเซ็ตรอบถัดไป dd/mm/yyyy
+}
+
+export const TOKEN_USAGE: TokenUsage = {
+  monthLabel: 'มิถุนายน 2569',
+  quota: 1_000_000,
+  used: 612_400,
+  resetsAt: '01/07/2569',
+};
+
 export interface InvoiceRecord {
   id: string;
   invoiceNo: string;
