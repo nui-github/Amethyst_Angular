@@ -6,6 +6,7 @@ import {
   LucideAngularModule, ArrowLeft, Pencil, Check, ChevronDown,
   Wifi, WifiOff, LogOut, User, Lock, SlidersHorizontal, UserCog, ShieldCheck, CreditCard,
   BarChart3, Plus, Package, FileText, Download, Receipt, FileCheck2, Wallet, Construction,
+  TrendingUp, PieChart, Trophy,
 } from 'lucide-angular';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { ChatService } from '@app/core/services/chat.service';
@@ -52,6 +53,9 @@ export class SettingsPageComponent {
   readonly FileCheck2   = FileCheck2;
   readonly Wallet       = Wallet;
   readonly Construction = Construction;
+  readonly TrendingUp   = TrendingUp;
+  readonly PieChart     = PieChart;
+  readonly Trophy       = Trophy;
 
   // ── Top-level section nav ──────────────────────────────────────────────────
   readonly navItems: { id: SettingsSection; label: string; icon: typeof SlidersHorizontal }[] = [
@@ -197,6 +201,56 @@ export class SettingsPageComponent {
   monthQuotaPct(m: UsageMonth): number {
     return Math.min(100, Math.round((m.items.length / this.plan.licenseQuota) * 100));
   }
+
+  // ── Usage dashboard ───────────────────────────────────────────────────────
+  private readonly AGENCY_COLORS: Record<string, string> = {
+    'อย.': '#0463EF', 'กษ.': '#B45309', 'วอ.': '#7C3AED', 'กรมประมง': '#0D8F61', 'กรมปศุสัตว์': '#DB2777',
+  };
+  agencyColor(agency: string): string { return this.AGENCY_COLORS[agency] ?? '#6B7280'; }
+
+  // oldest → newest, for left-to-right trend reading
+  readonly chronoMonths = computed(() => [...this.months].reverse());
+
+  readonly maxMonthlySpend = computed(() =>
+    Math.max(1, ...this.months.map(m => monthTotal(m)))
+  );
+
+  readonly agencyBreakdown = computed(() => {
+    const counts = new Map<string, number>();
+    for (const m of this.months) {
+      for (const item of m.items) {
+        counts.set(item.agency, (counts.get(item.agency) ?? 0) + 1);
+      }
+    }
+    const total = this.totalLicenses();
+    return Array.from(counts.entries())
+      .map(([agency, count]) => ({ agency, count, pct: total ? Math.round((count / total) * 100) : 0 }))
+      .sort((a, b) => b.count - a.count);
+  });
+
+  readonly agencyDonutGradient = computed(() => {
+    let acc = 0;
+    const stops = this.agencyBreakdown().map(a => {
+      const start = acc;
+      acc += a.pct;
+      return `${this.agencyColor(a.agency)} ${start}% ${acc}%`;
+    });
+    return `conic-gradient(${stops.join(', ')})`;
+  });
+
+  readonly topGoods = computed(() => {
+    const counts = new Map<string, number>();
+    for (const m of this.months) {
+      for (const item of m.items) {
+        counts.set(item.goods, (counts.get(item.goods) ?? 0) + 1);
+      }
+    }
+    const maxCount = Math.max(1, ...Array.from(counts.values()));
+    return Array.from(counts.entries())
+      .map(([goods, count]) => ({ goods, count, pct: Math.round((count / maxCount) * 100) }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+  });
 
   expandedMonths = signal<Set<string>>(new Set(this.months.length ? [this.months[0].monthKey] : []));
 

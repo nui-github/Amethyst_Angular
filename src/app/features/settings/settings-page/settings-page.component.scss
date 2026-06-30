@@ -819,6 +819,177 @@
   &--pending { color: #B45309; background: #FFFBEB; }
 }
 
+// ── Usage: Dashboard ────────────────────────────────────────────────────────
+
+.dash-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.dash-card {
+  background: #fff;
+  border: 1px solid #E8EAF2;
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.dash-card__hd {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #010136;
+}
+
+// Trend bar chart (spend / quota)
+.trend-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  height: 120px;
+}
+
+.trend-bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+}
+
+.trend-bar-col__amount {
+  font-size: 10px;
+  font-weight: 700;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.trend-bar-col__track {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  background: #F5F6FA;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.trend-bar-col__fill {
+  width: 100%;
+  min-height: 3px;
+  background: linear-gradient(180deg, #0463EF, #16EA9E);
+  border-radius: 6px 6px 0 0;
+  transition: height 0.2s;
+
+  &--quota { background: linear-gradient(180deg, #0D8F61, #16EA9E); }
+}
+
+.trend-bar-col__label {
+  font-size: 10px;
+  color: #9CA3AF;
+}
+
+// Donut chart (agency breakdown)
+.donut-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.donut {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 16px), #000 calc(100% - 16px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 16px), #000 calc(100% - 16px));
+}
+
+.donut-legend {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.donut-legend__row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+}
+
+.donut-legend__dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.donut-legend__agency {
+  flex: 1;
+  color: #374151;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.donut-legend__pct {
+  color: #9CA3AF;
+  font-weight: 600;
+  font-size: 11px;
+}
+
+// Top goods list
+.top-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.top-list__row {
+  display: grid;
+  grid-template-columns: 1fr 90px 56px;
+  align-items: center;
+  gap: 10px;
+}
+
+.top-list__name {
+  font-size: 12px;
+  font-weight: 500;
+  color: #374151;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.top-list__track {
+  height: 6px;
+  background: #F5F6FA;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.top-list__fill {
+  height: 100%;
+  background: linear-gradient(90deg, #B45309, #F59E0B);
+  border-radius: 3px;
+}
+
+.top-list__count {
+  font-size: 11px;
+  color: #9CA3AF;
+  text-align: right;
+  white-space: nowrap;
+}
+
 // ── Usage: Summary cards ─────────────────────────────────────────────────────
 
 .summary-row {
