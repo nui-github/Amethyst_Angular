@@ -470,6 +470,7 @@
                   <lucide-icon [img]="ChevronDown" [size]="14" class="chevron" [class.chevron--open]="isExpanded(m.monthKey)" />
                   <span class="month-card__title">{{ m.monthLabel }}</span>
                   <span class="month-card__count">{{ m.items.length }} ใบ</span>
+                  <span class="month-card__quota-tag">โควต้า {{ m.items.length }}/{{ plan.licenseQuota }} เอกสาร</span>
                 </div>
                 <div class="month-card__hd-right">
                   @if (monthPaidCount(m) > 0) {
@@ -482,6 +483,15 @@
 
               @if (isExpanded(m.monthKey)) {
                 <div class="month-card__body">
+                  <div class="month-card__quota">
+                    <div class="month-card__quota-row">
+                      <span>โควต้าการขอใบอนุญาต (แพ็กเกจ {{ plan.name }})</span>
+                      <span>{{ m.items.length }} / {{ plan.licenseQuota }} เอกสาร</span>
+                    </div>
+                    <div class="plan-bar plan-bar--sm">
+                      <div class="plan-bar__fill" [style.width.%]="monthQuotaPct(m)"></div>
+                    </div>
+                  </div>
                   <div class="doc-table">
                     <div class="doc-table__head">
                       <span>สินค้า / เลขอ้างอิง</span>

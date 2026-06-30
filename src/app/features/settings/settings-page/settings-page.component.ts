@@ -195,6 +195,10 @@ export class SettingsPageComponent {
     this.months.reduce((sum, m) => sum + monthPaidCount(m), 0)
   );
 
+  monthQuotaPct(m: UsageMonth): number {
+    return Math.min(100, Math.round((m.items.length / this.plan.licenseQuota) * 100));
+  }
+
   readonly tokenUsage = TOKEN_USAGE;
   readonly tokenRemaining = computed(() => Math.max(0, this.tokenUsage.quota - this.tokenUsage.used));
   readonly tokenUsedPct = computed(() =>

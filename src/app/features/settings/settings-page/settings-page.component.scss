@@ -963,6 +963,32 @@
   color: #9CA3AF;
 }
 
+.month-card__quota-tag {
+  font-size: 10px;
+  font-weight: 600;
+  color: #6B7280;
+  background: #F3F4F6;
+  padding: 2px 8px;
+  border-radius: 5px;
+  white-space: nowrap;
+}
+
+.month-card__quota {
+  padding: 4px 8px 12px;
+}
+
+.month-card__quota-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #6B7280;
+  margin-bottom: 5px;
+}
+
+.plan-bar--sm {
+  height: 5px;
+}
+
 .month-card__fee-tag {
   font-size: 12px;
   font-weight: 700;
