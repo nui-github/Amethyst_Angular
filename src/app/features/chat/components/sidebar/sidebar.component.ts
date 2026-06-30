@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, HostListener, Input, Output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { LucideAngularModule, MessageSquareText, MessageSquare, Settings, Plus, ChevronRight, PanelLeftClose, PanelLeftOpen, List, Bot } from 'lucide-angular';
+import { LucideAngularModule, MessageSquareText, MessageSquare, Settings, Plus, ChevronRight, PanelLeftClose, PanelLeftOpen, List, Bot, Receipt, LogOut } from 'lucide-angular';
 import { ChatService } from '@app/core/services/chat.service';
 import { QueueService } from '@app/core/services/queue.service';
 
@@ -31,6 +31,8 @@ export class SidebarComponent {
   readonly icPanelOpen   = PanelLeftOpen;
   readonly icList        = List;
   readonly icBot         = Bot;
+  readonly icBilling     = Receipt;
+  readonly icLogout      = LogOut;
 
   isChat  = () => this.router.url === '/' || this.router.url === '';
   isQueue = () => this.router.url === '/queue';
@@ -48,4 +50,32 @@ export class SidebarComponent {
   }
 
   hideTooltip(): void { this.tooltip.set(null); }
+
+  // Profile popup menu
+  readonly profileMenuOpen = signal(false);
+  private readonly elRef = inject(ElementRef);
+
+  toggleProfileMenu(event: MouseEvent): void {
+    event.stopPropagation();
+    this.profileMenuOpen.update(v => !v);
+  }
+
+  closeProfileMenu(): void { this.profileMenuOpen.set(false); }
+
+  goSettings(): void { this.closeProfileMenu(); this.router.navigate(['/settings']); }
+  goBilling(): void  { this.closeProfileMenu(); this.router.navigate(['/billing']); }
+
+  logout(): void {
+    this.closeProfileMenu();
+    this.chat.disconnect();
+    this.chat.newChat();
+    this.router.navigate(['/']);
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (this.profileMenuOpen() && !this.elRef.nativeElement.contains(event.target)) {
+      this.closeProfileMenu();
+    }
+  }
 }

@@ -21,5 +21,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/settings/settings-page/settings-page.component')
       .then(m => m.SettingsPageComponent),
   },
+  {
+    path: 'billing',
+    loadComponent: () => import('./features/billing/billing-page/billing-page.component')
+      .then(m => m.BillingPageComponent),
+  },
   { path: '**', redirectTo: '' },
 ];

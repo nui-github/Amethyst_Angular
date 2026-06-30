@@ -85,21 +85,42 @@
       </div>
     }
 
-    <!-- Settings -->
-    <button class="settings-btn" [attr.data-tip]="collapsed ? 'ตั้งค่า' : null" (click)="router.navigate(['/settings'])">
-      <lucide-icon [img]="icSettings" [size]="14" />
-      @if (!collapsed) { <span>ตั้งค่า</span> }
-    </button>
-
-    <!-- Profile -->
-    <div class="sb-profile" [attr.data-tip]="collapsed ? 'Mr. John Doe' : null">
-      <div class="sb-profile__avatar">J</div>
-      @if (!collapsed) {
-        <div class="sb-profile__info">
-          <p class="sb-profile__name">Mr. John Doe</p>
-          <p class="sb-profile__role">Admin</p>
+    <!-- Profile (click → popup menu) -->
+    <div class="sb-profile-wrap">
+      @if (profileMenuOpen()) {
+        <div class="profile-menu" [class.profile-menu--collapsed]="collapsed">
+          <div class="profile-menu__header">
+            <div class="sb-profile__avatar">J</div>
+            <div class="sb-profile__info">
+              <p class="sb-profile__name">Mr. John Doe</p>
+              <p class="sb-profile__role">Admin</p>
+            </div>
+          </div>
+          <div class="profile-menu__divider"></div>
+          <button class="profile-menu__item" (click)="goSettings()">
+            <lucide-icon [img]="icSettings" [size]="14" />
+            <span>ตั้งค่า</span>
+          </button>
+          <button class="profile-menu__item" (click)="goBilling()">
+            <lucide-icon [img]="icBilling" [size]="14" />
+            <span>ค่าใช้จ่าย</span>
+          </button>
+          <div class="profile-menu__divider"></div>
+          <button class="profile-menu__item profile-menu__item--danger" (click)="logout()">
+            <lucide-icon [img]="icLogout" [size]="14" />
+            <span>ออกจากระบบ</span>
+          </button>
         </div>
       }
+      <button class="sb-profile" [attr.data-tip]="collapsed ? 'Mr. John Doe' : null" (click)="toggleProfileMenu($event)">
+        <div class="sb-profile__avatar">J</div>
+        @if (!collapsed) {
+          <div class="sb-profile__info">
+            <p class="sb-profile__name">Mr. John Doe</p>
+            <p class="sb-profile__role">Admin</p>
+          </div>
+        }
+      </button>
     </div>
 
     <!-- BizX logo — full or icon only -->

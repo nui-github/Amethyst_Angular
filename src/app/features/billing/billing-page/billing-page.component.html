@@ -1,0 +1,105 @@
+<div class="billing-shell">
+
+  <!-- Top header -->
+  <div class="billing-header">
+    <button class="back-btn" (click)="goBack()">
+      <lucide-icon [img]="ArrowLeft" [size]="15" />
+    </button>
+    <lucide-icon [img]="Receipt" [size]="15" color="#0463EF" />
+    <span class="billing-header__title">ค่าใช้จ่ายรายเดือน</span>
+  </div>
+
+  <div class="billing-body">
+
+    <!-- Summary cards -->
+    <div class="summary-row">
+      <div class="summary-card">
+        <div class="summary-card__icon" style="background:#EFF6FF">
+          <lucide-icon [img]="Wallet" [size]="16" color="#0463EF" />
+        </div>
+        <div>
+          <p class="summary-card__label">เดือนนี้ ({{ currentMonth()!.monthLabel }})</p>
+          <p class="summary-card__value">฿{{ currentMonth() ? monthTotal(currentMonth()!) : 0 | number }}</p>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-card__icon" style="background:#F3F4F6">
+          <lucide-icon [img]="FileCheck2" [size]="16" color="#6B7280" />
+        </div>
+        <div>
+          <p class="summary-card__label">ใบอนุญาตทั้งหมด</p>
+          <p class="summary-card__value">{{ totalLicenses() }} ใบ</p>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-card__icon" style="background:#FFFBEB">
+          <lucide-icon [img]="Receipt" [size]="16" color="#B45309" />
+        </div>
+        <div>
+          <p class="summary-card__label">ใบที่มีค่าธรรมเนียม</p>
+          <p class="summary-card__value">{{ totalPaidLicenses() }} ใบ · ฿{{ totalFeeAllTime() | number }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Monthly breakdown -->
+    <div class="month-list">
+      @for (m of months; track m.monthKey) {
+        <div class="month-card">
+          <button class="month-card__hd" (click)="toggleMonth(m.monthKey)">
+            <div class="month-card__hd-left">
+              <lucide-icon [img]="ChevronDown" [size]="14" class="chevron" [class.chevron--open]="isExpanded(m.monthKey)" />
+              <span class="month-card__title">{{ m.monthLabel }}</span>
+              <span class="month-card__count">{{ m.items.length }} ใบ</span>
+            </div>
+            <div class="month-card__hd-right">
+              @if (monthPaidCount(m) > 0) {
+                <span class="month-card__fee-tag">฿{{ monthTotal(m) | number }}</span>
+              } @else {
+                <span class="month-card__free-tag">ฟรีทั้งหมด</span>
+              }
+            </div>
+          </button>
+
+          @if (isExpanded(m.monthKey)) {
+            <div class="month-card__body">
+              <div class="doc-table">
+                <div class="doc-table__head">
+                  <span>สินค้า / เลขอ้างอิง</span>
+                  <span>กรม</span>
+                  <span>วันที่ยื่น</span>
+                  <span class="doc-table__fee-col">ค่าธรรมเนียม</span>
+                </div>
+                @for (item of m.items; track item.id) {
+                  <div class="doc-table__row">
+                    <div class="doc-table__goods">
+                      <span class="doc-table__goods-name">{{ item.goods }}</span>
+                      <span class="doc-table__ref">{{ item.refNo }}</span>
+                    </div>
+                    <span class="doc-table__agency">{{ item.agency }}</span>
+                    <span class="doc-table__date">{{ item.submittedAt }}</span>
+                    <span class="doc-table__fee-col">
+                      @if (item.fee > 0) {
+                        <span class="fee-paid">฿{{ item.fee | number }}</span>
+                      } @else {
+                        <span class="fee-free">ฟรี</span>
+                      }
+                    </span>
+                  </div>
+                }
+              </div>
+              <div class="month-card__total">
+                <span>รวม {{ monthFreeCount(m) }} ฟรี · {{ monthPaidCount(m) }} มีค่าธรรมเนียม</span>
+                <span class="month-card__total-amount">฿{{ monthTotal(m) | number }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+  </div>
+
+</div>
