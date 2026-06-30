@@ -57,7 +57,9 @@ button.back-btn,
 button.list-row,
 button.bizx-logo-btn,
 button.sb-profile,
-button.profile-menu__item {
+button.profile-menu__item,
+button.settings-sidebar__back,
+button.settings-sidebar__item {
   display: flex;
   justify-content: flex-start;
 }
