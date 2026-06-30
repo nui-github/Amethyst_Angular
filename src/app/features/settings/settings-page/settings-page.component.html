@@ -450,17 +450,11 @@
               <lucide-icon [img]="TrendingUp" [size]="14" color="#0463EF" />
               <span>แนวโน้มค่าใช้จ่ายรายเดือน</span>
             </div>
-            <div class="trend-chart">
-              @for (m of chronoMonths(); track m.monthKey) {
-                <div class="trend-bar-col">
-                  <span class="trend-bar-col__amount">฿{{ monthTotal(m) | number }}</span>
-                  <div class="trend-bar-col__track">
-                    <div class="trend-bar-col__fill" [style.height.%]="(monthTotal(m) / maxMonthlySpend()) * 100"></div>
-                  </div>
-                  <span class="trend-bar-col__label">{{ m.monthLabel.split(' ')[0].slice(0, 3) }}</span>
-                </div>
-              }
-            </div>
+            <apx-chart
+              [series]="spendSeries()" [chart]="spendChart" [xaxis]="spendXaxis()"
+              [plotOptions]="spendPlotOptions" [fill]="spendFill" [dataLabels]="spendDataLabels"
+              [tooltip]="spendTooltip" [grid]="chartGrid" [colors]="['#0463EF']"
+              [legend]="{ show: false }" />
           </div>
 
           <!-- โควต้าใบอนุญาต trend -->
@@ -469,17 +463,11 @@
               <lucide-icon [img]="BarChart3" [size]="14" color="#0D8F61" />
               <span>แนวโน้มการใช้โควต้าใบอนุญาต</span>
             </div>
-            <div class="trend-chart">
-              @for (m of chronoMonths(); track m.monthKey) {
-                <div class="trend-bar-col">
-                  <span class="trend-bar-col__amount">{{ m.items.length }}/{{ plan.licenseQuota }}</span>
-                  <div class="trend-bar-col__track">
-                    <div class="trend-bar-col__fill trend-bar-col__fill--quota" [style.height.%]="monthQuotaPct(m)"></div>
-                  </div>
-                  <span class="trend-bar-col__label">{{ m.monthLabel.split(' ')[0].slice(0, 3) }}</span>
-                </div>
-              }
-            </div>
+            <apx-chart
+              [series]="quotaSeries()" [chart]="quotaChart" [xaxis]="quotaXaxis()" [yaxis]="quotaYaxis"
+              [plotOptions]="quotaPlotOptions" [fill]="quotaFill" [dataLabels]="quotaDataLabels"
+              [tooltip]="quotaTooltip" [grid]="chartGrid" [colors]="['#0D8F61']"
+              [legend]="{ show: false }" />
           </div>
 
           <!-- สัดส่วนกรมที่ขอบ่อย -->
@@ -488,18 +476,10 @@
               <lucide-icon [img]="PieChart" [size]="14" color="#7C3AED" />
               <span>สัดส่วนกรมที่ขอบ่อย</span>
             </div>
-            <div class="donut-row">
-              <div class="donut" [style.background]="agencyDonutGradient()"></div>
-              <div class="donut-legend">
-                @for (a of agencyBreakdown(); track a.agency) {
-                  <div class="donut-legend__row">
-                    <span class="donut-legend__dot" [style.background]="agencyColor(a.agency)"></span>
-                    <span class="donut-legend__agency">{{ a.agency }}</span>
-                    <span class="donut-legend__pct">{{ a.pct }}%</span>
-                  </div>
-                }
-              </div>
-            </div>
+            <apx-chart
+              [series]="agencySeries()" [chart]="agencyChart" [labels]="agencyLabels()"
+              [colors]="agencyColors()" [legend]="agencyLegend" [dataLabels]="agencyDataLabels"
+              [stroke]="agencyStroke" [states]="agencyStates" />
           </div>
 
           <!-- สินค้าที่ขอบ่อยที่สุด -->
@@ -508,17 +488,11 @@
               <lucide-icon [img]="Trophy" [size]="14" color="#B45309" />
               <span>สินค้าที่ขอใบอนุญาตบ่อยที่สุด</span>
             </div>
-            <div class="top-list">
-              @for (g of topGoods(); track g.goods) {
-                <div class="top-list__row">
-                  <span class="top-list__name">{{ g.goods }}</span>
-                  <div class="top-list__track">
-                    <div class="top-list__fill" [style.width.%]="g.pct"></div>
-                  </div>
-                  <span class="top-list__count">{{ g.count }} ครั้ง</span>
-                </div>
-              }
-            </div>
+            <apx-chart
+              [series]="topGoodsSeries()" [chart]="topGoodsChart" [xaxis]="topGoodsXaxis()"
+              [plotOptions]="topGoodsPlotOptions" [fill]="topGoodsFill" [dataLabels]="topGoodsDataLabels"
+              [tooltip]="topGoodsTooltip" [grid]="topGoodsGrid" [colors]="['#B45309']"
+              [legend]="{ show: false }" />
           </div>
 
         </div>

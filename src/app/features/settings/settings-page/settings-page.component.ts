@@ -9,10 +9,17 @@ import {
   TrendingUp, PieChart, Trophy,
 } from 'lucide-angular';
 import { NzInputModule } from 'ng-zorro-antd/input';
+import {
+  NgApexchartsModule, ApexAxisChartSeries, ApexNonAxisChartSeries, ApexChart, ApexXAxis, ApexYAxis,
+  ApexDataLabels, ApexFill, ApexGrid, ApexTooltip, ApexStroke, ApexPlotOptions, ApexLegend, ApexStates,
+} from 'ng-apexcharts';
 import { ChatService } from '@app/core/services/chat.service';
 import { MOCK_SPN_PROFILES, SpnProfile } from '@mock/spn-companies.mock';
 import { CURRENT_PLAN, PAYMENT_METHOD, MOCK_INVOICES, BILLING_ADDRESS, BillingAddress } from '@mock/subscription.mock';
 import { MOCK_USAGE, UsageMonth, monthTotal, monthPaidCount, monthFreeCount } from '@mock/usage.mock';
+
+const CHART_FONT = 'IBM Plex Sans Thai, sans-serif';
+const AXIS_LABEL_STYLE = { colors: '#9CA3AF', fontSize: '11px', fontFamily: CHART_FONT };
 
 type SettingsSection = 'general' | 'account' | 'privacy' | 'billing' | 'usage';
 type AccountTab = 'connect' | 'profiles';
@@ -22,7 +29,7 @@ type BillingTab = 'plan' | 'payment' | 'invoice';
   selector: 'app-settings-page',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, LucideAngularModule, NzInputModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule, NzInputModule, NgApexchartsModule],
   templateUrl: './settings-page.component.html',
   styleUrl: './settings-page.component.scss',
 })
@@ -211,10 +218,6 @@ export class SettingsPageComponent {
   // oldest → newest, for left-to-right trend reading
   readonly chronoMonths = computed(() => [...this.months].reverse());
 
-  readonly maxMonthlySpend = computed(() =>
-    Math.max(1, ...this.months.map(m => monthTotal(m)))
-  );
-
   readonly agencyBreakdown = computed(() => {
     const counts = new Map<string, number>();
     for (const m of this.months) {
@@ -228,16 +231,6 @@ export class SettingsPageComponent {
       .sort((a, b) => b.count - a.count);
   });
 
-  readonly agencyDonutGradient = computed(() => {
-    let acc = 0;
-    const stops = this.agencyBreakdown().map(a => {
-      const start = acc;
-      acc += a.pct;
-      return `${this.agencyColor(a.agency)} ${start}% ${acc}%`;
-    });
-    return `conic-gradient(${stops.join(', ')})`;
-  });
-
   readonly topGoods = computed(() => {
     const counts = new Map<string, number>();
     for (const m of this.months) {
@@ -245,12 +238,101 @@ export class SettingsPageComponent {
         counts.set(item.goods, (counts.get(item.goods) ?? 0) + 1);
       }
     }
-    const maxCount = Math.max(1, ...Array.from(counts.values()));
     return Array.from(counts.entries())
-      .map(([goods, count]) => ({ goods, count, pct: Math.round((count / maxCount) * 100) }))
+      .map(([goods, count]) => ({ goods, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 5);
   });
+
+  // ── ApexCharts: แนวโน้มค่าใช้จ่ายรายเดือน ─────────────────────────────────
+  readonly spendChart: ApexChart = { type: 'bar', height: 220, width: '100%', fontFamily: CHART_FONT, toolbar: { show: false } };
+  readonly spendPlotOptions: ApexPlotOptions = { bar: { borderRadius: 6, columnWidth: '46%' } };
+  readonly spendFill: ApexFill = {
+    type: 'gradient',
+    gradient: { shade: 'light', type: 'vertical', shadeIntensity: 0.3, gradientToColors: ['#16EA9E'], opacityFrom: 0.95, opacityTo: 0.85, stops: [0, 100] },
+  };
+  readonly spendDataLabels: ApexDataLabels = {
+    enabled: true, offsetY: -20,
+    style: { fontSize: '11px', fontFamily: CHART_FONT, colors: ['#374151'], fontWeight: 700 },
+    formatter: (val: number) => `฿${val.toLocaleString()}`,
+  };
+  readonly spendTooltip: ApexTooltip = { theme: 'light', y: { formatter: (val: number) => `฿${val.toLocaleString()}` } };
+
+  readonly spendSeries = computed<ApexAxisChartSeries>(() => [
+    { name: 'ค่าใช้จ่าย', data: this.chronoMonths().map(m => monthTotal(m)) },
+  ]);
+  readonly spendXaxis = computed<ApexXAxis>(() => ({
+    categories: this.chronoMonths().map(m => m.monthLabel),
+    labels: { style: AXIS_LABEL_STYLE }, axisBorder: { show: false }, axisTicks: { show: false },
+  }));
+
+  // ── ApexCharts: แนวโน้มการใช้โควต้าใบอนุญาต ───────────────────────────────
+  readonly quotaChart: ApexChart = { type: 'bar', height: 220, width: '100%', fontFamily: CHART_FONT, toolbar: { show: false } };
+  readonly quotaPlotOptions: ApexPlotOptions = { bar: { borderRadius: 6, columnWidth: '46%' } };
+  readonly quotaFill: ApexFill = {
+    type: 'gradient',
+    gradient: { shade: 'light', type: 'vertical', shadeIntensity: 0.3, gradientToColors: ['#16EA9E'], opacityFrom: 0.95, opacityTo: 0.85, stops: [0, 100] },
+  };
+  readonly quotaDataLabels: ApexDataLabels = {
+    enabled: true, offsetY: -20,
+    style: { fontSize: '11px', fontFamily: CHART_FONT, colors: ['#374151'], fontWeight: 700 },
+    formatter: (val: number) => `${val}%`,
+  };
+  readonly quotaTooltip: ApexTooltip = { theme: 'light', y: { formatter: (val: number) => `${val}% ของโควต้า` } };
+  readonly quotaYaxis: ApexYAxis = { max: 100, labels: { style: AXIS_LABEL_STYLE, formatter: (val: number) => `${val}%` } };
+
+  readonly quotaSeries = computed<ApexAxisChartSeries>(() => [
+    { name: 'ใช้โควต้า', data: this.chronoMonths().map(m => this.monthQuotaPct(m)), color: '#0D8F61' },
+  ]);
+  readonly quotaXaxis = computed<ApexXAxis>(() => ({
+    categories: this.chronoMonths().map(m => m.monthLabel),
+    labels: { style: AXIS_LABEL_STYLE }, axisBorder: { show: false }, axisTicks: { show: false },
+  }));
+
+  // ── ApexCharts: สัดส่วนกรมที่ขอบ่อย ───────────────────────────────────────
+  readonly agencyChart: ApexChart = { type: 'donut', height: 240, width: '100%', fontFamily: CHART_FONT };
+  readonly agencyLegend: ApexLegend = {
+    position: 'right', fontSize: '12px', fontFamily: CHART_FONT,
+    labels: { colors: '#374151' }, markers: { width: 8, height: 8 },
+    itemMargin: { vertical: 4 },
+  };
+  readonly agencyDataLabels: ApexDataLabels = {
+    enabled: true, formatter: (val: number) => `${Math.round(val)}%`,
+    style: { fontSize: '11px', fontFamily: CHART_FONT, fontWeight: 700 },
+  };
+  readonly agencyStroke: ApexStroke = { width: 2, colors: ['#fff'] };
+  readonly agencyStates: ApexStates = { hover: { filter: { type: 'darken' } } };
+
+  readonly agencySeries = computed<ApexNonAxisChartSeries>(() => this.agencyBreakdown().map(a => a.count));
+  readonly agencyLabels = computed(() => this.agencyBreakdown().map(a => a.agency));
+  readonly agencyColors = computed(() => this.agencyBreakdown().map(a => this.agencyColor(a.agency)));
+
+  // ── ApexCharts: สินค้าที่ขอใบอนุญาตบ่อยที่สุด ─────────────────────────────
+  readonly topGoodsChart: ApexChart = { type: 'bar', height: 220, width: '100%', fontFamily: CHART_FONT, toolbar: { show: false } };
+  readonly topGoodsPlotOptions: ApexPlotOptions = {
+    bar: { horizontal: true, borderRadius: 5, barHeight: '55%', distributed: false },
+  };
+  readonly topGoodsFill: ApexFill = {
+    type: 'gradient',
+    gradient: { shade: 'light', type: 'horizontal', shadeIntensity: 0.3, gradientToColors: ['#F59E0B'], opacityFrom: 0.95, opacityTo: 0.9, stops: [0, 100] },
+  };
+  readonly topGoodsDataLabels: ApexDataLabels = {
+    enabled: true,
+    style: { fontSize: '11px', fontFamily: CHART_FONT, colors: ['#fff'], fontWeight: 700 },
+    formatter: (val: number) => `${val} ครั้ง`,
+  };
+  readonly topGoodsTooltip: ApexTooltip = { theme: 'light' };
+  readonly topGoodsGrid: ApexGrid = { borderColor: '#F0F1F5' };
+
+  readonly topGoodsSeries = computed<ApexAxisChartSeries>(() => [
+    { name: 'จำนวนครั้ง', data: this.topGoods().map(g => g.count), color: '#B45309' },
+  ]);
+  readonly topGoodsXaxis = computed<ApexXAxis>(() => ({
+    categories: this.topGoods().map(g => g.goods),
+    labels: { style: AXIS_LABEL_STYLE }, axisBorder: { show: false }, axisTicks: { show: false },
+  }));
+
+  readonly chartGrid: ApexGrid = { borderColor: '#F0F1F5', strokeDashArray: 4, yaxis: { lines: { show: true } } };
 
   expandedMonths = signal<Set<string>>(new Set(this.months.length ? [this.months[0].monthKey] : []));
 
