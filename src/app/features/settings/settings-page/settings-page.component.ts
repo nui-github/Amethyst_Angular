@@ -209,10 +209,11 @@ export class SettingsPageComponent {
     return Math.min(100, Math.round((m.items.length / this.plan.licenseQuota) * 100));
   }
 
-  // ── Usage dashboard ───────────────────────────────────────────────────────
+  // ── Usage dashboard (blue theme) ────────────────────────────────────────────
   private readonly AGENCY_COLORS: Record<string, string> = {
-    'อย.': '#0463EF', 'กษ.': '#B45309', 'วอ.': '#7C3AED', 'กรมประมง': '#0D8F61', 'กรมปศุสัตว์': '#DB2777',
+    'อย.': '#0463EF', 'กษ.': '#2563EB', 'วอ.': '#0EA5E9', 'กรมประมง': '#0E1B4D', 'กรมปศุสัตว์': '#7DB6FF',
   };
+  private readonly BLUE_PALETTE = ['#0463EF', '#2563EB', '#0EA5E9', '#0E1B4D', '#7DB6FF', '#60A5FA'];
   agencyColor(agency: string): string { return this.AGENCY_COLORS[agency] ?? '#6B7280'; }
 
   // oldest → newest, for left-to-right trend reading
@@ -245,15 +246,15 @@ export class SettingsPageComponent {
   });
 
   // ── ApexCharts: แนวโน้มค่าใช้จ่ายรายเดือน ─────────────────────────────────
-  readonly spendChart: ApexChart = { type: 'bar', height: 220, width: '100%', fontFamily: CHART_FONT, toolbar: { show: false } };
-  readonly spendPlotOptions: ApexPlotOptions = { bar: { borderRadius: 6, columnWidth: '46%' } };
+  readonly spendChart: ApexChart = { type: 'bar', height: 220, width: '100%', fontFamily: CHART_FONT, toolbar: { show: false }, dropShadow: { enabled: true, top: 4, left: 0, blur: 6, color: '#0463EF', opacity: 0.18 } };
+  readonly spendPlotOptions: ApexPlotOptions = { bar: { borderRadius: 7, columnWidth: '42%' } };
   readonly spendFill: ApexFill = {
     type: 'gradient',
-    gradient: { shade: 'light', type: 'vertical', shadeIntensity: 0.3, gradientToColors: ['#16EA9E'], opacityFrom: 0.95, opacityTo: 0.85, stops: [0, 100] },
+    gradient: { shade: 'light', type: 'vertical', shadeIntensity: 0.4, gradientToColors: ['#7DB6FF'], opacityFrom: 1, opacityTo: 0.75, stops: [0, 100] },
   };
   readonly spendDataLabels: ApexDataLabels = {
     enabled: true, offsetY: -20,
-    style: { fontSize: '11px', fontFamily: CHART_FONT, colors: ['#374151'], fontWeight: 700 },
+    style: { fontSize: '11px', fontFamily: CHART_FONT, colors: ['#0E1B4D'], fontWeight: 700 },
     formatter: (val: number) => `฿${val.toLocaleString()}`,
   };
   readonly spendTooltip: ApexTooltip = { theme: 'light', y: { formatter: (val: number) => `฿${val.toLocaleString()}` } };
@@ -267,22 +268,23 @@ export class SettingsPageComponent {
   }));
 
   // ── ApexCharts: แนวโน้มการใช้โควต้าใบอนุญาต ───────────────────────────────
-  readonly quotaChart: ApexChart = { type: 'bar', height: 220, width: '100%', fontFamily: CHART_FONT, toolbar: { show: false } };
-  readonly quotaPlotOptions: ApexPlotOptions = { bar: { borderRadius: 6, columnWidth: '46%' } };
+  readonly quotaChart: ApexChart = { type: 'area', height: 220, width: '100%', fontFamily: CHART_FONT, toolbar: { show: false } };
+  readonly quotaStroke: ApexStroke = { curve: 'smooth', width: 3, colors: ['#0463EF'] };
   readonly quotaFill: ApexFill = {
     type: 'gradient',
-    gradient: { shade: 'light', type: 'vertical', shadeIntensity: 0.3, gradientToColors: ['#16EA9E'], opacityFrom: 0.95, opacityTo: 0.85, stops: [0, 100] },
+    gradient: { shade: 'light', type: 'vertical', shadeIntensity: 0.5, gradientToColors: ['#0463EF'], opacityFrom: 0.45, opacityTo: 0.04, stops: [0, 100] },
   };
   readonly quotaDataLabels: ApexDataLabels = {
-    enabled: true, offsetY: -20,
-    style: { fontSize: '11px', fontFamily: CHART_FONT, colors: ['#374151'], fontWeight: 700 },
+    enabled: true, offsetY: -10,
+    style: { fontSize: '11px', fontFamily: CHART_FONT, colors: ['#0463EF'], fontWeight: 700 },
     formatter: (val: number) => `${val}%`,
   };
   readonly quotaTooltip: ApexTooltip = { theme: 'light', y: { formatter: (val: number) => `${val}% ของโควต้า` } };
   readonly quotaYaxis: ApexYAxis = { max: 100, labels: { style: AXIS_LABEL_STYLE, formatter: (val: number) => `${val}%` } };
+  readonly quotaMarkers = { size: 4, colors: ['#fff'], strokeColors: '#0463EF', strokeWidth: 2, hover: { size: 6 } };
 
   readonly quotaSeries = computed<ApexAxisChartSeries>(() => [
-    { name: 'ใช้โควต้า', data: this.chronoMonths().map(m => this.monthQuotaPct(m)), color: '#0D8F61' },
+    { name: 'ใช้โควต้า', data: this.chronoMonths().map(m => this.monthQuotaPct(m)) },
   ]);
   readonly quotaXaxis = computed<ApexXAxis>(() => ({
     categories: this.chronoMonths().map(m => m.monthLabel),
@@ -301,21 +303,22 @@ export class SettingsPageComponent {
     style: { fontSize: '11px', fontFamily: CHART_FONT, fontWeight: 700 },
   };
   readonly agencyStroke: ApexStroke = { width: 2, colors: ['#fff'] };
-  readonly agencyStates: ApexStates = { hover: { filter: { type: 'darken' } } };
+  readonly agencyStates: ApexStates = { hover: { filter: { type: 'darken', value: 0.92 } } };
+  readonly agencyPlotOptions: ApexPlotOptions = {
+    pie: { donut: { size: '68%', labels: { show: true, total: { show: true, label: 'ทั้งหมด', fontSize: '11px', color: '#6B7280',
+      formatter: (w: { globals: { seriesTotals: number[] } }) => `${w.globals.seriesTotals.reduce((a: number, b: number) => a + b, 0)}` } } } },
+  };
 
   readonly agencySeries = computed<ApexNonAxisChartSeries>(() => this.agencyBreakdown().map(a => a.count));
   readonly agencyLabels = computed(() => this.agencyBreakdown().map(a => a.agency));
-  readonly agencyColors = computed(() => this.agencyBreakdown().map(a => this.agencyColor(a.agency)));
+  readonly agencyColors = computed(() => this.agencyBreakdown().map((a, i) => this.agencyColor(a.agency) ?? this.BLUE_PALETTE[i % this.BLUE_PALETTE.length]));
 
   // ── ApexCharts: สินค้าที่ขอใบอนุญาตบ่อยที่สุด ─────────────────────────────
   readonly topGoodsChart: ApexChart = { type: 'bar', height: 220, width: '100%', fontFamily: CHART_FONT, toolbar: { show: false } };
   readonly topGoodsPlotOptions: ApexPlotOptions = {
-    bar: { horizontal: true, borderRadius: 5, barHeight: '55%', distributed: false },
+    bar: { horizontal: true, borderRadius: 5, barHeight: '55%', distributed: true },
   };
-  readonly topGoodsFill: ApexFill = {
-    type: 'gradient',
-    gradient: { shade: 'light', type: 'horizontal', shadeIntensity: 0.3, gradientToColors: ['#F59E0B'], opacityFrom: 0.95, opacityTo: 0.9, stops: [0, 100] },
-  };
+  readonly topGoodsFill: ApexFill = { type: 'solid', opacity: 1 };
   readonly topGoodsDataLabels: ApexDataLabels = {
     enabled: true,
     style: { fontSize: '11px', fontFamily: CHART_FONT, colors: ['#fff'], fontWeight: 700 },
@@ -323,10 +326,12 @@ export class SettingsPageComponent {
   };
   readonly topGoodsTooltip: ApexTooltip = { theme: 'light' };
   readonly topGoodsGrid: ApexGrid = { borderColor: '#F0F1F5' };
+  readonly topGoodsLegend: ApexLegend = { show: false };
 
   readonly topGoodsSeries = computed<ApexAxisChartSeries>(() => [
-    { name: 'จำนวนครั้ง', data: this.topGoods().map(g => g.count), color: '#B45309' },
+    { name: 'จำนวนครั้ง', data: this.topGoods().map(g => g.count) },
   ]);
+  readonly topGoodsColors = computed(() => this.topGoods().map((_, i) => this.BLUE_PALETTE[i % this.BLUE_PALETTE.length]));
   readonly topGoodsXaxis = computed<ApexXAxis>(() => ({
     categories: this.topGoods().map(g => g.goods),
     labels: { style: AXIS_LABEL_STYLE }, axisBorder: { show: false }, axisTicks: { show: false },

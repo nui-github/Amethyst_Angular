@@ -447,7 +447,7 @@
           <!-- ค่าใช้จ่ายรายเดือน trend -->
           <div class="dash-card">
             <div class="dash-card__hd">
-              <lucide-icon [img]="TrendingUp" [size]="14" color="#0463EF" />
+              <span class="dash-card__icon"><lucide-icon [img]="TrendingUp" [size]="14" color="#0463EF" /></span>
               <span>แนวโน้มค่าใช้จ่ายรายเดือน</span>
             </div>
             <apx-chart
@@ -460,39 +460,39 @@
           <!-- โควต้าใบอนุญาต trend -->
           <div class="dash-card">
             <div class="dash-card__hd">
-              <lucide-icon [img]="BarChart3" [size]="14" color="#0D8F61" />
+              <span class="dash-card__icon"><lucide-icon [img]="BarChart3" [size]="14" color="#0463EF" /></span>
               <span>แนวโน้มการใช้โควต้าใบอนุญาต</span>
             </div>
             <apx-chart
               [series]="quotaSeries()" [chart]="quotaChart" [xaxis]="quotaXaxis()" [yaxis]="quotaYaxis"
-              [plotOptions]="quotaPlotOptions" [fill]="quotaFill" [dataLabels]="quotaDataLabels"
-              [tooltip]="quotaTooltip" [grid]="chartGrid" [colors]="['#0D8F61']"
+              [stroke]="quotaStroke" [fill]="quotaFill" [dataLabels]="quotaDataLabels" [markers]="quotaMarkers"
+              [tooltip]="quotaTooltip" [grid]="chartGrid" [colors]="['#0463EF']"
               [legend]="{ show: false }" />
           </div>
 
           <!-- สัดส่วนกรมที่ขอบ่อย -->
           <div class="dash-card">
             <div class="dash-card__hd">
-              <lucide-icon [img]="PieChart" [size]="14" color="#7C3AED" />
+              <span class="dash-card__icon"><lucide-icon [img]="PieChart" [size]="14" color="#0463EF" /></span>
               <span>สัดส่วนกรมที่ขอบ่อย</span>
             </div>
             <apx-chart
               [series]="agencySeries()" [chart]="agencyChart" [labels]="agencyLabels()"
               [colors]="agencyColors()" [legend]="agencyLegend" [dataLabels]="agencyDataLabels"
-              [stroke]="agencyStroke" [states]="agencyStates" />
+              [plotOptions]="agencyPlotOptions" [stroke]="agencyStroke" [states]="agencyStates" />
           </div>
 
           <!-- สินค้าที่ขอบ่อยที่สุด -->
           <div class="dash-card">
             <div class="dash-card__hd">
-              <lucide-icon [img]="Trophy" [size]="14" color="#B45309" />
+              <span class="dash-card__icon"><lucide-icon [img]="Trophy" [size]="14" color="#0463EF" /></span>
               <span>สินค้าที่ขอใบอนุญาตบ่อยที่สุด</span>
             </div>
             <apx-chart
               [series]="topGoodsSeries()" [chart]="topGoodsChart" [xaxis]="topGoodsXaxis()"
               [plotOptions]="topGoodsPlotOptions" [fill]="topGoodsFill" [dataLabels]="topGoodsDataLabels"
-              [tooltip]="topGoodsTooltip" [grid]="topGoodsGrid" [colors]="['#B45309']"
-              [legend]="{ show: false }" />
+              [tooltip]="topGoodsTooltip" [grid]="topGoodsGrid" [colors]="topGoodsColors()"
+              [legend]="topGoodsLegend" />
           </div>
 
         </div>
