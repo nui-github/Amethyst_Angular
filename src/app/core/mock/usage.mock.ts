@@ -1,6 +1,6 @@
-// replace with real billing data → GET /billing/months + GET /billing/months/:monthKey
+// replace with real usage data → GET /usage/months + GET /usage/months/:monthKey
 
-export interface BillingLicenseItem {
+export interface UsageLicenseItem {
   id: string;
   refNo: string;       // เลขอ้างอิงใบอนุญาต
   goods: string;
@@ -10,13 +10,13 @@ export interface BillingLicenseItem {
   fee: number;           // 0 = ฟรี
 }
 
-export interface BillingMonth {
+export interface UsageMonth {
   monthKey: string;     // "2569-06"
   monthLabel: string;   // "มิถุนายน 2569"
-  items: BillingLicenseItem[];
+  items: UsageLicenseItem[];
 }
 
-export const MOCK_BILLING: BillingMonth[] = [
+export const MOCK_USAGE: UsageMonth[] = [
   {
     monthKey: '2569-06',
     monthLabel: 'มิถุนายน 2569',
@@ -46,14 +46,14 @@ export const MOCK_BILLING: BillingMonth[] = [
   },
 ];
 
-export function monthTotal(month: BillingMonth): number {
+export function monthTotal(month: UsageMonth): number {
   return month.items.reduce((sum, i) => sum + i.fee, 0);
 }
 
-export function monthPaidCount(month: BillingMonth): number {
+export function monthPaidCount(month: UsageMonth): number {
   return month.items.filter(i => i.fee > 0).length;
 }
 
-export function monthFreeCount(month: BillingMonth): number {
+export function monthFreeCount(month: UsageMonth): number {
   return month.items.filter(i => i.fee === 0).length;
 }

@@ -1,239 +1,505 @@
-<div class="shell">
-  <app-sidebar [collapsed]="collapsed()" (toggleCollapse)="toggleSidebar()" />
+<div class="settings-shell">
 
-  <div class="settings-shell">
-
-  <!-- Top header -->
-  <div class="settings-header">
-    <button class="back-btn" (click)="goBack()">
-      <lucide-icon [img]="ArrowLeft" [size]="15" />
+  <!-- New dedicated settings sidebar (not the main app sidebar) -->
+  <aside class="settings-sidebar">
+    <button class="settings-sidebar__back" (click)="goBack()">
+      <lucide-icon [img]="ArrowLeft" [size]="14" />
+      <span>กลับ</span>
     </button>
-    <lucide-icon [img]="Settings" [size]="15" color="#0463EF" />
-    <span class="settings-header__title">ตั้งค่าระบบ</span>
-  </div>
 
-  <div class="settings-body">
+    <p class="settings-sidebar__title">ตั้งค่า</p>
 
-    <!-- Settings sidebar nav -->
-    <nav class="settings-nav">
-      <p class="settings-nav__label">การตั้งค่า</p>
+    <nav class="settings-sidebar__nav">
       @for (item of navItems; track item.id) {
-        <button class="settings-nav__item" [class.settings-nav__item--active]="activeSection() === item.id"
+        <button class="settings-sidebar__item" [class.settings-sidebar__item--active]="activeSection() === item.id"
           (click)="activeSection.set(item.id)">
-          <lucide-icon [img]="item.icon" [size]="14" />
+          <lucide-icon [img]="item.icon" [size]="15" />
           <span>{{ item.label }}</span>
         </button>
       }
     </nav>
+  </aside>
 
-    <!-- Content area -->
+  <!-- Content -->
+  <div class="settings-main">
     <div class="settings-content">
 
-      <!-- ── SPN Connect Section ── -->
-      @if (activeSection() === 'spn-connect') {
-
+      <!-- ════════ GENERAL ════════ -->
+      @if (activeSection() === 'general') {
         <div class="content-header">
-          <p class="content-title">เชื่อมต่อ ShippingNet</p>
-          <p class="content-desc">เชื่อมต่อบัญชี ShippingNet เพื่อดึงข้อมูลใบขนสินค้าอัตโนมัติ</p>
+          <p class="content-title">ทั่วไป</p>
+          <p class="content-desc">การตั้งค่าทั่วไปของระบบ</p>
         </div>
-
-        <section class="settings-section">
-
-          @if (chat.isConnected()) {
-            <!-- Connected state -->
-            <div class="spn-status spn-status--connected">
-              <div class="spn-status__icon">
-                <lucide-icon [img]="Wifi" [size]="18" color="#0D8F61" />
-              </div>
-              <div class="spn-status__body">
-                <p class="spn-status__label">เชื่อมต่อแล้ว</p>
-                <p class="spn-status__company">{{ chat.spnSession()?.companyName }}</p>
-                <p class="spn-status__url">{{ chat.spnSession()?.url }}</p>
-                <p class="spn-status__user">ผู้ใช้: {{ chat.spnSession()?.username }}</p>
-              </div>
-              <div class="spn-status__dot"></div>
-            </div>
-
-            <div class="spn-actions">
-              <button class="spn-disconnect-btn" (click)="disconnect()">
-                <lucide-icon [img]="LogOut" [size]="13" color="#EF4444" />
-                ยกเลิกการเชื่อมต่อ
-              </button>
-            </div>
-
-          } @else {
-            <!-- Disconnected state -->
-            <div class="spn-status spn-status--disconnected">
-              <div class="spn-status__icon spn-status__icon--off">
-                <lucide-icon [img]="WifiOff" [size]="18" color="#9CA3AF" />
-              </div>
-              <div class="spn-status__body">
-                <p class="spn-status__label spn-status__label--off">ยังไม่ได้เชื่อมต่อ</p>
-                <p class="spn-status__desc">เชื่อมต่อเพื่อดึงข้อมูลใบขนสินค้าจาก ShippingNet โดยอัตโนมัติ</p>
-              </div>
-            </div>
-
-            @if (!showLoginForm()) {
-              <div class="spn-actions">
-                <button class="spn-connect-btn" (click)="openLoginForm()">
-                  <lucide-icon [img]="Wifi" [size]="13" color="#fff" />
-                  เชื่อมต่อ ShippingNet
-                </button>
-              </div>
-            } @else {
-              <div class="spn-login-form">
-                <p class="spn-login-form__title">เข้าสู่ระบบ ShippingNet</p>
-                <div class="spn-login-form__fields">
-                  <div class="spn-login-field">
-                    <label>ชื่อผู้ใช้ (Username)</label>
-                    <nz-input-group [nzPrefix]="userIcon" nzSize="default">
-                      <input nz-input placeholder="กรอก Username"
-                        [value]="loginUser()" (input)="loginUser.set($any($event.target).value)"
-                        [disabled]="loginLoading()" />
-                    </nz-input-group>
-                    <ng-template #userIcon><lucide-icon [img]="User" [size]="13" color="#AAAAAA" /></ng-template>
-                  </div>
-                  <div class="spn-login-field">
-                    <label>รหัสผ่าน (Password)</label>
-                    <nz-input-group [nzPrefix]="lockIcon" nzSize="default">
-                      <input nz-input type="password" placeholder="กรอก Password"
-                        [value]="loginPass()" (input)="loginPass.set($any($event.target).value)"
-                        [disabled]="loginLoading()"
-                        (keydown.enter)="doLogin()" />
-                    </nz-input-group>
-                    <ng-template #lockIcon><lucide-icon [img]="Lock" [size]="13" color="#AAAAAA" /></ng-template>
-                  </div>
-                </div>
-                @if (loginError()) {
-                  <p class="spn-login-error">{{ loginError() }}</p>
-                }
-                <div class="spn-login-form__actions">
-                  <button class="spn-cancel-btn" (click)="cancelLogin()" [disabled]="loginLoading()">ยกเลิก</button>
-                  <button class="spn-connect-btn" [disabled]="!loginValid() || loginLoading()" (click)="doLogin()">
-                    <lucide-icon [img]="Wifi" [size]="13" color="#fff" />
-                    {{ loginLoading() ? 'กำลังเชื่อมต่อ...' : 'เชื่อมต่อ' }}
-                  </button>
-                </div>
-              </div>
-            }
-          }
-
-        </section>
+        <div class="empty-state">
+          <div class="empty-state__icon">
+            <lucide-icon [img]="Construction" [size]="22" color="#9CA3AF" />
+          </div>
+          <p class="empty-state__title">ยังไม่มีการตั้งค่าทั่วไปในขณะนี้</p>
+          <p class="empty-state__desc">ฟีเจอร์นี้กำลังอยู่ระหว่างการพัฒนา</p>
+        </div>
       }
 
-      <!-- ── SPN URL Section ── -->
-      @if (activeSection() === 'spn-url') {
+      <!-- ════════ ACCOUNT ════════ -->
+      @if (activeSection() === 'account') {
+        <div class="content-header">
+          <p class="content-title">บัญชี</p>
+          <p class="content-desc">จัดการการเชื่อมต่อ ShippingNet และโปรไฟล์สำหรับส่งข้อมูลไปยังกรม</p>
+        </div>
 
-        <!-- Company list view -->
-        @if (!selectedCompanyId()) {
-          <div class="content-header">
-            <p class="content-title">ตั้งชื่อ SPN URL</p>
-            <p class="content-desc">เลือก Company เพื่อจัดการชื่อ URL ที่ใช้งาน ชื่อที่ตั้งจะแสดงแทนค่าเริ่มต้นในทุกที่</p>
-          </div>
+        <div class="sub-tabs">
+          @for (t of accountTabs; track t.id) {
+            <button class="sub-tab" [class.sub-tab--active]="accountTab() === t.id" (click)="accountTab.set(t.id)">
+              {{ t.label }}
+            </button>
+          }
+        </div>
 
-          <div class="company-list">
-            @for (company of companies; track company.id) {
-              <button class="company-card" (click)="selectCompany(company.id)">
-                <div class="company-card__icon">
-                  <lucide-icon [img]="Building2" [size]="15" color="#0463EF" />
+        <!-- ── เชื่อมต่อ ShippingNet ── -->
+        @if (accountTab() === 'connect') {
+          <section class="settings-section">
+            @if (chat.isConnected()) {
+              <div class="spn-status spn-status--connected">
+                <div class="spn-status__icon">
+                  <lucide-icon [img]="Wifi" [size]="18" color="#0D8F61" />
                 </div>
-                <div class="company-card__body">
-                  <p class="company-card__name">{{ company.name }}</p>
-                  <p class="company-card__meta">
-                    {{ company.urls.length }} URLs
-                    @if (customizedCount(company) > 0) {
-                      · <span class="meta-custom">{{ customizedCount(company) }} แก้ไขแล้ว</span>
-                    }
-                  </p>
+                <div class="spn-status__body">
+                  <p class="spn-status__label">เชื่อมต่อแล้ว</p>
+                  <p class="spn-status__company">{{ chat.spnSession()?.companyName }}</p>
+                  <p class="spn-status__url">{{ chat.spnSession()?.url }}</p>
+                  <p class="spn-status__user">ผู้ใช้: {{ chat.spnSession()?.username }}</p>
                 </div>
-                <lucide-icon [img]="ChevronRight" [size]="14" color="#CCCCCC" />
-              </button>
+                <div class="spn-status__dot"></div>
+              </div>
+
+              <div class="spn-actions">
+                <button class="spn-disconnect-btn" (click)="disconnect()">
+                  <lucide-icon [img]="LogOut" [size]="13" color="#EF4444" />
+                  ยกเลิกการเชื่อมต่อ
+                </button>
+              </div>
+
+            } @else {
+              <div class="spn-status spn-status--disconnected">
+                <div class="spn-status__icon spn-status__icon--off">
+                  <lucide-icon [img]="WifiOff" [size]="18" color="#9CA3AF" />
+                </div>
+                <div class="spn-status__body">
+                  <p class="spn-status__label spn-status__label--off">ยังไม่ได้เชื่อมต่อ</p>
+                  <p class="spn-status__desc">เชื่อมต่อเพื่อดึงข้อมูลใบขนสินค้าจาก ShippingNet โดยอัตโนมัติ</p>
+                </div>
+              </div>
+
+              @if (!showLoginForm()) {
+                <div class="spn-actions">
+                  <button class="spn-connect-btn" (click)="openLoginForm()">
+                    <lucide-icon [img]="Wifi" [size]="13" color="#fff" />
+                    เชื่อมต่อ ShippingNet
+                  </button>
+                </div>
+              } @else {
+                <div class="spn-login-form">
+                  <p class="spn-login-form__title">เข้าสู่ระบบ ShippingNet</p>
+                  <div class="spn-login-form__fields">
+                    <div class="spn-login-field">
+                      <label>ชื่อผู้ใช้ (Username)</label>
+                      <nz-input-group [nzPrefix]="userIcon" nzSize="default">
+                        <input nz-input placeholder="กรอก Username"
+                          [value]="loginUser()" (input)="loginUser.set($any($event.target).value)"
+                          [disabled]="loginLoading()" />
+                      </nz-input-group>
+                      <ng-template #userIcon><lucide-icon [img]="User" [size]="13" color="#AAAAAA" /></ng-template>
+                    </div>
+                    <div class="spn-login-field">
+                      <label>รหัสผ่าน (Password)</label>
+                      <nz-input-group [nzPrefix]="lockIcon" nzSize="default">
+                        <input nz-input type="password" placeholder="กรอก Password"
+                          [value]="loginPass()" (input)="loginPass.set($any($event.target).value)"
+                          [disabled]="loginLoading()"
+                          (keydown.enter)="doLogin()" />
+                      </nz-input-group>
+                      <ng-template #lockIcon><lucide-icon [img]="Lock" [size]="13" color="#AAAAAA" /></ng-template>
+                    </div>
+                  </div>
+                  @if (loginError()) {
+                    <p class="spn-login-error">{{ loginError() }}</p>
+                  }
+                  <div class="spn-login-form__actions">
+                    <button class="spn-cancel-btn" (click)="cancelLogin()" [disabled]="loginLoading()">ยกเลิก</button>
+                    <button class="spn-connect-btn" [disabled]="!loginValid() || loginLoading()" (click)="doLogin()">
+                      <lucide-icon [img]="Wifi" [size]="13" color="#fff" />
+                      {{ loginLoading() ? 'กำลังเชื่อมต่อ...' : 'เชื่อมต่อ' }}
+                    </button>
+                  </div>
+                </div>
+              }
+            }
+          </section>
+        }
+
+        <!-- ── โปรไฟล์สำหรับส่งกรม ── -->
+        @if (accountTab() === 'profiles') {
+          <div class="profile-list">
+            @for (p of profiles(); track p.code) {
+              <div class="profile-card">
+                <div class="profile-card__avatar" [style.background]="p.color + '1c'" [style.color]="p.color">
+                  {{ p.code }}
+                </div>
+                <div class="profile-card__body">
+                  <p class="profile-card__name">{{ p.displayName }}</p>
+                  <p class="profile-card__meta">{{ p.username }}</p>
+                </div>
+              </div>
             }
           </div>
 
-        <!-- URL detail view (per company) -->
-        } @else {
-          <div class="content-header">
+          @if (!showCreateProfile()) {
+            <button class="create-profile-btn" (click)="openCreateProfile()">
+              <lucide-icon [img]="Plus" [size]="13" />
+              สร้างโปรไฟล์ใหม่
+            </button>
+          } @else {
+            <div class="spn-login-form create-profile-form">
+              <p class="spn-login-form__title">สร้างโปรไฟล์สำหรับส่งกรม</p>
+              <div class="spn-login-form__fields">
+                <div class="spn-login-field">
+                  <label>รหัสโปรไฟล์ (4 ตัวอักษร)</label>
+                  <nz-input-group nzSize="default">
+                    <input nz-input placeholder="เช่น NETB" maxlength="4"
+                      [value]="newProfileCode()" (input)="newProfileCode.set($any($event.target).value)" />
+                  </nz-input-group>
+                </div>
+                <div class="spn-login-field">
+                  <label>ชื่อโปรไฟล์</label>
+                  <nz-input-group nzSize="default">
+                    <input nz-input placeholder="เช่น Netbay Production"
+                      [value]="newProfileName()" (input)="newProfileName.set($any($event.target).value)" />
+                  </nz-input-group>
+                </div>
+                <div class="spn-login-field">
+                  <label>ชื่อผู้ใช้</label>
+                  <nz-input-group nzSize="default">
+                    <input nz-input placeholder="ชื่อผู้ใช้สำหรับโปรไฟล์นี้"
+                      [value]="newProfileUser()" (input)="newProfileUser.set($any($event.target).value)" />
+                  </nz-input-group>
+                </div>
+              </div>
+              <div class="spn-login-form__actions">
+                <button class="spn-cancel-btn" (click)="cancelCreateProfile()">ยกเลิก</button>
+                <button class="spn-connect-btn" [disabled]="!newProfileValid()" (click)="saveNewProfile()">
+                  <lucide-icon [img]="Check" [size]="13" color="#fff" />
+                  บันทึกโปรไฟล์
+                </button>
+              </div>
+            </div>
+          }
+        }
+
+        <!-- ── ตั้งชื่อ SPN URL ── -->
+        @if (accountTab() === 'url-labels') {
+
+          @if (!selectedCompanyId()) {
+            <div class="company-list">
+              @for (company of companies; track company.id) {
+                <button class="company-card" (click)="selectCompany(company.id)">
+                  <div class="company-card__icon">
+                    <lucide-icon [img]="Building2" [size]="15" color="#0463EF" />
+                  </div>
+                  <div class="company-card__body">
+                    <p class="company-card__name">{{ company.name }}</p>
+                    <p class="company-card__meta">
+                      {{ company.urls.length }} URLs
+                      @if (customizedCount(company) > 0) {
+                        · <span class="meta-custom">{{ customizedCount(company) }} แก้ไขแล้ว</span>
+                      }
+                    </p>
+                  </div>
+                  <lucide-icon [img]="ChevronRight" [size]="14" color="#CCCCCC" />
+                </button>
+              }
+            </div>
+          } @else {
             <button class="breadcrumb-btn" (click)="backToList()">
               <lucide-icon [img]="ArrowLeft" [size]="13" color="#6B7280" />
               <span>ตั้งชื่อ SPN URL</span>
             </button>
-            <p class="content-title">{{ selectedCompany()?.name }}</p>
-            <p class="content-desc">ตั้งชื่อให้จดจำง่ายสำหรับแต่ละ URL ชื่อใหม่จะแทนที่ค่าเริ่มต้นในทุกที่</p>
-          </div>
+            <p class="content-title" style="margin-bottom:10px">{{ selectedCompany()?.name }}</p>
 
-          <div class="url-table">
-            <div class="url-table__head">
-              <span>ชื่อ URL</span>
-              <span>URL</span>
-              <span>ENV</span>
-              <span></span>
+            <div class="url-table">
+              <div class="url-table__head">
+                <span>ชื่อ URL</span>
+                <span>URL</span>
+                <span>ENV</span>
+                <span></span>
+              </div>
+
+              @for (u of selectedCompany()!.urls; track u.id) {
+                <div class="url-table__row" [class.url-table__row--editing]="editingId() === u.id">
+
+                  <div class="url-table__cell">
+                    @if (editingId() === u.id) {
+                      <div class="inline-edit">
+                        <input class="edit-input" [value]="editingValue()"
+                          (input)="editingValue.set($any($event.target).value)"
+                          (keydown.enter)="saveEdit(u.id)"
+                          (keydown.escape)="cancelEdit()"
+                          autofocus />
+                      </div>
+                    } @else {
+                      <span class="url-name" [class.url-name--custom]="isCustom(u)">{{ displayLabel(u) }}</span>
+                      @if (isCustom(u)) {
+                        <span class="custom-badge">แก้ไขแล้ว</span>
+                      }
+                    }
+                  </div>
+
+                  <div class="url-table__cell">
+                    <span class="url-mono">{{ u.url }}</span>
+                  </div>
+
+                  <div class="url-table__cell">
+                    <span class="env-chip"
+                      [style.background]="envColor(u.env) + '18'"
+                      [style.color]="envColor(u.env)">
+                      {{ envLabel(u.env) }}
+                    </span>
+                  </div>
+
+                  <div class="url-table__cell url-table__actions">
+                    @if (editingId() === u.id) {
+                      <button class="action-btn action-btn--save" (click)="saveEdit(u.id)" title="บันทึก">
+                        <lucide-icon [img]="Check" [size]="13" color="#0D8F61" />
+                      </button>
+                      <button class="action-btn" (click)="cancelEdit()" title="ยกเลิก">
+                        <lucide-icon [img]="IconX" [size]="13" color="#9CA3AF" />
+                      </button>
+                    } @else {
+                      <button class="action-btn" (click)="startEdit(u)" title="แก้ไขชื่อ">
+                        <lucide-icon [img]="Pencil" [size]="13" color="#6B7280" />
+                      </button>
+                      @if (isCustom(u)) {
+                        <button class="action-btn action-btn--danger" (click)="resetUrl(u)" title="รีเซ็ต">
+                          <lucide-icon [img]="RotateCcw" [size]="13" color="#EF4444" />
+                        </button>
+                      }
+                    }
+                  </div>
+
+                </div>
+              }
+            </div>
+          }
+        }
+      }
+
+      <!-- ════════ PRIVACY ════════ -->
+      @if (activeSection() === 'privacy') {
+        <div class="content-header">
+          <p class="content-title">ความเป็นส่วนตัว</p>
+          <p class="content-desc">การตั้งค่าความเป็นส่วนตัวและการจัดการข้อมูล</p>
+        </div>
+        <div class="empty-state">
+          <div class="empty-state__icon">
+            <lucide-icon [img]="Construction" [size]="22" color="#9CA3AF" />
+          </div>
+          <p class="empty-state__title">ยังไม่มีการตั้งค่าความเป็นส่วนตัวในขณะนี้</p>
+          <p class="empty-state__desc">ฟีเจอร์นี้กำลังอยู่ระหว่างการพัฒนา</p>
+        </div>
+      }
+
+      <!-- ════════ BILLING ════════ -->
+      @if (activeSection() === 'billing') {
+        <div class="content-header">
+          <p class="content-title">การเรียกเก็บเงิน</p>
+          <p class="content-desc">จัดการแพ็กเกจ วิธีการชำระเงิน และใบแจ้งหนี้</p>
+        </div>
+
+        <div class="sub-tabs">
+          @for (t of billingTabs; track t.id) {
+            <button class="sub-tab" [class.sub-tab--active]="billingTab() === t.id" (click)="billingTab.set(t.id)">
+              {{ t.label }}
+            </button>
+          }
+        </div>
+
+        <!-- ── แพ็กเกจ ── -->
+        @if (billingTab() === 'plan') {
+          <div class="plan-card">
+            <div class="plan-card__hd">
+              <div class="plan-card__icon">
+                <lucide-icon [img]="Package" [size]="18" color="#0463EF" />
+              </div>
+              <div>
+                <p class="plan-card__name">แพ็กเกจ {{ plan.name }}</p>
+                <p class="plan-card__price">฿{{ plan.priceMonthly | number }} / เดือน</p>
+              </div>
             </div>
 
-            @for (u of selectedCompany()!.urls; track u.id) {
-              <div class="url-table__row" [class.url-table__row--editing]="editingId() === u.id">
+            <div class="plan-card__usage">
+              <div class="plan-card__usage-row">
+                <span>ใบอนุญาตที่ใช้ไป</span>
+                <span>{{ plan.licenseUsed }} / {{ plan.licenseQuota }} ใบ</span>
+              </div>
+              <div class="plan-bar">
+                <div class="plan-bar__fill" [style.width.%]="planUsagePct()"></div>
+              </div>
+            </div>
 
-                <!-- Name cell -->
-                <div class="url-table__cell">
-                  @if (editingId() === u.id) {
-                    <div class="inline-edit">
-                      <input class="edit-input" [value]="editingValue()"
-                        (input)="editingValue.set($any($event.target).value)"
-                        (keydown.enter)="saveEdit(u.id)"
-                        (keydown.escape)="cancelEdit()"
-                        autofocus />
-                    </div>
+            <ul class="plan-card__features">
+              @for (f of plan.features; track f) {
+                <li><lucide-icon [img]="Check" [size]="13" color="#0D8F61" /> {{ f }}</li>
+              }
+            </ul>
+
+            <button class="spn-connect-btn">อัปเกรดแพ็กเกจ</button>
+          </div>
+        }
+
+        <!-- ── การชำระเงิน ── -->
+        @if (billingTab() === 'payment') {
+          <div class="payment-card">
+            <div class="payment-card__icon">
+              <lucide-icon [img]="CreditCard" [size]="20" color="#0463EF" />
+            </div>
+            <div class="payment-card__body">
+              <p class="payment-card__brand">{{ paymentMethod.brand }} •••• {{ paymentMethod.last4 }}</p>
+              <p class="payment-card__expiry">หมดอายุ {{ paymentMethod.expiry }}</p>
+            </div>
+            <button class="spn-cancel-btn">เปลี่ยนวิธีการชำระเงิน</button>
+          </div>
+        }
+
+        <!-- ── ใบแจ้งหนี้ ── -->
+        @if (billingTab() === 'invoice') {
+          <div class="invoice-table">
+            <div class="invoice-table__head">
+              <span>เลขที่ใบแจ้งหนี้</span>
+              <span>รอบบิล</span>
+              <span>วันที่ออก</span>
+              <span>จำนวนเงิน</span>
+              <span>สถานะ</span>
+              <span></span>
+            </div>
+            @for (inv of invoices; track inv.id) {
+              <div class="invoice-table__row">
+                <span class="invoice-no">
+                  <lucide-icon [img]="FileText" [size]="13" color="#9CA3AF" />
+                  {{ inv.invoiceNo }}
+                </span>
+                <span>{{ inv.period }}</span>
+                <span>{{ inv.issuedAt }}</span>
+                <span>฿{{ inv.amount | number }}</span>
+                <span>
+                  @if (inv.status === 'paid') {
+                    <span class="invoice-status invoice-status--paid">ชำระแล้ว</span>
                   } @else {
-                    <span class="url-name" [class.url-name--custom]="isCustom(u)">{{ displayLabel(u) }}</span>
-                    @if (isCustom(u)) {
-                      <span class="custom-badge">แก้ไขแล้ว</span>
-                    }
+                    <span class="invoice-status invoice-status--pending">รอชำระ</span>
                   }
-                </div>
-
-                <!-- URL cell -->
-                <div class="url-table__cell">
-                  <span class="url-mono">{{ u.url }}</span>
-                </div>
-
-                <!-- ENV cell -->
-                <div class="url-table__cell">
-                  <span class="env-chip"
-                    [style.background]="envColor(u.env) + '18'"
-                    [style.color]="envColor(u.env)">
-                    {{ envLabel(u.env) }}
-                  </span>
-                </div>
-
-                <!-- Action cell -->
-                <div class="url-table__cell url-table__actions">
-                  @if (editingId() === u.id) {
-                    <button class="action-btn action-btn--save" (click)="saveEdit(u.id)" title="บันทึก">
-                      <lucide-icon [img]="Check" [size]="13" color="#0D8F61" />
-                    </button>
-                    <button class="action-btn" (click)="cancelEdit()" title="ยกเลิก">
-                      <lucide-icon [img]="IconX" [size]="13" color="#9CA3AF" />
-                    </button>
-                  } @else {
-                    <button class="action-btn" (click)="startEdit(u)" title="แก้ไขชื่อ">
-                      <lucide-icon [img]="Pencil" [size]="13" color="#6B7280" />
-                    </button>
-                    @if (isCustom(u)) {
-                      <button class="action-btn action-btn--danger" (click)="resetUrl(u)" title="รีเซ็ต">
-                        <lucide-icon [img]="RotateCcw" [size]="13" color="#EF4444" />
-                      </button>
-                    }
-                  }
-                </div>
-
+                </span>
+                <button class="action-btn" title="ดาวน์โหลด" (click)="downloadInvoice(inv.invoiceNo)">
+                  <lucide-icon [img]="Download" [size]="13" color="#6B7280" />
+                </button>
               </div>
             }
           </div>
         }
       }
 
+      <!-- ════════ USAGE ════════ -->
+      @if (activeSection() === 'usage') {
+        <div class="content-header">
+          <p class="content-title">การใช้งาน</p>
+          <p class="content-desc">ค่าใช้จ่ายรายเดือน แยกตามใบอนุญาตที่ขอในแต่ละเดือน</p>
+        </div>
+
+        <div class="summary-row">
+          <div class="summary-card">
+            <div class="summary-card__icon" style="background:#EFF6FF">
+              <lucide-icon [img]="Wallet" [size]="16" color="#0463EF" />
+            </div>
+            <div>
+              <p class="summary-card__label">เดือนนี้ ({{ currentMonth()!.monthLabel }})</p>
+              <p class="summary-card__value">฿{{ currentMonth() ? monthTotal(currentMonth()!) : 0 | number }}</p>
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <div class="summary-card__icon" style="background:#F3F4F6">
+              <lucide-icon [img]="FileCheck2" [size]="16" color="#6B7280" />
+            </div>
+            <div>
+              <p class="summary-card__label">ใบอนุญาตทั้งหมด</p>
+              <p class="summary-card__value">{{ totalLicenses() }} ใบ</p>
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <div class="summary-card__icon" style="background:#FFFBEB">
+              <lucide-icon [img]="Receipt" [size]="16" color="#B45309" />
+            </div>
+            <div>
+              <p class="summary-card__label">ใบที่มีค่าธรรมเนียม</p>
+              <p class="summary-card__value">{{ totalPaidLicenses() }} ใบ · ฿{{ totalFeeAllTime() | number }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="month-list">
+          @for (m of months; track m.monthKey) {
+            <div class="month-card">
+              <button class="month-card__hd" (click)="toggleMonth(m.monthKey)">
+                <div class="month-card__hd-left">
+                  <lucide-icon [img]="ChevronDown" [size]="14" class="chevron" [class.chevron--open]="isExpanded(m.monthKey)" />
+                  <span class="month-card__title">{{ m.monthLabel }}</span>
+                  <span class="month-card__count">{{ m.items.length }} ใบ</span>
+                </div>
+                <div class="month-card__hd-right">
+                  @if (monthPaidCount(m) > 0) {
+                    <span class="month-card__fee-tag">฿{{ monthTotal(m) | number }}</span>
+                  } @else {
+                    <span class="month-card__free-tag">ฟรีทั้งหมด</span>
+                  }
+                </div>
+              </button>
+
+              @if (isExpanded(m.monthKey)) {
+                <div class="month-card__body">
+                  <div class="doc-table">
+                    <div class="doc-table__head">
+                      <span>สินค้า / เลขอ้างอิง</span>
+                      <span>กรม</span>
+                      <span>วันที่ยื่น</span>
+                      <span class="doc-table__fee-col">ค่าธรรมเนียม</span>
+                    </div>
+                    @for (item of m.items; track item.id) {
+                      <div class="doc-table__row">
+                        <div class="doc-table__goods">
+                          <span class="doc-table__goods-name">{{ item.goods }}</span>
+                          <span class="doc-table__ref">{{ item.refNo }}</span>
+                        </div>
+                        <span class="doc-table__agency">{{ item.agency }}</span>
+                        <span class="doc-table__date">{{ item.submittedAt }}</span>
+                        <span class="doc-table__fee-col">
+                          @if (item.fee > 0) {
+                            <span class="fee-paid">฿{{ item.fee | number }}</span>
+                          } @else {
+                            <span class="fee-free">ฟรี</span>
+                          }
+                        </span>
+                      </div>
+                    }
+                  </div>
+                  <div class="month-card__total">
+                    <span>รวม {{ monthFreeCount(m) }} ฟรี · {{ monthPaidCount(m) }} มีค่าธรรมเนียม</span>
+                    <span class="month-card__total-amount">฿{{ monthTotal(m) | number }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
     </div>
   </div>
 
-  </div>
 </div>

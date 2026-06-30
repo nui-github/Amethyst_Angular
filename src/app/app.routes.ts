@@ -20,11 +20,13 @@ export const routes: Routes = [
     path: 'settings',
     loadComponent: () => import('./features/settings/settings-page/settings-page.component')
       .then(m => m.SettingsPageComponent),
+    data: { section: 'account' },
   },
   {
     path: 'billing',
-    loadComponent: () => import('./features/billing/billing-page/billing-page.component')
-      .then(m => m.BillingPageComponent),
+    loadComponent: () => import('./features/settings/settings-page/settings-page.component')
+      .then(m => m.SettingsPageComponent),
+    data: { section: 'usage' },
   },
   { path: '**', redirectTo: '' },
 ];
