@@ -14,6 +14,7 @@ Built with **Angular 17** · ng-zorro-antd · BizX Design System · IBM Plex San
 - **UI Library**: ng-zorro-antd (Ant Design for Angular) — import per-module (e.g. `NzInputModule`)
 - **Styling**: SCSS — no Tailwind. BizX colors via CSS custom properties only
 - **Icons**: lucide-angular — `import { LucideAngularModule, IconName } from 'lucide-angular'`
+- **Charts**: ng-apexcharts `1.8.0` (+ `apexcharts` `^3.54`) — pinned to this version because `ng-apexcharts` 2.x requires Angular 20; used on the Usage dashboard only
 - **Font**: IBM Plex Sans Thai — loaded via `<link>` in `index.html`
 - **Change Detection**: `ChangeDetectionStrategy.OnPush` on ALL components
 - **State**: Angular Signals (`signal()`, `computed()`) — all state in services, never in components
@@ -77,8 +78,8 @@ ChatService      → src/app/core/services/chat.service.ts
 QueueService     → src/app/core/services/queue.service.ts
   - open(id) seals ship.messages as isReadOnly=true before setting openId
 OcrService       → src/app/core/services/ocr.service.ts
-UrlLabelService  → src/app/core/services/url-label.service.ts  ← custom SPN URL names (localStorage)
 ```
+> `UrlLabelService` (`url-label.service.ts`) still exists but is currently unused — the "ตั้งชื่อ SPN URL" feature that used it was removed from settings.
 
 ### Path Aliases (tsconfig.json)
 ```ts
@@ -114,7 +115,8 @@ src/
 │   │   │   └── components/
 │   │   │       ├── chat-area/         ← @switch renderer; checks !readOnly && !msg.isReadOnly
 │   │   │       ├── sidebar/           ← collapsible 224px/48px rail
-│   │   │       │                         footer order: SPN badge → ตั้งค่า → Account → BizX logo
+│   │   │       │                         footer order: SPN badge → Profile (popup menu) → BizX logo
+│   │   │       │                         profile popup: ตั้งค่า → ค่าใช้จ่าย → ออกจากระบบ
 │   │   │       ├── flag-card/
 │   │   │       ├── choice-card/
 │   │   │       ├── spn-result/
@@ -141,7 +143,8 @@ src/
 │   │   │   └── queue-page/            ← full-width tracking table + sidebar
 │   │   │                                 click row → loadQueueSession() → navigate to /
 │   │   ├── settings/
-│   │   │   └── settings-page/         ← 2-panel settings; sections: เชื่อมต่อ ShippingNet, ตั้งชื่อ SPN URL
+│   │   │   └── settings-page/         ← unified shell with its OWN dedicated sidebar (not app-sidebar)
+│   │   │                                 serves both /settings and /billing routes (see Settings Page below)
 │   │   └── print/
 │   │       └── license-print/         ← A4 print page
 │   └── shared/
@@ -308,6 +311,41 @@ Add to `mainItems` array in `sidebar.component.ts`
 
 ---
 
+## Settings Page
+`SettingsPageComponent` is a standalone shell — does **not** use the main `app-sidebar`. It has its own
+dedicated left nav (`.settings-sidebar`) with a "← กลับ" link back to chat, plus 5 top-level sections:
+
+```
+activeSection: 'general' | 'account' | 'privacy' | 'billing' | 'usage'
+  - initialized from route data: { section: '...' } (see app.routes.ts)
+  - /settings → defaults to 'account'
+  - /billing  → defaults to 'usage'
+
+General   → placeholder empty-state (not built yet)
+Privacy   → placeholder empty-state (not built yet)
+
+Account   → sub-tabs (accountTab signal): 'connect' | 'profiles'
+  - connect:  เชื่อมต่อ ShippingNet (login form, same flow as before)
+  - profiles: โปรไฟล์สำหรับส่งกรม — list from MOCK_SPN_PROFILES + "สร้างโปรไฟล์ใหม่" inline form
+  (the old "ตั้งชื่อ SPN URL" sub-tab was removed entirely — UrlLabelService is now unused)
+
+Billing   → sub-tabs (billingTab signal): 'plan' | 'payment' | 'invoice'
+  - plan:    CURRENT_PLAN card with usage bar + feature list (subscription.mock.ts)
+  - payment: PAYMENT_METHOD card + editable BillingAddress (company-format: tax ID, branch, address)
+  - invoice: MOCK_INVOICES table with download button
+
+Usage     → ค่าใช้จ่ายรายเดือน — NOT the same as Billing tab above
+  - Summary cards: เดือนนี้ / ใบอนุญาตทั้งหมด / ใบที่มีค่าธรรมเนียม
+  - Dashboard (4 ApexCharts cards, built with ng-apexcharts — see Tech Stack):
+    แนวโน้มค่าใช้จ่ายรายเดือน (bar) · แนวโน้มการใช้โควต้าใบอนุญาต (bar, %)
+    สัดส่วนกรมที่ขอบ่อย (donut) · สินค้าที่ขอใบอนุญาตบ่อยที่สุด (horizontal bar)
+    Colors follow BizX theme: blue #0463EF → teal #16EA9E gradients, amber #B45309, purple #7C3AED
+  - Below the dashboard: existing accordion list per month (MOCK_USAGE) — kept on purpose, do not remove
+  - Each month shows a license-quota tag/bar against `plan.licenseQuota` (licenses sold as transactions per package tier)
+```
+
+---
+
 ## Mock → Real API
 > Full endpoint contracts: **[docs/API.md](./docs/API.md)**
 
@@ -327,6 +365,10 @@ Replace in `src/app/core/mock/`:
   - `documents[]` → swap `SAMPLE_PDF` url to signed URLs from `GET /shipments/:id/documents`
   - `ShipmentDocument.category`: `'invoice' | 'customs' | 'packing_list' | 'coa' | 'coo' | 'other'`
   - ทุก shipment มี documents อย่างน้อย 1 ไฟล์ (ไฟล์ที่ใช้ OCR วิเคราะห์ HS Code)
+- `usage.mock.ts` → `MOCK_USAGE` → `GET /usage/months` (used by Settings → Usage tab dashboard + accordion)
+- `subscription.mock.ts` → `CURRENT_PLAN` / `PAYMENT_METHOD` / `BILLING_ADDRESS` / `MOCK_INVOICES`
+  → `GET /subscription/plan` + `GET /subscription/payment-method` + `GET /subscription/invoices`
+  (used by Settings → Billing tab)
 
 ---
 
