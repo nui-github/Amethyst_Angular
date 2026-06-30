@@ -11,7 +11,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { UrlLabelService } from '@app/core/services/url-label.service';
 import { ChatService } from '@app/core/services/chat.service';
 import { MOCK_SPN_COMPANIES, MOCK_SPN_PROFILES, SpnCompany, SpnUrl, SpnProfile } from '@mock/spn-companies.mock';
-import { CURRENT_PLAN, PAYMENT_METHOD, MOCK_INVOICES } from '@mock/subscription.mock';
+import { CURRENT_PLAN, PAYMENT_METHOD, MOCK_INVOICES, BILLING_ADDRESS, BillingAddress } from '@mock/subscription.mock';
 import { MOCK_USAGE, UsageMonth, monthTotal, monthPaidCount, monthFreeCount } from '@mock/usage.mock';
 
 type SettingsSection = 'general' | 'account' | 'privacy' | 'billing' | 'usage';
@@ -189,6 +189,24 @@ export class SettingsPageComponent {
   readonly planUsagePct = computed(() =>
     Math.min(100, Math.round((this.plan.licenseUsed / this.plan.licenseQuota) * 100))
   );
+
+  // ── Billing address (company-format, editable) ───────────────────────────
+  billingAddress = signal<BillingAddress>({ ...BILLING_ADDRESS });
+  editingAddress = signal(false);
+  addressDraft = signal<BillingAddress>({ ...BILLING_ADDRESS });
+
+  startEditAddress(): void {
+    this.addressDraft.set({ ...this.billingAddress() });
+    this.editingAddress.set(true);
+  }
+  cancelEditAddress(): void { this.editingAddress.set(false); }
+  saveAddress(): void {
+    this.billingAddress.set({ ...this.addressDraft() });
+    this.editingAddress.set(false);
+  }
+  updateAddressField<K extends keyof BillingAddress>(field: K, value: string): void {
+    this.addressDraft.update(a => ({ ...a, [field]: value }));
+  }
 
   downloadInvoice(invoiceNo: string): void {
     const blob = new Blob([`ใบแจ้งหนี้ ${invoiceNo}`], { type: 'application/pdf' });

@@ -38,6 +38,28 @@ export const PAYMENT_METHOD: PaymentMethod = {
   expiry: '08/27',
 };
 
+export interface BillingAddress {
+  companyName: string;
+  taxId: string;          // เลขประจำตัวผู้เสียภาษี
+  branch: string;         // สำนักงานใหญ่ / สาขาที่ xxx
+  address: string;
+  subDistrict: string;    // แขวง/ตำบล
+  district: string;       // เขต/อำเภอ
+  province: string;
+  postalCode: string;
+}
+
+export const BILLING_ADDRESS: BillingAddress = {
+  companyName: 'บริษัท เฮลท์ฟาร์มา จำกัด',
+  taxId: '0105561000123',
+  branch: 'สำนักงานใหญ่',
+  address: '123/45 อาคารเนทเบย์ ชั้น 8 ถนนสุขุมวิท',
+  subDistrict: 'คลองตันเหนือ',
+  district: 'วัฒนา',
+  province: 'กรุงเทพมหานคร',
+  postalCode: '10110',
+};
+
 export interface InvoiceRecord {
   id: string;
   invoiceNo: string;

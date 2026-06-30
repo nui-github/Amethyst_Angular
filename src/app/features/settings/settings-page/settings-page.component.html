@@ -366,6 +366,99 @@
             </div>
             <button class="spn-cancel-btn">เปลี่ยนวิธีการชำระเงิน</button>
           </div>
+
+          <!-- ── Billing address ── -->
+          <div class="address-card">
+            <div class="address-card__hd">
+              <p class="address-card__title">ที่อยู่ในการออกใบกำกับภาษี (Billing Address)</p>
+              @if (!editingAddress()) {
+                <button class="action-btn" title="แก้ไขที่อยู่" (click)="startEditAddress()">
+                  <lucide-icon [img]="Pencil" [size]="13" color="#6B7280" />
+                </button>
+              }
+            </div>
+
+            @if (!editingAddress()) {
+              <div class="address-view">
+                <p class="address-view__company">{{ billingAddress().companyName }}</p>
+                <p class="address-view__line">เลขประจำตัวผู้เสียภาษี {{ billingAddress().taxId }} · {{ billingAddress().branch }}</p>
+                <p class="address-view__line">
+                  {{ billingAddress().address }} แขวง/ตำบล{{ billingAddress().subDistrict }}
+                  เขต/อำเภอ{{ billingAddress().district }} {{ billingAddress().province }} {{ billingAddress().postalCode }}
+                </p>
+              </div>
+            } @else {
+              <div class="address-form">
+                <div class="address-form__row">
+                  <div class="spn-login-field">
+                    <label>ชื่อบริษัท</label>
+                    <nz-input-group nzSize="default">
+                      <input nz-input placeholder="ชื่อบริษัท"
+                        [value]="addressDraft().companyName" (input)="updateAddressField('companyName', $any($event.target).value)" />
+                    </nz-input-group>
+                  </div>
+                </div>
+                <div class="address-form__row address-form__row--split">
+                  <div class="spn-login-field">
+                    <label>เลขประจำตัวผู้เสียภาษี</label>
+                    <nz-input-group nzSize="default">
+                      <input nz-input placeholder="0000000000000"
+                        [value]="addressDraft().taxId" (input)="updateAddressField('taxId', $any($event.target).value)" />
+                    </nz-input-group>
+                  </div>
+                  <div class="spn-login-field">
+                    <label>สาขา</label>
+                    <nz-input-group nzSize="default">
+                      <input nz-input placeholder="สำนักงานใหญ่ / สาขาที่ ..."
+                        [value]="addressDraft().branch" (input)="updateAddressField('branch', $any($event.target).value)" />
+                    </nz-input-group>
+                  </div>
+                </div>
+                <div class="address-form__row">
+                  <div class="spn-login-field">
+                    <label>ที่อยู่</label>
+                    <nz-input-group nzSize="default">
+                      <input nz-input placeholder="เลขที่ อาคาร ถนน"
+                        [value]="addressDraft().address" (input)="updateAddressField('address', $any($event.target).value)" />
+                    </nz-input-group>
+                  </div>
+                </div>
+                <div class="address-form__row address-form__row--quad">
+                  <div class="spn-login-field">
+                    <label>แขวง/ตำบล</label>
+                    <nz-input-group nzSize="default">
+                      <input nz-input [value]="addressDraft().subDistrict" (input)="updateAddressField('subDistrict', $any($event.target).value)" />
+                    </nz-input-group>
+                  </div>
+                  <div class="spn-login-field">
+                    <label>เขต/อำเภอ</label>
+                    <nz-input-group nzSize="default">
+                      <input nz-input [value]="addressDraft().district" (input)="updateAddressField('district', $any($event.target).value)" />
+                    </nz-input-group>
+                  </div>
+                  <div class="spn-login-field">
+                    <label>จังหวัด</label>
+                    <nz-input-group nzSize="default">
+                      <input nz-input [value]="addressDraft().province" (input)="updateAddressField('province', $any($event.target).value)" />
+                    </nz-input-group>
+                  </div>
+                  <div class="spn-login-field">
+                    <label>รหัสไปรษณีย์</label>
+                    <nz-input-group nzSize="default">
+                      <input nz-input [value]="addressDraft().postalCode" (input)="updateAddressField('postalCode', $any($event.target).value)" />
+                    </nz-input-group>
+                  </div>
+                </div>
+                <div class="spn-login-form__actions">
+                  <button class="spn-cancel-btn" (click)="cancelEditAddress()">ยกเลิก</button>
+                  <button class="spn-connect-btn" (click)="saveAddress()">
+                    <lucide-icon [img]="Check" [size]="13" color="#fff" />
+                    บันทึกที่อยู่
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
         }
 
         <!-- ── ใบแจ้งหนี้ ── -->
