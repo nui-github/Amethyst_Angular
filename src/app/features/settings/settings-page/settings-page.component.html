@@ -1,4 +1,7 @@
-<div class="settings-shell">
+<div class="shell">
+  <app-sidebar [collapsed]="collapsed()" (toggleCollapse)="toggleSidebar()" />
+
+  <div class="settings-shell">
 
   <!-- Top header -->
   <div class="settings-header">
@@ -232,4 +235,5 @@
     </div>
   </div>
 
+  </div>
 </div>

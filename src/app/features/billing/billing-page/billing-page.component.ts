@@ -3,17 +3,21 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { LucideAngularModule, ArrowLeft, Receipt, FileCheck2, Wallet, ChevronDown } from 'lucide-angular';
 import { MOCK_BILLING, BillingMonth, monthTotal, monthPaidCount, monthFreeCount } from '@mock/billing.mock';
+import { SidebarComponent } from '../../chat/components/sidebar/sidebar.component';
 
 @Component({
   selector: 'app-billing-page',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, LucideAngularModule],
+  imports: [CommonModule, LucideAngularModule, SidebarComponent],
   templateUrl: './billing-page.component.html',
   styleUrl: './billing-page.component.scss',
 })
 export class BillingPageComponent {
   readonly router = inject(Router);
+
+  collapsed = signal(false);
+  toggleSidebar(): void { this.collapsed.update(v => !v); }
 
   readonly ArrowLeft  = ArrowLeft;
   readonly Receipt    = Receipt;

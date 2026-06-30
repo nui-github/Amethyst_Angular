@@ -1,4 +1,7 @@
-<div class="billing-shell">
+<div class="shell">
+  <app-sidebar [collapsed]="collapsed()" (toggleCollapse)="toggleSidebar()" />
+
+  <div class="billing-shell">
 
   <!-- Top header -->
   <div class="billing-header">
@@ -102,4 +105,5 @@
 
   </div>
 
+  </div>
 </div>

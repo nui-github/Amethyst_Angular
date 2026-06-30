@@ -7,6 +7,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { UrlLabelService } from '@app/core/services/url-label.service';
 import { ChatService } from '@app/core/services/chat.service';
 import { MOCK_SPN_COMPANIES, SpnCompany, SpnUrl } from '@mock/spn-companies.mock';
+import { SidebarComponent } from '../../chat/components/sidebar/sidebar.component';
 
 type SettingsSection = 'spn-connect' | 'spn-url';
 
@@ -14,7 +15,7 @@ type SettingsSection = 'spn-connect' | 'spn-url';
   selector: 'app-settings-page',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, LucideAngularModule, NzInputModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule, NzInputModule, SidebarComponent],
   templateUrl: './settings-page.component.html',
   styleUrl: './settings-page.component.scss',
 })
@@ -22,6 +23,9 @@ export class SettingsPageComponent {
   readonly urlLabels = inject(UrlLabelService);
   readonly chat      = inject(ChatService);
   readonly router    = inject(Router);
+
+  collapsed = signal(false);
+  toggleSidebar(): void { this.collapsed.update(v => !v); }
 
   readonly ArrowLeft    = ArrowLeft;
   readonly Globe        = Globe;
