@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { LucideAngularModule, Printer, Download } from 'lucide-angular';
 import { ChatService } from '@app/core/services/chat.service';
 
 export interface PermitItem {
@@ -16,7 +17,7 @@ export interface PermitItem {
   selector: 'app-permit-status',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.Default,
-  imports: [CommonModule],
+  imports: [CommonModule, LucideAngularModule],
   template: `
     <div class="ps-wrap">
       <div class="ps-header">
@@ -76,6 +77,16 @@ export interface PermitItem {
                   </span>
                 }
               </div>
+              @if (item.status === 'approved') {
+                <div class="ps-item__actions">
+                  <button class="ps-action-btn ps-action-btn--outline" (click)="printLicense(item)">
+                    <lucide-icon [img]="Printer" [size]="12" /> พิมพ์ใบอนุญาต
+                  </button>
+                  <button class="ps-action-btn ps-action-btn--primary" (click)="downloadLicense(item)">
+                    <lucide-icon [img]="Download" [size]="12" /> ดาวน์โหลดใบอนุญาต
+                  </button>
+                </div>
+              }
             } @else {
               <div class="ps-item__details ps-item__details--not-applied">
                 <span class="ps-detail-value" style="color:#9CA3AF;font-size:11px">ยังไม่ได้ยื่นขอสำหรับกรมนี้</span>
@@ -96,6 +107,20 @@ export class PermitStatusComponent {
   readonly cdr       = inject(ChangeDetectorRef);
   readonly refreshing  = signal(false);
   readonly lastUpdated = signal(new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }));
+  readonly Printer  = Printer;
+  readonly Download = Download;
+
+  printLicense(item: PermitItem): void {
+    window.open(`/print?ref=${item.refNo}`, '_blank');
+  }
+
+  downloadLicense(item: PermitItem): void {
+    const blob = new Blob([`ใบอนุญาต ${item.licenseNo}`], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `${item.licenseNo}.pdf`; a.click();
+    URL.revokeObjectURL(url);
+  }
 
   private readonly approvedRefs = signal<Set<string>>(new Set());
 
