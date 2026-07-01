@@ -229,12 +229,23 @@ Agency fee config (payment.mock.ts):
 ### Queue → Chatbot session handoff
 ```
 QueuePage.selectRow(id)
-  → chat.loadQueueSession(ship)   ← seals existing messages as isReadOnly=true
+  → chat.loadQueueSession(ship)   ← seals messages as isReadOnly=true
   → router.navigate(['/'])        ← opens chatbot page with that session
+
+loadQueueSession(ship):
+  - statusKey 'submitted' | 'no_permit' → all messages sealed read-only (nothing left to do)
+  - statusKey 'needs_you'              → all messages sealed EXCEPT the last one, which stays
+                                          interactive so the user can continue the flow
+                                          (e.g. confirm a flag-card, proceed a form-preview)
+  - restoreStateFromMessages() rebuilds the minimal ChatService state (formData,
+    currentAgency, ALL_AGENCIES, checkMissingAfterFlags) by scanning the shipment's own
+    message history (ocr-results/form-preview data, hs-analysis agency) — this is what lets
+    the resumed card's existing handler (onAllFlagsConfirmed, onFormPreviewProceed, etc.)
+    act on the right data instead of empty defaults
 
 ChatPage (in queue mode):
   - shows "กลับไปคิวงาน" banner (when chat.queueShipmentId() is set)
-  - chat history shows rich card designs (non-interactive, isReadOnly per message)
+  - sealed history shows rich card designs (non-interactive, isReadOnly per message)
   - new messages via chat.send() use full ChatService flow normally
   - "กลับไปคิวงาน" calls chat.newChat() + router.navigate(['/queue'])
 ```
