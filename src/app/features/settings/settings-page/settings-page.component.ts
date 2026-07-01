@@ -211,9 +211,9 @@ export class SettingsPageComponent {
 
   // ── Usage dashboard (blue theme) ────────────────────────────────────────────
   private readonly AGENCY_COLORS: Record<string, string> = {
-    'อย.': '#0463EF', 'กษ.': '#2563EB', 'วอ.': '#0EA5E9', 'กรมประมง': '#0E1B4D', 'กรมปศุสัตว์': '#7DB6FF',
+    'อย.': '#0463EF', 'กษ.': '#0E1B4D', 'วอ.': '#38BDF8', 'กรมประมง': '#60A5FA', 'กรมปศุสัตว์': '#BFDBFE',
   };
-  private readonly BLUE_PALETTE = ['#0463EF', '#2563EB', '#0EA5E9', '#0E1B4D', '#7DB6FF', '#60A5FA'];
+  private readonly BLUE_PALETTE = ['#0463EF', '#0E1B4D', '#38BDF8', '#60A5FA', '#BFDBFE', '#2563EB'];
   agencyColor(agency: string): string { return this.AGENCY_COLORS[agency] ?? '#6B7280'; }
 
   // oldest → newest, for left-to-right trend reading
