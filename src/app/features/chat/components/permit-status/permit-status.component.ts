@@ -97,14 +97,19 @@ export class PermitStatusComponent {
   readonly refreshing  = signal(false);
   readonly lastUpdated = signal(new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }));
 
+  private readonly approvedRefs = signal<Set<string>>(new Set());
+
   readonly permits = computed<PermitItem[]>(() => {
     const all       = this.chat.allPermitAgencies();
     const submitted = this.chat.submittedPermits();
+    const approved  = this.approvedRefs();
     if (!all.length) return [];
     return all.map(agency => {
       const sub = submitted.find(s => s.agency === agency);
       if (!sub) return { agency, refNo: '—', invoiceRef: '—', licenseType: '—', submittedAt: '—', status: 'not_applied' } as PermitItem;
-      return { agency, refNo: sub.refNo, invoiceRef: sub.invoiceRef, licenseType: sub.licenseType, submittedAt: sub.submittedAt, status: 'pending' } as PermitItem;
+      const status = approved.has(sub.refNo) ? 'approved' : 'pending';
+      const licenseNo = status === 'approved' ? `LIC-${sub.refNo.replace(/\D/g, '')}` : undefined;
+      return { agency, refNo: sub.refNo, invoiceRef: sub.invoiceRef, licenseType: sub.licenseType, submittedAt: sub.submittedAt, status, licenseNo } as PermitItem;
     });
   });
 
@@ -113,6 +118,10 @@ export class PermitStatusComponent {
     this.refreshing.set(true);
     this.cdr.detectChanges();
     setTimeout(() => {
+      const nextPending = this.permits().find(p => p.status === 'pending');
+      if (nextPending) {
+        this.approvedRefs.update(set => new Set(set).add(nextPending.refNo));
+      }
       this.lastUpdated.set(new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }));
       this.refreshing.set(false);
       this.cdr.detectChanges();
