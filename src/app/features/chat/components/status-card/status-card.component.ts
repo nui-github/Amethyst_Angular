@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, CheckCircle, Search, Plus, Printer, Clock } from 'lucide-angular';
+import { LucideAngularModule, CheckCircle, Search, Plus, Clock } from 'lucide-angular';
 import { StatusCardData } from '@app/core/models/types';
 import { ChatService } from '@app/core/services/chat.service';
 
@@ -75,9 +75,6 @@ import { ChatService } from '@app/core/services/chat.service';
           <button class="quick-chip" (click)="chat.send('ตรวจสอบสถานะใบอนุญาต')">
             <lucide-icon [img]="Search" [size]="12" /> ตรวจสอบสถานะ
           </button>
-          <button class="quick-chip" (click)="chat.send('พิมพ์ใบอนุญาต')">
-            <lucide-icon [img]="Printer" [size]="12" /> พิมพ์ใบอนุญาต
-          </button>
         </div>
       }
     </div>
@@ -98,7 +95,6 @@ export class StatusCardComponent {
   readonly CheckCircle = CheckCircle;
   readonly Search = Search;
   readonly Plus = Plus;
-  readonly Printer = Printer;
   readonly Clock = Clock;
   get d(): StatusCardData { return this.data as unknown as StatusCardData; }
 }
