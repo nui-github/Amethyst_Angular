@@ -98,9 +98,9 @@
             <span class="hs-agency-type">{{ ag.licenseType }}</span>
           }
           @if (agencyFee(ag.code).requiresFee) {
-            <span class="hs-agency-fee" title="ค่าธรรมเนียมการขอใบอนุญาต">฿ {{ agencyFee(ag.code).amount | number:'1.0-0' }}</span>
+            <span class="hs-agency-fee" data-tip="ค่าธรรมเนียมการขอใบอนุญาต">฿ {{ agencyFee(ag.code).amount | number:'1.0-0' }}</span>
           } @else {
-            <span class="hs-agency-fee hs-agency-fee--free" title="ค่าธรรมเนียมการขอใบอนุญาต">ฟรี</span>
+            <span class="hs-agency-fee hs-agency-fee--free" data-tip="ค่าธรรมเนียมการขอใบอนุญาต">ฟรี</span>
           }
         </div>
         @if (ag.legalRef) {

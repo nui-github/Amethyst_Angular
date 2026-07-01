@@ -102,7 +102,6 @@
 .hs-agencies {
   border: 1px solid rgba(4, 99, 239, 0.14);
   border-radius: 8px;
-  overflow: hidden;
   margin-top: 2px;
 
   &__title {
@@ -114,6 +113,7 @@
     padding: 6px 12px;
     background: rgba(4, 99, 239, 0.04);
     border-bottom: 1px solid rgba(4, 99, 239, 0.1);
+    border-radius: 7px 7px 0 0;
     margin: 0;
   }
 }
@@ -163,6 +163,7 @@
 }
 
 .hs-agency-fee {
+  position: relative;
   font-size: 10px;
   font-weight: 700;
   background: rgba(245, 158, 11, 0.12);
@@ -175,6 +176,44 @@
     background: rgba(13, 143, 97, 0.1);
     color: #0D8F61;
   }
+
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 3px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: #1F2937;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s ease 0.05s;
+    z-index: 999;
+  }
+
+  &::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1F2937;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+    padding: 5px 10px;
+    border-radius: 7px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s ease 0.05s;
+    z-index: 999;
+    font-family: inherit;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  &:hover::before,
+  &:hover::after { opacity: 1; }
 }
 
 .hs-agency-legal {
