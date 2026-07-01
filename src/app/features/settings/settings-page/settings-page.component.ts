@@ -246,25 +246,25 @@ export class SettingsPageComponent {
   });
 
   // ── ApexCharts: แนวโน้มค่าใช้จ่ายรายเดือน ─────────────────────────────────
-  readonly spendChart: ApexChart = { type: 'bar', height: 220, width: '100%', fontFamily: CHART_FONT, toolbar: { show: false }, dropShadow: { enabled: true, top: 4, left: 0, blur: 6, color: '#0463EF', opacity: 0.18 } };
-  readonly spendPlotOptions: ApexPlotOptions = { bar: { borderRadius: 7, columnWidth: '42%' } };
+  readonly spendChart: ApexChart = { type: 'bar', height: 220, width: '100%', fontFamily: CHART_FONT, toolbar: { show: false } };
+  readonly spendPlotOptions: ApexPlotOptions = { bar: { borderRadius: 8, columnWidth: '38%' } };
   readonly spendFill: ApexFill = {
     type: 'gradient',
-    gradient: { shade: 'light', type: 'vertical', shadeIntensity: 0.4, gradientToColors: ['#7DB6FF'], opacityFrom: 1, opacityTo: 0.75, stops: [0, 100] },
+    gradient: { shade: 'dark', type: 'vertical', shadeIntensity: 0.5, gradientToColors: ['#38BDF8'], opacityFrom: 1, opacityTo: 0.85, stops: [0, 100] },
   };
-  readonly spendDataLabels: ApexDataLabels = {
-    enabled: true, offsetY: -20,
-    style: { fontSize: '11px', fontFamily: CHART_FONT, colors: ['#0E1B4D'], fontWeight: 700 },
-    formatter: (val: number) => `฿${val.toLocaleString()}`,
-  };
+  readonly spendDataLabels: ApexDataLabels = { enabled: false };
   readonly spendTooltip: ApexTooltip = { theme: 'light', y: { formatter: (val: number) => `฿${val.toLocaleString()}` } };
+  readonly spendYaxis: ApexYAxis = {
+    labels: { style: AXIS_LABEL_STYLE, formatter: (val: number) => `฿${val.toLocaleString()}` },
+  };
 
   readonly spendSeries = computed<ApexAxisChartSeries>(() => [
     { name: 'ค่าใช้จ่าย', data: this.chronoMonths().map(m => monthTotal(m)) },
   ]);
   readonly spendXaxis = computed<ApexXAxis>(() => ({
-    categories: this.chronoMonths().map(m => m.monthLabel),
-    labels: { style: AXIS_LABEL_STYLE }, axisBorder: { show: false }, axisTicks: { show: false },
+    categories: this.chronoMonths().map(m => m.monthLabel.split(' ')[0]),
+    labels: { style: AXIS_LABEL_STYLE, rotate: 0 },
+    axisBorder: { show: false }, axisTicks: { show: false },
   }));
 
   // ── ApexCharts: แนวโน้มการใช้โควต้าใบอนุญาต ───────────────────────────────
