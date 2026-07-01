@@ -898,12 +898,12 @@ export class ChatService {
     this.bot('choice-card', {
       question: 'ต้องการขอใบอนุญาตเพิ่มเติมไหมครับ?',
       options: [
+        doneOption,
         {
           label: 'ขอใบอนุญาตเพิ่ม',
           value: 'more-agencies',
           description: `ยังมีกรมที่ยังไม่ได้ยื่นขอ: ${remainingLabel}`,
         },
-        doneOption,
       ],
     } satisfies ChoiceCardData);
   }
