@@ -80,10 +80,11 @@
   cursor: pointer;
   padding: 6px 10px;
   border-radius: 7px;
-  border: 1px solid var(--bizx-n200);
-  background: var(--bizx-n50);
+  border: 1.5px solid var(--bizx-blue);
+  background: #fff;
   color: var(--bizx-blue);
   font-size: 11px;
+  font-weight: 600;
   font-family: inherit;
   width: fit-content;
   transition: background 0.12s;
