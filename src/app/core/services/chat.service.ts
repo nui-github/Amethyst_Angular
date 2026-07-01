@@ -3,7 +3,7 @@ import {
   ChatMessage, ChatHistorySession, ChatStep, LicenseFormData, MessageType,
   FlagCardData, FlagItem, ChoiceCardData, EmailDraftData,
   StatusCardData, OcrResultsData, SpnResultData, Shipment,
-  MissingField, MissingFieldsData, PaymentQrData, PaymentSlipData,
+  MissingField, MissingFieldsData, PaymentQrData, PaymentSlipData, HsAnalysisData,
 } from '@app/core/models/types';
 import { OcrService } from './ocr.service';
 import { QueueService } from './queue.service';
@@ -1077,16 +1077,39 @@ export class ChatService {
   }
 
   loadQueueSession(ship: { id: string; messages?: import('@app/core/models/types').ChatMessage[]; statusKey: string; formCode?: string; hs?: string; goods?: string; }): void {
-    const sealed = (ship.messages ?? []).map(m => ({ ...m, isReadOnly: true }));
+    const msgs = ship.messages ?? [];
+    // For unresolved shipments, leave the last message live so the user can continue the flow
+    const canResume = ship.statusKey === 'needs_you' && msgs.length > 0;
+    const sealed = msgs.map((m, i) => ({ ...m, isReadOnly: canResume ? i < msgs.length - 1 : true }));
     this.messages.set(sealed.length ? sealed : [WELCOME]);
     this.flowStartIdx = sealed.length;
     this.queueShipmentId.set(ship.id);
+    if (canResume) this.restoreStateFromMessages(msgs);
     // Restore step from statusKey so send() context is correct
     const stepMap: Record<string, import('@app/core/models/types').ChatStep> = {
       needs_you: 'preview',
       submitted: 'done', no_permit: 'done',
     };
     this.step.set((stepMap[ship.statusKey] as import('@app/core/models/types').ChatStep) ?? 'idle');
+  }
+
+  /** Rebuild the minimal service state needed for the last (unsealed) message's action to work correctly. */
+  private restoreStateFromMessages(msgs: ChatMessage[]): void {
+    let formData: LicenseFormData = {};
+    for (const m of msgs) {
+      if (m.type === 'ocr-results' || m.type === 'form-preview') {
+        formData = { ...formData, ...(m.data as LicenseFormData) };
+      }
+      if (m.type === 'hs-analysis') {
+        const d = m.data as HsAnalysisData;
+        this.ALL_AGENCIES = d.agencies?.length ? d.agencies.map(a => a.code) : (d.agency && d.agency !== '—' ? [d.agency] : []);
+        if (d.agency && d.agency !== '—') this.currentAgency = d.agency;
+      }
+    }
+    this.formData.set(formData);
+    this.submittedAgencies = [];
+    this.pendingAfterFlow = 'proceed';
+    this.checkMissingAfterFlags = msgs[msgs.length - 1]?.type === 'flag-card';
   }
 
   private delay(ms: number): Promise<void> {
