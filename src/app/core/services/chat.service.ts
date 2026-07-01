@@ -880,20 +880,22 @@ export class ChatService {
   private showNextAgencyIfAny(): void {
     const remaining = this.ALL_AGENCIES.filter(a => !this.submittedAgencies.includes(a));
 
+    if (remaining.length === 0) {
+      this.bot('text', undefined, 'ขออนุญาตครบทุกใบแล้วครับ ✓');
+      this.bot('choice-card', {
+        question: 'ต้องการตรวจสอบสถานะใบอนุญาตที่ยื่นไปหรือไม่ครับ?',
+        options: [
+          { label: 'ตรวจสอบสถานะใบอนุญาต', value: 'check-status', description: 'ดูสถานะใบอนุญาตทั้งหมดที่ยื่นไปในแชทนี้' },
+        ],
+      } satisfies ChoiceCardData);
+      return;
+    }
+
     const doneOption = {
       label: 'เสร็จสิ้น',
       value: 'no-more-agency',
       description: 'ไม่ต้องการขอใบอนุญาตเพิ่มเติม',
     };
-
-    if (remaining.length === 0) {
-      this.bot('choice-card', {
-        question: 'ต้องการขอใบอนุญาตเพิ่มเติมไหมครับ?',
-        options: [doneOption],
-      } satisfies ChoiceCardData);
-      return;
-    }
-
     const remainingLabel = remaining.join(', ');
     this.bot('choice-card', {
       question: 'ต้องการขอใบอนุญาตเพิ่มเติมไหมครับ?',
@@ -923,6 +925,12 @@ export class ChatService {
     // Specific agency selected from selector — go straight to upload, skip agency choice card
     const agency = value.replace('agency:', '');
     this.onAgencyChoice(agency);
+  }
+
+  onCheckStatusChoice(value: string): void {
+    if (value !== 'check-status') return;
+    this.user('ตรวจสอบสถานะใบอนุญาต');
+    this.withTyping(() => this.bot('permit-status'), 500);
   }
 
   private showRemainingAgencySelector(): void {

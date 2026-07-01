@@ -107,15 +107,17 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked {
     const hasSpn    = data.options.some(o => o.value === 'spn');
     const hasImport = data.options.some(o => o.value === 'import');
 
-    const hasMulti     = data.options.some(o => o.value.startsWith('dept:'));
-    const hasNoMore    = data.options.some(o => o.value === 'no-more-agency');
-    const hasAgencyKey = data.options.some(o => o.value.startsWith('agency:'));
+    const hasMulti       = data.options.some(o => o.value.startsWith('dept:'));
+    const hasNoMore      = data.options.some(o => o.value === 'no-more-agency');
+    const hasAgencyKey   = data.options.some(o => o.value.startsWith('agency:'));
+    const hasCheckStatus = data.options.some(o => o.value === 'check-status');
 
-    if (hasImport)     return this.chat.onDocTypeChoice(value);
-    if (hasSpn)        return this.chat.onCustomsDocsChoice(value);
-    if (hasMulti)      return this.chat.onAgencyChoice(value);
-    if (hasNoMore)     return this.chat.onNextAgencyChoice(value);
-    if (hasAgencyKey)  return this.chat.onNextAgencyChoice(value);
+    if (hasImport)       return this.chat.onDocTypeChoice(value);
+    if (hasSpn)          return this.chat.onCustomsDocsChoice(value);
+    if (hasMulti)        return this.chat.onAgencyChoice(value);
+    if (hasNoMore)       return this.chat.onNextAgencyChoice(value);
+    if (hasAgencyKey)    return this.chat.onNextAgencyChoice(value);
+    if (hasCheckStatus)  return this.chat.onCheckStatusChoice(value);
     if (hasEmail)   return this.chat.onProceedChoice(value);
     if (hasSubmit)  return this.chat.onPreviewChoice(value);
     if (hasConfirm) return this.chat.onPostEmailChoice(value);
