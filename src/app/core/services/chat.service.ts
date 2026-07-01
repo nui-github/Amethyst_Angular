@@ -879,7 +879,20 @@ export class ChatService {
 
   private showNextAgencyIfAny(): void {
     const remaining = this.ALL_AGENCIES.filter(a => !this.submittedAgencies.includes(a));
-    if (remaining.length === 0) return;
+
+    const doneOption = {
+      label: 'เสร็จสิ้น',
+      value: 'no-more-agency',
+      description: 'ไม่ต้องการขอใบอนุญาตเพิ่มเติม',
+    };
+
+    if (remaining.length === 0) {
+      this.bot('choice-card', {
+        question: 'ต้องการขอใบอนุญาตเพิ่มเติมไหมครับ?',
+        options: [doneOption],
+      } satisfies ChoiceCardData);
+      return;
+    }
 
     const remainingLabel = remaining.join(', ');
     this.bot('choice-card', {
@@ -890,11 +903,7 @@ export class ChatService {
           value: 'more-agencies',
           description: `ยังมีกรมที่ยังไม่ได้ยื่นขอ: ${remainingLabel}`,
         },
-        {
-          label: 'เสร็จสิ้น',
-          value: 'no-more-agency',
-          description: 'ไม่ต้องการขอใบอนุญาตเพิ่มเติม',
-        },
+        doneOption,
       ],
     } satisfies ChoiceCardData);
   }

@@ -10,7 +10,7 @@
 
   <!-- Rich cards when options have descriptions -->
   @if (!isSimple) {
-    <div class="choice-options" [class.choice-options--col]="data.options.length > 2"
+    <div class="choice-options" [class.choice-options--col]="data.options.length !== 2"
       [class.choice-options--locked]="selectedValue() !== null">
       @for (opt of data.options; track opt.value; let i = $index) {
         <button class="option-card"
