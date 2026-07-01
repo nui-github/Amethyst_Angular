@@ -314,27 +314,35 @@ export class SettingsPageComponent {
   readonly agencyColors = computed(() => this.agencyBreakdown().map((a, i) => this.agencyColor(a.agency) ?? this.BLUE_PALETTE[i % this.BLUE_PALETTE.length]));
 
   // ── ApexCharts: สินค้าที่ขอใบอนุญาตบ่อยที่สุด ─────────────────────────────
-  readonly topGoodsChart: ApexChart = { type: 'bar', height: 220, width: '100%', fontFamily: CHART_FONT, toolbar: { show: false } };
+  readonly topGoodsChart: ApexChart = { type: 'bar', height: 248, width: '100%', fontFamily: CHART_FONT, toolbar: { show: false } };
   readonly topGoodsPlotOptions: ApexPlotOptions = {
-    bar: { horizontal: true, borderRadius: 5, barHeight: '55%', distributed: true },
+    bar: { horizontal: true, borderRadius: 6, barHeight: '48%', distributed: false },
   };
-  readonly topGoodsFill: ApexFill = { type: 'solid', opacity: 1 };
-  readonly topGoodsDataLabels: ApexDataLabels = {
-    enabled: true,
-    style: { fontSize: '11px', fontFamily: CHART_FONT, colors: ['#fff'], fontWeight: 700 },
-    formatter: (val: number) => `${val} ครั้ง`,
+  readonly topGoodsFill: ApexFill = {
+    type: 'gradient',
+    gradient: { shade: 'light', type: 'horizontal', shadeIntensity: 0.3, gradientToColors: ['#7DB6FF'], opacityFrom: 1, opacityTo: 0.85, stops: [0, 100] },
   };
-  readonly topGoodsTooltip: ApexTooltip = { theme: 'light' };
-  readonly topGoodsGrid: ApexGrid = { borderColor: '#F0F1F5' };
+  readonly topGoodsDataLabels: ApexDataLabels = { enabled: false };
+  readonly topGoodsTooltip: ApexTooltip = { theme: 'light', y: { formatter: (val: number) => `${val} ครั้ง` } };
+  readonly topGoodsGrid: ApexGrid = { borderColor: '#EEF0F8', xaxis: { lines: { show: false } }, yaxis: { lines: { show: false } }, padding: { left: 0, right: 16 } };
   readonly topGoodsLegend: ApexLegend = { show: false };
 
   readonly topGoodsSeries = computed<ApexAxisChartSeries>(() => [
     { name: 'จำนวนครั้ง', data: this.topGoods().map(g => g.count) },
   ]);
-  readonly topGoodsColors = computed(() => this.topGoods().map((_, i) => this.BLUE_PALETTE[i % this.BLUE_PALETTE.length]));
+  readonly topGoodsColors = computed(() => ['#0463EF']);
   readonly topGoodsXaxis = computed<ApexXAxis>(() => ({
     categories: this.topGoods().map(g => g.goods),
-    labels: { style: AXIS_LABEL_STYLE }, axisBorder: { show: false }, axisTicks: { show: false },
+    labels: { show: false },
+    axisBorder: { show: false },
+    axisTicks: { show: false },
+  }));
+  readonly topGoodsYaxis = computed<ApexYAxis>(() => ({
+    labels: {
+      style: { ...AXIS_LABEL_STYLE, fontWeight: 600, colors: '#374151' },
+      maxWidth: 140,
+      formatter: (val: number) => String(val),
+    },
   }));
 
   readonly chartGrid: ApexGrid = { borderColor: '#F0F1F5', strokeDashArray: 4, yaxis: { lines: { show: true } } };
