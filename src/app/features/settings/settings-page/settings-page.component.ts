@@ -6,7 +6,7 @@ import {
   LucideAngularModule, ArrowLeft, Pencil, Check, ChevronDown,
   Wifi, WifiOff, LogOut, User, Lock, SlidersHorizontal, UserCog, ShieldCheck, CreditCard,
   BarChart3, Plus, Package, FileText, Download, Receipt, FileCheck2, Wallet, Construction,
-  TrendingUp, PieChart, Trophy,
+  TrendingUp, PieChart, Trophy, X,
 } from 'lucide-angular';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import {
@@ -15,7 +15,7 @@ import {
 } from 'ng-apexcharts';
 import { ChatService } from '@app/core/services/chat.service';
 import { MOCK_SPN_PROFILES, SpnProfile } from '@mock/spn-companies.mock';
-import { CURRENT_PLAN, PAYMENT_METHOD, MOCK_INVOICES, BILLING_ADDRESS, BillingAddress } from '@mock/subscription.mock';
+import { CURRENT_PLAN, PAYMENT_METHOD, MOCK_INVOICES, BILLING_ADDRESS, BillingAddress, PLAN_TIERS, PlanTier } from '@mock/subscription.mock';
 import { MOCK_USAGE, UsageMonth, monthTotal, monthPaidCount, monthFreeCount } from '@mock/usage.mock';
 
 const CHART_FONT = 'IBM Plex Sans Thai, sans-serif';
@@ -63,6 +63,7 @@ export class SettingsPageComponent {
   readonly TrendingUp   = TrendingUp;
   readonly PieChart     = PieChart;
   readonly Trophy       = Trophy;
+  readonly X            = X;
 
   // ── Top-level section nav ──────────────────────────────────────────────────
   readonly navItems: { id: SettingsSection; label: string; icon: typeof SlidersHorizontal }[] = [
@@ -158,6 +159,17 @@ export class SettingsPageComponent {
   readonly planUsagePct = computed(() =>
     Math.min(100, Math.round((this.plan.licenseUsed / this.plan.licenseQuota) * 100))
   );
+
+  // ── Upgrade plan modal ────────────────────────────────────────────────────
+  readonly planTiers = PLAN_TIERS;
+  showUpgradeModal = signal(false);
+
+  isCurrentPlan(tier: PlanTier): boolean {
+    return tier.name === this.plan.name;
+  }
+
+  openUpgradeModal(): void { this.showUpgradeModal.set(true); }
+  closeUpgradeModal(): void { this.showUpgradeModal.set(false); }
 
   // ── Billing address (company-format, editable) ───────────────────────────
   billingAddress = signal<BillingAddress>({ ...BILLING_ADDRESS });

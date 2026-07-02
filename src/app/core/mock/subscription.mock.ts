@@ -23,6 +23,54 @@ export const CURRENT_PLAN: SubscriptionPlan = {
   ],
 };
 
+export interface PlanTier {
+  id: string;
+  name: string;
+  priceMonthly: number;
+  licenseQuota: number;
+  features: string[];
+}
+
+export const PLAN_TIERS: PlanTier[] = [
+  {
+    id: 'starter',
+    name: 'Starter',
+    priceMonthly: 990,
+    licenseQuota: 5,
+    features: [
+      'ขอใบอนุญาตได้สูงสุด 5 ใบ/เดือน',
+      'OCR วิเคราะห์เอกสารอัตโนมัติ',
+      'เชื่อมต่อ ShippingNet ได้ 1 บัญชี',
+      'ทีมงาน 1 ผู้ใช้',
+    ],
+  },
+  {
+    id: 'business',
+    name: 'Business',
+    priceMonthly: 2900,
+    licenseQuota: 20,
+    features: [
+      'ขอใบอนุญาตได้ไม่จำกัดประเภท',
+      'OCR วิเคราะห์เอกสารอัตโนมัติ',
+      'เชื่อมต่อ ShippingNet ได้ไม่จำกัดจำนวนบัญชี',
+      'ทีมงาน 5 ผู้ใช้',
+    ],
+  },
+  {
+    id: 'enterprise',
+    name: 'Enterprise',
+    priceMonthly: 7900,
+    licenseQuota: 100,
+    features: [
+      'ขอใบอนุญาตได้ไม่จำกัดประเภทและจำนวน',
+      'OCR วิเคราะห์เอกสารอัตโนมัติ พร้อมลำดับความสำคัญสูง',
+      'เชื่อมต่อ ShippingNet ได้ไม่จำกัดจำนวนบัญชี',
+      'ทีมงานไม่จำกัดจำนวนผู้ใช้',
+      'ผู้ดูแลบัญชีเฉพาะ (Dedicated Account Manager)',
+    ],
+  },
+];
+
 export interface PaymentMethod {
   type: 'credit_card' | 'bank_transfer';
   brand?: string;     // 'Visa' | 'Mastercard'

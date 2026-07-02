@@ -255,7 +255,7 @@
               }
             </ul>
 
-            <button class="spn-connect-btn">อัปเกรดแพ็กเกจ</button>
+            <button class="spn-connect-btn" (click)="openUpgradeModal()">อัปเกรดแพ็กเกจ</button>
           </div>
         }
 
@@ -565,5 +565,45 @@
 
     </div>
   </div>
+
+  <!-- ── Upgrade plan modal ── -->
+  @if (showUpgradeModal()) {
+    <div class="upgrade-modal__backdrop" (click)="closeUpgradeModal()">
+      <div class="upgrade-modal" (click)="$event.stopPropagation()">
+        <div class="upgrade-modal__hd">
+          <div>
+            <p class="upgrade-modal__title">เลือกแพ็กเกจ</p>
+            <p class="upgrade-modal__sub">แพ็กเกจปัจจุบันของคุณคือ <strong>{{ plan.name }}</strong></p>
+          </div>
+          <button class="upgrade-modal__close" (click)="closeUpgradeModal()">
+            <lucide-icon [img]="X" [size]="16" />
+          </button>
+        </div>
+
+        <div class="upgrade-modal__tiers">
+          @for (tier of planTiers; track tier.id) {
+            <div class="tier-card" [class.tier-card--current]="isCurrentPlan(tier)">
+              @if (isCurrentPlan(tier)) {
+                <span class="tier-card__badge">แพ็กเกจปัจจุบัน</span>
+              }
+              <p class="tier-card__name">{{ tier.name }}</p>
+              <p class="tier-card__price">฿{{ tier.priceMonthly | number }}<span>/เดือน</span></p>
+              <p class="tier-card__quota">ขอใบอนุญาตได้ {{ tier.licenseQuota }} ใบ/เดือน</p>
+              <ul class="tier-card__features">
+                @for (f of tier.features; track f) {
+                  <li><lucide-icon [img]="Check" [size]="12" color="#0D8F61" /> {{ f }}</li>
+                }
+              </ul>
+              @if (isCurrentPlan(tier)) {
+                <button class="tier-card__btn tier-card__btn--current" disabled>แพ็กเกจที่ใช้อยู่</button>
+              } @else {
+                <button class="tier-card__btn">เลือกแพ็กเกจนี้</button>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
 
 </div>
