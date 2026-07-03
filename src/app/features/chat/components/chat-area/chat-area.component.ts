@@ -3,7 +3,7 @@ import {
   ElementRef, Input, OnChanges, ViewChild, inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ChatMessage, FlagCardData, EmailDraftData, ChoiceCardData } from '@app/core/models/types';
+import { ChatMessage, FlagCardData, EmailDraftData, ChoiceCardData, InvoiceItemsData, InvoiceLineItem } from '@app/core/models/types';
 import { ChatService } from '@app/core/services/chat.service';
 import { OcrService } from '@app/core/services/ocr.service';
 import { SafeHtmlPipe } from '@app/shared/pipes/safe-html.pipe';
@@ -30,6 +30,7 @@ import { ProfileSelectComponent } from '../profile-select/profile-select.compone
 import { PermitStatusComponent } from '../permit-status/permit-status.component';
 import { PaymentQrComponent } from '../payment-qr/payment-qr.component';
 import { PaymentSlipComponent } from '../payment-slip/payment-slip.component';
+import { InvoiceItemsComponent } from '../invoice-items/invoice-items.component';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 
 /**
@@ -54,7 +55,7 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
     StatusCardComponent, OcrProgressComponent, ImportLicenseMenuComponent,
     ConnectPanelComponent, FullUploadComponent, SingleUploadComponent, EmailDraftComponent, FormPanelComponent,
     SpnConnectComponent, HsAnalysisComponent, FormPreviewComponent, MissingFieldsComponent, AgencyUploadComponent, ProfileSelectComponent, PermitStatusComponent,
-    PaymentQrComponent, PaymentSlipComponent,
+    PaymentQrComponent, PaymentSlipComponent, InvoiceItemsComponent,
   ],
   templateUrl: './chat-area.component.html',
   styleUrl: './chat-area.component.scss',
@@ -80,10 +81,15 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked {
     }
   }
 
-  asFlagCard(data: unknown)    { return data as FlagCardData; }
-  asEmailDraft(data: unknown)  { return data as EmailDraftData; }
-  asChoiceCard(data: unknown)  { return data as ChoiceCardData; }
-  asAny(data: unknown)         { return data as Record<string, unknown>; }
+  asFlagCard(data: unknown)     { return data as FlagCardData; }
+  asEmailDraft(data: unknown)   { return data as EmailDraftData; }
+  asChoiceCard(data: unknown)   { return data as ChoiceCardData; }
+  asInvoiceItems(data: unknown) { return data as InvoiceItemsData; }
+  asAny(data: unknown)          { return data as Record<string, unknown>; }
+
+  onInvoiceItemsConfirmed(msgId: string, items: InvoiceLineItem[]): void {
+    this.chat.onInvoiceItemsConfirmed(msgId, items);
+  }
   hasRewindableChoice(): boolean {
     const msgs = this.messages;
     const done = msgs.some(m => m.type === 'status-card');

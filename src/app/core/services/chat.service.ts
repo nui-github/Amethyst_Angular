@@ -4,6 +4,7 @@ import {
   FlagCardData, FlagItem, ChoiceCardData, EmailDraftData,
   StatusCardData, OcrResultsData, SpnResultData, Shipment,
   MissingField, MissingFieldsData, PaymentQrData, PaymentSlipData, HsAnalysisData,
+  InvoiceItemsData, InvoiceLineItem,
 } from '@app/core/models/types';
 import { OcrService } from './ocr.service';
 import { QueueService } from './queue.service';
@@ -11,6 +12,7 @@ import { analyzeHsCode } from '@mock/hs-analysis.mock';
 import { getAgencyPayment } from '@mock/payment.mock';
 import { KNOWN_REFS, MOCK_FORM_DATA, MOCK_SPN_LIST } from '@mock/spn.mock';
 import { MOCK_SPN_PROFILES } from '@mock/spn-companies.mock';
+import { getInvoiceLineItems } from '@mock/invoice-items.mock';
 import { environment } from '@env/environment';
 import { MOCK_SESSIONS } from '@mock/sessions.mock';
 
@@ -428,11 +430,12 @@ export class ChatService {
   }
 
   private continueAfterOCR(): void {
-    // Agency docs upload (2nd doc in invoice path): skip hs-analysis, go straight to flags
+    // Agency docs upload (2nd doc in invoice path): skip hs-analysis, go straight to
+    // item selection → flags
     if (this.isAgencyDocsUpload) {
       this.isAgencyDocsUpload = false;
       this.checkMissingAfterFlags = true;   // invoice path: check missing fields after flags confirmed
-      this.withTyping(() => this.showFlags(), 600);
+      this.withTyping(() => this.showInvoiceItemsSelection(), 600);
       return;
     }
     // Customs single-upload: skip flags, hs-analysis → profile → agency choice (same as invoice)
@@ -603,6 +606,25 @@ export class ChatService {
         afterComplete();
       }
     }
+  }
+
+  // ── Invoice line-item selection (invoice path, after agency-docs OCR) ───────
+  private showInvoiceItemsSelection(): void {
+    this.bot('invoice-items', {
+      agency: this.currentAgency,
+      items: getInvoiceLineItems(this.formData().invoiceNo),
+    } satisfies InvoiceItemsData);
+  }
+
+  onInvoiceItemsConfirmed(msgId: string, items: InvoiceLineItem[]): void {
+    this.messages.update(ms => ms.map(m =>
+      m.id === msgId && m.type === 'invoice-items'
+        ? { ...m, data: { ...(m.data as InvoiceItemsData), selectedIds: items.map(i => i.id) } }
+        : m
+    ));
+    this.formData.update(f => ({ ...f, selectedItems: items }));
+    this.user(`เลือกสินค้า ${items.length} รายการ`);
+    this.withTyping(() => this.showFlags(), 500);
   }
 
   // ── Flag confirm flow ──────────────────────────────────────────────────────

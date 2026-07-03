@@ -32,7 +32,14 @@ export type MessageType =
   | 'profile-select'    // pick or confirm ShippingNet profile before submission
   | 'permit-status'     // status overview of all submitted permit requests
   | 'payment-qr'       // QR payment card (fee required by agency)
-  | 'payment-slip';    // upload payment slip after scanning QR
+  | 'payment-slip'     // upload payment slip after scanning QR
+  | 'invoice-items';   // select which invoice line items to submit for this agency's permit
+
+export interface InvoiceItemsData {
+  agency: string;
+  items: InvoiceLineItem[];
+  selectedIds?: string[]; // set once confirmed (isReadOnly display)
+}
 
 export interface MissingField {
   key: keyof LicenseFormData;
@@ -173,6 +180,19 @@ export interface LicenseFormData {
   uNo?: string;
   drugRegNo?: string;
   importDate?: string;
+  selectedItems?: InvoiceLineItem[]; // สินค้าที่เลือกยื่นขอใบอนุญาต (จาก invoice-items step)
+}
+
+// รายการสินค้าใน Invoice — field ตามที่กรม (อย./กษ.) ใช้ประกอบคำขอนำเข้า
+export interface InvoiceLineItem {
+  id: string;
+  name: string;           // ชื่อสินค้า/รายการสินค้า
+  quantity: string;
+  unit: string;
+  unitPrice: number;      // ราคาต่อหน่วย
+  amount: number;         // มูลค่ารวม
+  lotNo: string;          // Lot/Batch No.
+  hsCode: string;
 }
 
 export type ChatStep =

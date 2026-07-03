@@ -16,6 +16,23 @@
     </div>
   </div>
 
+  @if (local.selectedItems?.length) {
+    <div class="fp-section">
+      <div class="fp-section__head" style="border-left-color:#0463EF">
+        <span class="fp-section__title">รายการสินค้าที่ยื่นขอ ({{ local.selectedItems!.length }} รายการ)</span>
+      </div>
+      <div class="fp-items">
+        @for (item of local.selectedItems; track item.id) {
+          <div class="fp-item-row">
+            <span class="fp-item-row__name">{{ item.name }}</span>
+            <span class="fp-item-row__meta">{{ item.quantity }} {{ item.unit }} · Lot {{ item.lotNo }} · HS {{ item.hsCode }}</span>
+            <span class="fp-item-row__amount">฿{{ item.amount | number }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
   @for (section of sections; track section.title) {
     <div class="fp-section">
       <div class="fp-section__head" [style.border-left-color]="section.color">

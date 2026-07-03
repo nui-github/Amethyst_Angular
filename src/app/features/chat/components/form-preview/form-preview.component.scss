@@ -52,6 +52,45 @@
   }
 }
 
+// ── Selected invoice items ──────────────────────────────────────────────────────
+
+.fp-items {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 16px 12px;
+  gap: 6px;
+}
+
+.fp-item-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  background: #FAFBFF;
+  border: 1px solid #F0F1F8;
+  border-radius: 8px;
+}
+
+.fp-item-row__name {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #010136;
+  flex-shrink: 0;
+}
+
+.fp-item-row__meta {
+  font-size: 10.5px;
+  color: #9CA3AF;
+  flex: 1;
+}
+
+.fp-item-row__amount {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #010136;
+  flex-shrink: 0;
+}
+
 // ── Table rows ────────────────────────────────────────────────────────────────
 
 .fp-table {
