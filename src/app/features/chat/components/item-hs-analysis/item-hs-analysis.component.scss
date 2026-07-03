@@ -162,8 +162,22 @@
   box-shadow: 0 1px 2px rgba(1, 1, 54, 0.03);
 
   &--done {
-    border-color: #D1FAE5;
+    border-color: #A7F3D0;
+    background: rgba(13, 143, 97, 0.05);
     box-shadow: 0 1px 3px rgba(13, 143, 97, 0.08);
+
+    .ih-group__head {
+      background: rgba(13, 143, 97, 0.14) !important;
+      color: #0D8F61 !important;
+    }
+
+    .ih-group__icon {
+      color: #0D8F61 !important;
+    }
+
+    .ih-item {
+      border-bottom-color: rgba(13, 143, 97, 0.12);
+    }
   }
 }
 
