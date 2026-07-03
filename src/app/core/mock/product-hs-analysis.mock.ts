@@ -1,4 +1,4 @@
-import { ProductHsAnalysis } from '@app/core/models/types';
+import { ProductHsAnalysis, InvoiceLineItem } from '@app/core/models/types';
 
 // AI usecase: product description (จาก invoice OCR) → HS Code → Smart Tariff (พิกัดอัตราศุลกากรเต็ม)
 // → กรมที่ต้องยื่นขอใบอนุญาตสำหรับสินค้าตัวนั้น (ถ้ามี)
@@ -20,4 +20,25 @@ const PRODUCT_HS_ANALYSIS: ProductHsAnalysis[] = [
 
 export function getProductHsAnalysis(): ProductHsAnalysis[] {
   return PRODUCT_HS_ANALYSIS;
+}
+
+// Commercial data (qty/unit/price) per item — reconstructed from the same real invoice
+// (invoice-ocr.mock.ts) so the customs/SPN item-selection step shows realistic figures.
+const ITEM_COMMERCIAL: Record<string, { quantity: string; unit: string; unitPrice: number; amount: number; lotNo: string }> = {
+  p1: { quantity: '1',   unit: 'ชิ้น', unitPrice: 85326.74, amount: 85326.74,  lotNo: 'ETBF2313C145EE' },
+  p2: { quantity: '39',  unit: 'ชิ้น', unitPrice: 11001.55, amount: 429060.45, lotNo: 'TRCR30015X' },
+  p3: { quantity: '29',  unit: 'ชิ้น', unitPrice: 3864.14,  amount: 112060.06, lotNo: 'SENSH1628W' },
+  p4: { quantity: '189', unit: 'ชิ้น', unitPrice: 1966.27,  amount: 371625.03, lotNo: 'SPL20015X' },
+  p5: { quantity: '1',   unit: 'ชิ้น', unitPrice: 5246.59,  amount: 5246.59,   lotNo: 'SBI06012013P' },
+  p6: { quantity: '1',   unit: 'ชิ้น', unitPrice: 1962.24,  amount: 1962.24,   lotNo: 'SPL30020X' },
+};
+
+/** Convert confirmed item-hs-analysis rows into the InvoiceLineItem shape used by the
+ *  invoice-items selection step (SPN / customs paths — selecting which of the AI-analyzed,
+ *  agency-grouped items to actually submit). */
+export function mapToInvoiceLineItems(items: ProductHsAnalysis[]): InvoiceLineItem[] {
+  return items.map(p => {
+    const c = ITEM_COMMERCIAL[p.id] ?? { quantity: '1', unit: 'ชิ้น', unitPrice: 0, amount: 0, lotNo: p.id };
+    return { id: p.id, name: p.name, hsCode: p.hsCode, quantity: c.quantity, unit: c.unit, unitPrice: c.unitPrice, amount: c.amount, lotNo: c.lotNo };
+  });
 }

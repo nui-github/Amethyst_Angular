@@ -13,7 +13,7 @@ import { getAgencyPayment } from '@mock/payment.mock';
 import { KNOWN_REFS, MOCK_FORM_DATA, MOCK_SPN_LIST } from '@mock/spn.mock';
 import { MOCK_SPN_PROFILES } from '@mock/spn-companies.mock';
 import { getInvoiceLineItems } from '@mock/invoice-items.mock';
-import { getProductHsAnalysis } from '@mock/product-hs-analysis.mock';
+import { getProductHsAnalysis, mapToInvoiceLineItems } from '@mock/product-hs-analysis.mock';
 import { InvoiceOcrResult } from '@mock/invoice-ocr.mock';
 import { environment } from '@env/environment';
 import { MOCK_SESSIONS } from '@mock/sessions.mock';
@@ -527,11 +527,11 @@ export class ChatService {
         }, 400), 600);
       }, 500);
     } else if (this.pendingAfterFlow === 'form-preview') {
-      // Customs path: show form-preview
-      this.withTyping(() => this.showPreview(), 500);
+      // Customs path: select which of this agency's AI-analyzed items to submit → form-preview
+      this.withTyping(() => this.showAgencyItemsSelection('form-preview'), 500);
     } else {
-      // SPN / proceed path
-      this.withTyping(() => this.showProceedChoice(), 500);
+      // SPN path: select which of this agency's AI-analyzed items to submit → proceed choice
+      this.withTyping(() => this.showAgencyItemsSelection('proceed'), 500);
     }
   }
 
@@ -597,6 +597,10 @@ export class ChatService {
     this.bot('item-hs-analysis', { items: getProductHsAnalysis() } satisfies ItemHsAnalysisData);
   }
 
+  /** All items from the most recently confirmed item-hs-analysis card — kept so the
+   *  customs/SPN item-selection step can filter down to whichever agency was chosen. */
+  private confirmedProductItems: ProductHsAnalysis[] = [];
+
   onItemHsAnalysisConfirmed(msgId: string, items: ProductHsAnalysis[]): void {
     this.messages.update(ms => ms.map(m =>
       m.id === msgId && m.type === 'item-hs-analysis'
@@ -604,6 +608,7 @@ export class ChatService {
         : m
     ));
     this.user('ยืนยันผลการวิเคราะห์รายสินค้าแล้ว');
+    this.confirmedProductItems = items;
 
     const requiredAgencies = Array.from(new Set(items.filter(i => i.requiresPermit).map(i => i.agency)));
     if (requiredAgencies.length === 0) {
@@ -616,11 +621,26 @@ export class ChatService {
     this.withTyping(() => this.showAgencyChoice(requiredAgencies[0]), 600);
   }
 
+  /** What to do once the user finishes the invoice-items selection step. */
+  private itemsSelectionPurpose: 'invoice-flags' | 'form-preview' | 'proceed' = 'invoice-flags';
+
   // ── Invoice line-item selection (invoice path, after agency-docs OCR) ───────
   private showInvoiceItemsSelection(): void {
+    this.itemsSelectionPurpose = 'invoice-flags';
     this.bot('invoice-items', {
       agency: this.currentAgency,
       items: getInvoiceLineItems(this.formData().invoiceNo),
+    } satisfies InvoiceItemsData);
+  }
+
+  /** Customs-declaration / SPN paths: item-selection scoped to the chosen agency's
+   *  AI-analyzed group, shown before form-preview / the proceed choice. */
+  private showAgencyItemsSelection(purpose: 'form-preview' | 'proceed'): void {
+    this.itemsSelectionPurpose = purpose;
+    const agencyItems = this.confirmedProductItems.filter(i => i.requiresPermit && i.agency === this.currentAgency);
+    this.bot('invoice-items', {
+      agency: this.currentAgency,
+      items: mapToInvoiceLineItems(agencyItems),
     } satisfies InvoiceItemsData);
   }
 
@@ -632,7 +652,14 @@ export class ChatService {
     ));
     this.formData.update(f => ({ ...f, selectedItems: items }));
     this.user(`เลือกสินค้า ${items.length} รายการ`);
-    this.withTyping(() => this.showFlags(), 500);
+
+    if (this.itemsSelectionPurpose === 'form-preview') {
+      this.withTyping(() => this.showPreview(), 500);
+    } else if (this.itemsSelectionPurpose === 'proceed') {
+      this.withTyping(() => this.showProceedChoice(), 500);
+    } else {
+      this.withTyping(() => this.showFlags(), 500);
+    }
   }
 
   // ── Flag confirm flow ──────────────────────────────────────────────────────
