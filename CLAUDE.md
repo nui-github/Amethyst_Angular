@@ -66,6 +66,7 @@ ChatMessage.type → @switch in ChatAreaComponent
   'form-preview'       → FormPreviewComponent   (editable pre-submit data review; "ดำเนินการต่อ" triggers choice-card)
   'missing-fields'     → MissingFieldsComponent (incomplete OCR → fill + optional re-upload)
   'agency-upload'      → AgencyUploadComponent  (per-agency doc slots; upload file OR manual entry per slot)
+  'invoice-items'      → InvoiceItemsComponent  (invoice path only; multi-select which invoice line items to submit; ≥1 required)
   'profile-select'     → ProfileSelectComponent (pick/confirm ShippingNet profile; mode: 'select'|'confirm')
   'payment-qr'         → PaymentQrComponent     (QR PromptPay สำหรับกรมที่มีค่าธรรมเนียม)
   'payment-slip'       → PaymentSlipComponent   (อัปโหลด slip หลังชำระ; disabled after upload via msg.isReadOnly)
@@ -103,6 +104,7 @@ src/
 │   │   │   ├── spn-companies.mock.ts
 │   │   │   ├── hs-analysis.mock.ts
 │   │   │   ├── agency-docs.mock.ts    ← required docs per agency (อย./กษ.) + manualFields
+│   │   │   ├── invoice-items.mock.ts  ← invoice line items (getInvoiceLineItems) for invoice-items step
 │   │   │   └── payment.mock.ts        ← fee config per agency (requiresFee, amount)
 │   │   ├── models/types.ts            ← ALL interfaces + MessageType union
 │   │   └── services/
@@ -180,14 +182,15 @@ ChatService.send(text)
 Universal agency+profile order (all paths after hs-analysis): เลือกกรม (dept:) → เลือกโปรไฟล์ → continue
   pendingAfterFlow: 'agency-docs' (invoice) | 'form-preview' (customs) | 'proceed' (SPN)
 
-import-license-menu → 3 choices:
+import-license-menu → 2 choices (chooseFullUpload()/full-upload card removed from menu, method still exists unused):
   ├─ chooseCustomsDocs()   → single-upload → OCR → hs-analysis → เลือกกรม → เลือกโปรไฟล์ → form-preview → submit → next-agency
-  ├─ chooseInvoiceFirst()  → single-upload(invoice) → OCR → hs-analysis → เลือกกรม → เลือกโปรไฟล์
-  │     → agency-upload (per-agency file slots) → OCR → flags → form-preview (editable) → "ดำเนินการต่อ"
-  │     → choice-card(submit/edit) → submit → showNextAgencyIfAny()
-  │           ├─ remaining agencies? → "ขอใบอนุญาตเพิ่ม / เสร็จสิ้น"
-  │           └─ ขอใบอนุญาตเพิ่ม → agency selector → repeat agency flow
-  └─ chooseFullUpload()    → full-upload → OCR → hs-analysis → flags → form-preview → submit
+  └─ chooseInvoiceFirst()  → single-upload(invoice) → OCR → hs-analysis → เลือกกรม → เลือกโปรไฟล์
+        → agency-upload (per-agency file slots) → OCR → invoice-items (เลือกสินค้าที่จะยื่น, ≥1 รายการ) → flags
+        → form-preview (editable, shows selected items table) → "ดำเนินการต่อ"
+        → choice-card(submit/edit) → submit → showNextAgencyIfAny()
+              ├─ remaining agencies? → "เสร็จสิ้น / ขอใบอนุญาตเพิ่ม"
+              ├─ ขอใบอนุญาตเพิ่ม → agency selector → repeat agency flow
+              └─ no remaining agencies → completion text + "ตรวจสอบสถานะใบอนุญาต" → permit-status
 
 After flags confirmed (full-upload path) → form-preview (editable) → "ดำเนินการต่อ" → choice-card(submit/edit) → submit
 
