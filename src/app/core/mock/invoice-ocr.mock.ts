@@ -2,7 +2,7 @@ import { OcrLineItem } from '@app/core/models/types';
 
 // Mock OCR result for the invoice-upload path — mirrors a real commercial invoice
 // (medical device shipment, multiple HS codes/origins per line item)
-const INVOICE_LINE_ITEMS: OcrLineItem[] = [
+export const INVOICE_LINE_ITEMS: OcrLineItem[] = [
   { id: 'l1', name: 'Stent Graft (ETBF2313C145EE)',        hsCode: '9021.39.00', origin: 'ไอร์แลนด์ (IE)', qty: '1',   unit: 'ชิ้น' },
   { id: 'l2', name: 'Coronary Stent (TRCR30015X)',         hsCode: '9018.90.90', origin: 'ไอร์แลนด์ (IE)', qty: '39',  unit: 'ชิ้น' },
   { id: 'l3', name: 'Introducer Sheath (SENSH1628W)',      hsCode: '9018.39.90', origin: 'ไอร์แลนด์ (IE)', qty: '29',  unit: 'ชิ้น' },
