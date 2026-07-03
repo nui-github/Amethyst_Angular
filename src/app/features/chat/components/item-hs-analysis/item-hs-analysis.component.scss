@@ -1,0 +1,230 @@
+.ih-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ih-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+
+  &__icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    background: rgba(4, 99, 239, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+}
+
+.ih-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--bizx-navy);
+  margin: 0 0 2px;
+}
+
+.ih-sub {
+  font-size: 11px;
+  color: var(--bizx-n500);
+  margin: 0;
+}
+
+.ih-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  max-height: 420px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.ih-row {
+  border: 1.5px solid var(--bizx-n200);
+  border-radius: 10px;
+  padding: 9px 12px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color 0.14s, background 0.14s;
+
+  &--pending { border-color: #FDE68A; background: #FFFBEB; }
+  &--done { border-color: #D1FAE5; background: #F0FDF4; }
+}
+
+.ih-row__main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ih-row__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ih-row__name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--bizx-navy);
+}
+
+.ih-row__codes {
+  font-size: 10.5px;
+  color: var(--bizx-n500);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ih-row__dot { color: var(--bizx-n300); }
+
+.ih-row__result {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.ih-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 5px;
+
+  &--permit { background: rgba(180, 83, 9, 0.1); color: #B45309; }
+  &--free   { background: #F3F4F6; color: #6B7280; }
+}
+
+.ih-conf {
+  font-size: 10px;
+  color: var(--bizx-n400);
+}
+
+.ih-row__actions {
+  display: flex;
+  gap: 6px;
+}
+
+.ih-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  border: 1.5px solid;
+
+  &--ok  { border-color: #0D8F61; color: #0D8F61; background: #fff; &:hover { background: rgba(13,143,97,0.06); } }
+  &--no  { border-color: #EF4444; color: #EF4444; background: #fff; &:hover { background: rgba(239,68,68,0.06); } }
+}
+
+.ih-row__decided {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #0D8F61;
+}
+
+.ih-recorrect {
+  margin-left: auto;
+  border: none;
+  background: none;
+  color: var(--bizx-blue);
+  font-size: 10.5px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.ih-correct-panel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.ih-correct-label {
+  font-size: 10.5px;
+  color: var(--bizx-n500);
+}
+
+.ih-agency-opt {
+  padding: 3px 10px;
+  border-radius: 6px;
+  border: 1.5px solid var(--bizx-blue);
+  background: #fff;
+  color: var(--bizx-blue);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+
+  &:hover { background: rgba(4, 99, 239, 0.06); }
+}
+
+.ih-correct-cancel {
+  border: none;
+  background: none;
+  color: var(--bizx-n500);
+  font-size: 10.5px;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.ih-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 4px;
+
+  &--saved {
+    font-size: 12px;
+    font-weight: 600;
+    color: #0D8F61;
+    display: flex;
+    gap: 6px;
+    justify-content: flex-start;
+  }
+}
+
+.ih-footer__count {
+  font-size: 11.5px;
+  color: var(--bizx-n500);
+}
+
+.ih-proceed-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background: var(--bizx-blue);
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.14s;
+
+  &:hover:not(:disabled) { background: #034DBA; }
+  &:disabled { opacity: 0.45; cursor: default; }
+}

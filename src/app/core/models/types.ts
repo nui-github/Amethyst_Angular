@@ -33,12 +33,31 @@ export type MessageType =
   | 'permit-status'     // status overview of all submitted permit requests
   | 'payment-qr'       // QR payment card (fee required by agency)
   | 'payment-slip'     // upload payment slip after scanning QR
-  | 'invoice-items';   // select which invoice line items to submit for this agency's permit
+  | 'invoice-items'    // select which invoice line items to submit for this agency's permit
+  | 'item-hs-analysis';// invoice path: per-product HS Code + Smart Tariff → agency lookup, user must confirm/correct each row
 
 export interface InvoiceItemsData {
   agency: string;
   items: InvoiceLineItem[];
   selectedIds?: string[]; // set once confirmed (isReadOnly display)
+}
+
+// รายการวิเคราะห์รายสินค้า: product description → HS Code → Smart Tariff → กรมที่ต้องยื่น
+export interface ProductHsAnalysis {
+  id: string;
+  name: string;          // product description จาก invoice
+  hsCode: string;
+  tariffCode: string;    // เลขพิกัดอัตราศุลกากรเต็ม (Smart Tariff)
+  requiresPermit: boolean;
+  agency: string;        // 'อย.' | 'กษ.' | '—' (ไม่ต้องขอ)
+  agencyFull: string;
+  licenseType?: string;
+  confidence: number;
+}
+
+export interface ItemHsAnalysisData {
+  items: ProductHsAnalysis[];
+  reviewed?: boolean; // true once user has confirmed/corrected every row (isReadOnly display)
 }
 
 export interface MissingField {

@@ -233,6 +233,17 @@
               }
             }
 
+            <!-- Per-product HS Code + Smart Tariff → agency analysis, user confirms/corrects each row -->
+            @case ('item-hs-analysis') {
+              @if (!readOnly && !msg.isReadOnly) {
+                <app-item-hs-analysis
+                  [data]="asItemHsAnalysis(msg.data)"
+                  (confirmed)="onItemHsAnalysisConfirmed(msg.id, $event)" />
+              } @else {
+                <span class="readonly-tag">✓ ยืนยันผลวิเคราะห์รายสินค้าแล้ว</span>
+              }
+            }
+
           }
         </div>
 

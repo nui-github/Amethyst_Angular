@@ -4,7 +4,7 @@ import {
   FlagCardData, FlagItem, ChoiceCardData, EmailDraftData,
   StatusCardData, OcrResultsData, SpnResultData, Shipment,
   MissingField, MissingFieldsData, PaymentQrData, PaymentSlipData, HsAnalysisData,
-  InvoiceItemsData, InvoiceLineItem,
+  InvoiceItemsData, InvoiceLineItem, ItemHsAnalysisData, ProductHsAnalysis,
 } from '@app/core/models/types';
 import { OcrService } from './ocr.service';
 import { QueueService } from './queue.service';
@@ -13,6 +13,7 @@ import { getAgencyPayment } from '@mock/payment.mock';
 import { KNOWN_REFS, MOCK_FORM_DATA, MOCK_SPN_LIST } from '@mock/spn.mock';
 import { MOCK_SPN_PROFILES } from '@mock/spn-companies.mock';
 import { getInvoiceLineItems } from '@mock/invoice-items.mock';
+import { getProductHsAnalysis } from '@mock/product-hs-analysis.mock';
 import { environment } from '@env/environment';
 import { MOCK_SESSIONS } from '@mock/sessions.mock';
 
@@ -444,22 +445,12 @@ export class ChatService {
       this.continueAfterCustomsOCR();
       return;
     }
-    // Invoice path: hs-analysis → profile select → agency choice → second upload → flags
+    // Invoice path: per-product HS Code + Smart Tariff analysis (user reviews each row)
+    // → profile select → agency choice → second upload → flags
     if (this.isInvoicePath) {
       this.isInvoicePath = false;
-      if (this.formData().hsCode) {
-        this.withTyping(() => {
-          const analysis = analyzeHsCode(this.formData().hsCode!);
-          this.bot('hs-analysis', analysis);
-          if (analysis.agencies?.length) { this.ALL_AGENCIES = analysis.agencies.map(a => a.code); this.allPermitAgencies.set(this.ALL_AGENCIES); }
-          // Invoice path: agency choice → profile → agency-upload
-          this.pendingAfterFlow = 'agency-docs';
-          setTimeout(() => this.withTyping(() => this.showAgencyChoice(analysis.agency), 600), 400);
-        }, 600);
-      } else {
-        this.pendingAfterFlow = 'agency-docs';
-        this.withTyping(() => this.showAgencyChoice('—'), 800);
-      }
+      this.pendingAfterFlow = 'agency-docs';
+      this.withTyping(() => this.showItemHsAnalysis(), 600);
       return;
     }
     // Full-upload path: hs-analysis → flags
@@ -606,6 +597,30 @@ export class ChatService {
         afterComplete();
       }
     }
+  }
+
+  // ── Per-product HS Code + Smart Tariff analysis (invoice path, right after OCR) ──
+  private showItemHsAnalysis(): void {
+    this.bot('item-hs-analysis', { items: getProductHsAnalysis() } satisfies ItemHsAnalysisData);
+  }
+
+  onItemHsAnalysisConfirmed(msgId: string, items: ProductHsAnalysis[]): void {
+    this.messages.update(ms => ms.map(m =>
+      m.id === msgId && m.type === 'item-hs-analysis'
+        ? { ...m, data: { items, reviewed: true } satisfies ItemHsAnalysisData }
+        : m
+    ));
+    this.user('ยืนยันผลการวิเคราะห์รายสินค้าแล้ว');
+
+    const requiredAgencies = Array.from(new Set(items.filter(i => i.requiresPermit).map(i => i.agency)));
+    if (requiredAgencies.length === 0) {
+      this.withTyping(() => this.bot('text', undefined,
+        'ไม่มีสินค้ารายการใดต้องขอใบอนุญาตเพิ่มเติมครับ — ท่านสามารถดำเนินพิธีการนำเข้าได้ตามปกติ'), 600);
+      return;
+    }
+    this.ALL_AGENCIES = requiredAgencies;
+    this.allPermitAgencies.set(this.ALL_AGENCIES);
+    this.withTyping(() => this.showAgencyChoice(requiredAgencies[0]), 600);
   }
 
   // ── Invoice line-item selection (invoice path, after agency-docs OCR) ───────
@@ -1054,7 +1069,8 @@ export class ChatService {
     }
     if (hasType('form-preview'))   return 'ตรวจสอบก่อนส่งกรม';
     if (hasType('flag-card'))      return 'ยืนยัน flags';
-    if (hasType('hs-analysis'))    return 'วิเคราะห์ HS Code';
+    if (hasType('invoice-items'))  return 'เลือกรายการสินค้า';
+    if (hasType('item-hs-analysis') || hasType('hs-analysis')) return 'วิเคราะห์ HS Code';
     if (hasType('ocr-results'))    return 'OCR เสร็จแล้ว';
     if (hasType('ocr-progress'))   return 'กำลัง OCR';
     if (hasType('agency-upload') || hasType('single-upload') || hasType('full-upload'))
