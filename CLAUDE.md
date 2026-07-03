@@ -122,7 +122,9 @@ src/
 │   │   │   │                            and historical hs-analysis message replay; NOT used by item-hs-analysis
 │   │   │   ├── product-hs-analysis.mock.ts ← getProductHsAnalysis() — the single shared item-hs-analysis
 │   │   │   │                            dataset for ALL flows (invoice/SPN/customs); mirrors the invoice-ocr
-│   │   │   │                            mock's 6 line items (medical devices, all → อย. เครื่องมือแพทย์)
+│   │   │   │                            mock's 6 line items (medical devices) — 4 → อย. เครื่องมือแพทย์,
+│   │   │   │                            2 gamma-sterilized items → ปส. (สำนักงานปรมาณูเพื่อสันติภาพ), so every
+│   │   │   │                            flow reaches the 2nd-agency "ขอใบอนุญาตเพิ่ม" (next-agency LPI) step
 │   │   │   ├── agency-docs.mock.ts    ← required docs per agency (อย./กษ.) + manualFields
 │   │   │   ├── invoice-items.mock.ts  ← invoice line items (getInvoiceLineItems) for invoice-items step
 │   │   │   └── payment.mock.ts        ← fee config per agency (requiresFee, amount)

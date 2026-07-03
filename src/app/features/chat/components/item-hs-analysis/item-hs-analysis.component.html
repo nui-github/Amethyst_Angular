@@ -63,9 +63,10 @@
         <div class="ih-group__head" [style.background]="groupStyle(group.key).bg" [style.color]="groupStyle(group.key).color">
           <span class="ih-group__icon" [style.color]="groupStyle(group.key).color">
             @switch (groupStyle(group.key).icon) {
-              @case ('shield')  { <lucide-icon [img]="ShieldCheck" [size]="15" /> }
-              @case ('sprout')  { <lucide-icon [img]="Sprout" [size]="15" /> }
-              @default          { <lucide-icon [img]="PackageCheck" [size]="15" /> }
+              @case ('shield')    { <lucide-icon [img]="ShieldCheck" [size]="15" /> }
+              @case ('sprout')    { <lucide-icon [img]="Sprout" [size]="15" /> }
+              @case ('radiation') { <lucide-icon [img]="Radiation" [size]="15" /> }
+              @default            { <lucide-icon [img]="PackageCheck" [size]="15" /> }
             }
           </span>
           <div class="ih-group__title">

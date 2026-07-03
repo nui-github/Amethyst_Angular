@@ -60,6 +60,24 @@ export const AGENCY_REQUIRED_DOCS: Record<string, AgencyDoc[]> = {
       ],
     },
   ],
+  'ปส.': [
+    {
+      key: 'irradiation_cert', label: 'ใบรับรองการฆ่าเชื้อด้วยรังสี', required: true,
+      hint: 'Certificate of Irradiation/Sterilization จากผู้ผลิต',
+      manualFields: [
+        { key: 'irradiationNo',   label: 'เลขที่ใบรับรอง', placeholder: 'Certificate No.' },
+        { key: 'irradiationDate', label: 'วันที่ออก',       placeholder: 'dd/mm/yyyy' },
+      ],
+    },
+    {
+      key: 'radiation_permit', label: 'ใบอนุญาตครอบครองเครื่องมือแพทย์ที่ผ่านการฉายรังสี', required: true,
+      hint: 'ออกโดยสำนักงานปรมาณูเพื่อสันติภาพ (ปส.)',
+      manualFields: [
+        { key: 'radiationPermitNo',   label: 'เลขที่ใบอนุญาต', placeholder: 'เช่น ปส.-2568-000456' },
+        { key: 'radiationPermitDate', label: 'วันที่อนุมัติ',    placeholder: 'dd/mm/yyyy' },
+      ],
+    },
+  ],
   'multi': [
     {
       key: 'license_app', label: 'คำขออนุญาตนำเข้า', required: true,

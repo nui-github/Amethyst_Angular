@@ -460,6 +460,7 @@ export class ChatService {
   private readonly AGENCY_DESC: Record<string, string> = {
     'อย.': 'สำนักงานคณะกรรมการอาหารและยา (อย.)',
     'กษ.': 'กรมวิชาการเกษตร (กษ.)',
+    'ปส.': 'สำนักงานปรมาณูเพื่อสันติภาพ (ปส.)',
     '—':   'ขอใบอนุญาตนำเข้าทั่วไป',
   };
 
@@ -967,6 +968,7 @@ export class ChatService {
     const AGENCY_DESC: Record<string, string> = {
       'อย.': 'สำนักงานคณะกรรมการอาหารและยา',
       'กษ.': 'กรมวิชาการเกษตร',
+      'ปส.': 'สำนักงานปรมาณูเพื่อสันติภาพ',
     };
     this.bot('choice-card', {
       question: 'เลือกกรมที่ต้องการยื่นขอใบอนุญาต',

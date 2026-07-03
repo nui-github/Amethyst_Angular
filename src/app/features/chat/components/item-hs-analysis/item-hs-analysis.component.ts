@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, Search, Check, ArrowDown, Percent, ShieldCheck, Sprout, PackageCheck } from 'lucide-angular';
+import { LucideAngularModule, Search, Check, ArrowDown, Percent, ShieldCheck, Sprout, PackageCheck, Radiation } from 'lucide-angular';
 import { ItemHsAnalysisData, ProductHsAnalysis } from '@app/core/models/types';
 import { getAgencyPayment } from '@mock/payment.mock';
 
@@ -19,9 +19,10 @@ interface AgencyGroup {
   items: ProductHsAnalysis[];
 }
 
-const GROUP_STYLE: Record<string, { color: string; bg: string; icon: 'shield' | 'sprout' | 'package' }> = {
+const GROUP_STYLE: Record<string, { color: string; bg: string; icon: 'shield' | 'sprout' | 'package' | 'radiation' }> = {
   'อย.': { color: '#0463EF', bg: 'rgba(4, 99, 239, 0.08)', icon: 'shield' },
   'กษ.': { color: '#B45309', bg: 'rgba(180, 83, 9, 0.08)', icon: 'sprout' },
+  'ปส.': { color: '#7C3AED', bg: 'rgba(124, 58, 237, 0.08)', icon: 'radiation' },
   '—':   { color: '#6B7280', bg: 'rgba(107, 114, 128, 0.08)', icon: 'package' },
 };
 
@@ -44,6 +45,7 @@ export class ItemHsAnalysisComponent implements OnInit {
   readonly ShieldCheck = ShieldCheck;
   readonly Sprout = Sprout;
   readonly PackageCheck = PackageCheck;
+  readonly Radiation = Radiation;
 
   groups: AgencyGroup[] = [];
   confirmedGroups = signal<Record<string, boolean>>({});
