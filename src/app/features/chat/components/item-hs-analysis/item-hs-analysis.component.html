@@ -5,7 +5,7 @@
     </div>
     <div>
       <p class="ih-title">AI วิเคราะห์ HS Code และพิกัดอัตราศุลกากรรายสินค้า</p>
-      <p class="ih-sub">ตรวจสอบผลแต่ละรายการ — กดยืนยันถ้าถูกต้อง หรือแก้ไขกรมที่ถูกต้องเอง</p>
+      <p class="ih-sub">ตรวจสอบผลแยกตามกรม — กดยืนยันทั้งกลุ่มถ้าถูกต้อง หรือแก้ไขกรมของกลุ่มนั้นเอง</p>
     </div>
   </div>
 
@@ -53,69 +53,80 @@
     }
   </div>
 
-  <div class="ih-list">
-    @for (item of data.items; track item.id) {
-      <div class="ih-row" [class.ih-row--pending]="row(item.id).status === 'pending'"
-        [class.ih-row--done]="row(item.id).status !== 'pending'">
+  <div class="ih-groups">
+    @for (group of groups; track group.key) {
+      <div class="ih-group"
+        [style.--group-color]="groupStyle(group.key).color"
+        [style.--group-bg]="groupStyle(group.key).bg"
+        [class.ih-group--done]="groupState(group.key).status !== 'pending'">
 
-        <div class="ih-row__main">
-          <div class="ih-row__info">
-            <span class="ih-row__name">{{ item.name }}</span>
-            <span class="ih-row__codes">
-              <span>HS {{ item.hsCode }}</span>
-              <span class="ih-row__dot">·</span>
-              <span>พิกัด {{ item.tariffCode }}</span>
+        <div class="ih-group__head">
+          <div class="ih-group__title">
+            <span class="ih-group__icon">
+              @switch (groupStyle(group.key).icon) {
+                @case ('shield')  { <lucide-icon [img]="ShieldCheck" [size]="14" /> }
+                @case ('sprout')  { <lucide-icon [img]="Sprout" [size]="14" /> }
+                @default          { <lucide-icon [img]="PackageCheck" [size]="14" /> }
+              }
             </span>
+            <div>
+              <span class="ih-group__name">{{ group.key === '—' ? 'ไม่ต้องขอใบอนุญาต' : group.key }}</span>
+              @if (group.key !== '—') {
+                <span class="ih-group__full">{{ group.full }}</span>
+              }
+            </div>
           </div>
-
-          <div class="ih-row__result">
-            @if (requiresPermit(item)) {
-              <span class="ih-badge ih-badge--permit">{{ row(item.id).agency }}</span>
-            } @else {
-              <span class="ih-badge ih-badge--free">ไม่ต้องขอ</span>
-            }
-            <span class="ih-conf">AI {{ item.confidence }}%</span>
-          </div>
+          <span class="ih-group__count">{{ group.items.length }} รายการ</span>
         </div>
 
         @if (!proceeded()) {
-          @if (row(item.id).correcting) {
+          @if (groupState(group.key).correcting) {
             <div class="ih-correct-panel">
-              <span class="ih-correct-label">เลือกกรมที่ถูกต้อง:</span>
+              <span class="ih-correct-label">เลือกกรมที่ถูกต้องสำหรับกลุ่มนี้:</span>
               @for (opt of agencyOptions; track opt.code) {
-                <button class="ih-agency-opt" (click)="applyCorrection(item, opt.code)">{{ opt.code === '—' ? 'ไม่ต้องขอ' : opt.code }}</button>
+                <button class="ih-agency-opt" (click)="applyGroupCorrection(group.key, opt.code)">{{ opt.code === '—' ? 'ไม่ต้องขอ' : opt.code }}</button>
               }
-              <button class="ih-correct-cancel" (click)="cancelCorrect(item)">ยกเลิก</button>
+              <button class="ih-correct-cancel" (click)="cancelCorrectGroup(group.key)">ยกเลิก</button>
             </div>
-          } @else if (row(item.id).status === 'pending') {
+          } @else if (groupState(group.key).status === 'pending') {
             <div class="ih-row__actions">
-              <button class="ih-action-btn ih-action-btn--ok" (click)="confirm(item)">
-                <lucide-icon [img]="Check" [size]="11" /> ถูกต้อง
+              <button class="ih-action-btn ih-action-btn--ok" (click)="confirmGroup(group.key)">
+                <lucide-icon [img]="Check" [size]="11" /> ถูกต้องทั้งกลุ่ม
               </button>
-              <button class="ih-action-btn ih-action-btn--no" (click)="openCorrect(item)">
+              <button class="ih-action-btn ih-action-btn--no" (click)="openCorrectGroup(group.key)">
                 <lucide-icon [img]="X" [size]="11" /> ไม่ถูกต้อง
               </button>
             </div>
           } @else {
             <div class="ih-row__decided">
               <lucide-icon [img]="Check" [size]="11" color="#0D8F61" />
-              {{ row(item.id).status === 'corrected' ? 'แก้ไขแล้ว' : 'ยืนยันแล้ว' }}
-              <button class="ih-recorrect" (click)="openCorrect(item)">แก้ไข</button>
+              {{ groupState(group.key).status === 'corrected' ? ('แก้ไขเป็น ' + groupState(group.key).agency + ' แล้ว') : 'ยืนยันแล้ว' }}
+              <button class="ih-recorrect" (click)="openCorrectGroup(group.key)">แก้ไข</button>
             </div>
           }
         } @else {
           <div class="ih-row__decided">
             <lucide-icon [img]="Check" [size]="11" color="#0D8F61" />
-            {{ row(item.id).status === 'corrected' ? 'แก้ไขแล้ว' : 'ยืนยันแล้ว' }}
+            {{ groupState(group.key).status === 'corrected' ? ('แก้ไขเป็น ' + groupState(group.key).agency + ' แล้ว') : 'ยืนยันแล้ว' }}
           </div>
         }
+
+        <div class="ih-group__items">
+          @for (item of group.items; track item.id) {
+            <div class="ih-item">
+              <span class="ih-item__name">{{ item.name }}</span>
+              <span class="ih-item__codes">HS {{ item.hsCode }} · พิกัด {{ item.tariffCode }}</span>
+              <span class="ih-item__conf">AI {{ item.confidence }}%</span>
+            </div>
+          }
+        </div>
       </div>
     }
   </div>
 
   @if (!proceeded()) {
     <div class="ih-footer">
-      <span class="ih-footer__count">ตรวจสอบแล้ว {{ decidedCount() }} / {{ data.items.length }} รายการ</span>
+      <span class="ih-footer__count">ยืนยันแล้ว {{ decidedCount() }} / {{ groups.length }} กลุ่ม</span>
       <button class="ih-proceed-btn" [disabled]="!allDecided()" (click)="proceed()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
         ดำเนินการต่อ
@@ -124,7 +135,7 @@
   } @else {
     <div class="ih-footer ih-footer--saved">
       <lucide-icon [img]="Check" [size]="13" color="#0D8F61" />
-      ยืนยันผลการวิเคราะห์ครบทุกรายการแล้ว
+      ยืนยันผลการวิเคราะห์ครบทุกกลุ่มแล้ว
     </div>
   }
 </div>

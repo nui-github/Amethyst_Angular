@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, Search, Check, X, ArrowDown, Banknote } from 'lucide-angular';
+import { LucideAngularModule, Search, Check, X, ArrowDown, Banknote, ShieldCheck, Sprout, PackageCheck } from 'lucide-angular';
 import { ItemHsAnalysisData, ProductHsAnalysis } from '@app/core/models/types';
 import { AGENCY_CORRECTION_OPTIONS } from '@mock/product-hs-analysis.mock';
 import { getAgencyPayment } from '@mock/payment.mock';
@@ -13,14 +13,26 @@ interface AgencySummaryRow {
   amount: number;
 }
 
-type ReviewStatus = 'pending' | 'confirmed' | 'corrected';
+type GroupStatus = 'pending' | 'confirmed' | 'corrected';
 
-interface RowState {
-  status: ReviewStatus;
+interface GroupState {
+  status: GroupStatus;
   agency: string;
   agencyFull: string;
   correcting: boolean;
 }
+
+interface AgencyGroup {
+  key: string;          // original AI-assigned agency code (or '—')
+  full: string;
+  items: ProductHsAnalysis[];
+}
+
+const GROUP_STYLE: Record<string, { color: string; bg: string; icon: 'shield' | 'sprout' | 'package' }> = {
+  'อย.': { color: '#0463EF', bg: 'rgba(4, 99, 239, 0.06)', icon: 'shield' },
+  'กษ.': { color: '#B45309', bg: 'rgba(180, 83, 9, 0.06)', icon: 'sprout' },
+  '—':   { color: '#6B7280', bg: 'rgba(107, 114, 128, 0.06)', icon: 'package' },
+};
 
 @Component({
   selector: 'app-item-hs-analysis',
@@ -39,9 +51,13 @@ export class ItemHsAnalysisComponent implements OnInit {
   readonly X = X;
   readonly ArrowDown = ArrowDown;
   readonly Banknote = Banknote;
+  readonly ShieldCheck = ShieldCheck;
+  readonly Sprout = Sprout;
+  readonly PackageCheck = PackageCheck;
   readonly agencyOptions = AGENCY_CORRECTION_OPTIONS;
 
-  rows = signal<Record<string, RowState>>({});
+  groups: AgencyGroup[] = [];
+  groupStates = signal<Record<string, GroupState>>({});
   proceeded = signal(false);
 
   // Summary of the AI's own analysis (before any user correction)
@@ -50,11 +66,20 @@ export class ItemHsAnalysisComponent implements OnInit {
   totalFee = 0;
 
   ngOnInit(): void {
-    const init: Record<string, RowState> = {};
+    const byAgency = new Map<string, AgencyGroup>();
     for (const item of this.data.items) {
-      init[item.id] = { status: this.data.reviewed ? 'confirmed' : 'pending', agency: item.agency, agencyFull: item.agencyFull, correcting: false };
+      const key = item.agency;
+      if (!byAgency.has(key)) byAgency.set(key, { key, full: item.agencyFull, items: [] });
+      byAgency.get(key)!.items.push(item);
     }
-    this.rows.set(init);
+    // Order: permit-required agencies first, "ไม่ต้องขอ" group last
+    this.groups = Array.from(byAgency.values()).sort((a, b) => (a.key === '—' ? 1 : 0) - (b.key === '—' ? 1 : 0));
+
+    const initStates: Record<string, GroupState> = {};
+    for (const g of this.groups) {
+      initStates[g.key] = { status: this.data.reviewed ? 'confirmed' : 'pending', agency: g.key, agencyFull: g.full, correcting: false };
+    }
+    this.groupStates.set(initStates);
     this.proceeded.set(!!this.data.reviewed);
 
     this.requiresAnyPermit = this.data.items.some(i => i.requiresPermit);
@@ -72,42 +97,43 @@ export class ItemHsAnalysisComponent implements OnInit {
     this.totalFee = this.agencySummary.reduce((sum, a) => sum + (a.requiresFee ? a.amount : 0), 0);
   }
 
-  row(id: string): RowState { return this.rows()[id]; }
+  groupState(key: string): GroupState { return this.groupStates()[key]; }
 
-  requiresPermit(item: ProductHsAnalysis): boolean {
-    return this.row(item.id).agency !== '—';
-  }
+  groupStyle(key: string) { return GROUP_STYLE[key] ?? GROUP_STYLE['—']; }
 
-  confirm(item: ProductHsAnalysis): void {
+  confirmGroup(key: string): void {
     if (this.proceeded()) return;
-    this.rows.update(r => ({ ...r, [item.id]: { ...r[item.id], status: 'confirmed', correcting: false } }));
+    this.groupStates.update(s => ({ ...s, [key]: { ...s[key], status: 'confirmed', correcting: false } }));
   }
 
-  openCorrect(item: ProductHsAnalysis): void {
+  openCorrectGroup(key: string): void {
     if (this.proceeded()) return;
-    this.rows.update(r => ({ ...r, [item.id]: { ...r[item.id], correcting: true } }));
+    this.groupStates.update(s => ({ ...s, [key]: { ...s[key], correcting: true } }));
   }
 
-  cancelCorrect(item: ProductHsAnalysis): void {
-    this.rows.update(r => ({ ...r, [item.id]: { ...r[item.id], correcting: false } }));
+  cancelCorrectGroup(key: string): void {
+    this.groupStates.update(s => ({ ...s, [key]: { ...s[key], correcting: false } }));
   }
 
-  applyCorrection(item: ProductHsAnalysis, code: string): void {
+  applyGroupCorrection(key: string, code: string): void {
     const opt = this.agencyOptions.find(a => a.code === code);
     if (!opt) return;
-    this.rows.update(r => ({ ...r, [item.id]: { status: 'corrected', agency: opt.code, agencyFull: opt.full, correcting: false } }));
+    this.groupStates.update(s => ({ ...s, [key]: { status: 'corrected', agency: opt.code, agencyFull: opt.full, correcting: false } }));
   }
 
-  readonly allDecided = () => this.data.items.every(i => this.row(i.id)?.status !== 'pending');
-  readonly decidedCount = () => this.data.items.filter(i => this.row(i.id)?.status !== 'pending').length;
+  readonly allDecided = () => this.groups.every(g => this.groupState(g.key)?.status !== 'pending');
+  readonly decidedCount = () => this.groups.filter(g => this.groupState(g.key)?.status !== 'pending').length;
 
   proceed(): void {
     if (this.proceeded() || !this.allDecided()) return;
     this.proceeded.set(true);
-    const result: ProductHsAnalysis[] = this.data.items.map(item => {
-      const r = this.row(item.id);
-      return { ...item, agency: r.agency, agencyFull: r.agencyFull, requiresPermit: r.agency !== '—' };
-    });
+    const result: ProductHsAnalysis[] = [];
+    for (const g of this.groups) {
+      const s = this.groupState(g.key);
+      for (const item of g.items) {
+        result.push({ ...item, agency: s.agency, agencyFull: s.agencyFull, requiresPermit: s.agency !== '—' });
+      }
+    }
     this.confirmed.emit(result);
   }
 }
