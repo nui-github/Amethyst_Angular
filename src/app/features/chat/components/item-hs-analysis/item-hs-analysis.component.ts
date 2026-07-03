@@ -1,8 +1,17 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, Search, Check, X } from 'lucide-angular';
+import { LucideAngularModule, Search, Check, X, ArrowDown, Banknote } from 'lucide-angular';
 import { ItemHsAnalysisData, ProductHsAnalysis } from '@app/core/models/types';
 import { AGENCY_CORRECTION_OPTIONS } from '@mock/product-hs-analysis.mock';
+import { getAgencyPayment } from '@mock/payment.mock';
+
+interface AgencySummaryRow {
+  code: string;
+  full: string;
+  count: number;
+  requiresFee: boolean;
+  amount: number;
+}
 
 type ReviewStatus = 'pending' | 'confirmed' | 'corrected';
 
@@ -28,10 +37,17 @@ export class ItemHsAnalysisComponent implements OnInit {
   readonly Search = Search;
   readonly Check = Check;
   readonly X = X;
+  readonly ArrowDown = ArrowDown;
+  readonly Banknote = Banknote;
   readonly agencyOptions = AGENCY_CORRECTION_OPTIONS;
 
   rows = signal<Record<string, RowState>>({});
   proceeded = signal(false);
+
+  // Summary of the AI's own analysis (before any user correction)
+  requiresAnyPermit = false;
+  agencySummary: AgencySummaryRow[] = [];
+  totalFee = 0;
 
   ngOnInit(): void {
     const init: Record<string, RowState> = {};
@@ -40,6 +56,20 @@ export class ItemHsAnalysisComponent implements OnInit {
     }
     this.rows.set(init);
     this.proceeded.set(!!this.data.reviewed);
+
+    this.requiresAnyPermit = this.data.items.some(i => i.requiresPermit);
+    const map = new Map<string, { full: string; count: number }>();
+    for (const item of this.data.items) {
+      if (!item.requiresPermit) continue;
+      const cur = map.get(item.agency) ?? { full: item.agencyFull, count: 0 };
+      cur.count++;
+      map.set(item.agency, cur);
+    }
+    this.agencySummary = Array.from(map.entries()).map(([code, v]) => {
+      const pay = getAgencyPayment(code);
+      return { code, full: v.full, count: v.count, requiresFee: pay.requiresFee, amount: pay.amount };
+    });
+    this.totalFee = this.agencySummary.reduce((sum, a) => sum + (a.requiresFee ? a.amount : 0), 0);
   }
 
   row(id: string): RowState { return this.rows()[id]; }
