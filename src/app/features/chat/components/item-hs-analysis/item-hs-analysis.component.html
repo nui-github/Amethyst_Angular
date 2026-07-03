@@ -89,7 +89,11 @@
 
         <button class="ih-confirm-btn" [class.ih-confirm-btn--done]="isGroupConfirmed(group.key)"
           [disabled]="proceeded() || isGroupConfirmed(group.key)" (click)="confirmGroup(group.key)">
-          <lucide-icon [img]="Check" [size]="13" [color]="isGroupConfirmed(group.key) ? '#0D8F61' : '#fff'" />
+          @if (isGroupConfirmed(group.key)) {
+            <lucide-icon [img]="Check" [size]="13" color="#0D8F61" />
+          } @else {
+            <lucide-icon [img]="Check" [size]="13" color="#fff" />
+          }
           {{ isGroupConfirmed(group.key) ? 'ยืนยันแล้ว' : 'ยืนยันกลุ่มนี้ถูกต้อง' }}
         </button>
       </div>
