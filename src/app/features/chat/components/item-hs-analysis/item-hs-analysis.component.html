@@ -5,7 +5,7 @@
     </div>
     <div>
       <p class="ih-title">AI วิเคราะห์ HS Code และพิกัดอัตราศุลกากรรายสินค้า</p>
-      <p class="ih-sub">ตรวจสอบผลแยกตามกรม — กดยืนยันทั้งกลุ่มถ้าถูกต้อง หรือแก้ไขกรมของกลุ่มนั้นเอง</p>
+      <p class="ih-sub">เลือกกรมให้ตรง (ถ้า AI ผิด) แล้วกดยืนยันแต่ละกลุ่มก่อนไปต่อ</p>
     </div>
   </div>
 
@@ -58,68 +58,65 @@
       <div class="ih-group"
         [style.--group-color]="groupStyle(group.key).color"
         [style.--group-bg]="groupStyle(group.key).bg"
-        [class.ih-group--done]="groupState(group.key).status !== 'pending'">
+        [class.ih-group--done]="groupState(group.key).confirmed">
 
         <div class="ih-group__head">
+          <span class="ih-group__icon">
+            @switch (groupStyle(group.key).icon) {
+              @case ('shield')  { <lucide-icon [img]="ShieldCheck" [size]="15" /> }
+              @case ('sprout')  { <lucide-icon [img]="Sprout" [size]="15" /> }
+              @default          { <lucide-icon [img]="PackageCheck" [size]="15" /> }
+            }
+          </span>
           <div class="ih-group__title">
-            <span class="ih-group__icon">
-              @switch (groupStyle(group.key).icon) {
-                @case ('shield')  { <lucide-icon [img]="ShieldCheck" [size]="14" /> }
-                @case ('sprout')  { <lucide-icon [img]="Sprout" [size]="14" /> }
-                @default          { <lucide-icon [img]="PackageCheck" [size]="14" /> }
-              }
-            </span>
-            <div>
-              <span class="ih-group__name">{{ group.key === '—' ? 'ไม่ต้องขอใบอนุญาต' : group.key }}</span>
-              @if (group.key !== '—') {
-                <span class="ih-group__full">{{ group.full }}</span>
-              }
-            </div>
+            <span class="ih-group__name">{{ group.key === '—' ? 'ไม่ต้องขอใบอนุญาต' : group.key }}</span>
+            @if (group.key !== '—') {
+              <span class="ih-group__full">{{ group.full }}</span>
+            }
           </div>
           <span class="ih-group__count">{{ group.items.length }} รายการ</span>
         </div>
 
-        @if (!proceeded()) {
-          @if (groupState(group.key).correcting) {
-            <div class="ih-correct-panel">
-              <span class="ih-correct-label">เลือกกรมที่ถูกต้องสำหรับกลุ่มนี้:</span>
+        <div class="ih-group__control">
+          <label class="ih-select-wrap">
+            <span class="ih-select-label">AI วิเคราะห์ว่าควรยื่น</span>
+            <select class="ih-select" [disabled]="proceeded() || groupState(group.key).confirmed"
+              (change)="onAgencyChange(group.key, $any($event.target).value)">
               @for (opt of agencyOptions; track opt.code) {
-                <button class="ih-agency-opt" (click)="applyGroupCorrection(group.key, opt.code)">{{ opt.code === '—' ? 'ไม่ต้องขอ' : opt.code }}</button>
+                <option [value]="opt.code" [selected]="opt.code === groupState(group.key).agency">
+                  {{ opt.code === '—' ? 'ไม่ต้องขอใบอนุญาต' : opt.code + ' — ' + opt.full }}
+                </option>
               }
-              <button class="ih-correct-cancel" (click)="cancelCorrectGroup(group.key)">ยกเลิก</button>
-            </div>
-          } @else if (groupState(group.key).status === 'pending') {
-            <div class="ih-row__actions">
-              <button class="ih-action-btn ih-action-btn--ok" (click)="confirmGroup(group.key)">
-                <lucide-icon [img]="Check" [size]="11" /> ถูกต้องทั้งกลุ่ม
-              </button>
-              <button class="ih-action-btn ih-action-btn--no" (click)="openCorrectGroup(group.key)">
-                <lucide-icon [img]="X" [size]="11" /> ไม่ถูกต้อง
-              </button>
-            </div>
-          } @else {
-            <div class="ih-row__decided">
-              <lucide-icon [img]="Check" [size]="11" color="#0D8F61" />
-              {{ groupState(group.key).status === 'corrected' ? ('แก้ไขเป็น ' + groupState(group.key).agency + ' แล้ว') : 'ยืนยันแล้ว' }}
-              <button class="ih-recorrect" (click)="openCorrectGroup(group.key)">แก้ไข</button>
-            </div>
-          }
-        } @else {
-          <div class="ih-row__decided">
-            <lucide-icon [img]="Check" [size]="11" color="#0D8F61" />
-            {{ groupState(group.key).status === 'corrected' ? ('แก้ไขเป็น ' + groupState(group.key).agency + ' แล้ว') : 'ยืนยันแล้ว' }}
-          </div>
-        }
-
-        <div class="ih-group__items">
-          @for (item of group.items; track item.id) {
-            <div class="ih-item">
-              <span class="ih-item__name">{{ item.name }}</span>
-              <span class="ih-item__codes">HS {{ item.hsCode }} · พิกัด {{ item.tariffCode }}</span>
-              <span class="ih-item__conf">AI {{ item.confidence }}%</span>
-            </div>
+            </select>
+          </label>
+          @if (isChanged(group.key)) {
+            <span class="ih-changed-note">แก้ไขจาก AI แล้ว</span>
           }
         </div>
+
+        <button class="ih-confirm-toggle" [class.ih-confirm-toggle--on]="groupState(group.key).confirmed"
+          [disabled]="proceeded()" (click)="toggleGroupConfirm(group.key)">
+          <span class="ih-confirm-toggle__box">
+            @if (groupState(group.key).confirmed) { <lucide-icon [img]="Check" [size]="11" color="#fff" /> }
+          </span>
+          {{ groupState(group.key).confirmed ? 'ยืนยันแล้ว — กดเพื่อแก้ไข' : 'ยืนยันว่าถูกต้อง' }}
+        </button>
+
+        <button class="ih-expand-btn" (click)="toggleExpanded(group.key)">
+          {{ isExpanded(group.key) ? 'ซ่อนรายการสินค้า' : 'ดูรายการสินค้า (' + group.items.length + ')' }}
+        </button>
+
+        @if (isExpanded(group.key)) {
+          <div class="ih-group__items">
+            @for (item of group.items; track item.id) {
+              <div class="ih-item">
+                <span class="ih-item__name">{{ item.name }}</span>
+                <span class="ih-item__codes">HS {{ item.hsCode }} · พิกัด {{ item.tariffCode }}</span>
+                <span class="ih-item__conf">AI {{ item.confidence }}%</span>
+              </div>
+            }
+          </div>
+        }
       </div>
     }
   </div>

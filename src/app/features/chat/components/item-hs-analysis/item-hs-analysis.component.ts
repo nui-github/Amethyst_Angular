@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, Search, Check, X, ArrowDown, Banknote, ShieldCheck, Sprout, PackageCheck } from 'lucide-angular';
+import { LucideAngularModule, Search, Check, ArrowDown, Banknote, ShieldCheck, Sprout, PackageCheck } from 'lucide-angular';
 import { ItemHsAnalysisData, ProductHsAnalysis } from '@app/core/models/types';
 import { AGENCY_CORRECTION_OPTIONS } from '@mock/product-hs-analysis.mock';
 import { getAgencyPayment } from '@mock/payment.mock';
@@ -13,13 +13,10 @@ interface AgencySummaryRow {
   amount: number;
 }
 
-type GroupStatus = 'pending' | 'confirmed' | 'corrected';
-
 interface GroupState {
-  status: GroupStatus;
+  confirmed: boolean;
   agency: string;
   agencyFull: string;
-  correcting: boolean;
 }
 
 interface AgencyGroup {
@@ -48,7 +45,6 @@ export class ItemHsAnalysisComponent implements OnInit {
 
   readonly Search = Search;
   readonly Check = Check;
-  readonly X = X;
   readonly ArrowDown = ArrowDown;
   readonly Banknote = Banknote;
   readonly ShieldCheck = ShieldCheck;
@@ -59,6 +55,7 @@ export class ItemHsAnalysisComponent implements OnInit {
   groups: AgencyGroup[] = [];
   groupStates = signal<Record<string, GroupState>>({});
   proceeded = signal(false);
+  expanded = signal<Record<string, boolean>>({});
 
   // Summary of the AI's own analysis (before any user correction)
   requiresAnyPermit = false;
@@ -76,10 +73,13 @@ export class ItemHsAnalysisComponent implements OnInit {
     this.groups = Array.from(byAgency.values()).sort((a, b) => (a.key === '—' ? 1 : 0) - (b.key === '—' ? 1 : 0));
 
     const initStates: Record<string, GroupState> = {};
+    const initExpanded: Record<string, boolean> = {};
     for (const g of this.groups) {
-      initStates[g.key] = { status: this.data.reviewed ? 'confirmed' : 'pending', agency: g.key, agencyFull: g.full, correcting: false };
+      initStates[g.key] = { confirmed: !!this.data.reviewed, agency: g.key, agencyFull: g.full };
+      initExpanded[g.key] = false;
     }
     this.groupStates.set(initStates);
+    this.expanded.set(initExpanded);
     this.proceeded.set(!!this.data.reviewed);
 
     this.requiresAnyPermit = this.data.items.some(i => i.requiresPermit);
@@ -98,31 +98,28 @@ export class ItemHsAnalysisComponent implements OnInit {
   }
 
   groupState(key: string): GroupState { return this.groupStates()[key]; }
+  isExpanded(key: string): boolean { return this.expanded()[key]; }
+  toggleExpanded(key: string): void {
+    this.expanded.update(e => ({ ...e, [key]: !e[key] }));
+  }
 
   groupStyle(key: string) { return GROUP_STYLE[key] ?? GROUP_STYLE['—']; }
 
-  confirmGroup(key: string): void {
+  onAgencyChange(key: string, code: string): void {
     if (this.proceeded()) return;
-    this.groupStates.update(s => ({ ...s, [key]: { ...s[key], status: 'confirmed', correcting: false } }));
-  }
-
-  openCorrectGroup(key: string): void {
-    if (this.proceeded()) return;
-    this.groupStates.update(s => ({ ...s, [key]: { ...s[key], correcting: true } }));
-  }
-
-  cancelCorrectGroup(key: string): void {
-    this.groupStates.update(s => ({ ...s, [key]: { ...s[key], correcting: false } }));
-  }
-
-  applyGroupCorrection(key: string, code: string): void {
     const opt = this.agencyOptions.find(a => a.code === code);
     if (!opt) return;
-    this.groupStates.update(s => ({ ...s, [key]: { status: 'corrected', agency: opt.code, agencyFull: opt.full, correcting: false } }));
+    this.groupStates.update(s => ({ ...s, [key]: { ...s[key], agency: opt.code, agencyFull: opt.full } }));
   }
 
-  readonly allDecided = () => this.groups.every(g => this.groupState(g.key)?.status !== 'pending');
-  readonly decidedCount = () => this.groups.filter(g => this.groupState(g.key)?.status !== 'pending').length;
+  toggleGroupConfirm(key: string): void {
+    if (this.proceeded()) return;
+    this.groupStates.update(s => ({ ...s, [key]: { ...s[key], confirmed: !s[key].confirmed } }));
+  }
+
+  readonly allDecided = () => this.groups.every(g => this.groupState(g.key)?.confirmed);
+  readonly decidedCount = () => this.groups.filter(g => this.groupState(g.key)?.confirmed).length;
+  readonly isChanged = (key: string) => this.groupState(key)?.agency !== key;
 
   proceed(): void {
     if (this.proceeded() || !this.allDecided()) return;
