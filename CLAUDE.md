@@ -54,6 +54,8 @@ ChatMessage.type → @switch in ChatAreaComponent
   'ocr-progress'       → OcrProgressComponent
   'ocr-results'        → OcrResultsComponent   (editable inline; "ดำเนินการต่อ" triggers hs-analysis)
   'hs-analysis'        → HsAnalysisComponent   (shows fee badge per agency from payment.mock.ts)
+  'item-hs-analysis'   → ItemHsAnalysisComponent (invoice path only; per-product HS Code → Smart Tariff → agency;
+                            user must confirm or correct every row before continuing)
   'form'               → FormPanelComponent
   'full-upload'        → FullUploadComponent
   'single-upload'      → SingleUploadComponent
@@ -103,6 +105,7 @@ src/
 │   │   │   ├── queue.mock.ts          ← shipments with realistic chatbot-flow messages
 │   │   │   ├── spn-companies.mock.ts
 │   │   │   ├── hs-analysis.mock.ts
+│   │   │   ├── product-hs-analysis.mock.ts ← per-product HS/tariff/agency (getProductHsAnalysis) for item-hs-analysis step
 │   │   │   ├── agency-docs.mock.ts    ← required docs per agency (อย./กษ.) + manualFields
 │   │   │   ├── invoice-items.mock.ts  ← invoice line items (getInvoiceLineItems) for invoice-items step
 │   │   │   └── payment.mock.ts        ← fee config per agency (requiresFee, amount)
@@ -184,7 +187,9 @@ Universal agency+profile order (all paths after hs-analysis): เลือกก
 
 import-license-menu → 2 choices (chooseFullUpload()/full-upload card removed from menu, method still exists unused):
   ├─ chooseCustomsDocs()   → single-upload → OCR → hs-analysis → เลือกกรม → เลือกโปรไฟล์ → form-preview → submit → next-agency
-  └─ chooseInvoiceFirst()  → single-upload(invoice) → OCR → hs-analysis → เลือกกรม → เลือกโปรไฟล์
+  └─ chooseInvoiceFirst()  → single-upload(invoice) → OCR
+        → item-hs-analysis (รายสินค้า: HS Code → Smart Tariff → กรม; user ยืนยัน/แก้ไขทุกแถวก่อนไปต่อ)
+        → เลือกกรม (จาก union ของกรมที่ต้องขอทุกรายการ) → เลือกโปรไฟล์
         → agency-upload (per-agency file slots) → OCR → invoice-items (เลือกสินค้าที่จะยื่น, ≥1 รายการ) → flags
         → form-preview (editable, shows selected items table) → "ดำเนินการต่อ"
         → choice-card(submit/edit) → submit → showNextAgencyIfAny()
@@ -374,6 +379,8 @@ Replace in `src/app/core/mock/`:
 - `spn.mock.ts` → `KNOWN_REFS` + `MOCK_FORM_DATA` → `GET /spn/:ref`
 - `ocr.mock.ts` → `MOCK_OCR_RESULT` → `POST /ocr` (multipart)
 - `hs-analysis.mock.ts` → `analyzeHsCode()` → supports `agencies[]` for multi-agency HS codes
+- `product-hs-analysis.mock.ts` → `getProductHsAnalysis()` → per-product HS Code → Smart Tariff → agency lookup (invoice path)
+- `invoice-items.mock.ts` → `getInvoiceLineItems(invoiceNo)` → line items for the invoice-items selection step
 - `agency-docs.mock.ts` → `getAgencyDocs(agency)` → required docs + manualFields per agency
 - `payment.mock.ts` → `getAgencyPayment(agency)` → `{ requiresFee, amount }` per agency
 - `queue.mock.ts` → `MOCK_QUEUE` → `GET /shipments` + `GET /shipments/:id`
