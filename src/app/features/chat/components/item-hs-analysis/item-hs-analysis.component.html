@@ -31,9 +31,9 @@
           ต้องยื่น {{ agencySummary.length }} หน่วยงาน
         </span>
       }
-      <span class="ih-tag ih-tag--fee">
-        <lucide-icon [img]="Banknote" [size]="11" />
-        ค่าใช้จ่ายรวม {{ totalFee > 0 ? ('฿' + (totalFee | number)) : 'ฟรี' }}
+      <span class="ih-tag ih-tag--confidence">
+        <lucide-icon [img]="Percent" [size]="11" />
+        AI มั่นใจเฉลี่ย {{ avgConfidence }}%
       </span>
     </div>
 
@@ -43,6 +43,9 @@
           <div class="ih-summary__agency-row">
             <span class="ih-summary__agency-code">{{ a.code }}</span>
             <span class="ih-summary__agency-full">{{ a.full }}</span>
+            @if (a.licenseTypes.length) {
+              <span class="ih-summary__agency-license">{{ a.licenseTypes.join(' / ') }}</span>
+            }
             <span class="ih-summary__agency-count">{{ a.count }} รายการ</span>
             <span class="ih-summary__agency-fee" [class.ih-summary__agency-fee--free]="!a.requiresFee" data-tip="ค่าธรรมเนียมการขอใบอนุญาต">
               {{ a.requiresFee ? ('฿' + (a.amount | number)) : 'ฟรี' }}

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, Search, Check, ArrowDown, Banknote, ShieldCheck, Sprout, PackageCheck } from 'lucide-angular';
+import { LucideAngularModule, Search, Check, ArrowDown, Percent, ShieldCheck, Sprout, PackageCheck } from 'lucide-angular';
 import { ItemHsAnalysisData, ProductHsAnalysis } from '@app/core/models/types';
 import { getAgencyPayment } from '@mock/payment.mock';
 
@@ -10,6 +10,7 @@ interface AgencySummaryRow {
   count: number;
   requiresFee: boolean;
   amount: number;
+  licenseTypes: string[];
 }
 
 interface AgencyGroup {
@@ -39,7 +40,7 @@ export class ItemHsAnalysisComponent implements OnInit {
   readonly Search = Search;
   readonly Check = Check;
   readonly ArrowDown = ArrowDown;
-  readonly Banknote = Banknote;
+  readonly Percent = Percent;
   readonly ShieldCheck = ShieldCheck;
   readonly Sprout = Sprout;
   readonly PackageCheck = PackageCheck;
@@ -52,6 +53,7 @@ export class ItemHsAnalysisComponent implements OnInit {
   requiresAnyPermit = false;
   agencySummary: AgencySummaryRow[] = [];
   totalFee = 0;
+  avgConfidence = 0;
 
   ngOnInit(): void {
     const byAgency = new Map<string, AgencyGroup>();
@@ -69,18 +71,20 @@ export class ItemHsAnalysisComponent implements OnInit {
     this.proceeded.set(!!this.data.reviewed);
 
     this.requiresAnyPermit = this.data.items.some(i => i.requiresPermit);
-    const map = new Map<string, { full: string; count: number }>();
+    const map = new Map<string, { full: string; count: number; licenseTypes: Set<string> }>();
     for (const item of this.data.items) {
       if (!item.requiresPermit) continue;
-      const cur = map.get(item.agency) ?? { full: item.agencyFull, count: 0 };
+      const cur = map.get(item.agency) ?? { full: item.agencyFull, count: 0, licenseTypes: new Set<string>() };
       cur.count++;
+      if (item.licenseType) cur.licenseTypes.add(item.licenseType);
       map.set(item.agency, cur);
     }
     this.agencySummary = Array.from(map.entries()).map(([code, v]) => {
       const pay = getAgencyPayment(code);
-      return { code, full: v.full, count: v.count, requiresFee: pay.requiresFee, amount: pay.amount };
+      return { code, full: v.full, count: v.count, requiresFee: pay.requiresFee, amount: pay.amount, licenseTypes: Array.from(v.licenseTypes) };
     });
     this.totalFee = this.agencySummary.reduce((sum, a) => sum + (a.requiresFee ? a.amount : 0), 0);
+    this.avgConfidence = Math.round(this.data.items.reduce((sum, i) => sum + i.confidence, 0) / this.data.items.length);
   }
 
   isGroupConfirmed(key: string): boolean { return this.confirmedGroups()[key]; }
