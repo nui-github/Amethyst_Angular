@@ -1,5 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { MOCK_OCR_RESULT, OcrResult } from '@mock/ocr.mock';
+import { MOCK_INVOICE_OCR_RESULT, InvoiceOcrResult } from '@mock/invoice-ocr.mock';
 
 const OCR_STAGES = ['อ่านเอกสาร', 'วิเคราะห์ข้อมูล', 'ตรวจสอบ HS Code', 'ร่างคำขอ'];
 
@@ -15,7 +16,7 @@ export class OcrService {
     this.isOCRing.set(false);
   }
 
-  async startOCR(_files?: unknown[]): Promise<OcrResult> {
+  async startOCR(_files?: unknown[], variant: 'default' | 'invoice' = 'default'): Promise<OcrResult | InvoiceOcrResult> {
     this.reset();
     this.isOCRing.set(true);
 
@@ -26,7 +27,7 @@ export class OcrService {
     }
 
     this.isOCRing.set(false);
-    return MOCK_OCR_RESULT;
+    return variant === 'invoice' ? MOCK_INVOICE_OCR_RESULT : MOCK_OCR_RESULT;
   }
 
   private delay(ms: number): Promise<void> {

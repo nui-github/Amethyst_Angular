@@ -94,16 +94,28 @@ export interface SpnResultData {
   licenseType?: string;
 }
 
+// One line item as read directly off an uploaded invoice by OCR (invoice-upload path only)
+export interface OcrLineItem {
+  id: string;
+  name: string;
+  hsCode: string;
+  origin: string;
+  qty: string;
+  unit: string;
+}
+
 export interface OcrResultsData {
   invoiceNo: string;
   invoiceDate: string;
   quantity: string;
+  qtyUnit?: string;         // unit suffix for `quantity` — defaults to 'กิโลกรัม' when absent
   importer: string;
   port: string;
   hsCode: string;
   countryOrigin: string;
   lotNo: string;
   uNo: string;
+  lineItems?: OcrLineItem[]; // per-product breakdown (invoice-upload path) — grouped display only, not editable inline
   isManual?: boolean;       // true = data came from manual entry, not OCR
   autoProceeded?: boolean;  // true = flow auto-proceeded, hide the button immediately
 }

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule, CheckCircle } from 'lucide-angular';
-import { OcrResultsData } from '@app/core/models/types';
+import { OcrResultsData, OcrLineItem } from '@app/core/models/types';
 import { ChatService } from '@app/core/services/chat.service';
 
 interface OcrRow { label: string; key: string; accent: boolean; checkNeeded?: boolean; conf?: number; }
@@ -61,6 +61,23 @@ interface OcrSection { title: string; color: string; rows: OcrRow[]; }
         </div>
       }
 
+      @if (lineItems.length) {
+        <div class="ocr-sec">
+          <div class="ocr-sec__head" style="border-left-color: #0D8F61">
+            <span class="ocr-sec__title">รายการสินค้า ({{ lineItems.length }} รายการ)</span>
+          </div>
+          <div class="ocr-items">
+            @for (item of lineItems; track item.id) {
+              <div class="ocr-item">
+                <span class="ocr-item__name">{{ item.name }}</span>
+                <span class="ocr-item__meta">HS {{ item.hsCode }} · {{ item.origin }}</span>
+                <span class="ocr-item__qty">{{ item.qty }} {{ item.unit }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
       @if (!proceeded()) {
         <div class="ocr-foot">
           <span class="ocr-foot__hint">
@@ -112,6 +129,11 @@ interface OcrSection { title: string; color: string; rows: OcrRow[]; }
     .ocr-foot--done{color:#0D8F61;font-weight:600;justify-content:flex-start;gap:6px}
     .ocr-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:8px;border:none;background:var(--bizx-blue);color:#fff;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;transition:opacity .15s}
     .ocr-btn:hover{opacity:.88}
+    .ocr-items{display:flex;flex-direction:column;padding:0 16px 10px;gap:6px}
+    .ocr-item{display:flex;align-items:center;gap:10px;padding:7px 10px;background:#F8FAFC;border-radius:8px;font-size:11.5px}
+    .ocr-item__name{font-weight:600;color:#010136;flex-shrink:0}
+    .ocr-item__meta{color:#6B7280;font-size:10.5px;flex:1}
+    .ocr-item__qty{color:#0463EF;font-weight:700;font-size:11px;flex-shrink:0}
   `],
 })
 export class OcrResultsComponent {
@@ -135,6 +157,7 @@ export class OcrResultsComponent {
   readonly el   = inject(ElementRef);
 
   get isManual(): boolean { return !!(this._data as Partial<OcrResultsData>).isManual; }
+  get lineItems(): OcrLineItem[] { return this.local.lineItems ?? []; }
 
   readonly sections: OcrSection[] = [
     { title: 'ข้อมูลเอกสาร', color: '#0463EF', rows: [
@@ -162,7 +185,7 @@ export class OcrResultsComponent {
   display(key: string): string {
     const v = this.getValue(key);
     if (!v.trim()) return '—';
-    if (key === '_qty') return v + ' กิโลกรัม';
+    if (key === '_qty') return v + ' ' + (this.local.qtyUnit ?? 'กิโลกรัม');
     return v;
   }
   hasValue(key: string): boolean { const v = this.getValue(key); return v.trim().length > 0; }

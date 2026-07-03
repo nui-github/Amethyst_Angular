@@ -14,6 +14,7 @@ import { KNOWN_REFS, MOCK_FORM_DATA, MOCK_SPN_LIST } from '@mock/spn.mock';
 import { MOCK_SPN_PROFILES } from '@mock/spn-companies.mock';
 import { getInvoiceLineItems } from '@mock/invoice-items.mock';
 import { getProductHsAnalysis } from '@mock/product-hs-analysis.mock';
+import { InvoiceOcrResult } from '@mock/invoice-ocr.mock';
 import { environment } from '@env/environment';
 import { MOCK_SESSIONS } from '@mock/sessions.mock';
 
@@ -351,7 +352,7 @@ export class ChatService {
   async startOCR(_files?: unknown[]): Promise<void> {
     this.step.set('ocr');
     this.bot('ocr-progress');
-    const result = await this.ocr.startOCR(_files);
+    const result = await this.ocr.startOCR(_files, this.isInvoicePath ? 'invoice' : 'default');
     this.formData.update(f => ({ ...f, ...result }));
     this.promoteActiveSession();
     this.showOCRResults(result);
@@ -382,12 +383,15 @@ export class ChatService {
     return this.REQUIRED_FIELDS.filter(f => !((data as Record<string, string>)[f.key]?.trim()));
   }
 
-  private showOCRResults(result: typeof import('@mock/ocr.mock').MOCK_OCR_RESULT, round = 1): void {
+  private showOCRResults(result: typeof import('@mock/ocr.mock').MOCK_OCR_RESULT | InvoiceOcrResult, round = 1): void {
+    const withLineItems = result as Partial<InvoiceOcrResult>;
     this.bot('ocr-results', {
       invoiceNo: result.invoiceNo, invoiceDate: result.invoiceDate,
       quantity: result.quantity, importer: result.importer, port: result.port,
       hsCode: result.hsCode, countryOrigin: result.countryOrigin,
       lotNo: result.lotNo, uNo: result.uNo,
+      ...(withLineItems.qtyUnit ? { qtyUnit: withLineItems.qtyUnit } : {}),
+      ...(withLineItems.lineItems ? { lineItems: withLineItems.lineItems } : {}),
     } satisfies OcrResultsData);
 
     // Skip missing fields check for re-edit paths (post-email, post-flag edit)

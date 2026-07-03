@@ -107,7 +107,10 @@ src/
 │   ├── core/
 │   │   ├── mock/                      ← replace with real API (see docs/API.md)
 │   │   │   ├── spn.mock.ts
-│   │   │   ├── ocr.mock.ts
+│   │   │   ├── ocr.mock.ts            ← MOCK_OCR_RESULT (customs/full-upload paths)
+│   │   │   ├── invoice-ocr.mock.ts    ← MOCK_INVOICE_OCR_RESULT (invoice-upload path only; mirrors a real
+│   │   │   │                            commercial invoice — multi-HS-code/origin line items, shown grouped
+│   │   │   │                            in the ocr-results card via OcrResultsData.lineItems)
 │   │   │   ├── queue.mock.ts          ← shipments with realistic chatbot-flow messages
 │   │   │   ├── spn-companies.mock.ts
 │   │   │   ├── hs-analysis.mock.ts    ← analyzeHsCode() (single-shipment) + buildItemsFromHsAnalysis()
@@ -388,6 +391,8 @@ apiUrl: 'https://your-api.com',
 Replace in `src/app/core/mock/`:
 - `spn.mock.ts` → `KNOWN_REFS` + `MOCK_FORM_DATA` → `GET /spn/:ref`
 - `ocr.mock.ts` → `MOCK_OCR_RESULT` → `POST /ocr` (multipart)
+- `invoice-ocr.mock.ts` → `MOCK_INVOICE_OCR_RESULT` → same `POST /ocr` endpoint for the invoice-upload path;
+  response should include a `lineItems[]` array (one row per invoice line) for the ocr-results grouped display
 - `hs-analysis.mock.ts` → `analyzeHsCode()` → supports `agencies[]` for multi-agency HS codes
 - `product-hs-analysis.mock.ts` → `getProductHsAnalysis()` → per-product HS Code → Smart Tariff → agency lookup (invoice path)
 - `invoice-items.mock.ts` → `getInvoiceLineItems(invoiceNo)` → line items for the invoice-items selection step
