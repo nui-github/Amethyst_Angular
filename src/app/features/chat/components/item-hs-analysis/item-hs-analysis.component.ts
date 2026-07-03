@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule, Search, Check, ArrowDown, Banknote, ShieldCheck, Sprout, PackageCheck } from 'lucide-angular';
 import { ItemHsAnalysisData, ProductHsAnalysis } from '@app/core/models/types';
-import { AGENCY_CORRECTION_OPTIONS } from '@mock/product-hs-analysis.mock';
 import { getAgencyPayment } from '@mock/payment.mock';
 
 interface AgencySummaryRow {
@@ -13,22 +12,16 @@ interface AgencySummaryRow {
   amount: number;
 }
 
-interface GroupState {
-  confirmed: boolean;
-  agency: string;
-  agencyFull: string;
-}
-
 interface AgencyGroup {
-  key: string;          // original AI-assigned agency code (or '—')
+  key: string;          // AI-assigned agency code (or '—')
   full: string;
   items: ProductHsAnalysis[];
 }
 
 const GROUP_STYLE: Record<string, { color: string; bg: string; icon: 'shield' | 'sprout' | 'package' }> = {
-  'อย.': { color: '#0463EF', bg: 'rgba(4, 99, 239, 0.06)', icon: 'shield' },
-  'กษ.': { color: '#B45309', bg: 'rgba(180, 83, 9, 0.06)', icon: 'sprout' },
-  '—':   { color: '#6B7280', bg: 'rgba(107, 114, 128, 0.06)', icon: 'package' },
+  'อย.': { color: '#0463EF', bg: 'rgba(4, 99, 239, 0.08)', icon: 'shield' },
+  'กษ.': { color: '#B45309', bg: 'rgba(180, 83, 9, 0.08)', icon: 'sprout' },
+  '—':   { color: '#6B7280', bg: 'rgba(107, 114, 128, 0.08)', icon: 'package' },
 };
 
 @Component({
@@ -50,14 +43,12 @@ export class ItemHsAnalysisComponent implements OnInit {
   readonly ShieldCheck = ShieldCheck;
   readonly Sprout = Sprout;
   readonly PackageCheck = PackageCheck;
-  readonly agencyOptions = AGENCY_CORRECTION_OPTIONS;
 
   groups: AgencyGroup[] = [];
-  groupStates = signal<Record<string, GroupState>>({});
+  confirmedGroups = signal<Record<string, boolean>>({});
   proceeded = signal(false);
-  expanded = signal<Record<string, boolean>>({});
 
-  // Summary of the AI's own analysis (before any user correction)
+  // Summary of the AI's own analysis
   requiresAnyPermit = false;
   agencySummary: AgencySummaryRow[] = [];
   totalFee = 0;
@@ -72,14 +63,9 @@ export class ItemHsAnalysisComponent implements OnInit {
     // Order: permit-required agencies first, "ไม่ต้องขอ" group last
     this.groups = Array.from(byAgency.values()).sort((a, b) => (a.key === '—' ? 1 : 0) - (b.key === '—' ? 1 : 0));
 
-    const initStates: Record<string, GroupState> = {};
-    const initExpanded: Record<string, boolean> = {};
-    for (const g of this.groups) {
-      initStates[g.key] = { confirmed: !!this.data.reviewed, agency: g.key, agencyFull: g.full };
-      initExpanded[g.key] = false;
-    }
-    this.groupStates.set(initStates);
-    this.expanded.set(initExpanded);
+    const init: Record<string, boolean> = {};
+    for (const g of this.groups) init[g.key] = !!this.data.reviewed;
+    this.confirmedGroups.set(init);
     this.proceeded.set(!!this.data.reviewed);
 
     this.requiresAnyPermit = this.data.items.some(i => i.requiresPermit);
@@ -97,40 +83,20 @@ export class ItemHsAnalysisComponent implements OnInit {
     this.totalFee = this.agencySummary.reduce((sum, a) => sum + (a.requiresFee ? a.amount : 0), 0);
   }
 
-  groupState(key: string): GroupState { return this.groupStates()[key]; }
-  isExpanded(key: string): boolean { return this.expanded()[key]; }
-  toggleExpanded(key: string): void {
-    this.expanded.update(e => ({ ...e, [key]: !e[key] }));
-  }
-
+  isGroupConfirmed(key: string): boolean { return this.confirmedGroups()[key]; }
   groupStyle(key: string) { return GROUP_STYLE[key] ?? GROUP_STYLE['—']; }
 
-  onAgencyChange(key: string, code: string): void {
-    if (this.proceeded()) return;
-    const opt = this.agencyOptions.find(a => a.code === code);
-    if (!opt) return;
-    this.groupStates.update(s => ({ ...s, [key]: { ...s[key], agency: opt.code, agencyFull: opt.full } }));
+  confirmGroup(key: string): void {
+    if (this.proceeded() || this.isGroupConfirmed(key)) return;
+    this.confirmedGroups.update(s => ({ ...s, [key]: true }));
   }
 
-  toggleGroupConfirm(key: string): void {
-    if (this.proceeded()) return;
-    this.groupStates.update(s => ({ ...s, [key]: { ...s[key], confirmed: !s[key].confirmed } }));
-  }
-
-  readonly allDecided = () => this.groups.every(g => this.groupState(g.key)?.confirmed);
-  readonly decidedCount = () => this.groups.filter(g => this.groupState(g.key)?.confirmed).length;
-  readonly isChanged = (key: string) => this.groupState(key)?.agency !== key;
+  readonly allDecided = () => this.groups.every(g => this.isGroupConfirmed(g.key));
+  readonly decidedCount = () => this.groups.filter(g => this.isGroupConfirmed(g.key)).length;
 
   proceed(): void {
     if (this.proceeded() || !this.allDecided()) return;
     this.proceeded.set(true);
-    const result: ProductHsAnalysis[] = [];
-    for (const g of this.groups) {
-      const s = this.groupState(g.key);
-      for (const item of g.items) {
-        result.push({ ...item, agency: s.agency, agencyFull: s.agencyFull, requiresPermit: s.agency !== '—' });
-      }
-    }
-    this.confirmed.emit(result);
+    this.confirmed.emit(this.data.items);
   }
 }

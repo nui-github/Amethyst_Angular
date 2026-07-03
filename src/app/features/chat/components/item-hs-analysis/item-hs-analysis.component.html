@@ -5,7 +5,7 @@
     </div>
     <div>
       <p class="ih-title">AI วิเคราะห์ HS Code และพิกัดอัตราศุลกากรรายสินค้า</p>
-      <p class="ih-sub">เลือกกรมให้ตรง (ถ้า AI ผิด) แล้วกดยืนยันแต่ละกลุ่มก่อนไปต่อ</p>
+      <p class="ih-sub">จัดกลุ่มตามกรมที่ต้องยื่น — ตรวจสอบรายการแล้วกดยืนยันทีละกลุ่ม</p>
     </div>
   </div>
 
@@ -55,13 +55,10 @@
 
   <div class="ih-groups">
     @for (group of groups; track group.key) {
-      <div class="ih-group"
-        [style.--group-color]="groupStyle(group.key).color"
-        [style.--group-bg]="groupStyle(group.key).bg"
-        [class.ih-group--done]="groupState(group.key).confirmed">
+      <div class="ih-group" [class.ih-group--done]="isGroupConfirmed(group.key)">
 
-        <div class="ih-group__head">
-          <span class="ih-group__icon">
+        <div class="ih-group__head" [style.background]="groupStyle(group.key).bg" [style.color]="groupStyle(group.key).color">
+          <span class="ih-group__icon" [style.color]="groupStyle(group.key).color">
             @switch (groupStyle(group.key).icon) {
               @case ('shield')  { <lucide-icon [img]="ShieldCheck" [size]="15" /> }
               @case ('sprout')  { <lucide-icon [img]="Sprout" [size]="15" /> }
@@ -77,46 +74,21 @@
           <span class="ih-group__count">{{ group.items.length }} รายการ</span>
         </div>
 
-        <div class="ih-group__control">
-          <label class="ih-select-wrap">
-            <span class="ih-select-label">AI วิเคราะห์ว่าควรยื่น</span>
-            <select class="ih-select" [disabled]="proceeded() || groupState(group.key).confirmed"
-              (change)="onAgencyChange(group.key, $any($event.target).value)">
-              @for (opt of agencyOptions; track opt.code) {
-                <option [value]="opt.code" [selected]="opt.code === groupState(group.key).agency">
-                  {{ opt.code === '—' ? 'ไม่ต้องขอใบอนุญาต' : opt.code + ' — ' + opt.full }}
-                </option>
-              }
-            </select>
-          </label>
-          @if (isChanged(group.key)) {
-            <span class="ih-changed-note">แก้ไขจาก AI แล้ว</span>
+        <div class="ih-group__items">
+          @for (item of group.items; track item.id) {
+            <div class="ih-item">
+              <span class="ih-item__name">{{ item.name }}</span>
+              <span class="ih-item__codes">HS {{ item.hsCode }} · พิกัด {{ item.tariffCode }}</span>
+              <span class="ih-item__conf">AI {{ item.confidence }}%</span>
+            </div>
           }
         </div>
 
-        <button class="ih-confirm-toggle" [class.ih-confirm-toggle--on]="groupState(group.key).confirmed"
-          [disabled]="proceeded()" (click)="toggleGroupConfirm(group.key)">
-          <span class="ih-confirm-toggle__box">
-            @if (groupState(group.key).confirmed) { <lucide-icon [img]="Check" [size]="11" color="#fff" /> }
-          </span>
-          {{ groupState(group.key).confirmed ? 'ยืนยันแล้ว — กดเพื่อแก้ไข' : 'ยืนยันว่าถูกต้อง' }}
+        <button class="ih-confirm-btn" [class.ih-confirm-btn--done]="isGroupConfirmed(group.key)"
+          [disabled]="proceeded() || isGroupConfirmed(group.key)" (click)="confirmGroup(group.key)">
+          <lucide-icon [img]="Check" [size]="13" [color]="isGroupConfirmed(group.key) ? '#0D8F61' : '#fff'" />
+          {{ isGroupConfirmed(group.key) ? 'ยืนยันแล้ว' : 'ยืนยันกลุ่มนี้ถูกต้อง' }}
         </button>
-
-        <button class="ih-expand-btn" (click)="toggleExpanded(group.key)">
-          {{ isExpanded(group.key) ? 'ซ่อนรายการสินค้า' : 'ดูรายการสินค้า (' + group.items.length + ')' }}
-        </button>
-
-        @if (isExpanded(group.key)) {
-          <div class="ih-group__items">
-            @for (item of group.items; track item.id) {
-              <div class="ih-item">
-                <span class="ih-item__name">{{ item.name }}</span>
-                <span class="ih-item__codes">HS {{ item.hsCode }} · พิกัด {{ item.tariffCode }}</span>
-                <span class="ih-item__conf">AI {{ item.confidence }}%</span>
-              </div>
-            }
-          </div>
-        }
       </div>
     }
   </div>
