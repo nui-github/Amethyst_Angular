@@ -8,7 +8,7 @@ import {
 } from '@app/core/models/types';
 import { OcrService } from './ocr.service';
 import { QueueService } from './queue.service';
-import { analyzeHsCode, buildItemsFromHsAnalysis } from '@mock/hs-analysis.mock';
+import { analyzeHsCode } from '@mock/hs-analysis.mock';
 import { getAgencyPayment } from '@mock/payment.mock';
 import { KNOWN_REFS, MOCK_FORM_DATA, MOCK_SPN_LIST } from '@mock/spn.mock';
 import { MOCK_SPN_PROFILES } from '@mock/spn-companies.mock';
@@ -219,7 +219,7 @@ export class ChatService {
     this.pendingAfterFlow = 'proceed';
     this.submittedAgencies = [];
     if (this.formData().hsCode) {
-      this.withTyping(() => this.showItemHsAnalysisFromSingle(this.formData().hsCode!), 600);
+      this.withTyping(() => this.showItemHsAnalysis(), 600);
     } else {
       this.withTyping(() => this.showProfileSelectForProceed(), 800);
     }
@@ -230,17 +230,10 @@ export class ChatService {
     this.pendingAfterFlow = 'form-preview';
     this.submittedAgencies = [];
     if (this.formData().hsCode) {
-      this.withTyping(() => this.showItemHsAnalysisFromSingle(this.formData().hsCode!), 600);
+      this.withTyping(() => this.showItemHsAnalysis(), 600);
     } else {
       this.withTyping(() => this.showProfileSelectForProceed(), 800);
     }
-  }
-
-  /** SPN / customs-declaration paths: single-shipment HS analysis, rendered with the
-   *  same per-agency grouped-card review used by the invoice path. */
-  private showItemHsAnalysisFromSingle(hsCode: string): void {
-    const analysis = analyzeHsCode(hsCode);
-    this.bot('item-hs-analysis', { items: buildItemsFromHsAnalysis(analysis) } satisfies ItemHsAnalysisData);
   }
 
   private showProfileSelectForProceed(): void {

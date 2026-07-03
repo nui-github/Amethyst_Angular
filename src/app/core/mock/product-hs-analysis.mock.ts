@@ -1,23 +1,18 @@
 import { ProductHsAnalysis } from '@app/core/models/types';
 
-// AI usecase: product description (จาก invoice) → HS Code → Smart Tariff (พิกัดอัตราศุลกากรเต็ม)
+// AI usecase: product description (จาก invoice OCR) → HS Code → Smart Tariff (พิกัดอัตราศุลกากรเต็ม)
 // → กรมที่ต้องยื่นขอใบอนุญาตสำหรับสินค้าตัวนั้น (ถ้ามี)
+//
+// Item set mirrors the invoice OCR line items (invoice-ocr.mock.ts) — all are medical devices,
+// which require an import license from อย. (เครื่องมือแพทย์) under the Medical Device Act.
+// Used as the single shared dataset for item-hs-analysis across every flow (invoice, SPN, customs).
 const PRODUCT_HS_ANALYSIS: ProductHsAnalysis[] = [
-  { id: 'p1',  name: 'Amoxicillin Trihydrate',            hsCode: '2941.10.00', tariffCode: '2941.10.00.001', requiresPermit: true,  agency: 'อย.', agencyFull: 'สำนักงานคณะกรรมการอาหารและยา', licenseType: 'RGoods', confidence: 96 },
-  { id: 'p2',  name: 'Ampicillin Sodium',                 hsCode: '2941.10.00', tariffCode: '2941.10.00.002', requiresPermit: true,  agency: 'อย.', agencyFull: 'สำนักงานคณะกรรมการอาหารและยา', licenseType: 'RGoods', confidence: 94 },
-  { id: 'p3',  name: 'Paracetamol Powder (API)',          hsCode: '3004.90.00', tariffCode: '3004.90.00.014', requiresPermit: true,  agency: 'อย.', agencyFull: 'สำนักงานคณะกรรมการอาหารและยา', licenseType: 'RGoods', confidence: 92 },
-  { id: 'p4',  name: 'Ibuprofen Tablets',                 hsCode: '3004.90.00', tariffCode: '3004.90.00.021', requiresPermit: true,  agency: 'อย.', agencyFull: 'สำนักงานคณะกรรมการอาหารและยา', licenseType: 'RGoods', confidence: 90 },
-  { id: 'p5',  name: 'Metformin HCl',                     hsCode: '2941.90.00', tariffCode: '2941.90.00.007', requiresPermit: true,  agency: 'อย.', agencyFull: 'สำนักงานคณะกรรมการอาหารและยา', licenseType: 'RGoods', confidence: 88 },
-  { id: 'p6',  name: 'Chlorpyrifos (สารกำจัดแมลง)',        hsCode: '3808.91.00', tariffCode: '3808.91.00.003', requiresPermit: true,  agency: 'กษ.', agencyFull: 'กรมวิชาการเกษตร', licenseType: 'วัตถุอันตราย', confidence: 93 },
-  { id: 'p7',  name: 'Glyphosate Technical',              hsCode: '3808.93.00', tariffCode: '3808.93.00.011', requiresPermit: true,  agency: 'กษ.', agencyFull: 'กรมวิชาการเกษตร', licenseType: 'วัตถุอันตราย', confidence: 95 },
-  { id: 'p8',  name: 'Wheat Flour (แป้งสาลี)',             hsCode: '1101.00.00', tariffCode: '1101.00.00.000', requiresPermit: false, agency: '—',   agencyFull: 'ไม่ต้องขออนุญาตเพิ่มเติม', confidence: 85 },
-  { id: 'p9',  name: 'Titanium Dioxide (เกรดอุตสาหกรรม)',  hsCode: '3206.11.00', tariffCode: '3206.11.00.005', requiresPermit: false, agency: '—',   agencyFull: 'ไม่ต้องขออนุญาตเพิ่มเติม', confidence: 81 },
-  { id: 'p10', name: 'Vitamin C Powder (Food Grade)',      hsCode: '2936.27.00', tariffCode: '2936.27.00.009', requiresPermit: true,  agency: 'อย.', agencyFull: 'สำนักงานคณะกรรมการอาหารและยา', licenseType: 'อาหาร', confidence: 87 },
-  { id: 'p11', name: 'Insulin (Human, สำเร็จรูป)',         hsCode: '3004.31.00', tariffCode: '3004.31.00.002', requiresPermit: true,  agency: 'อย.', agencyFull: 'สำนักงานคณะกรรมการอาหารและยา', licenseType: 'RGoods', confidence: 91 },
-  { id: 'p12', name: 'Mancozeb (สารป้องกันเชื้อรา)',       hsCode: '3808.92.00', tariffCode: '3808.92.00.006', requiresPermit: true,  agency: 'กษ.', agencyFull: 'กรมวิชาการเกษตร', licenseType: 'วัตถุอันตราย', confidence: 89 },
-  { id: 'p13', name: 'เครื่องวิเคราะห์ทางห้องปฏิบัติการ',  hsCode: '9027.80.90', tariffCode: '9027.80.90.012', requiresPermit: false, agency: '—',   agencyFull: 'ไม่ต้องขออนุญาตเพิ่มเติม', confidence: 83 },
-  { id: 'p14', name: 'Sodium Benzoate (วัตถุกันเสียอาหาร)', hsCode: '2916.31.00', tariffCode: '2916.31.00.004', requiresPermit: true,  agency: 'อย.', agencyFull: 'สำนักงานคณะกรรมการอาหารและยา', licenseType: 'อาหาร', confidence: 86 },
-  { id: 'p15', name: 'Microcrystalline Cellulose (Excipient)', hsCode: '3912.90.00', tariffCode: '3912.90.00.008', requiresPermit: false, agency: '—', agencyFull: 'ไม่ต้องขออนุญาตเพิ่มเติม', confidence: 80 },
+  { id: 'p1', name: 'Stent Graft (ETBF2313C145EE)',       hsCode: '9021.39.00', tariffCode: '9021.39.00.001', requiresPermit: true, agency: 'อย.', agencyFull: 'สำนักงานคณะกรรมการอาหารและยา', licenseType: 'เครื่องมือแพทย์', confidence: 95 },
+  { id: 'p2', name: 'Coronary Stent (TRCR30015X)',        hsCode: '9018.90.90', tariffCode: '9018.90.90.002', requiresPermit: true, agency: 'อย.', agencyFull: 'สำนักงานคณะกรรมการอาหารและยา', licenseType: 'เครื่องมือแพทย์', confidence: 93 },
+  { id: 'p3', name: 'Introducer Sheath (SENSH1628W)',     hsCode: '9018.39.90', tariffCode: '9018.39.90.003', requiresPermit: true, agency: 'อย.', agencyFull: 'สำนักงานคณะกรรมการอาหารและยา', licenseType: 'เครื่องมือแพทย์', confidence: 91 },
+  { id: 'p4', name: 'Balloon Catheter (SPL20015X)',       hsCode: '9018.39.90', tariffCode: '9018.39.90.004', requiresPermit: true, agency: 'อย.', agencyFull: 'สำนักงานคณะกรรมการอาหารและยา', licenseType: 'เครื่องมือแพทย์', confidence: 90 },
+  { id: 'p5', name: 'Drug-Coated Balloon (SBI06012013P)', hsCode: '9018.39.90', tariffCode: '9018.39.90.005', requiresPermit: true, agency: 'อย.', agencyFull: 'สำนักงานคณะกรรมการอาหารและยา', licenseType: 'เครื่องมือแพทย์', confidence: 94 },
+  { id: 'p6', name: 'Balloon Catheter (SPL30020X)',       hsCode: '9018.39.90', tariffCode: '9018.39.90.006', requiresPermit: true, agency: 'อย.', agencyFull: 'สำนักงานคณะกรรมการอาหารและยา', licenseType: 'เครื่องมือแพทย์', confidence: 89 },
 ];
 
 export function getProductHsAnalysis(): ProductHsAnalysis[] {
