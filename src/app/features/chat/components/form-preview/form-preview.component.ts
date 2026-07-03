@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LicenseFormData } from '@app/core/models/types';
+import { LicenseFormData, InvoiceLineItem, ItemManualDetail, ITEM_MANUAL_DETAIL_FIELDS } from '@app/core/models/types';
 import { ChatService } from '@app/core/services/chat.service';
 
 interface PreviewRow {
@@ -28,11 +28,21 @@ export class FormPreviewComponent {
     this._data = val;
     // init local editable copy
     this.local = { ...val };
+    this.manualDetails = {};
+    this.confirmedItemIds = new Set();
+    for (const item of val.selectedItems ?? []) {
+      this.manualDetails[item.id] = { nameTh: '', netWeight: '', manufacturerName: '', mfgDate: '', expDate: '', remarks: '' };
+    }
   }
   get data(): LicenseFormData { return this._data; }
   private _data!: LicenseFormData;
 
   local: LicenseFormData = {};
+
+  readonly manualFields = ITEM_MANUAL_DETAIL_FIELDS;
+  manualDetails: Record<string, ItemManualDetail> = {};
+  confirmedItemIds = new Set<string>();
+  detailItemId: string | null = null;
 
   readonly chat = inject(ChatService);
   readonly cdr  = inject(ChangeDetectorRef);
@@ -123,8 +133,47 @@ export class FormPreviewComponent {
     if (event.key === 'Escape') { this.editingKey = null; this.cdr.detectChanges(); }
   }
 
-  proceed(): void {
+  // ── Per-item detail (invoice path only) ─────────────────────────────────────
+  get detailItem(): InvoiceLineItem | undefined {
+    return this.local.selectedItems?.find(i => i.id === this.detailItemId);
+  }
+
+  isItemConfirmed(id: string): boolean { return this.confirmedItemIds.has(id); }
+
+  isManualDetailComplete(id: string): boolean {
+    const d = this.manualDetails[id];
+    if (!d) return false;
+    return this.manualFields.every(f => (d[f.key] ?? '').trim().length > 0);
+  }
+
+  allItemDetailsConfirmed(): boolean {
+    const items = this.local.selectedItems ?? [];
+    return items.every(i => this.confirmedItemIds.has(i.id));
+  }
+
+  openItemDetail(id: string): void {
     if (this.saved) return;
+    this.detailItemId = id;
+  }
+
+  closeItemDetail(): void {
+    this.detailItemId = null;
+  }
+
+  onManualFieldInput(id: string, key: keyof ItemManualDetail, event: Event): void {
+    const val = (event.target as HTMLInputElement).value;
+    this.manualDetails[id] = { ...this.manualDetails[id], [key]: val };
+  }
+
+  confirmItemDetail(id: string): void {
+    if (!this.isManualDetailComplete(id)) return;
+    this.confirmedItemIds = new Set(this.confirmedItemIds).add(id);
+    this.detailItemId = null;
+    this.cdr.detectChanges();
+  }
+
+  proceed(): void {
+    if (this.saved || !this.allItemDetailsConfirmed()) return;
     this.saved = true;
     this.chat.formData.update(f => ({ ...f, ...this.local }));
     this.cdr.detectChanges();

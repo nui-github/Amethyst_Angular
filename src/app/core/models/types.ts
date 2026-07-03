@@ -224,7 +224,28 @@ export interface InvoiceLineItem {
   amount: number;         // มูลค่ารวม
   lotNo: string;          // Lot/Batch No.
   hsCode: string;
+  origin?: string;        // ประเทศกำเนิดสินค้า (จาก OCR)
 }
+
+// Fields NOT available from OCR — user must key these in per item before the
+// form-preview step (invoice path) can proceed. All required.
+export interface ItemManualDetail {
+  nameTh: string;          // ชื่อสินค้าภาษาไทย
+  netWeight: string;       // น้ำหนักสุทธิ (กก.)
+  manufacturerName: string; // ชื่อผู้ผลิต
+  mfgDate: string;         // วันที่ผลิต
+  expDate: string;         // วันหมดอายุ
+  remarks: string;         // หมายเหตุ
+}
+
+export const ITEM_MANUAL_DETAIL_FIELDS: { key: keyof ItemManualDetail; label: string; placeholder: string }[] = [
+  { key: 'nameTh',           label: 'ชื่อสินค้าภาษาไทย',   placeholder: 'เช่น ยาปฏิชีวนะชนิดผง' },
+  { key: 'netWeight',        label: 'น้ำหนักสุทธิ (กก.)',  placeholder: 'เช่น 150' },
+  { key: 'manufacturerName', label: 'ชื่อผู้ผลิต',          placeholder: 'เช่น XYZ Pharma Ltd.' },
+  { key: 'mfgDate',          label: 'วันที่ผลิต',           placeholder: 'วว-ดด-ปปปป' },
+  { key: 'expDate',          label: 'วันหมดอายุ',          placeholder: 'วว-ดด-ปปปป' },
+  { key: 'remarks',          label: 'หมายเหตุ',            placeholder: 'เช่น N/A' },
+];
 
 export type ChatStep =
   | 'idle'

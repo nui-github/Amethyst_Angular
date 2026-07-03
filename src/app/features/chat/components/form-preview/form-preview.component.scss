@@ -91,6 +91,46 @@
   flex-shrink: 0;
 }
 
+.fp-item-row__status {
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 99px;
+  flex-shrink: 0;
+  white-space: nowrap;
+
+  &--done { color: #0D8F61; background: rgba(13, 143, 97, 0.1); display: inline-flex; align-items: center; gap: 3px; }
+  &--warn { color: #B45309; background: rgba(180, 83, 9, 0.1); }
+}
+
+.fp-detail-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 9px;
+  border-radius: 6px;
+  border: 1px solid #D6DCF0;
+  background: #fff;
+  color: #0463EF;
+  font-size: 10.5px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.12s;
+
+  &:hover { background: #F5F8FF; }
+}
+
+.fp-items__hint {
+  font-size: 10.5px;
+  color: #B45309;
+  margin: 0 16px 10px;
+  padding: 6px 10px;
+  background: rgba(180, 83, 9, 0.06);
+  border-radius: 6px;
+}
+
 // ── Table rows ────────────────────────────────────────────────────────────────
 
 .fp-table {
@@ -229,7 +269,179 @@
   cursor: pointer;
   transition: opacity 0.15s;
 
-  &:hover { opacity: 0.88; }
+  &:hover:not(:disabled) { opacity: 0.88; }
+  &:disabled { opacity: 0.4; cursor: default; }
+}
+
+// ── Item detail modal ────────────────────────────────────────────────────────
+
+.fp-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(1, 1, 54, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.fp-modal {
+  background: #fff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(1, 1, 54, 0.25);
+}
+
+.fp-modal__hd {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 16px 18px;
+  border-bottom: 1px solid #F0F1F8;
+}
+
+.fp-modal__title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #010136;
+  margin: 0;
+}
+
+.fp-modal__sub {
+  font-size: 11.5px;
+  color: #6B7280;
+  margin: 2px 0 0;
+}
+
+.fp-modal__close {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  border: none;
+  background: #F3F4F6;
+  color: #6B7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  &:hover { background: #E5E7EB; }
+}
+
+.fp-modal__body {
+  padding: 16px 18px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.fp-modal__section-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: #9CA3AF;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.fp-modal__ro-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 12px;
+  padding: 10px 12px;
+  background: #F8FAFC;
+  border-radius: 10px;
+}
+
+.fp-modal__ro {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-size: 11px;
+
+  span { color: #9CA3AF; }
+  strong { color: #0463EF; font-weight: 700; font-size: 11.5px; }
+}
+
+.fp-modal__form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.fp-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fp-modal__field-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #4B5563;
+
+  em { color: #DC2626; font-style: normal; }
+}
+
+.fp-modal__input {
+  font-size: 12px;
+  font-family: inherit;
+  color: #010136;
+  border: 1.5px solid #E5E7EB;
+  border-radius: 7px;
+  padding: 6px 9px;
+  outline: none;
+  background: #fff;
+  width: 100%;
+
+  &:focus { border-color: #0463EF; }
+}
+
+.fp-modal__ft {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 12px 18px;
+  border-top: 1px solid #F0F1F8;
+  background: #FAFBFF;
+}
+
+.fp-modal__ft-hint {
+  font-size: 10.5px;
+  color: #B45309;
+  margin-right: auto;
+
+  em { font-style: normal; color: #DC2626; }
+}
+
+.fp-modal__confirm-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 8px;
+  border: none;
+  background: var(--bizx-blue);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 0.15s;
+
+  &:hover:not(:disabled) { opacity: 0.88; }
+  &:disabled { opacity: 0.4; cursor: default; }
 }
 
 // ── Footer note ───────────────────────────────────────────────────────────────

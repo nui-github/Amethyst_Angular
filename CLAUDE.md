@@ -72,7 +72,11 @@ ChatMessage.type → @switch in ChatAreaComponent
   'import-license-menu'→ ImportLicenseMenuComponent
   'status-card'        → StatusCardComponent    (isPending=true: รอชำระ / false: สำเร็จ)
   'spn-result'         → SpnResultComponent
-  'form-preview'       → FormPreviewComponent   (editable pre-submit data review; "ดำเนินการต่อ" triggers choice-card)
+  'form-preview'       → FormPreviewComponent   (editable pre-submit data review; "ดำเนินการต่อ" triggers choice-card;
+                            when data.selectedItems present (invoice path), each item row has a "รายละเอียด"
+                            button opening a modal — OCR-derived fields read-only, plus ItemManualDetail fields
+                            (types.ts) the user must fill in and confirm per item; "ดำเนินการต่อ" stays disabled
+                            until every selected item is confirmed via the modal)
   'missing-fields'     → MissingFieldsComponent (incomplete OCR → fill + optional re-upload)
   'agency-upload'      → AgencyUploadComponent  (per-agency doc slots; upload file OR manual entry per slot)
   'invoice-items'      → InvoiceItemsComponent  (invoice path only; multi-select which invoice line items to submit; ≥1 required)
