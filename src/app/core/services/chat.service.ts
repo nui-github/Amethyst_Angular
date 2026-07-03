@@ -1033,10 +1033,16 @@ export class ChatService {
     this.ocr.reset();
   }
 
+  /**
+   * Session title prefix. Only uses numbers that come from an uploaded document
+   * (invoiceNo from OCR on an invoice/customs/XML upload) or the final submitted
+   * license ref. `fd.ref`/`fd.hsCode` are set as soon as an SPN entry is fetched —
+   * before any file is uploaded — so they're deliberately excluded: until a real
+   * document has been uploaded and OCR'd, the title shows only the current step name.
+   */
   private buildBaseRef(): string {
     const fd = this.formData();
-    return this.submittedRefNo() || fd.ref || fd.invoiceNo
-      || (fd.hsCode ? `HS ${fd.hsCode}` : '');
+    return this.submittedRefNo() || fd.invoiceNo || '';
   }
 
   private buildStatusLabel(): string {

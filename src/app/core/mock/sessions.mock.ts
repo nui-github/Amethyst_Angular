@@ -178,6 +178,15 @@ const sess6Messages: ChatMessage[] = [
   card('s6b2', '16:49', 'hs-analysis', { ...HS_FDA, confidence: 93 }),
 ];
 
+// ── Session 7: อัปโหลดเอกสาร (ยังไม่ได้ upload file — ไม่มีเลขนำหน้าชื่อ) ─────
+const sess7Messages: ChatMessage[] = [
+  WELCOME_MSG,
+  usr('s7u1', '13:10', 'เอกสารนำเข้าสินค้า'),
+  usr('s7u2', '13:10', 'อัปโหลดเอกสารเอง'),
+  usr('s7u3', '13:11', 'ใบ Invoice'),
+  card('s7b1', '13:11', 'single-upload', { mode: 'invoice' }),
+];
+
 // ── Export ────────────────────────────────────────────────────────────────────
 export const MOCK_SESSIONS: ChatHistorySession[] = [
   { id: 'sess_mock_1', baseRef: 'INV-2024-8834', title: 'INV-2024-8834 · ส่งกรมแล้ว อย.',       timestamp: d(0), messages: sess1Messages },
@@ -186,4 +195,6 @@ export const MOCK_SESSIONS: ChatHistorySession[] = [
   { id: 'sess_mock_4', baseRef: 'HTHM-2568-00412', title: 'HTHM-2568-00412 · OCR เสร็จแล้ว',    timestamp: d(4), messages: sess4Messages },
   { id: 'sess_mock_5', baseRef: 'INV-2024-6540',  title: 'INV-2024-6540 · ยืนยัน flags',        timestamp: d(5), messages: sess5Messages },
   { id: 'sess_mock_6', baseRef: 'HS 2941.10.00',  title: 'HS 2941.10.00 · วิเคราะห์ HS Code',   timestamp: d(7), messages: sess6Messages },
+  // ยังไม่ได้ upload file (inv/ใบขน/xml) เลย — title จึงเป็นแค่ชื่อ step ล่าสุด ไม่มีเลขนำหน้า
+  { id: 'sess_mock_7', baseRef: '',               title: 'อัปโหลดเอกสาร',                       timestamp: d(3), messages: sess7Messages },
 ];
