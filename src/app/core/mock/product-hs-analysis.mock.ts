@@ -23,10 +23,3 @@ const PRODUCT_HS_ANALYSIS: ProductHsAnalysis[] = [
 export function getProductHsAnalysis(): ProductHsAnalysis[] {
   return PRODUCT_HS_ANALYSIS;
 }
-
-// ตัวเลือกกรมสำหรับแก้ไข ถ้า user เห็นว่า AI วิเคราะห์ผิด
-export const AGENCY_CORRECTION_OPTIONS: { code: string; full: string }[] = [
-  { code: 'อย.', full: 'สำนักงานคณะกรรมการอาหารและยา' },
-  { code: 'กษ.', full: 'กรมวิชาการเกษตร' },
-  { code: '—',   full: 'ไม่ต้องขอใบอนุญาต' },
-];

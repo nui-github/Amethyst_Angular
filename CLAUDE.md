@@ -54,8 +54,10 @@ ChatMessage.type → @switch in ChatAreaComponent
   'ocr-progress'       → OcrProgressComponent
   'ocr-results'        → OcrResultsComponent   (editable inline; "ดำเนินการต่อ" triggers hs-analysis)
   'hs-analysis'        → HsAnalysisComponent   (shows fee badge per agency from payment.mock.ts)
-  'item-hs-analysis'   → ItemHsAnalysisComponent (invoice path only; per-product HS Code → Smart Tariff → agency;
-                            user must confirm or correct every row before continuing)
+  'item-hs-analysis'   → ItemHsAnalysisComponent (invoice path only; per-product HS Code → Smart Tariff → agency,
+                            grouped by resulting agency (อย./กษ./ไม่ต้องขอใบอนุญาต); each group card shows its
+                            item list directly + one "ยืนยันกลุ่มนี้ถูกต้อง" button — no per-item or correction UI;
+                            all groups must be confirmed before "ดำเนินการต่อ")
   'form'               → FormPanelComponent
   'full-upload'        → FullUploadComponent
   'single-upload'      → SingleUploadComponent
@@ -188,7 +190,7 @@ Universal agency+profile order (all paths after hs-analysis): เลือกก
 import-license-menu → 2 choices (chooseFullUpload()/full-upload card removed from menu, method still exists unused):
   ├─ chooseCustomsDocs()   → single-upload → OCR → hs-analysis → เลือกกรม → เลือกโปรไฟล์ → form-preview → submit → next-agency
   └─ chooseInvoiceFirst()  → single-upload(invoice) → OCR
-        → item-hs-analysis (รายสินค้า: HS Code → Smart Tariff → กรม; user ยืนยัน/แก้ไขทุกแถวก่อนไปต่อ)
+        → item-hs-analysis (จัดกลุ่มสินค้าตามกรมที่ AI แนะนำ; user ยืนยันทีละกลุ่มก่อนไปต่อ)
         → เลือกกรม (จาก union ของกรมที่ต้องขอทุกรายการ) → เลือกโปรไฟล์
         → agency-upload (per-agency file slots) → OCR → invoice-items (เลือกสินค้าที่จะยื่น, ≥1 รายการ) → flags
         → form-preview (editable, shows selected items table) → "ดำเนินการต่อ"
