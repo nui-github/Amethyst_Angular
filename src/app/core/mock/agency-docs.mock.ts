@@ -13,16 +13,8 @@ export interface AgencyDoc {
 }
 
 export const AGENCY_REQUIRED_DOCS: Record<string, AgencyDoc[]> = {
+  // LPI (Local Product Inspection) ของ อย. ใช้แค่ COA และเอกสารเลข U — ไม่ต้องใช้ GMP/คำขอนำเข้า/MSDS
   'อย.': [
-    {
-      key: 'gmp', label: 'ใบรับรอง GMP', required: true,
-      hint: 'Good Manufacturing Practice Certificate จากผู้ผลิต',
-      manualFields: [
-        { key: 'gmpNo',     label: 'เลขที่ใบรับรอง GMP', placeholder: 'เช่น GMP-2024-00123' },
-        { key: 'gmpIssuer', label: 'ผู้ออกใบรับรอง',      placeholder: 'ชื่อหน่วยงานที่ออกใบรับรอง' },
-        { key: 'gmpExpiry', label: 'วันหมดอายุ',           placeholder: 'dd/mm/yyyy' },
-      ],
-    },
     {
       key: 'coa', label: 'Certificate of Analysis (COA)', required: true,
       hint: 'ผลการวิเคราะห์คุณภาพและความบริสุทธิ์ของสินค้า',
@@ -33,20 +25,11 @@ export const AGENCY_REQUIRED_DOCS: Record<string, AgencyDoc[]> = {
       ],
     },
     {
-      key: 'import_app', label: 'คำขออนุญาตนำเข้าวัตถุดิบยา', required: true,
-      hint: 'แบบฟอร์ม นย.1 จาก อย. — กรอกแล้วสแกนแนบ',
+      key: 'u_no', label: 'เอกสารเลข U', required: true,
+      hint: 'เลขทะเบียน U ที่ออกโดย อย. สำหรับยื่นขอ LPI',
       manualFields: [
-        { key: 'appNo',      label: 'เลขที่คำขอ',   placeholder: 'เช่น นย.1-2568-00456' },
-        { key: 'appDate',    label: 'วันที่ยื่นคำขอ', placeholder: 'dd/mm/yyyy' },
-        { key: 'appPurpose', label: 'วัตถุประสงค์',  placeholder: 'เช่น นำเข้าเพื่อการผลิต' },
-      ],
-    },
-    {
-      key: 'msds', label: 'Safety Data Sheet (MSDS/SDS)', required: false,
-      hint: 'เอกสารข้อมูลความปลอดภัยของสาร (ถ้ามี)',
-      manualFields: [
-        { key: 'msdsVersion', label: 'Version / Rev.',   placeholder: 'เช่น Rev. 3' },
-        { key: 'msdsDate',    label: 'วันที่ออกเอกสาร', placeholder: 'dd/mm/yyyy' },
+        { key: 'uNo',       label: 'เลข U',        placeholder: 'เช่น U-2568-00123' },
+        { key: 'uNoIssued', label: 'วันที่ออกเลข', placeholder: 'dd/mm/yyyy' },
       ],
     },
   ],
