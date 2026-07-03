@@ -1,4 +1,4 @@
-import { HsAnalysisData } from '@app/core/models/types';
+import { HsAnalysisData, ProductHsAnalysis } from '@app/core/models/types';
 
 // Mock HS Code rules — key: HS prefix, value: analysis
 const HS_RULES: Record<string, Omit<HsAnalysisData, 'hsCode' | 'confidence'>> = {
@@ -65,4 +65,37 @@ export function analyzeHsCode(hsCode: string): HsAnalysisData {
     agencyFull: 'ควรตรวจสอบเพิ่มเติม',
     confidence: 60,
   };
+}
+
+/** Convert a single-shipment HS analysis (SPN / customs-declaration paths) into the
+ *  per-product grouped-card shape used by ItemHsAnalysisComponent — one synthetic
+ *  "item" per required agency (or a single non-permit item when none is required). */
+export function buildItemsFromHsAnalysis(analysis: HsAnalysisData): ProductHsAnalysis[] {
+  const baseId = analysis.hsCode.replace(/\./g, '');
+
+  if (analysis.agencies?.length) {
+    return analysis.agencies.map((a, i) => ({
+      id: `${baseId}-${i}`,
+      name: analysis.goodsName,
+      hsCode: analysis.hsCode,
+      tariffCode: `${analysis.hsCode}.00.${String(i + 1).padStart(3, '0')}`,
+      requiresPermit: true,
+      agency: a.code,
+      agencyFull: a.full,
+      licenseType: a.licenseType,
+      confidence: analysis.confidence,
+    }));
+  }
+
+  return [{
+    id: baseId,
+    name: analysis.goodsName,
+    hsCode: analysis.hsCode,
+    tariffCode: `${analysis.hsCode}.00.001`,
+    requiresPermit: analysis.requiresPermit,
+    agency: analysis.agency,
+    agencyFull: analysis.agencyFull,
+    licenseType: analysis.licenseType,
+    confidence: analysis.confidence,
+  }];
 }

@@ -8,7 +8,7 @@ import {
 } from '@app/core/models/types';
 import { OcrService } from './ocr.service';
 import { QueueService } from './queue.service';
-import { analyzeHsCode } from '@mock/hs-analysis.mock';
+import { analyzeHsCode, buildItemsFromHsAnalysis } from '@mock/hs-analysis.mock';
 import { getAgencyPayment } from '@mock/payment.mock';
 import { KNOWN_REFS, MOCK_FORM_DATA, MOCK_SPN_LIST } from '@mock/spn.mock';
 import { MOCK_SPN_PROFILES } from '@mock/spn-companies.mock';
@@ -214,37 +214,32 @@ export class ChatService {
   }
 
   private continueAfterSPN(): void {
-    // SPN path: agency choice → profile → proceed
+    // SPN path: item-hs-analysis → agency choice → profile → proceed
     this.pendingAfterFlow = 'proceed';
     this.submittedAgencies = [];
     if (this.formData().hsCode) {
-      this.withTyping(() => {
-        const analysis = analyzeHsCode(this.formData().hsCode!);
-        this.bot('hs-analysis', analysis);
-        if (analysis.agencies?.length) { this.ALL_AGENCIES = analysis.agencies.map(a => a.code); this.allPermitAgencies.set(this.ALL_AGENCIES); }
-        else { this.ALL_AGENCIES = analysis.agency !== '—' ? [analysis.agency] : []; this.allPermitAgencies.set(this.ALL_AGENCIES); }
-        setTimeout(() => this.withTyping(() => this.showAgencyChoice(analysis.agency), 600), 400);
-      }, 600);
+      this.withTyping(() => this.showItemHsAnalysisFromSingle(this.formData().hsCode!), 600);
     } else {
       this.withTyping(() => this.showProfileSelectForProceed(), 800);
     }
   }
 
   private continueAfterCustomsOCR(): void {
-    // Customs path: agency choice → profile → form-preview (no extra upload)
+    // Customs path: item-hs-analysis → agency choice → profile → form-preview (no extra upload)
     this.pendingAfterFlow = 'form-preview';
     this.submittedAgencies = [];
     if (this.formData().hsCode) {
-      this.withTyping(() => {
-        const analysis = analyzeHsCode(this.formData().hsCode!);
-        this.bot('hs-analysis', analysis);
-        if (analysis.agencies?.length) { this.ALL_AGENCIES = analysis.agencies.map(a => a.code); this.allPermitAgencies.set(this.ALL_AGENCIES); }
-        else { this.ALL_AGENCIES = analysis.agency !== '—' ? [analysis.agency] : []; this.allPermitAgencies.set(this.ALL_AGENCIES); }
-        setTimeout(() => this.withTyping(() => this.showAgencyChoice(analysis.agency), 600), 400);
-      }, 600);
+      this.withTyping(() => this.showItemHsAnalysisFromSingle(this.formData().hsCode!), 600);
     } else {
       this.withTyping(() => this.showProfileSelectForProceed(), 800);
     }
+  }
+
+  /** SPN / customs-declaration paths: single-shipment HS analysis, rendered with the
+   *  same per-agency grouped-card review used by the invoice path. */
+  private showItemHsAnalysisFromSingle(hsCode: string): void {
+    const analysis = analyzeHsCode(hsCode);
+    this.bot('item-hs-analysis', { items: buildItemsFromHsAnalysis(analysis) } satisfies ItemHsAnalysisData);
   }
 
   private showProfileSelectForProceed(): void {
@@ -1156,6 +1151,12 @@ export class ChatService {
         const d = m.data as HsAnalysisData;
         this.ALL_AGENCIES = d.agencies?.length ? d.agencies.map(a => a.code) : (d.agency && d.agency !== '—' ? [d.agency] : []);
         if (d.agency && d.agency !== '—') this.currentAgency = d.agency;
+      }
+      if (m.type === 'item-hs-analysis') {
+        const d = m.data as ItemHsAnalysisData;
+        const agencies = Array.from(new Set(d.items.filter(i => i.requiresPermit).map(i => i.agency)));
+        this.ALL_AGENCIES = agencies;
+        if (agencies.length) this.currentAgency = agencies[0];
       }
     }
     this.formData.set(formData);

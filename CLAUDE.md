@@ -52,12 +52,16 @@ ChatMessage.type → @switch in ChatAreaComponent
   'choice-card'        → ChoiceCardComponent    (emit: chosen)
   'email-draft'        → EmailDraftComponent    (emit: sent)
   'ocr-progress'       → OcrProgressComponent
-  'ocr-results'        → OcrResultsComponent   (editable inline; "ดำเนินการต่อ" triggers hs-analysis)
-  'hs-analysis'        → HsAnalysisComponent   (shows fee badge per agency from payment.mock.ts)
-  'item-hs-analysis'   → ItemHsAnalysisComponent (invoice path only; per-product HS Code → Smart Tariff → agency,
-                            grouped by resulting agency (อย./กษ./ไม่ต้องขอใบอนุญาต); each group card shows its
-                            item list directly + one "ยืนยันกลุ่มนี้ถูกต้อง" button — no per-item or correction UI;
-                            all groups must be confirmed before "ดำเนินการต่อ")
+  'ocr-results'        → OcrResultsComponent   (editable inline; "ดำเนินการต่อ" triggers item-hs-analysis)
+  'hs-analysis'        → HsAnalysisComponent   (legacy — only used by the unreachable chooseFullUpload() path
+                            and historical queue-mock/sessions-mock message replay; live flows use item-hs-analysis)
+  'item-hs-analysis'   → ItemHsAnalysisComponent (used by ALL live analysis flows — invoice path, SPN path, and
+                            customs-declaration upload path; per-product/per-shipment HS Code → Smart Tariff →
+                            agency, grouped by resulting agency (อย./กษ./ไม่ต้องขอใบอนุญาต); each group card shows
+                            its item list directly + one "ยืนยันกลุ่มนี้ถูกต้อง" button — no per-item or correction
+                            UI; all groups must be confirmed before "ดำเนินการต่อ". For the SPN/customs paths
+                            (single-shipment, not itemized), buildItemsFromHsAnalysis() in hs-analysis.mock.ts
+                            converts analyzeHsCode()'s result into one synthetic item per required agency)
   'form'               → FormPanelComponent
   'full-upload'        → FullUploadComponent
   'single-upload'      → SingleUploadComponent
@@ -106,8 +110,10 @@ src/
 │   │   │   ├── ocr.mock.ts
 │   │   │   ├── queue.mock.ts          ← shipments with realistic chatbot-flow messages
 │   │   │   ├── spn-companies.mock.ts
-│   │   │   ├── hs-analysis.mock.ts
-│   │   │   ├── product-hs-analysis.mock.ts ← per-product HS/tariff/agency (getProductHsAnalysis) for item-hs-analysis step
+│   │   │   ├── hs-analysis.mock.ts    ← analyzeHsCode() (single-shipment) + buildItemsFromHsAnalysis()
+│   │   │   │                            (adapts it to item-hs-analysis's per-agency grouped shape, used by
+│   │   │   │                            SPN + customs-declaration paths)
+│   │   │   ├── product-hs-analysis.mock.ts ← per-product HS/tariff/agency (getProductHsAnalysis) for item-hs-analysis step (invoice path)
 │   │   │   ├── agency-docs.mock.ts    ← required docs per agency (อย./กษ.) + manualFields
 │   │   │   ├── invoice-items.mock.ts  ← invoice line items (getInvoiceLineItems) for invoice-items step
 │   │   │   └── payment.mock.ts        ← fee config per agency (requiresFee, amount)
@@ -184,11 +190,12 @@ ChatService.send(text)
   │           └─ not found → type:'import-license-menu'
   └─ unknown → fallback + chips
 
-Universal agency+profile order (all paths after hs-analysis): เลือกกรม (dept:) → เลือกโปรไฟล์ → continue
+Universal agency+profile order (all paths after item-hs-analysis): เลือกกรม (dept:) → เลือกโปรไฟล์ → continue
   pendingAfterFlow: 'agency-docs' (invoice) | 'form-preview' (customs) | 'proceed' (SPN)
 
 import-license-menu → 2 choices (chooseFullUpload()/full-upload card removed from menu, method still exists unused):
-  ├─ chooseCustomsDocs()   → single-upload → OCR → hs-analysis → เลือกกรม → เลือกโปรไฟล์ → form-preview → submit → next-agency
+  ├─ chooseCustomsDocs()   → single-upload → OCR → item-hs-analysis (single-shipment, via buildItemsFromHsAnalysis)
+  │                            → เลือกกรม → เลือกโปรไฟล์ → form-preview → submit → next-agency
   └─ chooseInvoiceFirst()  → single-upload(invoice) → OCR
         → item-hs-analysis (จัดกลุ่มสินค้าตามกรมที่ AI แนะนำ; user ยืนยันทีละกลุ่มก่อนไปต่อ)
         → เลือกกรม (จาก union ของกรมที่ต้องขอทุกรายการ) → เลือกโปรไฟล์
@@ -210,7 +217,8 @@ onPreviewChoice 'edit' behaviour:
   └─ otherwise                    → full-upload (multi-doc, เหมือนเดิม)
 
 SPN path: "ดึงข้อมูลจาก SPN" → spn-list (skip profile picker) → selectSpnEntry → spn-result
-  → hs-analysis → เลือกกรม → เลือกโปรไฟล์ (confirm/change) → proceed choice → submit
+  → item-hs-analysis (single-shipment, via buildItemsFromHsAnalysis) → เลือกกรม → เลือกโปรไฟล์ (confirm/change)
+  → proceed choice → submit
 ```
 
 ### Payment flow (after ยืนยันส่งกรม)
