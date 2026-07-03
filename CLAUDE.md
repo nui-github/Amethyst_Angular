@@ -52,7 +52,10 @@ ChatMessage.type → @switch in ChatAreaComponent
   'choice-card'        → ChoiceCardComponent    (emit: chosen)
   'email-draft'        → EmailDraftComponent    (emit: sent)
   'ocr-progress'       → OcrProgressComponent
-  'ocr-results'        → OcrResultsComponent   (editable inline; "ดำเนินการต่อ" triggers item-hs-analysis)
+  'ocr-results'        → OcrResultsComponent   (editable inline; "ดำเนินการต่อ" triggers item-hs-analysis;
+                            when data.lineItems present, shows a grouped "รายการสินค้า" section below the
+                            editable fields — read-only line-item display, not individually editable. All
+                            three OCR mocks (ocr.mock.ts, invoice-ocr.mock.ts) share the same 6 line items)
   'hs-analysis'        → HsAnalysisComponent   (legacy — only used by the unreachable chooseFullUpload() path
                             and historical queue-mock/sessions-mock message replay; live flows use item-hs-analysis)
   'item-hs-analysis'   → ItemHsAnalysisComponent (used by ALL live analysis flows — invoice path, SPN path, and
@@ -73,13 +76,17 @@ ChatMessage.type → @switch in ChatAreaComponent
   'status-card'        → StatusCardComponent    (isPending=true: รอชำระ / false: สำเร็จ)
   'spn-result'         → SpnResultComponent
   'form-preview'       → FormPreviewComponent   (editable pre-submit data review; "ดำเนินการต่อ" triggers choice-card;
-                            when data.selectedItems present (invoice path), each item row has a "รายละเอียด"
-                            button opening a modal — OCR-derived fields read-only, plus ItemManualDetail fields
-                            (types.ts) the user must fill in and confirm per item; "ดำเนินการต่อ" stays disabled
-                            until every selected item is confirmed via the modal)
+                            when data.selectedItems present (invoice path, and customs/SPN paths via the shared
+                            item-selection step below), each item row has a "รายละเอียด" button opening a modal —
+                            OCR-derived fields read-only, plus ItemManualDetail fields (types.ts) the user must
+                            fill in and confirm per item; "ดำเนินการต่อ" stays disabled until every selected item
+                            is confirmed via the modal)
   'missing-fields'     → MissingFieldsComponent (incomplete OCR → fill + optional re-upload)
   'agency-upload'      → AgencyUploadComponent  (per-agency doc slots; upload file OR manual entry per slot)
-  'invoice-items'      → InvoiceItemsComponent  (invoice path only; multi-select which invoice line items to submit; ≥1 required)
+  'invoice-items'      → InvoiceItemsComponent  (multi-select which items to submit, ≥1 required; used by the
+                            invoice path — items from invoice-items.mock.ts, after agency-upload's own OCR —
+                            AND the customs/SPN paths — items are the chosen agency's confirmed item-hs-analysis
+                            group, via showAgencyItemsSelection()/mapToInvoiceLineItems())
   'profile-select'     → ProfileSelectComponent (pick/confirm ShippingNet profile; mode: 'select'|'confirm')
   'payment-qr'         → PaymentQrComponent     (QR PromptPay สำหรับกรมที่มีค่าธรรมเนียม)
   'payment-slip'       → PaymentSlipComponent   (อัปโหลด slip หลังชำระ; disabled after upload via msg.isReadOnly)
@@ -124,10 +131,15 @@ src/
 │   │   │   │                            dataset for ALL flows (invoice/SPN/customs); mirrors the invoice-ocr
 │   │   │   │                            mock's 6 line items (medical devices) — 4 → อย. เครื่องมือแพทย์,
 │   │   │   │                            2 gamma-sterilized items → ปส. (สำนักงานปรมาณูเพื่อสันติภาพ), so every
-│   │   │   │                            flow reaches the 2nd-agency "ขอใบอนุญาตเพิ่ม" (next-agency LPI) step
-│   │   │   ├── agency-docs.mock.ts    ← required docs per agency (อย./กษ.) + manualFields
-│   │   │   ├── invoice-items.mock.ts  ← invoice line items (getInvoiceLineItems) for invoice-items step
-│   │   │   └── payment.mock.ts        ← fee config per agency (requiresFee, amount)
+│   │   │   │                            flow reaches the 2nd-agency "ขอใบอนุญาตเพิ่ม" (next-agency LPI) step;
+│   │   │   │                            also exports mapToInvoiceLineItems() — converts confirmed
+│   │   │   │                            item-hs-analysis rows into InvoiceLineItem shape for the
+│   │   │   │                            customs/SPN item-selection step (see showAgencyItemsSelection())
+│   │   │   ├── agency-docs.mock.ts    ← required docs per agency (อย./กษ./ปส.) + manualFields
+│   │   │   ├── invoice-items.mock.ts  ← invoice line items (getInvoiceLineItems) — invoice path's own
+│   │   │   │                            agency-upload+invoice-items step only (customs/SPN use
+│   │   │   │                            mapToInvoiceLineItems() above instead)
+│   │   │   └── payment.mock.ts        ← fee config per agency (requiresFee, amount) — อย./กษ./ปส./etc.
 │   │   ├── models/types.ts            ← ALL interfaces + MessageType union
 │   │   └── services/
 │   │       ├── chat.service.ts        ← all chat state + flow logic + queue session loading
