@@ -100,10 +100,49 @@
 }
 
 .ih-summary__agency-fee {
+  position: relative;
   font-weight: 700;
   color: #B45309;
 
   &--free { color: #0D8F61; }
+
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 3px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: #1F2937;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s ease 0.05s;
+    z-index: 999;
+  }
+
+  &::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1F2937;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+    padding: 5px 10px;
+    border-radius: 7px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s ease 0.05s;
+    z-index: 999;
+    font-family: inherit;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  &:hover::before,
+  &:hover::after { opacity: 1; }
 }
 
 .ih-groups {

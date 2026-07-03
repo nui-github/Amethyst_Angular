@@ -44,7 +44,7 @@
             <span class="ih-summary__agency-code">{{ a.code }}</span>
             <span class="ih-summary__agency-full">{{ a.full }}</span>
             <span class="ih-summary__agency-count">{{ a.count }} รายการ</span>
-            <span class="ih-summary__agency-fee" [class.ih-summary__agency-fee--free]="!a.requiresFee">
+            <span class="ih-summary__agency-fee" [class.ih-summary__agency-fee--free]="!a.requiresFee" data-tip="ค่าธรรมเนียมการขอใบอนุญาต">
               {{ a.requiresFee ? ('฿' + (a.amount | number)) : 'ฟรี' }}
             </span>
           </div>
