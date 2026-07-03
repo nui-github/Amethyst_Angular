@@ -468,7 +468,7 @@ export class ChatService {
     const others = this.ALL_AGENCIES.filter(a => a !== recommendedAgency);
     const options: ChoiceCardData['options'] = [
       {
-        label: `${recommendedAgency} (แนะนำ)`,
+        label: recommendedAgency,
         value: `dept:${recommendedAgency}`,
         description: this.AGENCY_DESC[recommendedAgency] ?? recommendedAgency,
       },
