@@ -6,7 +6,7 @@ import {
   LucideAngularModule, ArrowLeft, Pencil, Check, ChevronDown,
   User, Lock, SlidersHorizontal, UserCog, ShieldCheck, CreditCard,
   BarChart3, Plus, Package, FileText, Download, Receipt, FileCheck2, Wallet, Construction,
-  TrendingUp, PieChart, Trophy, X, Link,
+  TrendingUp, PieChart, Trophy, X, Link, KeyRound, Eye, EyeOff,
 } from 'lucide-angular';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import {
@@ -59,6 +59,9 @@ export class SettingsPageComponent {
   readonly PieChart     = PieChart;
   readonly Trophy       = Trophy;
   readonly X            = X;
+  readonly KeyRound     = KeyRound;
+  readonly Eye          = Eye;
+  readonly EyeOff       = EyeOff;
 
   // ── Top-level section nav ──────────────────────────────────────────────────
   readonly navItems: { id: SettingsSection; label: string; icon: typeof SlidersHorizontal }[] = [
@@ -72,6 +75,25 @@ export class SettingsPageComponent {
   activeSection = signal<SettingsSection>(
     (this.route.snapshot.data['section'] as SettingsSection) ?? 'account'
   );
+
+  // ── General: OCR service API key ─────────────────────────────────────────
+  ocrApiKey      = signal('');
+  ocrApiKeySaved = signal('');
+  showOcrApiKey  = signal(false);
+
+  readonly ocrApiKeyDirty = computed(() => this.ocrApiKey().trim() !== this.ocrApiKeySaved().trim());
+
+  toggleOcrApiKeyVisibility(): void { this.showOcrApiKey.update(v => !v); }
+
+  saveOcrApiKey(): void {
+    if (!this.ocrApiKey().trim()) return;
+    this.ocrApiKeySaved.set(this.ocrApiKey().trim());
+  }
+
+  clearOcrApiKey(): void {
+    this.ocrApiKey.set('');
+    this.ocrApiKeySaved.set('');
+  }
 
   // ── Profiles for submitting to agencies ──────────────────────────────────
   profiles = signal<SpnProfile[]>([...MOCK_SPN_PROFILES]);

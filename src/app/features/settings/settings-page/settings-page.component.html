@@ -30,12 +30,47 @@
           <p class="content-title">ทั่วไป</p>
           <p class="content-desc">การตั้งค่าทั่วไปของระบบ</p>
         </div>
-        <div class="empty-state">
-          <div class="empty-state__icon">
-            <lucide-icon [img]="Construction" [size]="22" color="#9CA3AF" />
+        <div class="api-key-card">
+          <div class="api-key-card__hd">
+            <div class="api-key-card__icon">
+              <lucide-icon [img]="KeyRound" [size]="16" color="#0463EF" />
+            </div>
+            <div>
+              <p class="api-key-card__title">OCR Service API Key</p>
+              <p class="api-key-card__sub">API key สำหรับเชื่อมต่อบริการ OCR ที่ใช้อ่านข้อมูลจากเอกสาร (invoice / ใบขนสินค้า)</p>
+            </div>
+            @if (ocrApiKeySaved()) {
+              <span class="api-key-card__status">
+                <lucide-icon [img]="Check" [size]="11" color="#0D8F61" />
+                เชื่อมต่อแล้ว
+              </span>
+            }
           </div>
-          <p class="empty-state__title">ยังไม่มีการตั้งค่าทั่วไปในขณะนี้</p>
-          <p class="empty-state__desc">ฟีเจอร์นี้กำลังอยู่ระหว่างการพัฒนา</p>
+
+          <div class="api-key-field">
+            <label>API Key</label>
+            <nz-input-group [nzPrefix]="apiKeyIcon" [nzSuffix]="apiKeyToggle" nzSize="default">
+              <input nz-input [type]="showOcrApiKey() ? 'text' : 'password'" placeholder="เช่น sk-ocr-xxxxxxxxxxxxxxxx"
+                [value]="ocrApiKey()" (input)="ocrApiKey.set($any($event.target).value)" />
+            </nz-input-group>
+            <ng-template #apiKeyIcon><lucide-icon [img]="KeyRound" [size]="13" color="#AAAAAA" /></ng-template>
+            <ng-template #apiKeyToggle>
+              <button type="button" class="api-key-field__eye" (click)="toggleOcrApiKeyVisibility()">
+                <lucide-icon [img]="showOcrApiKey() ? EyeOff : Eye" [size]="14" color="#9CA3AF" />
+              </button>
+            </ng-template>
+            <p class="api-key-field__hint">ใช้สำหรับเชื่อมต่อ API ของผู้ให้บริการ OCR เท่านั้น ระบบจะไม่แสดง key นี้ให้ผู้ใช้อื่นเห็น</p>
+          </div>
+
+          <div class="api-key-card__actions">
+            @if (ocrApiKeySaved()) {
+              <button class="spn-cancel-btn" (click)="clearOcrApiKey()">ลบ Key</button>
+            }
+            <button class="spn-connect-btn" [disabled]="!ocrApiKey().trim() || !ocrApiKeyDirty()" (click)="saveOcrApiKey()">
+              <lucide-icon [img]="Check" [size]="13" color="#fff" />
+              บันทึก API Key
+            </button>
+          </div>
         </div>
       }
 
