@@ -6,7 +6,7 @@ import {
   LucideAngularModule, ArrowLeft, Pencil, Check, ChevronDown,
   Wifi, WifiOff, LogOut, User, Lock, SlidersHorizontal, UserCog, ShieldCheck, CreditCard,
   BarChart3, Plus, Package, FileText, Download, Receipt, FileCheck2, Wallet, Construction,
-  TrendingUp, PieChart, Trophy, X,
+  TrendingUp, PieChart, Trophy, X, Link,
 } from 'lucide-angular';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import {
@@ -47,6 +47,7 @@ export class SettingsPageComponent {
   readonly LogOut       = LogOut;
   readonly User         = User;
   readonly Lock         = Lock;
+  readonly Link         = Link;
   readonly SlidersHorizontal = SlidersHorizontal;
   readonly UserCog      = UserCog;
   readonly ShieldCheck  = ShieldCheck;
@@ -115,29 +116,31 @@ export class SettingsPageComponent {
   // ── Profiles for submitting to agencies ──────────────────────────────────
   profiles = signal<SpnProfile[]>([...MOCK_SPN_PROFILES]);
   showCreateProfile = signal(false);
-  newProfileCode = signal('');
-  newProfileName = signal('');
+  newProfileUrl = signal('');
   newProfileUser = signal('');
+  newProfilePass = signal('');
 
   readonly newProfileValid = () =>
-    this.newProfileCode().trim().length > 0 &&
-    this.newProfileName().trim().length > 0 &&
-    this.newProfileUser().trim().length > 0;
+    this.newProfileUrl().trim().length > 0 &&
+    this.newProfileUser().trim().length > 0 &&
+    this.newProfilePass().trim().length > 0;
 
   openCreateProfile(): void { this.showCreateProfile.set(true); }
   cancelCreateProfile(): void {
     this.showCreateProfile.set(false);
-    this.newProfileCode.set(''); this.newProfileName.set(''); this.newProfileUser.set('');
+    this.newProfileUrl.set(''); this.newProfileUser.set(''); this.newProfilePass.set('');
   }
 
   saveNewProfile(): void {
     if (!this.newProfileValid()) return;
     const colors = ['#0463EF', '#7C3AED', '#0D8F61', '#B45309', '#DB2777'];
+    const host = this.newProfileUrl().trim().replace(/^https?:\/\//, '').split('/')[0];
+    const code = (host.replace(/[^a-zA-Z]/g, '').toUpperCase().slice(0, 4)) || 'NEW';
     this.profiles.update(list => [...list, {
-      code: this.newProfileCode().trim().toUpperCase().slice(0, 4),
-      displayName: this.newProfileName().trim(),
+      code,
+      displayName: host,
       companyId: 'custom',
-      urlId: 'custom',
+      urlId: host,
       username: this.newProfileUser().trim(),
       color: colors[list.length % colors.length],
     }]);

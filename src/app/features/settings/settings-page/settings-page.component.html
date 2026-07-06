@@ -162,25 +162,29 @@
               <p class="spn-login-form__title">สร้างโปรไฟล์สำหรับส่งกรม</p>
               <div class="spn-login-form__fields">
                 <div class="spn-login-field">
-                  <label>รหัสโปรไฟล์ (4 ตัวอักษร)</label>
-                  <nz-input-group nzSize="default">
-                    <input nz-input placeholder="เช่น NETB" maxlength="4"
-                      [value]="newProfileCode()" (input)="newProfileCode.set($any($event.target).value)" />
+                  <label>URL</label>
+                  <nz-input-group [nzPrefix]="urlIcon" nzSize="default">
+                    <input nz-input placeholder="เช่น spn.netbay.co.th"
+                      [value]="newProfileUrl()" (input)="newProfileUrl.set($any($event.target).value)" />
                   </nz-input-group>
+                  <ng-template #urlIcon><lucide-icon [img]="Link" [size]="13" color="#AAAAAA" /></ng-template>
                 </div>
                 <div class="spn-login-field">
-                  <label>ชื่อโปรไฟล์</label>
-                  <nz-input-group nzSize="default">
-                    <input nz-input placeholder="เช่น Netbay Production"
-                      [value]="newProfileName()" (input)="newProfileName.set($any($event.target).value)" />
-                  </nz-input-group>
-                </div>
-                <div class="spn-login-field">
-                  <label>ชื่อผู้ใช้</label>
-                  <nz-input-group nzSize="default">
-                    <input nz-input placeholder="ชื่อผู้ใช้สำหรับโปรไฟล์นี้"
+                  <label>ชื่อผู้ใช้ (Username)</label>
+                  <nz-input-group [nzPrefix]="createUserIcon" nzSize="default">
+                    <input nz-input placeholder="กรอก Username"
                       [value]="newProfileUser()" (input)="newProfileUser.set($any($event.target).value)" />
                   </nz-input-group>
+                  <ng-template #createUserIcon><lucide-icon [img]="User" [size]="13" color="#AAAAAA" /></ng-template>
+                </div>
+                <div class="spn-login-field">
+                  <label>รหัสผ่าน (Password)</label>
+                  <nz-input-group [nzPrefix]="createLockIcon" nzSize="default">
+                    <input nz-input type="password" placeholder="กรอก Password"
+                      [value]="newProfilePass()" (input)="newProfilePass.set($any($event.target).value)"
+                      (keydown.enter)="saveNewProfile()" />
+                  </nz-input-group>
+                  <ng-template #createLockIcon><lucide-icon [img]="Lock" [size]="13" color="#AAAAAA" /></ng-template>
                 </div>
               </div>
               <div class="spn-login-form__actions">
