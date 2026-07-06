@@ -358,6 +358,34 @@
               </div>
             }
 
+            <!-- Item list -->
+            @if (openShipment()!.items?.length) {
+              <div class="dv-card">
+                <div class="dv-card__hd">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0D8F61" stroke-width="2"><path d="M20 7h-3a2 2 0 0 1-2-2V2"/><path d="M9 22V12h6v10"/><path d="M4 22h16a2 2 0 0 0 2-2V8.5L15.5 2H6a2 2 0 0 0-2 2v4"/></svg>
+                  <span>รายการสินค้าที่ขอ LPI</span>
+                  <span class="dv-doc-count">{{ openShipment()!.items!.length }} รายการ</span>
+                </div>
+                <div class="dv-item-list">
+                  @for (it of openShipment()!.items!; track it.id) {
+                    <div class="dv-item-row">
+                      <div class="dv-item-row__main">
+                        <span class="dv-item-row__name">{{ it.name }}</span>
+                        <span class="dv-item-row__meta">{{ it.quantity }} {{ it.unit }} · HS {{ it.hsCode }}{{ it.lotNo ? ' · Lot ' + it.lotNo : '' }}</span>
+                      </div>
+                      @if (it.amount) {
+                        <span class="dv-item-row__amount">฿{{ it.amount | number }}</span>
+                      }
+                      <button class="dv-item-detail-btn" (click)="openItemDetail(it.id)">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        รายละเอียด
+                      </button>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
             <!-- Uploaded documents -->
             @if (openShipment()!.documents?.length) {
               <div class="dv-card">
@@ -453,6 +481,47 @@
         </div>
 
       </div><!-- /dv -->
+
+      @if (detailItem(); as item) {
+        <div class="iv-modal__backdrop" (click)="closeItemDetail()">
+          <div class="iv-modal" (click)="$event.stopPropagation()">
+            <div class="iv-modal__hd">
+              <div>
+                <p class="iv-modal__title">รายละเอียดสินค้า</p>
+                <p class="iv-modal__sub">{{ item.name }}</p>
+              </div>
+              <button class="iv-modal__close" (click)="closeItemDetail()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              </button>
+            </div>
+
+            <div class="iv-modal__body">
+              <div class="iv-modal__section">
+                <span class="iv-modal__section-title">ข้อมูลจากใบขน / Invoice</span>
+                <div class="iv-modal__ro-grid">
+                  <div class="iv-modal__ro"><span>ชื่อสินค้า</span><strong>{{ item.name }}</strong></div>
+                  <div class="iv-modal__ro"><span>HS Code</span><strong>{{ item.hsCode }}</strong></div>
+                  <div class="iv-modal__ro"><span>ประเทศกำเนิด</span><strong>{{ item.origin || '—' }}</strong></div>
+                  <div class="iv-modal__ro"><span>ปริมาณ</span><strong>{{ item.quantity }} {{ item.unit }}</strong></div>
+                  <div class="iv-modal__ro"><span>Lot No.</span><strong>{{ item.lotNo || '—' }}</strong></div>
+                  <div class="iv-modal__ro"><span>มูลค่า</span><strong>{{ item.amount ? ('฿' + (item.amount | number)) : '—' }}</strong></div>
+                </div>
+              </div>
+
+              @if (item.detail; as d) {
+                <div class="iv-modal__section">
+                  <span class="iv-modal__section-title">ข้อมูลเพิ่มเติมที่ยื่นประกอบคำขอ</span>
+                  <div class="iv-modal__ro-grid">
+                    @for (f of manualFields; track f.key) {
+                      <div class="iv-modal__ro"><span>{{ f.label }}</span><strong>{{ d[f.key] || '—' }}</strong></div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
     }
 
   </div><!-- /qp-outer -->

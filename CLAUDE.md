@@ -368,7 +368,11 @@ Add to `mainItems` array in `sidebar.component.ts`
 - **Background**: `#EDEEF4` page bg, `16px` outer padding
 - **Detail**: clicking any row opens inline detail panel (right side of same page)
   - Left column: AI assess card (HS Code pill + reason) · AI classify card · Audit trail
-  - Right column: Uploaded documents card · Flag alerts · Submission result card (submitted only)
+  - Right column: Flag alerts · Draft license summary · Item list card (Shipment.items — per-product
+    line item from the invoice/customs doc used for this LPI request; each row has a "รายละเอียด"
+    button opening a read-only modal split into OCR-derived fields + ItemManualDetail fields captured
+    during the request, same field set as the chat's form-preview item modal) · Uploaded documents card
+    · Submission result card (submitted only)
   - Footer: "ไปยืนยันในแชท" (needs_you) / "เสร็จสิ้นแล้ว" (submitted/no_permit)
 - **Stage labels** (7 stages): ตรวจรับใบขน → วิเคราะห์ HS → จัดประเภท → แนบเอกสาร → ตรวจ flag → ยืนยันร่าง → ยื่นกรม
 - Mock data: 12 shipments in `queue.mock.ts` (enough for 2 pages at 10/page)

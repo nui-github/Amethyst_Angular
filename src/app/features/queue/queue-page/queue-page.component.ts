@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
 import { QueueService, STATUS_META, AGENCY_SHORT, AGENCY_LABEL } from '@app/core/services/queue.service';
 import { ChatService } from '@app/core/services/chat.service';
 import { SidebarComponent } from '../../chat/components/sidebar/sidebar.component';
-import { ChatMessage, Shipment, ShipmentStatus } from '@app/core/models/types';
+import { ChatMessage, Shipment, ShipmentStatus, ShipmentItem, ITEM_MANUAL_DETAIL_FIELDS } from '@app/core/models/types';
 
 export { STATUS_META, AGENCY_SHORT };
 
@@ -126,10 +126,12 @@ export class QueuePageComponent {
   }
 
   selectRow(id: string): void {
+    this.detailItemId.set(null);
     this.q.open(id);
   }
 
   closeDetail(): void {
+    this.detailItemId.set(null);
     this.q.open('');
   }
 
@@ -151,6 +153,19 @@ export class QueuePageComponent {
     const d = msg.data as { refNo?: string; submittedAt?: string; feeNote?: string };
     return { refNo: d.refNo ?? '—', submittedAt: d.submittedAt ?? '—', feeNote: d.feeNote };
   });
+
+  // ── Item detail modal (read-only) ───────────────────────────────────────────
+  readonly manualFields = ITEM_MANUAL_DETAIL_FIELDS;
+  detailItemId = signal<string | null>(null);
+
+  readonly detailItem = computed<ShipmentItem | undefined>(() => {
+    const id = this.detailItemId();
+    if (!id) return undefined;
+    return this.openShipment()?.items?.find(i => i.id === id);
+  });
+
+  openItemDetail(id: string): void { this.detailItemId.set(id); }
+  closeItemDetail(): void { this.detailItemId.set(null); }
 
   printLicense(ship: Shipment): void {
     window.open(`/print?ref=${ship.hthmRef ?? ship.id}`, '_blank');

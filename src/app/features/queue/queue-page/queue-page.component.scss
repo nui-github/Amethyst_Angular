@@ -1059,6 +1059,153 @@
 .dv-draft-link { font-size: 11px; font-weight: 700; color: #0463EF; cursor: pointer; }
 .dv-draft-edit { font-size: 10px; color: #C4C9D6; }
 
+// ── Item list card ────────────────────────────────────────────────────────────
+.dv-item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dv-item-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: #F9FAFB;
+  border-radius: 8px;
+  border: 1px solid #F0F2F7;
+}
+
+.dv-item-row__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.dv-item-row__name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1F2937;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dv-item-row__meta {
+  font-size: 10.5px;
+  color: #9CA3AF;
+}
+
+.dv-item-row__amount {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1F2937;
+  flex-shrink: 0;
+}
+
+.dv-item-detail-btn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 6px;
+  border: 1.5px solid #D1D5DB;
+  background: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  font-family: inherit;
+  &:hover { border-color: #0463EF; color: #0463EF; }
+}
+
+// ── Item detail modal (read-only) ────────────────────────────────────────────
+.iv-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(1, 1, 54, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.iv-modal {
+  background: #fff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(1, 1, 54, 0.25);
+}
+
+.iv-modal__hd {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 16px 18px;
+  border-bottom: 1px solid #F0F1F8;
+}
+
+.iv-modal__title { font-size: 14px; font-weight: 800; color: #010136; margin: 0; }
+.iv-modal__sub   { font-size: 11.5px; color: #6B7280; margin: 2px 0 0; }
+
+.iv-modal__close {
+  width: 26px; height: 26px;
+  border-radius: 7px;
+  border: none;
+  background: #F3F4F6;
+  color: #6B7280;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  &:hover { background: #E5E7EB; }
+}
+
+.iv-modal__body {
+  padding: 16px 18px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.iv-modal__section-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: #9CA3AF;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.iv-modal__ro-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 12px;
+  padding: 10px 12px;
+  background: #F8FAFC;
+  border-radius: 10px;
+}
+
+.iv-modal__ro {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-size: 11px;
+  span { color: #9CA3AF; }
+  strong { color: #0463EF; font-weight: 700; font-size: 11.5px; }
+}
+
 // ── Uploaded documents card ───────────────────────────────────────────────────
 .dv-doc-count {
   margin-left: auto;

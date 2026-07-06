@@ -84,6 +84,10 @@ export const MOCK_QUEUE: Shipment[] = [
       doc('d1a', 'Invoice INV-2024-8834', 'invoice'),
       doc('d1b', 'Packing List', 'packing_list'),
     ],
+    items: [
+      { id: 'i1', name: 'Amoxicillin Trihydrate', hsCode: '2941.10.00', origin: 'อินเดีย', quantity: '250', unit: 'กก.', lotNo: 'AMX-2024-0617', amount: 63000,
+        detail: { nameTh: 'ยาปฏิชีวนะชนิดผง (อะม็อกซีซิลลิน)', netWeight: '250', manufacturerName: 'Advent Pharma India Pvt. Ltd.', mfgDate: '01-05-2568', expDate: '01-05-2570', remarks: 'รอยืนยันปริมาณและเลข GMP' } },
+    ],
   },
 
   // ── 2. needs_you: Human Insulin – รอยืนยัน flag + form-preview ───────────────
@@ -139,6 +143,10 @@ export const MOCK_QUEUE: Shipment[] = [
       doc('d2b', 'Packing List', 'packing_list'),
       doc('d2c', 'Certificate of Analysis (CoA)', 'coa'),
     ],
+    items: [
+      { id: 'i2', name: 'Human Insulin (สำเร็จรูป)', hsCode: '2941.10.00', origin: 'เยอรมนี', quantity: '100', unit: 'ไวอัล', lotNo: 'INS-2024-DE001', amount: 420000,
+        detail: { nameTh: 'อินซูลินสำเร็จรูปสำหรับฉีด', netWeight: '10', manufacturerName: 'Deutsche Insulin GmbH', mfgDate: '05-04-2568', expDate: '30-11-2568', remarks: 'ตรวจสอบวันหมดอายุระหว่าง CoA และฉลากแล้ว' } },
+    ],
   },
 
   // ── 3. needs_you: Surgical Gloves – รอ agency-upload ──────────────────────────
@@ -188,6 +196,9 @@ export const MOCK_QUEUE: Shipment[] = [
       doc('d3a', 'Invoice MY-2024-0312', 'invoice'),
       doc('d3b', 'Packing List', 'packing_list'),
     ],
+    items: [
+      { id: 'i3', name: 'Surgical Gloves (ปราศจากเชื้อ)', hsCode: '4015.11.00', origin: 'มาเลเซีย', quantity: '5,000', unit: 'ชิ้น', lotNo: 'GLV-MY-312', amount: 175000 },
+    ],
   },
 
   // ── 4. submitted: Glyphosate – ยื่น กษ. แล้ว ────────────────────────────────
@@ -236,6 +247,10 @@ export const MOCK_QUEUE: Shipment[] = [
       doc('d4b', 'Packing List', 'packing_list'),
       doc('d4c', 'Material Safety Data Sheet (MSDS)', 'other', 'pdf', 'doa'),
     ],
+    items: [
+      { id: 'i4', name: 'Glyphosate Technical', hsCode: '2931.39.00', origin: 'จีน', quantity: '1,000', unit: 'ลิตร', lotNo: 'GLY-CN-0601', amount: 850000,
+        detail: { nameTh: 'สารกำจัดวัชพืชไกลโฟเสท (เทคนิคอล)', netWeight: '1,000', manufacturerName: 'Sino Agro Chem Co., Ltd.', mfgDate: '10-05-2568', expDate: '10-05-2570', remarks: 'ยื่นกรม กษ. เรียบร้อยแล้ว' } },
+    ],
   },
 
   // ── 5. no_permit: HPLC Column – ไม่ต้องขอใบอนุญาต ──────────────────────────
@@ -268,6 +283,9 @@ export const MOCK_QUEUE: Shipment[] = [
     documents: [
       doc('d5a', 'Invoice US-2024-0802', 'invoice'),
       doc('d5b', 'Packing List', 'packing_list'),
+    ],
+    items: [
+      { id: 'i5', name: 'HPLC Column', hsCode: '9027.90.90', origin: 'สหรัฐอเมริกา', quantity: '4', unit: 'ชุด', lotNo: 'HPLC-US-0802', amount: 240000 },
     ],
   },
 
@@ -309,6 +327,10 @@ export const MOCK_QUEUE: Shipment[] = [
       doc('d6a', 'ใบขนสินค้าขาเข้า A012-25680617-00931', 'customs'),
       doc('d6b', 'Certificate of Analysis (CoA)', 'coa'),
       doc('d6c', 'MSDS — Ethanol 99.5%', 'other', 'pdf', 'diw'),
+    ],
+    items: [
+      { id: 'i6', name: 'Ethanol 99.5% (Absolute Ethanol)', hsCode: '2207.10.00', origin: 'ยุโรป', quantity: '1,000', unit: 'ลิตร', lotNo: 'ETH-EU-0730', amount: 320000,
+        detail: { nameTh: 'เอทานอลบริสุทธิ์ 99.5% สำหรับอุตสาหกรรม', netWeight: '1,000', manufacturerName: 'EuroChem Distillers B.V.', mfgDate: '15-06-2568', expDate: '15-06-2573', remarks: 'ยื่นกรม วอ. เรียบร้อยแล้ว' } },
     ],
   },
 
@@ -358,6 +380,9 @@ export const MOCK_QUEUE: Shipment[] = [
       doc('d7a', 'Invoice INV-2024-0701', 'invoice'),
       doc('d7b', 'Packing List', 'packing_list'),
     ],
+    items: [
+      { id: 'i7', name: 'Ascorbic Acid (Vitamin C Powder)', hsCode: '2936.27.00', origin: 'จีน', quantity: '500', unit: 'กก.', lotNo: 'VITC-CN-0701', amount: 210000 },
+    ],
   },
 
   // ── 8. submitted: Zinc Oxide – ยื่น อย. แล้ว ─────────────────────────────────
@@ -398,6 +423,10 @@ export const MOCK_QUEUE: Shipment[] = [
       doc('d8b', 'Certificate of Analysis (CoA)', 'coa', 'pdf', 'fda'),
       doc('d8c', 'ใบรับรองแหล่งกำเนิดสินค้า (COO)', 'coo', 'pdf', 'fda'),
     ],
+    items: [
+      { id: 'i8', name: 'Zinc Oxide (Nano Grade)', hsCode: '2817.00.00', origin: 'เกาหลีใต้', quantity: '200', unit: 'กก.', lotNo: 'ZNO-KR-0520', amount: 180000,
+        detail: { nameTh: 'ซิงค์ออกไซด์เกรดนาโน สำหรับเครื่องสำอาง', netWeight: '200', manufacturerName: 'Korea Nano Materials Co.', mfgDate: '01-05-2568', expDate: '01-05-2571', remarks: 'ยื่นกรม อย. เรียบร้อยแล้ว' } },
+    ],
   },
 
   // ── 9. submitted: Magnesium Stearate – ยื่น อย. แล้ว ─────────────────────────
@@ -433,6 +462,9 @@ export const MOCK_QUEUE: Shipment[] = [
       doc('d9a', 'Invoice US-2024-1430', 'invoice'),
       doc('d9b', 'Certificate of Analysis (CoA)', 'coa', 'pdf', 'fda'),
     ],
+    items: [
+      { id: 'i9', name: 'Magnesium Stearate', hsCode: '2915.70.21', origin: 'สหรัฐอเมริกา', quantity: '500', unit: 'กก.', lotNo: 'MGST-US-1430', amount: 95000 },
+    ],
   },
 
   // ── 10. no_permit: Sodium Chloride – ไม่ต้องขออนุญาต ───────────────────────
@@ -467,6 +499,9 @@ export const MOCK_QUEUE: Shipment[] = [
     documents: [
       doc('d10a', 'ใบขนสินค้าขาเข้า A012-25680617-01000', 'customs'),
       doc('d10b', 'Invoice AU-2024-1000', 'invoice'),
+    ],
+    items: [
+      { id: 'i10', name: 'Sodium Chloride (เกลือบริสุทธิ์)', hsCode: '2501.00.10', origin: 'ออสเตรเลีย', quantity: '2,000', unit: 'กก.', lotNo: 'NACL-AU-1000', amount: 60000 },
     ],
   },
 
@@ -508,6 +543,9 @@ export const MOCK_QUEUE: Shipment[] = [
     documents: [
       doc('d11a', 'ใบขนสินค้าขาเข้า A012-25680617-01100', 'customs'),
       doc('d11b', 'Packing List', 'packing_list'),
+    ],
+    items: [
+      { id: 'i11', name: 'Calcium Carbonate (เกรดยา)', hsCode: '2836.50.00', origin: 'มาเลเซีย', quantity: '1,000', unit: 'กก.', lotNo: 'CaCO3-MY-0612', amount: 145000 },
     ],
   },
 
@@ -562,6 +600,10 @@ export const MOCK_QUEUE: Shipment[] = [
       doc('d12a', 'Invoice DE-2024-0820', 'invoice'),
       doc('d12b', 'Certificate of Analysis (CoA)', 'coa', 'pdf', 'fda'),
       doc('d12c', 'ใบรับรองแหล่งกำเนิดสินค้า (COO)', 'coo', 'pdf', 'fda'),
+    ],
+    items: [
+      { id: 'i12', name: 'Titanium Dioxide (Rutile)', hsCode: '3206.11.00', origin: 'เยอรมนี', quantity: '300', unit: 'กก.', lotNo: 'TiO2-DE-0530', amount: 135000,
+        detail: { nameTh: 'ไทเทเนียมไดออกไซด์ (สีขาวสำหรับเครื่องสำอาง)', netWeight: '300', manufacturerName: 'Rhein Pigment Werke GmbH', mfgDate: '20-04-2568', expDate: '20-04-2572', remarks: 'แก้ไขชื่อสินค้าให้ตรงกับ CoA แล้ว (Rutile)' } },
     ],
   },
 ];

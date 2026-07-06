@@ -324,6 +324,21 @@ export interface Shipment {
   audit: AuditEntry[];
   documents?: ShipmentDocument[];
   email?: { toName: string; to: string; subject: string; body: string; attName: string };
+  items?: ShipmentItem[]; // per-product line items from the invoice/customs doc used for this LPI request
+}
+
+// A product line item as captured from the invoice/customs upload during the LPI request —
+// shown read-only in the queue detail view (per-item "รายละเอียด" card)
+export interface ShipmentItem {
+  id: string;
+  name: string;
+  hsCode: string;
+  origin?: string;
+  quantity: string;
+  unit: string;
+  lotNo?: string;
+  amount?: number;
+  detail?: ItemManualDetail; // manual fields captured when the LPI request was submitted
 }
 
 // replace url with real signed URL from storage (e.g. GET /shipments/:id/documents)
