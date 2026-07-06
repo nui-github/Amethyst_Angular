@@ -325,6 +325,9 @@ export interface Shipment {
   documents?: ShipmentDocument[];
   email?: { toName: string; to: string; subject: string; body: string; attName: string };
   items?: ShipmentItem[]; // per-product line items from the invoice/customs doc used for this LPI request
+  itemsSelected?: boolean; // true once the shipment's flow has passed the item-selection step (invoice-items
+                           // confirmed) — the queue detail view's item list card only renders when this is true,
+                           // since `items` may be populated ahead of that step existing in mock data
 }
 
 // A product line item as captured from the invoice/customs upload during the LPI request —

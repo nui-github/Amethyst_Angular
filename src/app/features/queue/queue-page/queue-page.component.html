@@ -358,31 +358,38 @@
               </div>
             }
 
-            <!-- Item list -->
-            @if (openShipment()!.items?.length) {
+            <!-- Item list (summary; opens searchable list modal for full detail) -->
+            @if (openShipment()!.itemsSelected && shipmentItems().length) {
               <div class="dv-card">
                 <div class="dv-card__hd">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0D8F61" stroke-width="2"><path d="M20 7h-3a2 2 0 0 1-2-2V2"/><path d="M9 22V12h6v10"/><path d="M4 22h16a2 2 0 0 0 2-2V8.5L15.5 2H6a2 2 0 0 0-2 2v4"/></svg>
                   <span>รายการสินค้าที่ขอ LPI</span>
-                  <span class="dv-doc-count">{{ openShipment()!.items!.length }} รายการ</span>
+                  <span class="dv-doc-count">{{ shipmentItems().length }} รายการ</span>
                 </div>
-                <div class="dv-item-list">
-                  @for (it of openShipment()!.items!; track it.id) {
-                    <div class="dv-item-row">
-                      <div class="dv-item-row__main">
-                        <span class="dv-item-row__name">{{ it.name }}</span>
-                        <span class="dv-item-row__meta">{{ it.quantity }} {{ it.unit }} · HS {{ it.hsCode }}{{ it.lotNo ? ' · Lot ' + it.lotNo : '' }}</span>
-                      </div>
-                      @if (it.amount) {
-                        <span class="dv-item-row__amount">฿{{ it.amount | number }}</span>
-                      }
-                      <button class="dv-item-detail-btn" (click)="openItemDetail(it.id)">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                        รายละเอียด
-                      </button>
+                <div class="dv-item-summary">
+                  <div class="dv-item-summary__stat">
+                    <span class="dv-item-summary__num">{{ shipmentItems().length }}</span>
+                    <span class="dv-item-summary__lbl">รายการสินค้า</span>
+                  </div>
+                  @if (itemsTotalValue() > 0) {
+                    <div class="dv-item-summary__stat">
+                      <span class="dv-item-summary__num">฿{{ itemsTotalValue() | number }}</span>
+                      <span class="dv-item-summary__lbl">มูลค่ารวม</span>
                     </div>
                   }
                 </div>
+                <div class="dv-item-preview">
+                  @for (it of shipmentItems().slice(0, 3); track it.id) {
+                    <div class="dv-item-preview__row">
+                      <span class="dv-item-preview__name">{{ it.name }}</span>
+                      <span class="dv-item-preview__hs">HS {{ it.hsCode }}</span>
+                    </div>
+                  }
+                </div>
+                <button class="dv-item-viewall-btn" (click)="openItemList()">
+                  ดูรายการสินค้าทั้งหมด ({{ shipmentItems().length }})
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
               </div>
             }
 
@@ -481,6 +488,56 @@
         </div>
 
       </div><!-- /dv -->
+
+      @if (itemListOpen()) {
+        <div class="iv-modal__backdrop" (click)="closeItemList()">
+          <div class="iv-modal iv-modal--list" (click)="$event.stopPropagation()">
+            <div class="iv-modal__hd">
+              <div>
+                <p class="iv-modal__title">รายการสินค้าที่ขอ LPI</p>
+                <p class="iv-modal__sub">{{ filteredItems().length }} จาก {{ shipmentItems().length }} รายการ</p>
+              </div>
+              <button class="iv-modal__close" (click)="closeItemList()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              </button>
+            </div>
+
+            <div class="iv-list-search">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#BEC3D0" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input [ngModel]="itemSearch()" (ngModelChange)="onItemSearch($event)" placeholder="ค้นหาชื่อสินค้า หรือ HS Code..." />
+            </div>
+
+            <div class="iv-modal__body iv-modal__body--list">
+              @if (pagedItems().length === 0) {
+                <p class="iv-list-empty">ไม่พบสินค้าที่ค้นหา</p>
+              }
+              @for (it of pagedItems(); track it.id) {
+                <div class="dv-item-row">
+                  <div class="dv-item-row__main">
+                    <span class="dv-item-row__name">{{ it.name }}</span>
+                    <span class="dv-item-row__meta">{{ it.quantity }} {{ it.unit }} · HS {{ it.hsCode }}{{ it.lotNo ? ' · Lot ' + it.lotNo : '' }}</span>
+                  </div>
+                  @if (it.amount) {
+                    <span class="dv-item-row__amount">฿{{ it.amount | number }}</span>
+                  }
+                  <button class="dv-item-detail-btn" (click)="openItemDetail(it.id)">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    รายละเอียด
+                  </button>
+                </div>
+              }
+            </div>
+
+            @if (itemPageCount() > 1) {
+              <div class="iv-list-pager">
+                <button class="iv-list-pager__btn" [disabled]="itemPageIndex() <= 1" (click)="itemPageIndex.set(itemPageIndex() - 1)">ก่อนหน้า</button>
+                <span class="iv-list-pager__lbl">หน้า {{ itemPageIndex() }} / {{ itemPageCount() }}</span>
+                <button class="iv-list-pager__btn" [disabled]="itemPageIndex() >= itemPageCount()" (click)="itemPageIndex.set(itemPageIndex() + 1)">ถัดไป</button>
+              </div>
+            }
+          </div>
+        </div>
+      }
 
       @if (detailItem(); as item) {
         <div class="iv-modal__backdrop" (click)="closeItemDetail()">

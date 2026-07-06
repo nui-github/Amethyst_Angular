@@ -127,11 +127,13 @@ export class QueuePageComponent {
 
   selectRow(id: string): void {
     this.detailItemId.set(null);
+    this.itemListOpen.set(false);
     this.q.open(id);
   }
 
   closeDetail(): void {
     this.detailItemId.set(null);
+    this.itemListOpen.set(false);
     this.q.open('');
   }
 
@@ -154,15 +156,50 @@ export class QueuePageComponent {
     return { refNo: d.refNo ?? '—', submittedAt: d.submittedAt ?? '—', feeNote: d.feeNote };
   });
 
-  // ── Item detail modal (read-only) ───────────────────────────────────────────
+  // ── Item list + detail modal (read-only) ────────────────────────────────────
   readonly manualFields = ITEM_MANUAL_DETAIL_FIELDS;
   detailItemId = signal<string | null>(null);
+  itemListOpen = signal(false);
+  itemSearch   = signal('');
+  itemPageSize = 20;
+  itemPageIndex = signal(1);
+
+  readonly shipmentItems = computed<ShipmentItem[]>(() => this.openShipment()?.items ?? []);
+
+  readonly itemsTotalValue = computed(() =>
+    this.shipmentItems().reduce((sum, i) => sum + (i.amount ?? 0), 0));
+
+  readonly filteredItems = computed<ShipmentItem[]>(() => {
+    const term = this.itemSearch().trim().toLowerCase();
+    if (!term) return this.shipmentItems();
+    return this.shipmentItems().filter(i =>
+      i.name.toLowerCase().includes(term) || i.hsCode.toLowerCase().includes(term));
+  });
+
+  readonly itemPageCount = computed(() => Math.max(1, Math.ceil(this.filteredItems().length / this.itemPageSize)));
+
+  readonly pagedItems = computed<ShipmentItem[]>(() => {
+    const start = (this.itemPageIndex() - 1) * this.itemPageSize;
+    return this.filteredItems().slice(start, start + this.itemPageSize);
+  });
 
   readonly detailItem = computed<ShipmentItem | undefined>(() => {
     const id = this.detailItemId();
     if (!id) return undefined;
-    return this.openShipment()?.items?.find(i => i.id === id);
+    return this.shipmentItems().find(i => i.id === id);
   });
+
+  openItemList(): void {
+    this.itemSearch.set('');
+    this.itemPageIndex.set(1);
+    this.itemListOpen.set(true);
+  }
+  closeItemList(): void { this.itemListOpen.set(false); }
+
+  onItemSearch(term: string): void {
+    this.itemSearch.set(term);
+    this.itemPageIndex.set(1);
+  }
 
   openItemDetail(id: string): void { this.detailItemId.set(id); }
   closeItemDetail(): void { this.detailItemId.set(null); }
