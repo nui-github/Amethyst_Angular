@@ -43,161 +43,68 @@
       @if (activeSection() === 'account') {
         <div class="content-header">
           <p class="content-title">บัญชี</p>
-          <p class="content-desc">จัดการการเชื่อมต่อ ShippingNet และโปรไฟล์สำหรับส่งข้อมูลไปยังกรม</p>
+          <p class="content-desc">จัดการโปรไฟล์สำหรับส่งข้อมูลไปยังกรม</p>
         </div>
-
-        <div class="sub-tabs">
-          @for (t of accountTabs; track t.id) {
-            <button class="sub-tab" [class.sub-tab--active]="accountTab() === t.id" (click)="accountTab.set(t.id)">
-              {{ t.label }}
-            </button>
-          }
-        </div>
-
-        <!-- ── เชื่อมต่อ ShippingNet ── -->
-        @if (accountTab() === 'connect') {
-          <section class="settings-section">
-            @if (chat.isConnected()) {
-              <div class="spn-status spn-status--connected">
-                <div class="spn-status__icon">
-                  <lucide-icon [img]="Wifi" [size]="18" color="#0D8F61" />
-                </div>
-                <div class="spn-status__body">
-                  <p class="spn-status__label">เชื่อมต่อแล้ว</p>
-                  <p class="spn-status__company">{{ chat.spnSession()?.companyName }}</p>
-                  <p class="spn-status__url">{{ chat.spnSession()?.url }}</p>
-                  <p class="spn-status__user">ผู้ใช้: {{ chat.spnSession()?.username }}</p>
-                </div>
-                <div class="spn-status__dot"></div>
-              </div>
-
-              <div class="spn-actions">
-                <button class="spn-disconnect-btn" (click)="disconnect()">
-                  <lucide-icon [img]="LogOut" [size]="13" color="#EF4444" />
-                  ยกเลิกการเชื่อมต่อ
-                </button>
-              </div>
-
-            } @else {
-              <div class="spn-status spn-status--disconnected">
-                <div class="spn-status__icon spn-status__icon--off">
-                  <lucide-icon [img]="WifiOff" [size]="18" color="#9CA3AF" />
-                </div>
-                <div class="spn-status__body">
-                  <p class="spn-status__label spn-status__label--off">ยังไม่ได้เชื่อมต่อ</p>
-                  <p class="spn-status__desc">เชื่อมต่อเพื่อดึงข้อมูลใบขนสินค้าจาก ShippingNet โดยอัตโนมัติ</p>
-                </div>
-              </div>
-
-              @if (!showLoginForm()) {
-                <div class="spn-actions">
-                  <button class="spn-connect-btn" (click)="openLoginForm()">
-                    <lucide-icon [img]="Wifi" [size]="13" color="#fff" />
-                    เชื่อมต่อ ShippingNet
-                  </button>
-                </div>
-              } @else {
-                <div class="spn-login-form">
-                  <p class="spn-login-form__title">เข้าสู่ระบบ ShippingNet</p>
-                  <div class="spn-login-form__fields">
-                    <div class="spn-login-field">
-                      <label>ชื่อผู้ใช้ (Username)</label>
-                      <nz-input-group [nzPrefix]="userIcon" nzSize="default">
-                        <input nz-input placeholder="กรอก Username"
-                          [value]="loginUser()" (input)="loginUser.set($any($event.target).value)"
-                          [disabled]="loginLoading()" />
-                      </nz-input-group>
-                      <ng-template #userIcon><lucide-icon [img]="User" [size]="13" color="#AAAAAA" /></ng-template>
-                    </div>
-                    <div class="spn-login-field">
-                      <label>รหัสผ่าน (Password)</label>
-                      <nz-input-group [nzPrefix]="lockIcon" nzSize="default">
-                        <input nz-input type="password" placeholder="กรอก Password"
-                          [value]="loginPass()" (input)="loginPass.set($any($event.target).value)"
-                          [disabled]="loginLoading()"
-                          (keydown.enter)="doLogin()" />
-                      </nz-input-group>
-                      <ng-template #lockIcon><lucide-icon [img]="Lock" [size]="13" color="#AAAAAA" /></ng-template>
-                    </div>
-                  </div>
-                  @if (loginError()) {
-                    <p class="spn-login-error">{{ loginError() }}</p>
-                  }
-                  <div class="spn-login-form__actions">
-                    <button class="spn-cancel-btn" (click)="cancelLogin()" [disabled]="loginLoading()">ยกเลิก</button>
-                    <button class="spn-connect-btn" [disabled]="!loginValid() || loginLoading()" (click)="doLogin()">
-                      <lucide-icon [img]="Wifi" [size]="13" color="#fff" />
-                      {{ loginLoading() ? 'กำลังเชื่อมต่อ...' : 'เชื่อมต่อ' }}
-                    </button>
-                  </div>
-                </div>
-              }
-            }
-          </section>
-        }
 
         <!-- ── โปรไฟล์สำหรับส่งกรม ── -->
-        @if (accountTab() === 'profiles') {
-          <div class="profile-list">
-            @for (p of profiles(); track p.code) {
-              <div class="profile-card">
-                <div class="profile-card__avatar" [style.background]="p.color + '1c'" [style.color]="p.color">
-                  {{ p.code }}
-                </div>
-                <div class="profile-card__body">
-                  <p class="profile-card__name">{{ p.displayName }}</p>
-                  <p class="profile-card__meta">{{ p.username }}</p>
-                </div>
+        <div class="profile-list">
+          @for (p of profiles(); track p.code) {
+            <div class="profile-card">
+              <div class="profile-card__avatar" [style.background]="p.color + '1c'" [style.color]="p.color">
+                {{ p.code }}
               </div>
-            }
-          </div>
-
-          @if (!showCreateProfile()) {
-            <button class="create-profile-btn" (click)="openCreateProfile()">
-              <lucide-icon [img]="Plus" [size]="13" />
-              สร้างโปรไฟล์ใหม่
-            </button>
-          } @else {
-            <div class="spn-login-form create-profile-form">
-              <p class="spn-login-form__title">สร้างโปรไฟล์สำหรับส่งกรม</p>
-              <div class="spn-login-form__fields">
-                <div class="spn-login-field">
-                  <label>URL</label>
-                  <nz-input-group [nzPrefix]="urlIcon" nzSize="default">
-                    <input nz-input placeholder="เช่น spn.netbay.co.th"
-                      [value]="newProfileUrl()" (input)="newProfileUrl.set($any($event.target).value)" />
-                  </nz-input-group>
-                  <ng-template #urlIcon><lucide-icon [img]="Link" [size]="13" color="#AAAAAA" /></ng-template>
-                </div>
-                <div class="spn-login-field">
-                  <label>ชื่อผู้ใช้ (Username)</label>
-                  <nz-input-group [nzPrefix]="createUserIcon" nzSize="default">
-                    <input nz-input placeholder="กรอก Username"
-                      [value]="newProfileUser()" (input)="newProfileUser.set($any($event.target).value)" />
-                  </nz-input-group>
-                  <ng-template #createUserIcon><lucide-icon [img]="User" [size]="13" color="#AAAAAA" /></ng-template>
-                </div>
-                <div class="spn-login-field">
-                  <label>รหัสผ่าน (Password)</label>
-                  <nz-input-group [nzPrefix]="createLockIcon" nzSize="default">
-                    <input nz-input type="password" placeholder="กรอก Password"
-                      [value]="newProfilePass()" (input)="newProfilePass.set($any($event.target).value)"
-                      (keydown.enter)="saveNewProfile()" />
-                  </nz-input-group>
-                  <ng-template #createLockIcon><lucide-icon [img]="Lock" [size]="13" color="#AAAAAA" /></ng-template>
-                </div>
-              </div>
-              <div class="spn-login-form__actions">
-                <button class="spn-cancel-btn" (click)="cancelCreateProfile()">ยกเลิก</button>
-                <button class="spn-connect-btn" [disabled]="!newProfileValid()" (click)="saveNewProfile()">
-                  <lucide-icon [img]="Check" [size]="13" color="#fff" />
-                  บันทึกโปรไฟล์
-                </button>
+              <div class="profile-card__body">
+                <p class="profile-card__name">{{ p.displayName }}</p>
+                <p class="profile-card__meta">{{ p.username }}</p>
               </div>
             </div>
           }
-        }
+        </div>
 
+        @if (!showCreateProfile()) {
+          <button class="create-profile-btn" (click)="openCreateProfile()">
+            <lucide-icon [img]="Plus" [size]="13" />
+            สร้างโปรไฟล์ใหม่
+          </button>
+        } @else {
+          <div class="spn-login-form create-profile-form">
+            <p class="spn-login-form__title">สร้างโปรไฟล์สำหรับส่งกรม</p>
+            <div class="spn-login-form__fields">
+              <div class="spn-login-field">
+                <label>URL</label>
+                <nz-input-group [nzPrefix]="urlIcon" nzSize="default">
+                  <input nz-input placeholder="เช่น spn.netbay.co.th"
+                    [value]="newProfileUrl()" (input)="newProfileUrl.set($any($event.target).value)" />
+                </nz-input-group>
+                <ng-template #urlIcon><lucide-icon [img]="Link" [size]="13" color="#AAAAAA" /></ng-template>
+              </div>
+              <div class="spn-login-field">
+                <label>ชื่อผู้ใช้ (Username)</label>
+                <nz-input-group [nzPrefix]="createUserIcon" nzSize="default">
+                  <input nz-input placeholder="กรอก Username"
+                    [value]="newProfileUser()" (input)="newProfileUser.set($any($event.target).value)" />
+                </nz-input-group>
+                <ng-template #createUserIcon><lucide-icon [img]="User" [size]="13" color="#AAAAAA" /></ng-template>
+              </div>
+              <div class="spn-login-field">
+                <label>รหัสผ่าน (Password)</label>
+                <nz-input-group [nzPrefix]="createLockIcon" nzSize="default">
+                  <input nz-input type="password" placeholder="กรอก Password"
+                    [value]="newProfilePass()" (input)="newProfilePass.set($any($event.target).value)"
+                    (keydown.enter)="saveNewProfile()" />
+                </nz-input-group>
+                <ng-template #createLockIcon><lucide-icon [img]="Lock" [size]="13" color="#AAAAAA" /></ng-template>
+              </div>
+            </div>
+            <div class="spn-login-form__actions">
+              <button class="spn-cancel-btn" (click)="cancelCreateProfile()">ยกเลิก</button>
+              <button class="spn-connect-btn" [disabled]="!newProfileValid()" (click)="saveNewProfile()">
+                <lucide-icon [img]="Check" [size]="13" color="#fff" />
+                บันทึกโปรไฟล์
+              </button>
+            </div>
+          </div>
+        }
       }
 
       <!-- ════════ PRIVACY ════════ -->

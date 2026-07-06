@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   LucideAngularModule, ArrowLeft, Pencil, Check, ChevronDown,
-  Wifi, WifiOff, LogOut, User, Lock, SlidersHorizontal, UserCog, ShieldCheck, CreditCard,
+  User, Lock, SlidersHorizontal, UserCog, ShieldCheck, CreditCard,
   BarChart3, Plus, Package, FileText, Download, Receipt, FileCheck2, Wallet, Construction,
   TrendingUp, PieChart, Trophy, X, Link,
 } from 'lucide-angular';
@@ -13,7 +13,6 @@ import {
   NgApexchartsModule, ApexAxisChartSeries, ApexNonAxisChartSeries, ApexChart, ApexXAxis, ApexYAxis,
   ApexDataLabels, ApexFill, ApexGrid, ApexTooltip, ApexStroke, ApexPlotOptions, ApexLegend, ApexStates,
 } from 'ng-apexcharts';
-import { ChatService } from '@app/core/services/chat.service';
 import { MOCK_SPN_PROFILES, SpnProfile } from '@mock/spn-companies.mock';
 import { CURRENT_PLAN, PAYMENT_METHOD, MOCK_INVOICES, BILLING_ADDRESS, BillingAddress, PLAN_TIERS, PlanTier } from '@mock/subscription.mock';
 import { MOCK_USAGE, UsageMonth, monthTotal, monthPaidCount, monthFreeCount } from '@mock/usage.mock';
@@ -22,7 +21,6 @@ const CHART_FONT = 'IBM Plex Sans Thai, sans-serif';
 const AXIS_LABEL_STYLE = { colors: '#9CA3AF', fontSize: '11px', fontFamily: CHART_FONT };
 
 type SettingsSection = 'general' | 'account' | 'privacy' | 'billing' | 'usage';
-type AccountTab = 'connect' | 'profiles';
 type BillingTab = 'plan' | 'payment' | 'invoice';
 
 @Component({
@@ -34,7 +32,6 @@ type BillingTab = 'plan' | 'payment' | 'invoice';
   styleUrl: './settings-page.component.scss',
 })
 export class SettingsPageComponent {
-  readonly chat      = inject(ChatService);
   readonly router    = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
@@ -42,9 +39,6 @@ export class SettingsPageComponent {
   readonly Pencil       = Pencil;
   readonly Check        = Check;
   readonly ChevronDown  = ChevronDown;
-  readonly Wifi         = Wifi;
-  readonly WifiOff      = WifiOff;
-  readonly LogOut       = LogOut;
   readonly User         = User;
   readonly Lock         = Lock;
   readonly Link         = Link;
@@ -78,40 +72,6 @@ export class SettingsPageComponent {
   activeSection = signal<SettingsSection>(
     (this.route.snapshot.data['section'] as SettingsSection) ?? 'account'
   );
-
-  // ── Account tab ───────────────────────────────────────────────────────────
-  accountTab = signal<AccountTab>('connect');
-  readonly accountTabs: { id: AccountTab; label: string }[] = [
-    { id: 'connect',     label: 'เชื่อมต่อ ShippingNet' },
-    { id: 'profiles',    label: 'โปรไฟล์สำหรับส่งกรม' },
-  ];
-
-  // Login form state
-  showLoginForm = signal(false);
-  loginUser     = signal('');
-  loginPass     = signal('');
-  loginLoading  = signal(false);
-  loginError    = signal('');
-
-  readonly loginValid = () => this.loginUser().trim().length > 0 && this.loginPass().trim().length > 0;
-
-  openLoginForm(): void { this.showLoginForm.set(true); this.loginError.set(''); }
-  cancelLogin(): void   { this.showLoginForm.set(false); this.loginUser.set(''); this.loginPass.set(''); this.loginError.set(''); }
-
-  doLogin(): void {
-    if (!this.loginValid() || this.loginLoading()) return;
-    this.loginLoading.set(true);
-    this.loginError.set('');
-    setTimeout(() => {
-      this.loginLoading.set(false);
-      this.chat.isConnected.set(true);
-      this.chat.spnSession.set({ companyName: 'ShippingNet', url: 'spn.netbay.co.th', username: this.loginUser() });
-      this.showLoginForm.set(false);
-      this.loginUser.set(''); this.loginPass.set('');
-    }, 1200);
-  }
-
-  disconnect(): void { this.chat.disconnect(); }
 
   // ── Profiles for submitting to agencies ──────────────────────────────────
   profiles = signal<SpnProfile[]>([...MOCK_SPN_PROFILES]);

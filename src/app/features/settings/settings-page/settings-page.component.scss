@@ -376,53 +376,6 @@
   overflow: hidden;
 }
 
-.spn-status {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  padding: 16px 20px;
-  position: relative;
-
-  &--connected { background: rgba(13, 143, 97, 0.03); }
-
-  &__icon {
-    width: 44px; height: 44px;
-    border-radius: 12px;
-    background: rgba(13, 143, 97, 0.1);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-
-    &--off { background: #F3F4F6; }
-  }
-
-  &__body { flex: 1; min-width: 0; }
-
-  &__label {
-    font-size: 13px; font-weight: 700; color: #0D8F61; margin: 0;
-    &--off { color: #6B7280; }
-  }
-
-  &__company { font-size: 13px; font-weight: 600; color: #010136; margin: 4px 0 0; }
-  &__url     { font-size: 11px; color: #9CA3AF; margin: 2px 0 0; font-family: monospace; }
-  &__user    { font-size: 11px; color: #6B7280; margin: 2px 0 0; }
-  &__desc    { font-size: 12px; color: #9CA3AF; margin: 4px 0 0; line-height: 1.5; }
-
-  &__dot {
-    position: absolute;
-    top: 18px; right: 20px;
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: #0D8F61;
-    box-shadow: 0 0 0 3px rgba(13, 143, 97, 0.2);
-  }
-}
-
-.spn-actions {
-  padding: 12px 20px;
-  border-top: 1px solid #F0F1F5;
-  background: #FAFBFF;
-}
-
 .spn-connect-btn {
   display: inline-flex;
   align-items: center;
@@ -440,23 +393,6 @@
   transition: background 0.15s;
   &:hover { background: #034DBA; }
   &:disabled { opacity: 0.5; cursor: default; }
-}
-
-.spn-disconnect-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 7px 16px;
-  border-radius: 8px;
-  border: 1.5px solid rgba(239, 68, 68, 0.3);
-  background: rgba(239, 68, 68, 0.05);
-  color: #EF4444;
-  font-size: 12px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.14s;
-  &:hover { background: rgba(239, 68, 68, 0.1); border-color: #EF4444; }
 }
 
 // ── SPN Login / Create Profile Form ──────────────────────────────────────────
@@ -501,15 +437,6 @@
     font-weight: 600;
     color: #6B7280;
   }
-}
-
-.spn-login-error {
-  font-size: 12px;
-  color: #EF4444;
-  margin: 0;
-  padding: 7px 10px;
-  background: rgba(239,68,68,0.06);
-  border-radius: 6px;
 }
 
 .spn-cancel-btn {

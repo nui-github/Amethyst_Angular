@@ -388,10 +388,10 @@ activeSection: 'general' | 'account' | 'privacy' | 'billing' | 'usage'
 General   → placeholder empty-state (not built yet)
 Privacy   → placeholder empty-state (not built yet)
 
-Account   → sub-tabs (accountTab signal): 'connect' | 'profiles'
-  - connect:  เชื่อมต่อ ShippingNet (login form, same flow as before)
-  - profiles: โปรไฟล์สำหรับส่งกรม — list from MOCK_SPN_PROFILES + "สร้างโปรไฟล์ใหม่" inline form
-  (the old "ตั้งชื่อ SPN URL" sub-tab was removed entirely — UrlLabelService is now unused)
+Account   → no sub-tabs (the "เชื่อมต่อ ShippingNet" login sub-tab was removed entirely) — shows
+  โปรไฟล์สำหรับส่งกรม directly: list from MOCK_SPN_PROFILES + "สร้างโปรไฟล์ใหม่" inline form
+  (URL / Username / Password fields; profile code + display name are derived from the URL's hostname)
+  (the old "ตั้งชื่อ SPN URL" sub-tab was also removed earlier — UrlLabelService is unused)
 
 Billing   → sub-tabs (billingTab signal): 'plan' | 'payment' | 'invoice'
   - plan:    CURRENT_PLAN card with usage bar + feature list (subscription.mock.ts)
