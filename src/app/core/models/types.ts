@@ -275,9 +275,10 @@ export interface SPNEntry {
 
 export type AgencyKey = 'dld' | 'fda' | 'dft' | 'doa' | 'diw' | 'none';
 
+// Queue shipments only exist once a chat session has passed profile selection — which only
+// happens when a permit is actually required — so there is no "no_permit" queue status.
 export type ShipmentStatus =
   | 'needs_you'
-  | 'no_permit'
   | 'submitted';
 
 export interface ShipmentFlag {

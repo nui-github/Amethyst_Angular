@@ -21,7 +21,6 @@ export const AGENCY_SHORT: Record<AgencyKey, string> = {
 
 export const STATUS_META: Record<ShipmentStatus, { label: string; bg: string; text: string; dot: string }> = {
   needs_you: { label: 'รอดำเนินการ',        bg: '#FFFBEB', text: '#B45309', dot: '#F59E0B' },
-  no_permit: { label: 'ไม่ต้องขอใบอนุญาต', bg: '#F3F4F6', text: '#6B7280', dot: '#9CA3AF' },
   submitted:  { label: 'ยื่นแล้ว',           bg: '#ECFDF5', text: '#065F46', dot: '#10B981' },
 };
 
@@ -270,40 +269,56 @@ export const MOCK_QUEUE: Shipment[] = [
     ],
   },
 
-  // ── 5. no_permit: HPLC Column – ไม่ต้องขอใบอนุญาต ──────────────────────────
+  // ── 5. needs_you: Vitamin D3 Softgel – รอแนบเอกสารรายกรม ────────────────────
   {
     id: 'IMP-68-008928', customsNo: 'A012-25680617-00928', hthmRef: 'HTHM000000005',
     isNew: false, type: 'IMP',
-    goods: 'HPLC Column (คอลัมน์วิเคราะห์สำหรับห้องปฏิบัติการ)', hs: '9027.90.90',
-    customer: 'บริษัท เฮลท์ฟาร์มา จำกัด', contact: '',
-    contactEmail: '', origin: 'สหรัฐอเมริกา', importedAt: '08:02 น. วันนี้', owner: 'ปวีณา ส.',
-    agency: 'none', permitNeeded: false, formCode: '—',
-    formName: 'ผ่านพิธีการปกติ',
-    conf: 94, stage: 2, statusKey: 'no_permit',
-    assess: { conf: 94, reason: 'ไม่อยู่ในบัญชีสินค้าควบคุม' },
-    classify: { agency: 'none', conf: 94, reason: '', alt: [] },
+    goods: 'Vitamin D3 Softgel (สารสกัดวิตามินดี3 เข้มข้น)', hs: '2936.29.00',
+    customer: 'บริษัท เฮลท์ฟาร์มา จำกัด', contact: 'คุณสมหญิง วัฒนกุล',
+    contactEmail: 'somying@healthpharma.co.th', origin: 'สหรัฐอเมริกา', importedAt: '08:02 น. วันนี้', owner: 'ปวีณา ส.',
+    agency: 'fda', permitNeeded: true, formCode: 'RGoods',
+    formName: 'คำขออนุญาตนำเข้าวัตถุเสริมอาหาร — อย.',
+    conf: 94, stage: 4, statusKey: 'needs_you',
+    assess: { conf: 94, reason: 'วิตามินดี3 เข้มข้นวัตถุดิบเสริมอาหาร ต้องขออนุญาต อย.' },
+    classify: { agency: 'fda', conf: 94, reason: '', alt: [] },
     draft: { fields: [] },
     flags: [],
     audit: [
       { time: '08:02', text: 'เข้าระบบ', by: 'ระบบ' },
-      { time: '08:02', text: 'วิเคราะห์ HS Code: 9027.90.90 → ไม่ต้องขออนุญาต (94%)', by: 'AI' },
+      { time: '08:03', text: 'OCR สำเร็จ', by: 'AI' },
+      { time: '08:03', text: 'วิเคราะห์ HS Code: 2936.29.00 → อย. (94%)', by: 'AI' },
+      { time: '08:04', text: 'รอแนบเอกสารรายกรม', by: 'AI' },
     ],
     messages: [
-      bot('08:02', 'ใบขนสินค้า HTHM000000005 เข้าระบบแล้วครับ — HPLC Column จากสหรัฐอเมริกา'),
-      t('08:02', 'bot', 'hs-analysis', undefined, {
-        hsCode: '9027.90.90', goodsName: 'ส่วนประกอบเครื่องมือวิเคราะห์',
-        description: 'อุปกรณ์ห้องปฏิบัติการ — ไม่อยู่ในบัญชีสินค้าควบคุม ผ่านพิธีการปกติได้เลยครับ',
-        requiresPermit: false, direction: 'import', agency: 'none', agencyFull: '—', confidence: 94,
+      bot('08:02', 'ใบขนสินค้า HTHM000000005 เข้าระบบแล้วครับ — Vitamin D3 Softgel จากสหรัฐอเมริกา'),
+      t('08:03', 'bot', 'ocr-results', undefined, {
+        invoiceNo: 'US-2024-0802', invoiceDate: '28/05/2568', quantity: '400 กก.',
+        importer: 'บริษัท เฮลท์ฟาร์มา จำกัด', port: 'ท่าอากาศยานสุวรรณภูมิ',
+        hsCode: '2936.29.00', countryOrigin: 'สหรัฐอเมริกา', lotNo: 'VITD-US-0802', uNo: '',
       }),
-      bot('08:03', 'HS Code 9027.90.90 — ไม่ต้องขออนุญาตนำเข้า ความมั่นใจ 94% ครับ ผ่านพิธีการศุลกากรปกติได้เลย'),
+      t('08:03', 'bot', 'hs-analysis', undefined, {
+        hsCode: '2936.29.00', goodsName: 'Vitamin D3 (Cholecalciferol) เข้มข้น',
+        description: 'วิตามินดี3 เข้มข้นวัตถุดิบผลิตภัณฑ์เสริมอาหาร → ต้องขออนุญาตนำเข้าจาก อย.',
+        requiresPermit: true, direction: 'import', agency: 'อย.', agencyFull: 'สำนักงานคณะกรรมการอาหารและยา',
+        licenseType: 'RGoods', confidence: 94,
+      }),
+      t('08:04', 'bot', 'agency-upload', undefined, {
+        agency: 'fda', agencyLabel: 'อย.',
+        slots: [
+          { id: 's1', label: 'Certificate of Analysis (COA)', required: true },
+          { id: 's2', label: 'ใบรับรองแหล่งกำเนิดสินค้า (COO)', required: true },
+          { id: 's3', label: 'Specification Sheet', required: false },
+        ],
+      }),
     ],
     documents: [
       doc('d5a', 'Invoice US-2024-0802', 'invoice'),
       doc('d5b', 'Packing List', 'packing_list'),
     ],
-    itemsSelected: false,
+    itemsSelected: true,
     items: [
-      { id: 'i5', name: 'HPLC Column', hsCode: '9027.90.90', origin: 'สหรัฐอเมริกา', quantity: '4', unit: 'ชุด', lotNo: 'HPLC-US-0802', amount: 240000 },
+      { id: 'i5a', name: 'Vitamin D3 (Cholecalciferol) 100,000 IU/g', hsCode: '2936.29.00', origin: 'สหรัฐอเมริกา', quantity: '250', unit: 'กก.', lotNo: 'VITD-US-0802', amount: 312500 },
+      { id: 'i5b', name: 'Vitamin D3 Oil Suspension 20,000 IU/g', hsCode: '2936.29.00', origin: 'สหรัฐอเมริกา', quantity: '150', unit: 'กก.', lotNo: 'VITD-US-0803', amount: 165000 },
     ],
   },
 
@@ -513,42 +528,50 @@ export const MOCK_QUEUE: Shipment[] = [
     ],
   },
 
-  // ── 10. no_permit: Sodium Chloride – ไม่ต้องขออนุญาต ───────────────────────
+  // ── 10. submitted: Sodium Hypochlorite – ยื่น วอ. แล้ว ──────────────────────
   {
     id: 'IMP-68-010001', customsNo: 'A012-25680617-01000', hthmRef: 'HTHM000000010',
     isNew: false, type: 'IMP',
-    goods: 'Sodium Chloride (เกลือบริสุทธิ์ระดับอุตสาหกรรม)', hs: '2501.00.10',
+    goods: 'Sodium Hypochlorite 10% (คลอรีนน้ำสำหรับฆ่าเชื้อ)', hs: '2828.90.10',
     customer: 'บริษัท เคมีไทย จำกัด', contact: 'คุณวิชัย ประสพโชค',
     contactEmail: 'wichai@chemthai.co.th',
     origin: 'ออสเตรเลีย', importedAt: '10:00 น. เมื่อวาน', owner: 'ปวีณา ส.',
-    agency: 'none', permitNeeded: false, formCode: '',
-    formName: 'ผ่านพิธีการปกติ',
-    conf: 98, stage: 2, statusKey: 'no_permit',
-    assess: { conf: 98, reason: 'เกลือบริสุทธิ์อุตสาหกรรมไม่อยู่ในข่ายที่ต้องขออนุญาต' },
-    classify: { agency: 'none', conf: 98, reason: '', alt: [] },
+    agency: 'diw', permitNeeded: true, formCode: 'RGoods',
+    formName: 'ใบอนุญาตนำเข้าวัตถุอันตราย — วอ.',
+    conf: 98, stage: 7, statusKey: 'submitted',
+    assess: { conf: 98, reason: 'สารฟอกขาว/ฆ่าเชื้อความเข้มข้นสูง ต้องขออนุญาต วอ.' },
+    classify: { agency: 'diw', conf: 98, reason: '', alt: [] },
     draft: { fields: [] },
     flags: [],
     audit: [
       { time: '10:00', text: 'เข้าระบบ', by: 'ระบบ' },
       { time: '10:01', text: 'OCR สำเร็จ', by: 'AI' },
-      { time: '10:02', text: 'วิเคราะห์ HS Code: 2501.00.10 → ไม่ต้องขออนุญาต (98%)', by: 'AI' },
+      { time: '10:02', text: 'วิเคราะห์ HS Code: 2828.90.10 → วอ. (98%)', by: 'AI' },
+      { time: '10:10', text: 'ยืนยันฟอร์มแล้ว', by: 'ปวีณา ส.' },
+      { time: '10:15', text: 'ยื่นกรม วอ. สำเร็จ', by: 'ระบบ' },
     ],
     messages: [
-      bot('10:00', 'ใบขนสินค้า HTHM000000010 เข้าระบบแล้วครับ — Sodium Chloride จากออสเตรเลีย'),
+      bot('10:00', 'ใบขนสินค้า HTHM000000010 เข้าระบบแล้วครับ — Sodium Hypochlorite 10% จากออสเตรเลีย'),
       t('10:02', 'bot', 'hs-analysis', undefined, {
-        hsCode: '2501.00.10', goodsName: 'เกลือบริสุทธิ์อุตสาหกรรม',
-        description: 'เกลือบริสุทธิ์ระดับอุตสาหกรรม ไม่อยู่ในบัญชีสินค้าควบคุม ผ่านพิธีการปกติได้เลยครับ',
-        requiresPermit: false, direction: 'import', agency: 'none', agencyFull: '—', confidence: 98,
+        hsCode: '2828.90.10', goodsName: 'โซเดียมไฮโปคลอไรท์ (คลอรีนน้ำ)',
+        description: 'สารฟอกขาว/ฆ่าเชื้อความเข้มข้นสูง → ต้องขออนุญาตนำเข้าจาก วอ. (กรมโรงงานอุตสาหกรรม)',
+        requiresPermit: true, direction: 'import', agency: 'วอ.', agencyFull: 'กรมโรงงานอุตสาหกรรม',
+        licenseType: 'ใบอนุญาตวัตถุอันตราย', confidence: 98,
       }),
-      bot('10:02', 'HS Code 2501.00.10 — ไม่ต้องขออนุญาตนำเข้า ความมั่นใจ 98% ครับ'),
+      t('10:15', 'bot', 'status-card', undefined, {
+        refNo: 'RG-2568-10001', customsRef: 'HTHM000000010',
+        submittedAt: new Date(Date.now() - 86400000).toLocaleDateString('th-TH'), isPending: false,
+      }),
     ],
     documents: [
       doc('d10a', 'ใบขนสินค้าขาเข้า A012-25680617-01000', 'customs'),
       doc('d10b', 'Invoice AU-2024-1000', 'invoice'),
+      doc('d10c', 'MSDS — Sodium Hypochlorite 10%', 'other', 'pdf', 'diw'),
     ],
-    itemsSelected: false,
+    itemsSelected: true,
     items: [
-      { id: 'i10', name: 'Sodium Chloride (เกลือบริสุทธิ์)', hsCode: '2501.00.10', origin: 'ออสเตรเลีย', quantity: '2,000', unit: 'กก.', lotNo: 'NACL-AU-1000', amount: 60000 },
+      { id: 'i10', name: 'Sodium Hypochlorite 10% Solution', hsCode: '2828.90.10', origin: 'ออสเตรเลีย', quantity: '2,000', unit: 'กก.', lotNo: 'NACL-AU-1000', amount: 60000,
+        detail: { nameTh: 'โซเดียมไฮโปคลอไรท์ 10% สารละลายสำหรับฆ่าเชื้อ', netWeight: '2,000', manufacturerName: 'AusChem Industries Pty Ltd.', mfgDate: '01-05-2568', expDate: '01-11-2568', remarks: 'ยื่นกรม วอ. เรียบร้อยแล้ว' } },
     ],
   },
 

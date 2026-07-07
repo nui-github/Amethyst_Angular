@@ -1161,7 +1161,7 @@ export class ChatService {
     // Restore step from statusKey so send() context is correct
     const stepMap: Record<string, import('@app/core/models/types').ChatStep> = {
       needs_you: 'preview',
-      submitted: 'done', no_permit: 'done',
+      submitted: 'done',
     };
     this.step.set((stepMap[ship.statusKey] as import('@app/core/models/types').ChatStep) ?? 'idle');
   }

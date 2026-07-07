@@ -16,7 +16,7 @@ import { ChatMessage, Shipment, ShipmentStatus, ShipmentItem, ITEM_MANUAL_DETAIL
 
 export { STATUS_META, AGENCY_SHORT };
 
-type TabValue = 'all' | 'needs_you' | 'no_permit' | 'submitted';
+type TabValue = 'all' | 'needs_you' | 'submitted';
 
 const STAGE_LABELS = ['','ตรวจรับใบขน','วิเคราะห์ HS','จัดประเภท','แนบเอกสาร','ตรวจ flag','ยืนยันร่าง','ยื่นกรม'];
 
@@ -50,14 +50,12 @@ export class QueuePageComponent {
   readonly tabs = [
     { label: 'ทั้งหมด',          value: 'all'       as TabValue },
     { label: 'รอดำเนินการ',      value: 'needs_you' as TabValue },
-    { label: 'ไม่ต้องขอ',        value: 'no_permit' as TabValue },
     { label: 'ยื่นแล้ว',         value: 'submitted' as TabValue },
   ];
 
   readonly statCards = [
-    { key: 'needs_you' as ShipmentStatus, label: 'รอดำเนินการ',       dot: '#F59E0B', iconBg: '#FFFBEB' },
-    { key: 'no_permit' as ShipmentStatus, label: 'ไม่ต้องขอใบอนุญาต', dot: '#9CA3AF', iconBg: '#F3F4F6' },
-    { key: 'submitted' as ShipmentStatus, label: 'ยื่นกรมแล้ว',       dot: '#10B981', iconBg: '#ECFDF5' },
+    { key: 'needs_you' as ShipmentStatus, label: 'รอดำเนินการ', dot: '#F59E0B', iconBg: '#FFFBEB' },
+    { key: 'submitted' as ShipmentStatus, label: 'ยื่นกรมแล้ว', dot: '#10B981', iconBg: '#ECFDF5' },
   ];
 
   readonly filteredQueue = computed(() => {
@@ -115,7 +113,7 @@ export class QueuePageComponent {
   resolvedFlags(ship: Shipment)   { return ship.flags.filter(f => f.resolved); }
 
   canProceed(ship: Shipment): boolean {
-    return ship.statusKey !== 'submitted' && ship.statusKey !== 'no_permit';
+    return ship.statusKey !== 'submitted';
   }
 
   toggleSidebar(): void { this.collapsed.update(v => !v); }

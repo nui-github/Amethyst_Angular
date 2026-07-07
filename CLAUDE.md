@@ -274,8 +274,12 @@ Agency fee config (payment.mock.ts):
 `idle` → `upload` / `not_found` → `ocr` → `form` → `preview` → `done`
 
 ### Queue Shipment lifecycle
-`needs_you` → `submitted`  
-`no_permit` = ไม่ต้องขอใบอนุญาต (AI วิเคราะห์ HS Code แล้วผ่านพิธีการปกติ)  
+`needs_you` → `submitted`
+No `no_permit` status exists — a shipment only gets saved into the queue at the point the chat
+session reaches profile selection, which only happens once the AI has already determined a permit
+IS required (see product-hs-analysis.mock.ts/hs-analysis.mock.ts for the "ไม่ต้องขออนุญาต" outcome,
+which ends the chat flow before ever reaching queue-save). So `permitNeeded` is always `true` for
+every shipment in `MOCK_QUEUE`.
 `email_outbox` / `await_customer` ถูกตัดออกจาก flow แล้ว (ไม่ใช้)
 
 ### Queue → Chatbot session handoff
@@ -285,7 +289,7 @@ QueuePage.selectRow(id)
   → router.navigate(['/'])        ← opens chatbot page with that session
 
 loadQueueSession(ship):
-  - statusKey 'submitted' | 'no_permit' → all messages sealed read-only (nothing left to do)
+  - statusKey 'submitted'   → all messages sealed read-only (nothing left to do)
   - statusKey 'needs_you'              → all messages sealed EXCEPT the last one, which stays
                                           interactive so the user can continue the flow
                                           (e.g. confirm a flag-card, proceed a form-preview)
@@ -363,8 +367,8 @@ Add to `mainItems` array in `sidebar.component.ts`
   - `needs_you` rows have amber left accent bar + amber background tint
   - Table uses `#queueTable` reference + iterates `queueTable.data` (not `filteredQueue()`) to respect client-side pagination
   - `pageSize = signal(10)` / `pageIndex = signal(1)` in component — bound as `[nzPageSize]="pageSize()"` with `(nzPageSizeChange)="pageSize.set($event)"`
-- **KPI cards** (3 อัน): รอดำเนินการ (amber) · ไม่ต้องขอใบอนุญาต (gray) · ยื่นกรมแล้ว (green) — clickable to filter
-- **Tabs** (4 อัน): ทั้งหมด · รอดำเนินการ · ไม่ต้องขอ · ยื่นแล้ว — pill-style
+- **KPI cards** (2 อัน): รอดำเนินการ (amber) · ยื่นกรมแล้ว (green) — clickable to filter
+- **Tabs** (3 อัน): ทั้งหมด · รอดำเนินการ · ยื่นแล้ว — pill-style
 - **Background**: `#EDEEF4` page bg, `16px` outer padding
 - **Detail**: clicking any row opens inline detail panel (right side of same page)
   - Left column: AI assess card (HS Code pill + reason) · AI classify card · Audit trail
@@ -373,7 +377,7 @@ Add to `mainItems` array in `sidebar.component.ts`
     button opening a read-only modal split into OCR-derived fields + ItemManualDetail fields captured
     during the request, same field set as the chat's form-preview item modal) · Uploaded documents card
     · Submission result card (submitted only)
-  - Footer: "ไปยืนยันในแชท" (needs_you) / "เสร็จสิ้นแล้ว" (submitted/no_permit)
+  - Footer: "ไปยืนยันในแชท" (needs_you) / "เสร็จสิ้นแล้ว" (submitted)
 - **Stage labels** (7 stages): ตรวจรับใบขน → วิเคราะห์ HS → จัดประเภท → แนบเอกสาร → ตรวจ flag → ยืนยันร่าง → ยื่นกรม
 - Mock data: 12 shipments in `queue.mock.ts` (enough for 2 pages at 10/page)
 
