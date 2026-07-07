@@ -245,17 +245,17 @@
 .ih-item {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   font-size: 11.5px;
-  padding: 7px 0;
+  padding: 8px 0;
   border-bottom: 1px solid #F5F6FA;
 
   &:last-child { border-bottom: none; }
 
-  &--mismatch {
-    background: rgba(180, 83, 9, 0.04);
+  &--editing {
+    background: rgba(4, 99, 239, 0.03);
     margin: 0 -14px;
-    padding: 7px 14px;
+    padding: 8px 14px;
     border-radius: 8px;
   }
 }
@@ -269,7 +269,41 @@
 .ih-item__name {
   font-weight: 600;
   color: var(--bizx-navy);
+  flex: 1;
+  min-width: 0;
+}
+
+.ih-item__edited-badge {
   flex-shrink: 0;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #0463EF;
+  background: rgba(4, 99, 239, 0.1);
+  padding: 2px 7px;
+  border-radius: 20px;
+}
+
+.ih-item__edit-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  border: none;
+  background: transparent;
+  color: var(--bizx-n400);
+  font-family: inherit;
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 4px;
+
+  &:hover { color: #0463EF; }
+}
+
+.ih-item__codes-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .ih-item__codes {
@@ -278,78 +312,92 @@
   flex: 1;
 }
 
+.ih-item__duty {
+  color: var(--bizx-n500);
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
 .ih-item__conf {
   color: var(--bizx-n400);
   font-size: 10px;
   flex-shrink: 0;
 }
 
-// ── HS Code mismatch resolution ──────────────────────────────────────────────
-.ih-item__mismatch {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.ih-item__mismatch-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  width: fit-content;
-  padding: 3px 9px;
-  border-radius: 20px;
-  background: rgba(180, 83, 9, 0.12);
-  color: #B45309;
+.ih-item__reason {
   font-size: 10.5px;
-  font-weight: 700;
+  color: var(--bizx-n400);
+  line-height: 1.5;
+  margin: 0;
 }
 
-.ih-item__mismatch-resolved {
-  font-size: 11px;
-  font-weight: 600;
-  color: #0D8F61;
-}
-
-.ih-item__mismatch-options {
+// ── HS Code candidate picker (manual re-classification) ─────────────────────
+.ih-item__candidates {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-
-  @media (min-width: 480px) {
-    flex-direction: row;
-  }
-}
-
-.ih-mismatch-opt {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  padding: 7px 10px;
+  gap: 5px;
+  margin-top: 4px;
+  padding: 10px;
+  background: #fff;
+  border: 1.5px solid #E5E7EB;
   border-radius: 9px;
+}
+
+.ih-item__candidates-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--bizx-n500);
+  margin: 0 0 2px;
+}
+
+.ih-candidate {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 9px;
+  border-radius: 8px;
   border: 1.5px solid #E5E7EB;
   background: #fff;
   font-family: inherit;
-  font-size: 11.5px;
-  font-weight: 700;
-  color: var(--bizx-navy);
   cursor: pointer;
   text-align: left;
   transition: all 0.12s;
 
-  &:hover { border-color: #B45309; background: rgba(180, 83, 9, 0.05); }
+  &:hover { border-color: #0463EF; background: rgba(4, 99, 239, 0.04); }
 
   &--active {
     border-color: #0D8F61;
     background: rgba(13, 143, 97, 0.08);
-    color: #0D8F61;
   }
 
-  &__hint {
-    font-size: 9.5px;
-    font-weight: 500;
+  &__main {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+  }
+
+  &__hs {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--bizx-navy);
+  }
+
+  &__desc {
+    font-size: 10px;
     color: var(--bizx-n400);
+  }
+
+  &__meta {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1px;
+    font-size: 10px;
+    color: var(--bizx-n500);
+    font-weight: 600;
   }
 }
 

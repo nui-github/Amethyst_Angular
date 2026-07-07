@@ -42,6 +42,17 @@ export interface InvoiceItemsData {
   selectedIds?: string[]; // set once confirmed (isReadOnly display)
 }
 
+// One alternative HS Code suggestion offered when the user edits an item's classification —
+// invoices from real users typically carry no HS Code at all, so AI classifies purely from the
+// product description and offers a shortlist of plausible codes to choose from instead.
+export interface HsCandidate {
+  hsCode: string;
+  tariffCode: string;
+  description: string;   // short description of what this HS heading covers
+  dutyRate: number;       // import duty rate, %
+  confidence: number;
+}
+
 // รายการวิเคราะห์รายสินค้า: product description → HS Code → Smart Tariff → กรมที่ต้องยื่น
 export interface ProductHsAnalysis {
   id: string;
@@ -53,11 +64,10 @@ export interface ProductHsAnalysis {
   agencyFull: string;
   licenseType?: string;
   confidence: number;
-  invoiceHsCode?: string;  // HS Code as declared on the invoice, when it differs from `hsCode` (AI's
-                           // classification from the product description) — set only when hsMismatch is true
-  hsMismatch?: boolean;    // true when AI's HS Code (from product description) disagrees with the invoice's
-                           // declared HS Code; user must pick which one to file under before confirming
-  hsResolution?: 'ai' | 'invoice'; // which HS Code the user chose to use; unset until resolved
+  reason: string;         // เหตุผลที่ AI จัดพิกัดนี้ให้ จาก product description
+  dutyRate: number;       // อัตราภาษีนำเข้า, %
+  candidates?: HsCandidate[]; // ตัวเลือกพิกัด HS Code อื่นๆ (สูงสุด 5 รายการ) สำหรับให้ user แก้ไขเลือกเอง
+  manuallyEdited?: boolean;   // true เมื่อ user เลือกพิกัดอื่นแทนที่ AI แนะนำ
 }
 
 export interface ItemHsAnalysisData {

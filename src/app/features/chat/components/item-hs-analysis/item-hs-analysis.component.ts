@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, Search, Check, ArrowDown, Percent, ShieldCheck, Sprout, PackageCheck, Radiation, AlertTriangle } from 'lucide-angular';
-import { ItemHsAnalysisData, ProductHsAnalysis } from '@app/core/models/types';
+import { LucideAngularModule, Search, Check, ArrowDown, Percent, ShieldCheck, Sprout, PackageCheck, Radiation, Pencil, X } from 'lucide-angular';
+import { HsCandidate, ItemHsAnalysisData, ProductHsAnalysis } from '@app/core/models/types';
 import { getAgencyPayment } from '@mock/payment.mock';
 
 interface AgencySummaryRow {
@@ -46,17 +46,18 @@ export class ItemHsAnalysisComponent implements OnInit {
   readonly Sprout = Sprout;
   readonly PackageCheck = PackageCheck;
   readonly Radiation = Radiation;
-  readonly AlertTriangle = AlertTriangle;
+  readonly Pencil = Pencil;
+  readonly X = X;
 
   groups: AgencyGroup[] = [];
   confirmedGroups = signal<Record<string, boolean>>({});
-  hsResolutions = signal<Record<string, 'ai' | 'invoice'>>({});
+  overrides = signal<Record<string, HsCandidate>>({});
+  editingItemId = signal<string | null>(null);
   proceeded = signal(false);
 
   // Summary of the AI's own analysis
   requiresAnyPermit = false;
   agencySummary: AgencySummaryRow[] = [];
-  totalFee = 0;
   avgConfidence = 0;
 
   ngOnInit(): void {
@@ -74,12 +75,6 @@ export class ItemHsAnalysisComponent implements OnInit {
     this.confirmedGroups.set(init);
     this.proceeded.set(!!this.data.reviewed);
 
-    const resInit: Record<string, 'ai' | 'invoice'> = {};
-    for (const item of this.data.items) {
-      if (item.hsResolution) resInit[item.id] = item.hsResolution;
-    }
-    this.hsResolutions.set(resInit);
-
     this.requiresAnyPermit = this.data.items.some(i => i.requiresPermit);
     const map = new Map<string, { full: string; count: number; licenseTypes: Set<string> }>();
     for (const item of this.data.items) {
@@ -93,34 +88,41 @@ export class ItemHsAnalysisComponent implements OnInit {
       const pay = getAgencyPayment(code);
       return { code, full: v.full, count: v.count, requiresFee: pay.requiresFee, amount: pay.amount, licenseTypes: Array.from(v.licenseTypes) };
     });
-    this.totalFee = this.agencySummary.reduce((sum, a) => sum + (a.requiresFee ? a.amount : 0), 0);
     this.avgConfidence = Math.round(this.data.items.reduce((sum, i) => sum + i.confidence, 0) / this.data.items.length);
   }
 
   isGroupConfirmed(key: string): boolean { return this.confirmedGroups()[key]; }
   groupStyle(key: string) { return GROUP_STYLE[key] ?? GROUP_STYLE['—']; }
 
-  isHsResolved(item: ProductHsAnalysis): boolean {
-    return !item.hsMismatch || !!this.hsResolutions()[item.id];
+  /** Effective HS Code/tariff/duty/confidence for display — reflects any in-progress edit. */
+  displayHs(item: ProductHsAnalysis): { hsCode: string; tariffCode: string; dutyRate: number; confidence: number } {
+    const c = this.overrides()[item.id];
+    return c
+      ? { hsCode: c.hsCode, tariffCode: c.tariffCode, dutyRate: c.dutyRate, confidence: c.confidence }
+      : { hsCode: item.hsCode, tariffCode: item.tariffCode, dutyRate: item.dutyRate, confidence: item.confidence };
   }
 
-  hsResolutionOf(item: ProductHsAnalysis): 'ai' | 'invoice' | undefined {
-    return this.hsResolutions()[item.id];
+  isManuallyEdited(item: ProductHsAnalysis): boolean {
+    return !!this.overrides()[item.id] || !!item.manuallyEdited;
   }
 
-  resolveHsMismatch(itemId: string, choice: 'ai' | 'invoice'): void {
+  canEditItem(group: AgencyGroup): boolean {
+    return !this.proceeded() && !this.isGroupConfirmed(group.key);
+  }
+
+  toggleEdit(itemId: string, group: AgencyGroup): void {
+    if (!this.canEditItem(group)) return;
+    this.editingItemId.update(cur => (cur === itemId ? null : itemId));
+  }
+
+  selectCandidate(item: ProductHsAnalysis, candidate: HsCandidate): void {
     if (this.proceeded()) return;
-    this.hsResolutions.update(s => ({ ...s, [itemId]: choice }));
-  }
-
-  groupHasUnresolvedMismatch(group: AgencyGroup): boolean {
-    return group.items.some(i => !this.isHsResolved(i));
+    this.overrides.update(o => ({ ...o, [item.id]: candidate }));
+    this.editingItemId.set(null);
   }
 
   confirmGroup(key: string): void {
     if (this.proceeded() || this.isGroupConfirmed(key)) return;
-    const group = this.groups.find(g => g.key === key);
-    if (group && this.groupHasUnresolvedMismatch(group)) return;
     this.confirmedGroups.update(s => ({ ...s, [key]: true }));
   }
 
@@ -130,11 +132,11 @@ export class ItemHsAnalysisComponent implements OnInit {
   proceed(): void {
     if (this.proceeded() || !this.allDecided()) return;
     this.proceeded.set(true);
-    const resolutions = this.hsResolutions();
+    const overrides = this.overrides();
     const resolved = this.data.items.map(item => {
-      if (!item.hsMismatch) return item;
-      const choice = resolutions[item.id] ?? 'ai';
-      return { ...item, hsResolution: choice, hsCode: choice === 'invoice' ? (item.invoiceHsCode ?? item.hsCode) : item.hsCode };
+      const c = overrides[item.id];
+      if (!c) return item;
+      return { ...item, hsCode: c.hsCode, tariffCode: c.tariffCode, dutyRate: c.dutyRate, confidence: c.confidence, manuallyEdited: true };
     });
     this.confirmed.emit(resolved);
   }

@@ -63,14 +63,17 @@ ChatMessage.type → @switch in ChatAreaComponent
                             getProductHsAnalysis() in product-hs-analysis.mock.ts — this is intentional so the
                             AI-analysis box always matches the invoice OCR box's item count/content, regardless
                             of which flow led there; per-product HS Code → Smart Tariff → agency, grouped by
-                            resulting agency (อย./กษ./ไม่ต้องขอใบอนุญาต); each group card shows its item list
-                            directly + one "ยืนยันกลุ่มนี้ถูกต้อง" button; items may also carry
-                            hsMismatch/invoiceHsCode (types.ts) — when the invoice's declared HS Code
-                            disagrees with the AI's classification from the product description, that row
-                            shows an amber mismatch badge + two picker buttons ("ใช้รหัสจาก AI" /
-                            "ใช้รหัสจาก Invoice"); the group's confirm button stays disabled until every
-                            mismatched item in it is resolved — see hsResolutions/resolveHsMismatch() in
-                            ItemHsAnalysisComponent; all groups must be confirmed before "ดำเนินการต่อ")
+                            resulting agency, INCLUDING a "ไม่ต้องขอใบอนุญาต" group (agency: '—') for items
+                            AI determines don't need any permit — each group card shows its item list
+                            directly + one "ยืนยันกลุ่มนี้ถูกต้อง" button that confirms every item in that
+                            group at once; every item shows its own `reason` (why AI chose that HS heading),
+                            `dutyRate` (import duty %), and AI confidence — real invoices from users carry no
+                            HS Code at all, so there is no invoice-vs-AI comparison, only AI-vs-user; each item
+                            has a "แก้ไข" button revealing up to 5 `candidates` (types.ts HsCandidate — HS
+                            Code/tariff/description/dutyRate/confidence) for the user to manually re-classify
+                            that single item (picking a candidate immediately updates the row and tags it
+                            "แก้ไขแล้ว" via ProductHsAnalysis.manuallyEdited); editing is only available before
+                            that item's group is confirmed; all groups must be confirmed before "ดำเนินการต่อ")
   'form'               → FormPanelComponent
   'full-upload'        → FullUploadComponent
   'single-upload'      → SingleUploadComponent
@@ -134,9 +137,12 @@ src/
 │   │   │   │                            and historical hs-analysis message replay; NOT used by item-hs-analysis
 │   │   │   ├── product-hs-analysis.mock.ts ← getProductHsAnalysis() — the single shared item-hs-analysis
 │   │   │   │                            dataset for ALL flows (invoice/SPN/customs); mirrors the invoice-ocr
-│   │   │   │                            mock's 6 line items (medical devices) — 4 → อย. เครื่องมือแพทย์,
+│   │   │   │                            mock's 6 line items (medical devices/accessories) — 3 → อย. เครื่องมือแพทย์,
 │   │   │   │                            2 gamma-sterilized items → ปส. (สำนักงานปรมาณูเพื่อสันติภาพ), so every
 │   │   │   │                            flow reaches the 2nd-agency "ขอใบอนุญาตเพิ่ม" (next-agency LPI) step;
+│   │   │   │                            1 item → ไม่ต้องขอใบอนุญาต (agency '—', a packaging accessory) to
+│   │   │   │                            demo that group in item-hs-analysis; each item also carries reason/
+│   │   │   │                            dutyRate/candidates (types.ts HsCandidate) for the per-item edit UI;
 │   │   │   │                            also exports mapToInvoiceLineItems() — converts confirmed
 │   │   │   │                            item-hs-analysis rows into InvoiceLineItem shape for the
 │   │   │   │                            customs/SPN item-selection step (see showAgencyItemsSelection())
@@ -440,7 +446,8 @@ Replace in `src/app/core/mock/`:
 - `hs-analysis.mock.ts` → `analyzeHsCode()` → supports `agencies[]` for multi-agency HS codes (legacy path only)
 - `product-hs-analysis.mock.ts` → `getProductHsAnalysis()` → per-product HS Code → Smart Tariff → agency lookup;
   shared across invoice/SPN/customs paths, so the real endpoint should return the same per-item breakdown
-  regardless of entry flow
+  regardless of entry flow; response should include `reason`, `dutyRate`, and up to 5 `candidates`
+  (alternative HS Code suggestions) per item so item-hs-analysis's per-item edit UI works
 - `invoice-items.mock.ts` → `getInvoiceLineItems(invoiceNo)` → line items for the invoice-items selection step
 - `agency-docs.mock.ts` → `getAgencyDocs(agency)` → required docs + manualFields per agency
 - `payment.mock.ts` → `getAgencyPayment(agency)` → `{ requiresFee, amount }` per agency
