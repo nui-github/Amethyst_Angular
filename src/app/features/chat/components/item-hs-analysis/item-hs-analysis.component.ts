@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, Search, Check, ArrowDown, Percent, ShieldCheck, Sprout, PackageCheck, Radiation } from 'lucide-angular';
+import { LucideAngularModule, Search, Check, ArrowDown, Percent, ShieldCheck, Sprout, PackageCheck, Radiation, AlertTriangle } from 'lucide-angular';
 import { ItemHsAnalysisData, ProductHsAnalysis } from '@app/core/models/types';
 import { getAgencyPayment } from '@mock/payment.mock';
 
@@ -46,9 +46,11 @@ export class ItemHsAnalysisComponent implements OnInit {
   readonly Sprout = Sprout;
   readonly PackageCheck = PackageCheck;
   readonly Radiation = Radiation;
+  readonly AlertTriangle = AlertTriangle;
 
   groups: AgencyGroup[] = [];
   confirmedGroups = signal<Record<string, boolean>>({});
+  hsResolutions = signal<Record<string, 'ai' | 'invoice'>>({});
   proceeded = signal(false);
 
   // Summary of the AI's own analysis
@@ -72,6 +74,12 @@ export class ItemHsAnalysisComponent implements OnInit {
     this.confirmedGroups.set(init);
     this.proceeded.set(!!this.data.reviewed);
 
+    const resInit: Record<string, 'ai' | 'invoice'> = {};
+    for (const item of this.data.items) {
+      if (item.hsResolution) resInit[item.id] = item.hsResolution;
+    }
+    this.hsResolutions.set(resInit);
+
     this.requiresAnyPermit = this.data.items.some(i => i.requiresPermit);
     const map = new Map<string, { full: string; count: number; licenseTypes: Set<string> }>();
     for (const item of this.data.items) {
@@ -92,8 +100,27 @@ export class ItemHsAnalysisComponent implements OnInit {
   isGroupConfirmed(key: string): boolean { return this.confirmedGroups()[key]; }
   groupStyle(key: string) { return GROUP_STYLE[key] ?? GROUP_STYLE['—']; }
 
+  isHsResolved(item: ProductHsAnalysis): boolean {
+    return !item.hsMismatch || !!this.hsResolutions()[item.id];
+  }
+
+  hsResolutionOf(item: ProductHsAnalysis): 'ai' | 'invoice' | undefined {
+    return this.hsResolutions()[item.id];
+  }
+
+  resolveHsMismatch(itemId: string, choice: 'ai' | 'invoice'): void {
+    if (this.proceeded()) return;
+    this.hsResolutions.update(s => ({ ...s, [itemId]: choice }));
+  }
+
+  groupHasUnresolvedMismatch(group: AgencyGroup): boolean {
+    return group.items.some(i => !this.isHsResolved(i));
+  }
+
   confirmGroup(key: string): void {
     if (this.proceeded() || this.isGroupConfirmed(key)) return;
+    const group = this.groups.find(g => g.key === key);
+    if (group && this.groupHasUnresolvedMismatch(group)) return;
     this.confirmedGroups.update(s => ({ ...s, [key]: true }));
   }
 
@@ -103,6 +130,12 @@ export class ItemHsAnalysisComponent implements OnInit {
   proceed(): void {
     if (this.proceeded() || !this.allDecided()) return;
     this.proceeded.set(true);
-    this.confirmed.emit(this.data.items);
+    const resolutions = this.hsResolutions();
+    const resolved = this.data.items.map(item => {
+      if (!item.hsMismatch) return item;
+      const choice = resolutions[item.id] ?? 'ai';
+      return { ...item, hsResolution: choice, hsCode: choice === 'invoice' ? (item.invoiceHsCode ?? item.hsCode) : item.hsCode };
+    });
+    this.confirmed.emit(resolved);
   }
 }

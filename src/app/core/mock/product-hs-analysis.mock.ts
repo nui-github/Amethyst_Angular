@@ -9,11 +9,17 @@ import { ProductHsAnalysis, InvoiceLineItem } from '@app/core/models/types';
 // clearance — this intentionally gives the flow 2 agencies so the "ขอใบอนุญาตเพิ่ม" (next-agency LPI)
 // step is reachable from every flow (invoice, SPN, customs).
 // Used as the single shared dataset for item-hs-analysis across every flow.
+//
+// p4 (Balloon Catheter) demonstrates the invoice/AI HS Code mismatch usecase: the product
+// description is correct, but the invoice's own declared HS Code (invoiceHsCode) disagrees with
+// what the AI classifies from that description (hsCode) — the user must pick which one to file
+// under before confirming the อย. group (see ItemHsAnalysisComponent's hsResolutions).
 const PRODUCT_HS_ANALYSIS: ProductHsAnalysis[] = [
   { id: 'p1', name: 'Stent Graft (ETBF2313C145EE)',       hsCode: '9021.39.00', tariffCode: '9021.39.00.001', requiresPermit: true, agency: 'ปส.', agencyFull: 'สำนักงานปรมาณูเพื่อสันติภาพ', licenseType: 'ผ่านการฆ่าเชื้อด้วยรังสีแกมมา', confidence: 95 },
   { id: 'p2', name: 'Coronary Stent (TRCR30015X)',        hsCode: '9018.90.90', tariffCode: '9018.90.90.002', requiresPermit: true, agency: 'อย.', agencyFull: 'สำนักงานคณะกรรมการอาหารและยา', licenseType: 'เครื่องมือแพทย์', confidence: 93 },
   { id: 'p3', name: 'Introducer Sheath (SENSH1628W)',     hsCode: '9018.39.90', tariffCode: '9018.39.90.003', requiresPermit: true, agency: 'ปส.', agencyFull: 'สำนักงานปรมาณูเพื่อสันติภาพ', licenseType: 'ผ่านการฆ่าเชื้อด้วยรังสีแกมมา', confidence: 91 },
-  { id: 'p4', name: 'Balloon Catheter (SPL20015X)',       hsCode: '9018.39.90', tariffCode: '9018.39.90.004', requiresPermit: true, agency: 'อย.', agencyFull: 'สำนักงานคณะกรรมการอาหารและยา', licenseType: 'เครื่องมือแพทย์', confidence: 90 },
+  { id: 'p4', name: 'Balloon Catheter (SPL20015X)',       hsCode: '9018.39.90', tariffCode: '9018.39.90.004', requiresPermit: true, agency: 'อย.', agencyFull: 'สำนักงานคณะกรรมการอาหารและยา', licenseType: 'เครื่องมือแพทย์', confidence: 90,
+    invoiceHsCode: '9021.10.00', hsMismatch: true },
   { id: 'p5', name: 'Drug-Coated Balloon (SBI06012013P)', hsCode: '9018.39.90', tariffCode: '9018.39.90.005', requiresPermit: true, agency: 'อย.', agencyFull: 'สำนักงานคณะกรรมการอาหารและยา', licenseType: 'เครื่องมือแพทย์', confidence: 94 },
   { id: 'p6', name: 'Balloon Catheter (SPL30020X)',       hsCode: '9018.39.90', tariffCode: '9018.39.90.006', requiresPermit: true, agency: 'อย.', agencyFull: 'สำนักงานคณะกรรมการอาหารและยา', licenseType: 'เครื่องมือแพทย์', confidence: 89 },
 ];

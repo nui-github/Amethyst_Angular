@@ -80,16 +80,49 @@
 
         <div class="ih-group__items">
           @for (item of group.items; track item.id) {
-            <div class="ih-item">
-              <span class="ih-item__name">{{ item.name }}</span>
-              <span class="ih-item__codes">HS {{ item.hsCode }} · พิกัด {{ item.tariffCode }}</span>
-              <span class="ih-item__conf">AI {{ item.confidence }}%</span>
+            <div class="ih-item" [class.ih-item--mismatch]="item.hsMismatch && !isHsResolved(item)">
+              <div class="ih-item__row">
+                <span class="ih-item__name">{{ item.name }}</span>
+                @if (!item.hsMismatch) {
+                  <span class="ih-item__codes">HS {{ item.hsCode }} · พิกัด {{ item.tariffCode }}</span>
+                  <span class="ih-item__conf">AI {{ item.confidence }}%</span>
+                }
+              </div>
+
+              @if (item.hsMismatch) {
+                <div class="ih-item__mismatch">
+                  <span class="ih-item__mismatch-badge">
+                    <lucide-icon [img]="AlertTriangle" [size]="11" />
+                    HS Code ใน Invoice ไม่ตรงกับ Product Description
+                  </span>
+
+                  @if (isGroupConfirmed(group.key) || proceeded()) {
+                    <span class="ih-item__mismatch-resolved">
+                      ใช้รหัส: {{ hsResolutionOf(item) === 'invoice' ? item.invoiceHsCode : item.hsCode }}
+                      ({{ hsResolutionOf(item) === 'invoice' ? 'ตาม Invoice' : 'ตาม AI' }})
+                    </span>
+                  } @else {
+                    <div class="ih-item__mismatch-options">
+                      <button type="button" class="ih-mismatch-opt" [class.ih-mismatch-opt--active]="hsResolutionOf(item) === 'ai'"
+                        (click)="resolveHsMismatch(item.id, 'ai')">
+                        ใช้รหัสจาก AI — {{ item.hsCode }}
+                        <span class="ih-mismatch-opt__hint">ตาม Product Description</span>
+                      </button>
+                      <button type="button" class="ih-mismatch-opt" [class.ih-mismatch-opt--active]="hsResolutionOf(item) === 'invoice'"
+                        (click)="resolveHsMismatch(item.id, 'invoice')">
+                        ใช้รหัสจาก Invoice — {{ item.invoiceHsCode }}
+                        <span class="ih-mismatch-opt__hint">ตามที่ระบุในเอกสาร</span>
+                      </button>
+                    </div>
+                  }
+                </div>
+              }
             </div>
           }
         </div>
 
         <button class="ih-confirm-btn" [class.ih-confirm-btn--done]="isGroupConfirmed(group.key)"
-          [disabled]="proceeded() || isGroupConfirmed(group.key)" (click)="confirmGroup(group.key)">
+          [disabled]="proceeded() || isGroupConfirmed(group.key) || groupHasUnresolvedMismatch(group)" (click)="confirmGroup(group.key)">
           @if (isGroupConfirmed(group.key)) {
             <lucide-icon [img]="Check" [size]="13" color="#0D8F61" />
           } @else {

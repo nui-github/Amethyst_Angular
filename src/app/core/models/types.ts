@@ -53,6 +53,11 @@ export interface ProductHsAnalysis {
   agencyFull: string;
   licenseType?: string;
   confidence: number;
+  invoiceHsCode?: string;  // HS Code as declared on the invoice, when it differs from `hsCode` (AI's
+                           // classification from the product description) — set only when hsMismatch is true
+  hsMismatch?: boolean;    // true when AI's HS Code (from product description) disagrees with the invoice's
+                           // declared HS Code; user must pick which one to file under before confirming
+  hsResolution?: 'ai' | 'invoice'; // which HS Code the user chose to use; unset until resolved
 }
 
 export interface ItemHsAnalysisData {

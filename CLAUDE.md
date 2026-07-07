@@ -64,8 +64,13 @@ ChatMessage.type → @switch in ChatAreaComponent
                             AI-analysis box always matches the invoice OCR box's item count/content, regardless
                             of which flow led there; per-product HS Code → Smart Tariff → agency, grouped by
                             resulting agency (อย./กษ./ไม่ต้องขอใบอนุญาต); each group card shows its item list
-                            directly + one "ยืนยันกลุ่มนี้ถูกต้อง" button — no per-item or correction UI; all
-                            groups must be confirmed before "ดำเนินการต่อ")
+                            directly + one "ยืนยันกลุ่มนี้ถูกต้อง" button; items may also carry
+                            hsMismatch/invoiceHsCode (types.ts) — when the invoice's declared HS Code
+                            disagrees with the AI's classification from the product description, that row
+                            shows an amber mismatch badge + two picker buttons ("ใช้รหัสจาก AI" /
+                            "ใช้รหัสจาก Invoice"); the group's confirm button stays disabled until every
+                            mismatched item in it is resolved — see hsResolutions/resolveHsMismatch() in
+                            ItemHsAnalysisComponent; all groups must be confirmed before "ดำเนินการต่อ")
   'form'               → FormPanelComponent
   'full-upload'        → FullUploadComponent
   'single-upload'      → SingleUploadComponent
