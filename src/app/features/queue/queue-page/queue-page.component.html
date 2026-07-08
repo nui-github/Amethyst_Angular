@@ -61,12 +61,12 @@
 
           <thead>
             <tr>
-              <th nzWidth="22%">เลขอ้างอิง</th>
-              <th nzWidth="25%">จำนวนสินค้าที่ขอใบอนุญาต</th>
-              <th nzWidth="17%">ประเภทเอกสาร</th>
-              <th nzWidth="13%">ความมั่นใจ</th>
+              <th nzWidth="20%">เลขอ้างอิง</th>
+              <th nzWidth="22%">จำนวนสินค้าที่ขอใบอนุญาต</th>
+              <th nzWidth="16%">ประเภทเอกสาร</th>
+              <th nzWidth="16%">ประเภทใบอนุญาต</th>
               <th nzWidth="16%">สถานะ</th>
-              <th nzWidth="7%"></th>
+              <th nzWidth="10%"></th>
             </tr>
           </thead>
 
@@ -106,15 +106,12 @@
                   <div class="assess-sub">{{ sourceDocLabel(s) }}</div>
                 </td>
 
-                <!-- Confidence -->
+                <!-- Permit type -->
                 <td>
-                  <div class="conf-row">
-                    <span class="conf-pct" [style.color]="confColor(s.conf)">{{ s.conf }}%</span>
-                    <span class="conf-lbl" [style.color]="confColor(s.conf)">{{ confLabel(s.conf) }}</span>
-                  </div>
-                  <div class="conf-track">
-                    <div class="conf-fill" [style.width.%]="s.conf" [style.background]="confColor(s.conf)"></div>
-                  </div>
+                  <span class="permit-type-tag" [class.permit-type-tag--exp]="s.type === 'EXP'">
+                    {{ s.formCode }}
+                  </span>
+                  <div class="assess-sub">{{ permitDirectionLabel(s.type) }}</div>
                 </td>
 
                 <!-- Status -->

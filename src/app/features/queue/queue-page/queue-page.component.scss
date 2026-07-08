@@ -581,38 +581,22 @@
   }
 }
 
-// ── Confidence column ─────────────────────────────────────────────────────────
-.conf-row {
-  display: flex;
-  align-items: baseline;
-  gap: 5px;
-  margin-bottom: 6px;
-}
+// ── Permit type column ────────────────────────────────────────────────────────
+.permit-type-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 6px;
+  margin-bottom: 5px;
+  background: #F3E8FF;
+  color: #7E22CE;
 
-.conf-pct {
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-}
-
-.conf-lbl {
-  font-size: 10px;
-  font-weight: 600;
-  opacity: 0.85;
-}
-
-.conf-track {
-  height: 4px;
-  background: #F0F2F7;
-  border-radius: 99px;
-  overflow: hidden;
-  max-width: 72px;
-}
-
-.conf-fill {
-  height: 100%;
-  border-radius: 99px;
-  transition: width 0.3s ease;
+  &--exp {
+    background: #FCE7F3;
+    color: #BE185D;
+  }
 }
 
 // ── Status column ─────────────────────────────────────────────────────────────

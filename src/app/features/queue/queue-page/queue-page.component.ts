@@ -92,6 +92,11 @@ export class QueuePageComponent {
   agencyShort(key: string): string { return (AGENCY_SHORT as Record<string, string>)[key] ?? '—'; }
   agencyFull(key: string): string  { return (AGENCY_LABEL as Record<string, string>)[key] ?? '—'; }
 
+  /** ทิศทางใบอนุญาต — ขาเข้า/ขาออก, ตาม Shipment.type */
+  permitDirectionLabel(type: 'IMP' | 'EXP'): string {
+    return type === 'EXP' ? 'ขาออก' : 'ขาเข้า';
+  }
+
   /** Which source document this shipment's LPI request was built from — a customs declaration
    *  (ใบขนสินค้า) if one was uploaded, otherwise the commercial invoice (ใบ Invoice). */
   isCustomsSource(ship: Shipment): boolean {
@@ -110,9 +115,6 @@ export class QueuePageComponent {
 
   confColor(conf: number): string {
     return conf >= 90 ? '#059669' : conf >= 75 ? '#B45309' : '#EF4444';
-  }
-  confLabel(conf: number): string {
-    return conf >= 90 ? 'สูง' : conf >= 75 ? 'ปานกลาง' : 'ต่ำ — ควรตรวจ';
   }
 
   isDone(step: number, stage: number)   { return step < stage; }
