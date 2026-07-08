@@ -194,49 +194,52 @@
           <!-- LEFT column -->
           <div class="dv-col-left">
 
-            <!-- AI assessment card -->
+            <!-- AI assessment + agency classification (merged) -->
             <div class="dv-card">
               <div class="dv-card__hd">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0463EF" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                <span>AI ตรวจสอบความจำเป็นในการขออนุญาต</span>
+                <span>AI วิเคราะห์การขอใบอนุญาต</span>
                 <span class="conf-chip" [style.color]="confColor(openShipment()!.assess.conf)">มั่นใจ {{ openShipment()!.assess.conf }}%</span>
               </div>
-              @if (openShipment()!.permitNeeded) {
-                <p class="dv-permit-label">● ต้องขอใบอนุญาต</p>
-              } @else {
-                <p class="dv-nopermit-label">● ไม่ต้องขอใบอนุญาต</p>
-              }
-              <p class="dv-hs-ref">HS {{ openShipment()!.hs }}</p>
+
+              <div class="dv-permit-row">
+                @if (openShipment()!.permitNeeded) {
+                  <p class="dv-permit-label">● ต้องขอใบอนุญาต</p>
+                } @else {
+                  <p class="dv-nopermit-label">● ไม่ต้องขอใบอนุญาต</p>
+                }
+                <p class="dv-hs-ref">HS {{ openShipment()!.hs }}</p>
+              </div>
+
               @if (openShipment()!.assess.reason) {
                 <div class="dv-reason-box">
                   <p class="dv-reason-title">เหตุผลจาก AI</p>
                   <p class="dv-reason-text">{{ openShipment()!.assess.reason }}</p>
                 </div>
               }
-            </div>
 
-            <!-- Agency classification card -->
-            @if (openShipment()!.permitNeeded) {
-              <div class="dv-card">
-                <div class="dv-card__hd">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                  <span>AI จัดประเภท — เลือกหน่วยงานที่ต้องยื่น</span>
-                  <span class="conf-chip" [style.color]="confColor(openShipment()!.classify.conf)">มั่นใจ {{ openShipment()!.classify.conf }}%</span>
-                </div>
+              @if (openShipment()!.permitNeeded) {
+                <div class="dv-card-divider"></div>
+
                 <div class="dv-agency-selected">
                   <div class="dv-agency-check">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
                   </div>
-                  <div>
+                  <div class="dv-agency-selected__body">
                     <p class="dv-agency-name">{{ agencyFull(openShipment()!.classify.agency) }}</p>
                     <p class="dv-agency-sub">ยื่น {{ openShipment()!.formCode }} — {{ openShipment()!.formName }}</p>
                   </div>
+                  @if (openShipment()!.classify.conf !== openShipment()!.assess.conf) {
+                    <span class="dv-agency-conf" [style.color]="confColor(openShipment()!.classify.conf)">{{ openShipment()!.classify.conf }}%</span>
+                  }
                 </div>
-                @if (openShipment()!.classify.reason) {
+
+                @if (openShipment()!.classify.reason && openShipment()!.classify.reason !== openShipment()!.assess.reason) {
                   <div class="dv-reason-box" style="margin-top:8px">
                     <p class="dv-reason-text">{{ openShipment()!.classify.reason }}</p>
                   </div>
                 }
+
                 @if (openShipment()!.classify.alt.length > 0) {
                   <div class="dv-alt-agencies">
                     @for (alt of openShipment()!.classify.alt; track alt.agency) {
@@ -247,8 +250,8 @@
                     }
                   </div>
                 }
-              </div>
-            }
+              }
+            </div>
 
             <!-- Audit trail -->
             @if (openShipment()!.audit.length > 0) {

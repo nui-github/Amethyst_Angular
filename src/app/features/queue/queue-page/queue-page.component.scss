@@ -839,18 +839,26 @@
   border-radius: 99px;
 }
 
+.dv-permit-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 10px;
+  flex-wrap: wrap;
+}
+
 .dv-permit-label {
   font-size: 14px;
   font-weight: 700;
   color: #B45309;
-  margin: 0 0 10px;
+  margin: 0;
 }
 
 .dv-nopermit-label {
   font-size: 14px;
   font-weight: 700;
   color: #059669;
-  margin: 0 0 10px;
+  margin: 0;
 }
 
 .dv-hs-ref {
@@ -861,7 +869,13 @@
   display: inline-block;
   padding: 2px 8px;
   border-radius: 4px;
-  margin: 0 0 10px;
+  margin: 0;
+}
+
+.dv-card-divider {
+  height: 1px;
+  background: #ECEEF5;
+  margin: 14px 0;
 }
 
 .dv-reason-box {
@@ -903,8 +917,17 @@
   margin-top: 1px;
 }
 
+.dv-agency-selected__body { flex: 1; min-width: 0; }
+
 .dv-agency-name { font-size: 13px; font-weight: 700; color: #0463EF; margin: 0 0 2px; }
 .dv-agency-sub  { font-size: 10px; color: #6B7280; margin: 0; }
+
+.dv-agency-conf {
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
 
 .dv-alt-agencies { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
 
