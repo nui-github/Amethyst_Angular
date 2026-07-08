@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   LucideAngularModule, ArrowLeft, Pencil, Check, ChevronDown,
-  SlidersHorizontal, UserCog, ShieldCheck, CreditCard,
+  User, Lock, Plus, Hash, SlidersHorizontal, UserCog, ShieldCheck, CreditCard,
   BarChart3, Package, FileText, Download, Receipt, FileCheck2, Wallet, Construction,
   TrendingUp, PieChart, Trophy, X, KeyRound, Eye, EyeOff,
 } from 'lucide-angular';
@@ -39,6 +39,10 @@ export class SettingsPageComponent {
   readonly Pencil       = Pencil;
   readonly Check        = Check;
   readonly ChevronDown  = ChevronDown;
+  readonly User         = User;
+  readonly Lock         = Lock;
+  readonly Plus         = Plus;
+  readonly Hash         = Hash;
   readonly SlidersHorizontal = SlidersHorizontal;
   readonly UserCog      = UserCog;
   readonly ShieldCheck  = ShieldCheck;
@@ -93,6 +97,39 @@ export class SettingsPageComponent {
 
   // ── Profiles for submitting to agencies ──────────────────────────────────
   profiles = signal<SpnProfile[]>([...MOCK_SPN_PROFILES]);
+  showCreateProfile  = signal(false);
+  newProfileUsername = signal('');
+  newProfilePassword = signal('');
+  newProfileCode     = signal('');
+  newProfileDesc     = signal('');
+
+  readonly newProfileValid = () =>
+    this.newProfileUsername().trim().length > 0 &&
+    this.newProfilePassword().trim().length > 0 &&
+    /^[A-Za-z]{4}$/.test(this.newProfileCode().trim()) &&
+    this.newProfileDesc().trim().length > 0;
+
+  openCreateProfile(): void { this.showCreateProfile.set(true); }
+  cancelCreateProfile(): void {
+    this.showCreateProfile.set(false);
+    this.newProfileUsername.set(''); this.newProfilePassword.set('');
+    this.newProfileCode.set(''); this.newProfileDesc.set('');
+  }
+
+  saveNewProfile(): void {
+    if (!this.newProfileValid()) return;
+    const colors = ['#0463EF', '#7C3AED', '#0D8F61', '#B45309', '#DB2777'];
+    const code = this.newProfileCode().trim().toUpperCase();
+    this.profiles.update(list => [...list, {
+      code,
+      displayName: this.newProfileDesc().trim(),
+      companyId: 'custom',
+      urlId: code.toLowerCase(),
+      username: this.newProfileUsername().trim(),
+      color: colors[list.length % colors.length],
+    }]);
+    this.cancelCreateProfile();
+  }
 
   // ── Billing tab (plan / payment / invoice) ───────────────────────────────
   billingTab = signal<BillingTab>('plan');

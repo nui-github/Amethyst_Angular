@@ -95,6 +95,59 @@
             </div>
           }
         </div>
+
+        @if (!showCreateProfile()) {
+          <button class="create-profile-btn" (click)="openCreateProfile()">
+            <lucide-icon [img]="Plus" [size]="13" />
+            เพิ่มโปรไฟล์
+          </button>
+        } @else {
+          <div class="spn-login-form create-profile-form">
+            <p class="spn-login-form__title">เพิ่มโปรไฟล์สำหรับส่งกรม</p>
+            <div class="spn-login-form__fields">
+              <div class="spn-login-field">
+                <label>Username</label>
+                <nz-input-group [nzPrefix]="createUserIcon" nzSize="default">
+                  <input nz-input placeholder="กรอก Username"
+                    [value]="newProfileUsername()" (input)="newProfileUsername.set($any($event.target).value)" />
+                </nz-input-group>
+                <ng-template #createUserIcon><lucide-icon [img]="User" [size]="13" color="#AAAAAA" /></ng-template>
+              </div>
+              <div class="spn-login-field">
+                <label>Password</label>
+                <nz-input-group [nzPrefix]="createLockIcon" nzSize="default">
+                  <input nz-input type="password" placeholder="กรอก Password"
+                    [value]="newProfilePassword()" (input)="newProfilePassword.set($any($event.target).value)" />
+                </nz-input-group>
+                <ng-template #createLockIcon><lucide-icon [img]="Lock" [size]="13" color="#AAAAAA" /></ng-template>
+              </div>
+              <div class="spn-login-field">
+                <label>รหัสโปรไฟล์ (ตัวอักษร 4 ตัว)</label>
+                <nz-input-group [nzPrefix]="createCodeIcon" nzSize="default">
+                  <input nz-input placeholder="เช่น NETB" maxlength="4"
+                    [value]="newProfileCode()" (input)="newProfileCode.set($any($event.target).value)" />
+                </nz-input-group>
+                <ng-template #createCodeIcon><lucide-icon [img]="Hash" [size]="13" color="#AAAAAA" /></ng-template>
+              </div>
+              <div class="spn-login-field">
+                <label>รายละเอียดโปรไฟล์</label>
+                <nz-input-group [nzPrefix]="createDescIcon" nzSize="default">
+                  <input nz-input placeholder="เช่น Netbay Production"
+                    [value]="newProfileDesc()" (input)="newProfileDesc.set($any($event.target).value)"
+                    (keydown.enter)="saveNewProfile()" />
+                </nz-input-group>
+                <ng-template #createDescIcon><lucide-icon [img]="FileText" [size]="13" color="#AAAAAA" /></ng-template>
+              </div>
+            </div>
+            <div class="spn-login-form__actions">
+              <button class="spn-cancel-btn" (click)="cancelCreateProfile()">ยกเลิก</button>
+              <button class="spn-connect-btn" [disabled]="!newProfileValid()" (click)="saveNewProfile()">
+                <lucide-icon [img]="Check" [size]="13" color="#fff" />
+                เพิ่มโปรไฟล์
+              </button>
+            </div>
+          </div>
+        }
       }
 
       <!-- ════════ PRIVACY ════════ -->
