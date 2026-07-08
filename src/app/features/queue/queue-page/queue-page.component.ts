@@ -92,6 +92,16 @@ export class QueuePageComponent {
   agencyShort(key: string): string { return (AGENCY_SHORT as Record<string, string>)[key] ?? '—'; }
   agencyFull(key: string): string  { return (AGENCY_LABEL as Record<string, string>)[key] ?? '—'; }
 
+  /** Which source document this shipment's LPI request was built from — a customs declaration
+   *  (ใบขนสินค้า) if one was uploaded, otherwise the commercial invoice (ใบ Invoice). */
+  sourceDocLabel(ship: Shipment): string {
+    const hasCustoms = (ship.documents ?? []).some(d => d.category === 'customs');
+    return hasCustoms ? 'ใบขนสินค้า' : 'ใบ Invoice';
+  }
+  isCustomsSource(ship: Shipment): boolean {
+    return (ship.documents ?? []).some(d => d.category === 'customs');
+  }
+
   confColor(conf: number): string {
     return conf >= 90 ? '#059669' : conf >= 75 ? '#B45309' : '#EF4444';
   }
