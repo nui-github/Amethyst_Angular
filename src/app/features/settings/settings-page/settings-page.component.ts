@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   LucideAngularModule, ArrowLeft, Pencil, Check, ChevronDown,
-  User, Lock, SlidersHorizontal, UserCog, ShieldCheck, CreditCard,
-  BarChart3, Plus, Package, FileText, Download, Receipt, FileCheck2, Wallet, Construction,
-  TrendingUp, PieChart, Trophy, X, Link, KeyRound, Eye, EyeOff,
+  SlidersHorizontal, UserCog, ShieldCheck, CreditCard,
+  BarChart3, Package, FileText, Download, Receipt, FileCheck2, Wallet, Construction,
+  TrendingUp, PieChart, Trophy, X, KeyRound, Eye, EyeOff,
 } from 'lucide-angular';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import {
@@ -39,15 +39,11 @@ export class SettingsPageComponent {
   readonly Pencil       = Pencil;
   readonly Check        = Check;
   readonly ChevronDown  = ChevronDown;
-  readonly User         = User;
-  readonly Lock         = Lock;
-  readonly Link         = Link;
   readonly SlidersHorizontal = SlidersHorizontal;
   readonly UserCog      = UserCog;
   readonly ShieldCheck  = ShieldCheck;
   readonly CreditCard   = CreditCard;
   readonly BarChart3    = BarChart3;
-  readonly Plus         = Plus;
   readonly Package      = Package;
   readonly FileText     = FileText;
   readonly Download     = Download;
@@ -97,37 +93,6 @@ export class SettingsPageComponent {
 
   // ── Profiles for submitting to agencies ──────────────────────────────────
   profiles = signal<SpnProfile[]>([...MOCK_SPN_PROFILES]);
-  showCreateProfile = signal(false);
-  newProfileUrl = signal('');
-  newProfileUser = signal('');
-  newProfilePass = signal('');
-
-  readonly newProfileValid = () =>
-    this.newProfileUrl().trim().length > 0 &&
-    this.newProfileUser().trim().length > 0 &&
-    this.newProfilePass().trim().length > 0;
-
-  openCreateProfile(): void { this.showCreateProfile.set(true); }
-  cancelCreateProfile(): void {
-    this.showCreateProfile.set(false);
-    this.newProfileUrl.set(''); this.newProfileUser.set(''); this.newProfilePass.set('');
-  }
-
-  saveNewProfile(): void {
-    if (!this.newProfileValid()) return;
-    const colors = ['#0463EF', '#7C3AED', '#0D8F61', '#B45309', '#DB2777'];
-    const host = this.newProfileUrl().trim().replace(/^https?:\/\//, '').split('/')[0];
-    const code = (host.replace(/[^a-zA-Z]/g, '').toUpperCase().slice(0, 4)) || 'NEW';
-    this.profiles.update(list => [...list, {
-      code,
-      displayName: host,
-      companyId: 'custom',
-      urlId: host,
-      username: this.newProfileUser().trim(),
-      color: colors[list.length % colors.length],
-    }]);
-    this.cancelCreateProfile();
-  }
 
   // ── Billing tab (plan / payment / invoice) ───────────────────────────────
   billingTab = signal<BillingTab>('plan');

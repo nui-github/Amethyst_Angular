@@ -584,26 +584,6 @@
   margin: 2px 0 0;
 }
 
-.create-profile-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1.5px dashed #C7CEDE;
-  background: #fff;
-  color: #6B7280;
-  font-size: 13px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.15s;
-  &:hover { border-color: #0463EF; color: #0463EF; background: rgba(4,99,239,0.03); }
-}
-
-.create-profile-form { margin-top: 4px; }
-
 // ── Billing: Plan card ────────────────────────────────────────────────────────
 
 .plan-card {
