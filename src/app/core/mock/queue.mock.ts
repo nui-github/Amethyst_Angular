@@ -35,7 +35,7 @@ const usr = (time: string, content: string): ChatMessage => t(time, 'user', 'tex
 export const MOCK_QUEUE: Shipment[] = [
   // ── 1. needs_you: Amoxicillin – รอยืนยัน flags ──────────────────────────────
   {
-    id: 'IMP-68-008912', customsNo: 'A012-25680617-00891', hthmRef: 'HTHM000000001',
+    id: 'IMP-68-008912', customsNo: 'HLTH000000001', hthmRef: 'HTHM000000001',
     isNew: true, type: 'IMP',
     goods: 'Amoxicillin Trihydrate (วัตถุดิบยาปฏิชีวนะ)', hs: '2941.10.00',
     customer: 'บริษัท เฮลท์ฟาร์มา จำกัด', contact: 'คุณสมหญิง วัฒนกุล',
@@ -92,7 +92,7 @@ export const MOCK_QUEUE: Shipment[] = [
 
   // ── 2. needs_you: Human Insulin – รอยืนยัน flag + form-preview ───────────────
   {
-    id: 'IMP-68-008915', customsNo: 'A012-25680617-00915', hthmRef: 'HTHM000000002',
+    id: 'IMP-68-008915', customsNo: 'HLTH000000002', hthmRef: 'HTHM000000002',
     isNew: true, type: 'IMP',
     goods: 'Human Insulin (มาตรฐานอินซูลิน สำเร็จรูป)', hs: '2941.10.00',
     customer: 'บริษัท เฮลท์ฟาร์มา จำกัด', contact: 'คุณสมหญิง วัฒนกุล',
@@ -157,7 +157,7 @@ export const MOCK_QUEUE: Shipment[] = [
 
   // ── 3. needs_you: Surgical Gloves – รอ agency-upload ──────────────────────────
   {
-    id: 'IMP-68-008920', customsNo: 'A012-25680617-00920', hthmRef: 'HTHM000000003',
+    id: 'IMP-68-008920', customsNo: 'HLTH000000003', hthmRef: 'HTHM000000003',
     isNew: true, type: 'IMP',
     goods: 'Surgical Gloves (ถุงมือผ่าตัด ชนิดปราศจากเชื้อ)', hs: '4015.11.00',
     customer: 'บริษัท เฮลท์ฟาร์มา จำกัด', contact: 'คุณสมหญิง วัฒนกุล',
@@ -210,7 +210,7 @@ export const MOCK_QUEUE: Shipment[] = [
 
   // ── 4. submitted: Glyphosate – ยื่น กษ. แล้ว ────────────────────────────────
   {
-    id: 'IMP-68-008923', customsNo: 'A012-25680617-00923', hthmRef: 'HTHM000000004',
+    id: 'IMP-68-008923', customsNo: 'AGRI000000004', hthmRef: 'HTHM000000004',
     isNew: false, type: 'IMP',
     goods: 'Glyphosate Technical (สารกำจัดวัชพืช วัตถุอันตราย)', hs: '2931.39.00',
     customer: 'บริษัท อะกริพลัส จำกัด', contact: 'คุณมานะ รุ่งเรือง',
@@ -250,7 +250,7 @@ export const MOCK_QUEUE: Shipment[] = [
       }),
     ],
     documents: [
-      doc('d4a', 'ใบขนสินค้าขาเข้า A012-25680617-00923', 'customs'),
+      doc('d4a', 'ใบขนสินค้าขาเข้า AGRI000000004', 'customs'),
       doc('d4b', 'Packing List', 'packing_list'),
       doc('d4c', 'Material Safety Data Sheet (MSDS)', 'other', 'pdf', 'doa'),
     ],
@@ -271,7 +271,7 @@ export const MOCK_QUEUE: Shipment[] = [
 
   // ── 5. needs_you: Vitamin D3 Softgel – รอแนบเอกสารรายกรม ────────────────────
   {
-    id: 'IMP-68-008928', customsNo: 'A012-25680617-00928', hthmRef: 'HTHM000000005',
+    id: 'IMP-68-008928', customsNo: 'HLTH000000005', hthmRef: 'HTHM000000005',
     isNew: false, type: 'IMP',
     goods: 'Vitamin D3 Softgel (สารสกัดวิตามินดี3 เข้มข้น)', hs: '2936.29.00',
     customer: 'บริษัท เฮลท์ฟาร์มา จำกัด', contact: 'คุณสมหญิง วัฒนกุล',
@@ -324,7 +324,7 @@ export const MOCK_QUEUE: Shipment[] = [
 
   // ── 6. submitted: Ethanol – ยื่น วอ. แล้ว ───────────────────────────────────
   {
-    id: 'IMP-68-008931', customsNo: 'A012-25680617-00931', hthmRef: 'HTHM000000006',
+    id: 'IMP-68-008931', customsNo: 'HLTH000000006', hthmRef: 'HTHM000000006',
     isNew: false, type: 'IMP',
     goods: 'Ethanol 99.5% (Absolute Ethanol) สำหรับอุตสาหกรรม', hs: '2207.10.00',
     customer: 'บริษัท เฮลท์ฟาร์มา จำกัด', contact: '',
@@ -357,7 +357,7 @@ export const MOCK_QUEUE: Shipment[] = [
       }),
     ],
     documents: [
-      doc('d6a', 'ใบขนสินค้าขาเข้า A012-25680617-00931', 'customs'),
+      doc('d6a', 'ใบขนสินค้าขาเข้า HLTH000000006', 'customs'),
       doc('d6b', 'Certificate of Analysis (CoA)', 'coa'),
       doc('d6c', 'MSDS — Ethanol 99.5%', 'other', 'pdf', 'diw'),
     ],
@@ -390,7 +390,7 @@ export const MOCK_QUEUE: Shipment[] = [
 
   // ── 7. needs_you: Vitamin C – รอ agency-upload + OCR ─────────────────────────
   {
-    id: 'IMP-68-007010', customsNo: 'A012-25680617-00701', hthmRef: 'HTHM000000007',
+    id: 'IMP-68-007010', customsNo: 'NETB000000007', hthmRef: 'HTHM000000007',
     isNew: true, type: 'IMP',
     goods: 'Ascorbic Acid (Vitamin C Powder) วัตถุดิบเสริมอาหาร', hs: '2936.27.00',
     customer: 'บริษัท นูทริเฟรช จำกัด', contact: 'คุณนภา ตันสกุล',
@@ -442,7 +442,7 @@ export const MOCK_QUEUE: Shipment[] = [
 
   // ── 8. submitted: Zinc Oxide – ยื่น อย. แล้ว ─────────────────────────────────
   {
-    id: 'IMP-68-008002', customsNo: 'A012-25680617-00800', hthmRef: 'HTHM000000008',
+    id: 'IMP-68-008002', customsNo: 'NETB000000008', hthmRef: 'HTHM000000008',
     isNew: false, type: 'IMP',
     goods: 'Zinc Oxide (วัตถุดิบเครื่องสำอาง)', hs: '2817.00.00',
     customer: 'บริษัท บิวตี้แล็บ จำกัด', contact: 'คุณพิมพ์ชนก ศรีไทย',
@@ -487,7 +487,7 @@ export const MOCK_QUEUE: Shipment[] = [
 
   // ── 9. submitted: Magnesium Stearate – ยื่น อย. แล้ว ─────────────────────────
   {
-    id: 'IMP-68-009005', customsNo: 'A012-25680617-00900', hthmRef: 'HTHM000000009',
+    id: 'IMP-68-009005', customsNo: 'NETU000000009', hthmRef: 'HTHM000000009',
     isNew: false, type: 'IMP',
     goods: 'Magnesium Stearate (วัตถุดิบยาเม็ด)', hs: '2915.70.21',
     customer: 'บริษัท ฟาร์มาโกลด์ จำกัด', contact: 'คุณธีรพงษ์ บุญมี',
@@ -510,7 +510,7 @@ export const MOCK_QUEUE: Shipment[] = [
     messages: [
       bot('14:30', 'ใบขนสินค้า HTHM000000009 เข้าระบบแล้วครับ — Magnesium Stearate จากสหรัฐอเมริกา'),
       t('14:45', 'bot', 'status-card', undefined, {
-        refNo: 'RG-2568-09005', customsRef: 'A012-25680617-00900', isPending: false,
+        refNo: 'RG-2568-09005', customsRef: 'NETU000000009', isPending: false,
         submittedAt: new Date(Date.now() - 86400000).toLocaleDateString('th-TH'),
       }),
     ],
@@ -530,7 +530,7 @@ export const MOCK_QUEUE: Shipment[] = [
 
   // ── 10. submitted: Sodium Hypochlorite – ยื่น วอ. แล้ว ──────────────────────
   {
-    id: 'IMP-68-010001', customsNo: 'A012-25680617-01000', hthmRef: 'HTHM000000010',
+    id: 'IMP-68-010001', customsNo: 'AGRD000000010', hthmRef: 'HTHM000000010',
     isNew: false, type: 'IMP',
     goods: 'Sodium Hypochlorite 10% (คลอรีนน้ำสำหรับฆ่าเชื้อ)', hs: '2828.90.10',
     customer: 'บริษัท เคมีไทย จำกัด', contact: 'คุณวิชัย ประสพโชค',
@@ -564,7 +564,7 @@ export const MOCK_QUEUE: Shipment[] = [
       }),
     ],
     documents: [
-      doc('d10a', 'ใบขนสินค้าขาเข้า A012-25680617-01000', 'customs'),
+      doc('d10a', 'ใบขนสินค้าขาเข้า AGRD000000010', 'customs'),
       doc('d10b', 'Invoice AU-2024-1000', 'invoice'),
       doc('d10c', 'MSDS — Sodium Hypochlorite 10%', 'other', 'pdf', 'diw'),
     ],
@@ -577,7 +577,7 @@ export const MOCK_QUEUE: Shipment[] = [
 
   // ── 11. needs_you: Calcium Carbonate – รอ OCR + hs-analysis ──────────────────
   {
-    id: 'IMP-68-011003', customsNo: 'A012-25680617-01100', hthmRef: 'HTHM000000011',
+    id: 'IMP-68-011003', customsNo: 'HLTH000000011', hthmRef: 'HTHM000000011',
     isNew: true, type: 'IMP',
     goods: 'Calcium Carbonate (วัตถุดิบยาเม็ดแคลเซียม)', hs: '2836.50.00',
     customer: 'บริษัท เฮลท์ฟาร์มา จำกัด', contact: 'คุณสมหญิง วัฒนกุล',
@@ -611,7 +611,7 @@ export const MOCK_QUEUE: Shipment[] = [
       }),
     ],
     documents: [
-      doc('d11a', 'ใบขนสินค้าขาเข้า A012-25680617-01100', 'customs'),
+      doc('d11a', 'ใบขนสินค้าขาเข้า HLTH000000011', 'customs'),
       doc('d11b', 'Packing List', 'packing_list'),
     ],
     itemsSelected: false,
@@ -622,7 +622,7 @@ export const MOCK_QUEUE: Shipment[] = [
 
   // ── 12. needs_you: Titanium Dioxide – รอยืนยัน form-preview ─────────────────
   {
-    id: 'IMP-68-012007', customsNo: 'A012-25680617-01200', hthmRef: 'HTHM000000012',
+    id: 'IMP-68-012007', customsNo: 'NETU000000012', hthmRef: 'HTHM000000012',
     isNew: false, type: 'IMP',
     goods: 'Titanium Dioxide (สี/วัตถุดิบเครื่องสำอาง)', hs: '3206.11.00',
     customer: 'บริษัท คัลเลอร์แพ็ค จำกัด', contact: 'คุณนิรมล สุขสม',

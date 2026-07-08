@@ -81,7 +81,6 @@
                     <div class="tc-accent" [style.background]="statusMeta(s.statusKey).dot"></div>
                     <div class="tc-ref__info">
                       <div class="tc-ref__top">
-                        <span class="type-badge" [class.type-badge--exp]="s.type === 'EXP'">{{ s.type }}</span>
                         <span class="ref-no">{{ s.customsNo }}</span>
                         @if (s.isNew) {
                           <span class="new-dot-pulse"></span>
@@ -164,7 +163,6 @@
 
           <div class="dv-hrow">
             <div class="dv-hrow__left">
-              <span class="type-badge" [class.type-badge--exp]="openShipment()!.type === 'EXP'">{{ openShipment()!.type }}</span>
               <h2 class="dv-ref">{{ openShipment()!.customsNo }}</h2>
               <span class="status-pill"
                 [style.background]="statusMeta(openShipment()!.statusKey).bg"
@@ -174,13 +172,6 @@
               </span>
             </div>
           </div>
-
-          <p class="dv-sub">
-            {{ openShipment()!.goods }} · HS {{ openShipment()!.hs }} · ต้นทาง {{ openShipment()!.origin }}
-          </p>
-          @if (openShipment()!.customer) {
-            <p class="dv-customer">ลูกค้า: {{ openShipment()!.customer }} · นำเข้าระบบ {{ openShipment()!.importedAt }}</p>
-          }
 
           <!-- Steps -->
           <div class="steps-bar">
