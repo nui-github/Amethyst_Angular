@@ -517,23 +517,20 @@
 }
 
 // ── Goods column ──────────────────────────────────────────────────────────────
-.goods-name {
+.goods-count {
   font-size: 12.5px;
-  font-weight: 500;
-  color: #374151;
+  font-weight: 700;
+  color: #0E1B4D;
+  margin-bottom: 4px;
+}
+
+.goods-name {
+  font-size: 11px;
+  color: #B0B4C4;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 230px;
-  margin-bottom: 4px;
-}
-
-.goods-hs {
-  font-size: 10.5px;
-  color: #C4C9D6;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.2px;
 }
 
 // ── AI assess column ──────────────────────────────────────────────────────────
