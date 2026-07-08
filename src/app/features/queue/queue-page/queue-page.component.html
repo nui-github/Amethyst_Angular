@@ -126,8 +126,7 @@
 
                 <!-- Action -->
                 <td class="td-action" (click)="$event.stopPropagation()">
-                  <button class="row-arrow" [class.row-arrow--primary]="s.statusKey === 'needs_you'"
-                    (click)="selectRow(s.id)">
+                  <button class="row-arrow" (click)="selectRow(s.id)">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
                   </button>
                 </td>

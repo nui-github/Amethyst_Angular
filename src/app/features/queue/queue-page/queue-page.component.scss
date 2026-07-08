@@ -450,7 +450,7 @@
 }
 
 // Show arrow highlight on row hover
-::ng-deep .ant-table-tbody .qt-row:hover .row-arrow:not(.row-arrow--primary) {
+::ng-deep .ant-table-tbody .qt-row:hover .row-arrow {
   border-color: #CBD5F8;
   color: #0463EF;
   background: #EFF6FF;
@@ -639,18 +639,6 @@
     border-color: #0463EF;
     color: #0463EF;
     background: #EFF6FF;
-  }
-
-  &--primary {
-    border-color: #0463EF;
-    background: #0463EF;
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(4,99,239,0.3);
-
-    &:hover {
-      background: #034DBA;
-      border-color: #034DBA;
-    }
   }
 }
 
