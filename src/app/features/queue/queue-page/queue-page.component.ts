@@ -94,12 +94,18 @@ export class QueuePageComponent {
 
   /** Which source document this shipment's LPI request was built from — a customs declaration
    *  (ใบขนสินค้า) if one was uploaded, otherwise the commercial invoice (ใบ Invoice). */
-  sourceDocLabel(ship: Shipment): string {
-    const hasCustoms = (ship.documents ?? []).some(d => d.category === 'customs');
-    return hasCustoms ? 'ใบขนสินค้า' : 'ใบ Invoice';
-  }
   isCustomsSource(ship: Shipment): boolean {
     return (ship.documents ?? []).some(d => d.category === 'customs');
+  }
+  sourceDocLabel(ship: Shipment): string {
+    return this.isCustomsSource(ship) ? 'ใบขนสินค้า' : 'ใบ Invoice';
+  }
+  /** The invoice/customs reference number as uploaded, parsed out of the document's display name. */
+  sourceDocNumber(ship: Shipment): string {
+    const docs = ship.documents ?? [];
+    const doc = docs.find(d => d.category === 'customs') ?? docs.find(d => d.category === 'invoice');
+    if (!doc) return '—';
+    return doc.name.replace(/^(Invoice|ใบขนสินค้าขาเข้า|ใบขนสินค้า)\s*/i, '').trim();
   }
 
   confColor(conf: number): string {
