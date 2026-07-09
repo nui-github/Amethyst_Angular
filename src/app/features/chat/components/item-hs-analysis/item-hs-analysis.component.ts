@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Search, Check, ArrowDown, Percent, ShieldCheck, Sprout, PackageCheck, Radiation, Pencil, X } from 'lucide-angular';
 import { HsCandidate, ItemHsAnalysisData, ProductHsAnalysis } from '@app/core/models/types';
 import { getAgencyPayment } from '@mock/payment.mock';
+import { lookupHsCode } from '@mock/hs-code-db.mock';
 
 interface AgencySummaryRow {
   code: string;
@@ -30,7 +32,7 @@ const GROUP_STYLE: Record<string, { color: string; bg: string; icon: 'shield' | 
   selector: 'app-item-hs-analysis',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, LucideAngularModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule],
   templateUrl: './item-hs-analysis.component.html',
   styleUrl: './item-hs-analysis.component.scss',
 })
@@ -54,6 +56,11 @@ export class ItemHsAnalysisComponent implements OnInit {
   overrides = signal<Record<string, HsCandidate>>({});
   editingItemId = signal<string | null>(null);
   proceeded = signal(false);
+
+  // Manual HS Code entry — user types a code, we "look it up" (mock DB), they confirm to use it
+  manualHsInput = signal<Record<string, string>>({});
+  manualHsResult = signal<Record<string, HsCandidate | null>>({}); // null = looked up, not found
+  confirmingGroupKey = signal<string | null>(null);
 
   // Summary of the AI's own analysis
   requiresAnyPermit = false;
@@ -113,6 +120,8 @@ export class ItemHsAnalysisComponent implements OnInit {
   toggleEdit(itemId: string, group: AgencyGroup): void {
     if (!this.canEditItem(group)) return;
     this.editingItemId.update(cur => (cur === itemId ? null : itemId));
+    this.manualHsInput.update(m => ({ ...m, [itemId]: '' }));
+    this.manualHsResult.update(m => { const { [itemId]: _, ...rest } = m; return rest; });
   }
 
   selectCandidate(item: ProductHsAnalysis, candidate: HsCandidate): void {
@@ -121,9 +130,46 @@ export class ItemHsAnalysisComponent implements OnInit {
     this.editingItemId.set(null);
   }
 
+  // ── Manual HS Code entry ──────────────────────────────────────────────────────
+  onManualHsInput(itemId: string, value: string): void {
+    this.manualHsInput.update(m => ({ ...m, [itemId]: value }));
+    this.manualHsResult.update(m => { const { [itemId]: _, ...rest } = m; return rest; });
+  }
+
+  searchManualHs(itemId: string): void {
+    const input = this.manualHsInput()[itemId]?.trim();
+    if (!input) return;
+    const found = lookupHsCode(input);
+    this.manualHsResult.update(m => ({ ...m, [itemId]: found ?? null }));
+  }
+
+  confirmManualHs(item: ProductHsAnalysis): void {
+    const result = this.manualHsResult()[item.id];
+    if (!result) return;
+    this.selectCandidate(item, result);
+    this.manualHsInput.update(m => ({ ...m, [item.id]: '' }));
+    this.manualHsResult.update(m => { const { [item.id]: _, ...rest } = m; return rest; });
+  }
+
+  // ── Group confirmation (asks the user to double-check first) ───────────────────
+  requestConfirmGroup(key: string): void {
+    if (this.proceeded() || this.isGroupConfirmed(key)) return;
+    this.confirmingGroupKey.set(key);
+  }
+
+  cancelConfirmGroup(): void {
+    this.confirmingGroupKey.set(null);
+  }
+
   confirmGroup(key: string): void {
     if (this.proceeded() || this.isGroupConfirmed(key)) return;
     this.confirmedGroups.update(s => ({ ...s, [key]: true }));
+    this.confirmingGroupKey.set(null);
+  }
+
+  get confirmingGroup(): AgencyGroup | undefined {
+    const key = this.confirmingGroupKey();
+    return key == null ? undefined : this.groups.find(g => g.key === key);
   }
 
   readonly allDecided = () => this.groups.every(g => this.isGroupConfirmed(g.key));

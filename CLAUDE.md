@@ -88,9 +88,16 @@ ChatMessage.type → @switch in ChatAreaComponent
                             HS Code at all, so there is no invoice-vs-AI comparison, only AI-vs-user; each item
                             has a "แก้ไข" button revealing up to 5 `candidates` (types.ts HsCandidate — HS
                             Code/tariff/description/dutyRate/confidence) for the user to manually re-classify
-                            that single item (picking a candidate immediately updates the row and tags it
-                            "แก้ไขแล้ว" via ProductHsAnalysis.manuallyEdited); editing is only available before
-                            that item's group is confirmed; all groups must be confirmed before "ดำเนินการต่อ")
+                            that single item, PLUS a manual-entry field ("หรือพิมพ์ HS Code เอง") — user
+                            types a code, "ค้นหา" looks it up via lookupHsCode() (mock/hs-code-db.mock.ts,
+                            a stand-in for the real tariff-schedule lookup), shows the matched
+                            code/description/duty if found (or "ไม่พบข้อมูล..." if not) with its own
+                            "ยืนยันใช้รหัสนี้" button; either path (candidate or manual) immediately updates
+                            the row and tags it "แก้ไขแล้ว" via ProductHsAnalysis.manuallyEdited; editing is
+                            only available before that item's group is confirmed. Clicking "ยืนยันกลุ่มนี้
+                            ถูกต้อง" opens a confirm dialog ("ได้ตรวจสอบ...ครบถ้วนแล้วใช่หรือไม่?") before
+                            actually locking the group — cancel closes it with no change, confirm calls
+                            confirmGroup(). All groups must be confirmed before "ดำเนินการต่อ")
   'form'               → FormPanelComponent
   'full-upload'        → FullUploadComponent
   'single-upload'      → SingleUploadComponent

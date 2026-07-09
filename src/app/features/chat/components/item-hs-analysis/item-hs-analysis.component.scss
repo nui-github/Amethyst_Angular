@@ -401,6 +401,166 @@
   }
 }
 
+// ── Manual HS Code entry ──────────────────────────────────────────────────────
+.ih-manual {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px dashed #E5E7EB;
+}
+
+.ih-manual__title {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--bizx-n500);
+  margin: 0;
+}
+
+.ih-manual__row {
+  display: flex;
+  gap: 6px;
+}
+
+.ih-manual__input {
+  flex: 1;
+  min-width: 0;
+  font-size: 11px;
+  font-family: inherit;
+  padding: 7px 9px;
+  border-radius: 8px;
+  border: 1.5px solid #E5E7EB;
+  outline: none;
+  color: var(--bizx-navy);
+
+  &:focus { border-color: #0463EF; }
+  &::placeholder { color: var(--bizx-n400); }
+}
+
+.ih-manual__search-btn {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: inherit;
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: none;
+  background: var(--bizx-navy);
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.12s;
+
+  &:hover { opacity: 0.88; }
+}
+
+.ih-manual__result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 9px;
+  border-radius: 8px;
+  border: 1.5px solid #0D8F61;
+  background: rgba(13, 143, 97, 0.06);
+}
+
+.ih-manual__confirm-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  font-size: 10.5px;
+  font-weight: 700;
+  font-family: inherit;
+  padding: 6px 10px;
+  border-radius: 7px;
+  border: none;
+  background: #0D8F61;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.12s;
+
+  &:hover { opacity: 0.88; }
+}
+
+.ih-manual__not-found {
+  font-size: 10.5px;
+  color: #B45309;
+  background: rgba(180, 83, 9, 0.08);
+  padding: 8px 9px;
+  border-radius: 8px;
+  margin: 0;
+}
+
+// ── Group-confirm dialog ─────────────────────────────────────────────────────
+.ih-dialog__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(1, 1, 54, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.ih-dialog {
+  background: #fff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 360px;
+  padding: 20px;
+  box-shadow: 0 20px 50px rgba(1, 1, 54, 0.25);
+}
+
+.ih-dialog__title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--bizx-navy);
+  margin: 0 0 8px;
+}
+
+.ih-dialog__body {
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--bizx-n500);
+  margin: 0 0 18px;
+}
+
+.ih-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.ih-dialog__btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.12s;
+
+  &:hover { opacity: 0.88; }
+}
+
+.ih-dialog__btn--cancel {
+  background: #F4F5F9;
+  color: var(--bizx-n500);
+}
+
+.ih-dialog__btn--confirm {
+  background: #0D8F61;
+  color: #fff;
+}
+
 .ih-confirm-btn {
   display: flex;
   align-items: center;

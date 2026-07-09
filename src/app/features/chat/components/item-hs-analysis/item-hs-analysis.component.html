@@ -118,6 +118,37 @@
                       </div>
                     </button>
                   }
+
+                  <div class="ih-manual">
+                    <p class="ih-manual__title">หรือพิมพ์ HS Code เอง</p>
+                    <div class="ih-manual__row">
+                      <input class="ih-manual__input" type="text" placeholder="เช่น 9018.90.90"
+                        [ngModel]="manualHsInput()[item.id]"
+                        (ngModelChange)="onManualHsInput(item.id, $event)"
+                        (keydown.enter)="searchManualHs(item.id)" />
+                      <button type="button" class="ih-manual__search-btn" (click)="searchManualHs(item.id)">ค้นหา</button>
+                    </div>
+
+                    @if (manualHsResult()[item.id] !== undefined) {
+                      @if (manualHsResult()[item.id]; as found) {
+                        <div class="ih-manual__result">
+                          <div class="ih-candidate__main">
+                            <span class="ih-candidate__hs">HS {{ found.hsCode }} · {{ found.tariffCode }}</span>
+                            <span class="ih-candidate__desc">{{ found.description }}</span>
+                          </div>
+                          <div class="ih-candidate__meta">
+                            <span>ภาษี {{ found.dutyRate }}%</span>
+                          </div>
+                          <button type="button" class="ih-manual__confirm-btn" (click)="confirmManualHs(item)">
+                            <lucide-icon [img]="Check" [size]="12" color="#fff" />
+                            ยืนยันใช้รหัสนี้
+                          </button>
+                        </div>
+                      } @else {
+                        <p class="ih-manual__not-found">ไม่พบข้อมูล HS Code นี้ในระบบ กรุณาตรวจสอบเลขที่กรอกอีกครั้ง</p>
+                      }
+                    }
+                  </div>
                 </div>
               }
             </div>
@@ -125,7 +156,7 @@
         </div>
 
         <button class="ih-confirm-btn" [class.ih-confirm-btn--done]="isGroupConfirmed(group.key)"
-          [disabled]="proceeded() || isGroupConfirmed(group.key)" (click)="confirmGroup(group.key)">
+          [disabled]="proceeded() || isGroupConfirmed(group.key)" (click)="requestConfirmGroup(group.key)">
           @if (isGroupConfirmed(group.key)) {
             <lucide-icon [img]="Check" [size]="13" color="#0D8F61" />
           } @else {
@@ -152,3 +183,22 @@
     </div>
   }
 </div>
+
+@if (confirmingGroup; as group) {
+  <div class="ih-dialog__backdrop" (click)="cancelConfirmGroup()">
+    <div class="ih-dialog" (click)="$event.stopPropagation()">
+      <p class="ih-dialog__title">ยืนยันกลุ่ม {{ group.key === '—' ? 'ไม่ต้องขอใบอนุญาต' : group.key }}</p>
+      <p class="ih-dialog__body">
+        ได้ตรวจสอบพิกัด HS Code ของทุกรายการในกลุ่มนี้ ({{ group.items.length }} รายการ) ครบถ้วนแล้วใช่หรือไม่?
+        หลังยืนยันจะไม่สามารถแก้ไขรายการในกลุ่มนี้ได้อีก
+      </p>
+      <div class="ih-dialog__actions">
+        <button type="button" class="ih-dialog__btn ih-dialog__btn--cancel" (click)="cancelConfirmGroup()">ยกเลิก</button>
+        <button type="button" class="ih-dialog__btn ih-dialog__btn--confirm" (click)="confirmGroup(group.key)">
+          <lucide-icon [img]="Check" [size]="13" color="#fff" />
+          ตรวจสอบครบถ้วนแล้ว ยืนยัน
+        </button>
+      </div>
+    </div>
+  </div>
+}
