@@ -2,7 +2,9 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inpu
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
-import { LicenseFormData, InvoiceLineItem, ItemManualDetail, ITEM_MANUAL_DETAIL_FIELDS } from '@app/core/models/types';
+import { LicenseFormData, InvoiceLineItem, ItemManualDetail, ITEM_MANUAL_DETAIL_FIELDS, CustomsDeclarationData, CustomsDeclarationItem } from '@app/core/models/types';
+import { CUSTOMS_DECLARATION_HEADER_SECTIONS } from '@app/shared/utils/customs-declaration-sections';
+import { CustomsItemDetailComponent } from '../customs-item-detail/customs-item-detail.component';
 import { ChatService } from '@app/core/services/chat.service';
 
 interface PreviewRow {
@@ -21,7 +23,7 @@ interface PreviewSection {
   selector: 'app-form-preview',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.Default,
-  imports: [CommonModule, FormsModule, NzDatePickerModule],
+  imports: [CommonModule, FormsModule, NzDatePickerModule, CustomsItemDetailComponent],
   templateUrl: './form-preview.component.html',
   styleUrl: './form-preview.component.scss',
 })
@@ -60,6 +62,42 @@ export class FormPreviewComponent {
 
   editingKey: string | null = null;
   saved = false;
+
+  readonly declSections = CUSTOMS_DECLARATION_HEADER_SECTIONS;
+  get declaration(): CustomsDeclarationData | undefined { return this.local.customsDeclaration; }
+
+  declValue(key: string): string {
+    return ((this.declaration as unknown as Record<string, string>)?.[key] ?? '').toString();
+  }
+  declHasValue(key: string): boolean { return this.declValue(key).trim().length > 0; }
+  declDisplay(key: string): string { return this.declValue(key) || '—'; }
+  sectionHasAnyValue(section: { rows: { key: string }[] }): boolean {
+    return section.rows.some(r => this.declHasValue(r.key));
+  }
+
+  startDeclEdit(key: string): void {
+    if (this.saved) return;
+    this.editingKey = 'decl:' + key;
+    this.cdr.detectChanges();
+    setTimeout(() => {
+      const input = this.el.nativeElement.querySelector(`[data-decl-key="${key}"]`) as HTMLInputElement;
+      input?.focus(); input?.select();
+    }, 30);
+  }
+
+  onDeclInput(key: string, event: Event): void {
+    const val = (event.target as HTMLInputElement).value;
+    if (!this.local.customsDeclaration) return;
+    this.local.customsDeclaration = { ...this.local.customsDeclaration, [key]: val };
+  }
+
+  /** The full CustomsDeclarationItem this line item was sourced from, when one exists (customs/
+   *  SPN paths) — drives the rich read-only detail via <app-customs-item-detail>. Invoice-path
+   *  items with no matching declaration item fall back to the basic InvoiceLineItem fields. */
+  declarationItem(item: InvoiceLineItem): CustomsDeclarationItem | undefined {
+    if (item.declarationItemNumber == null) return undefined;
+    return this.declaration?.items.find(i => i.itemNumber === item.declarationItemNumber);
+  }
 
   readonly sections: PreviewSection[] = [
     {

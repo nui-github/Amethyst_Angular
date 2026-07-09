@@ -126,9 +126,13 @@ const ITEM_COMMERCIAL: Record<string, { quantity: string; unit: string; unitPric
 export function mapToInvoiceLineItems(items: ProductHsAnalysis[]): InvoiceLineItem[] {
   return items.map(p => {
     const c = ITEM_COMMERCIAL[p.id] ?? { quantity: '1', unit: 'ชิ้น', unitPrice: 0, amount: 0, lotNo: p.id };
+    // p1..p6 map 1:1 (by construction) to CustomsDeclarationItem.itemNumber 1..6 in
+    // INVOICE_CUSTOMS_ITEMS (invoice-ocr.mock.ts) — same 6-item invoice, same order.
+    const declarationItemNumber = Number(p.id.replace(/^p/, '')) || undefined;
     return {
       id: p.id, name: p.name, hsCode: p.hsCode, quantity: c.quantity, unit: c.unit,
       unitPrice: c.unitPrice, amount: c.amount, lotNo: c.lotNo, mfgDate: c.mfgDate, expDate: c.expDate,
+      declarationItemNumber,
     };
   });
 }

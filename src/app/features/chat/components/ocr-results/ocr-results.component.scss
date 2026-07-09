@@ -60,10 +60,4 @@
 .ocr-modal__sub{font-size:12px;color:#6B7280;margin:2px 0 0}
 .ocr-modal__close{display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:7px;border:none;background:#F4F5F9;color:#6B7280;cursor:pointer;flex-shrink:0}
 .ocr-modal__close:hover{background:#E5E7EB}
-.ocr-modal__body{padding:16px 18px;overflow-y:auto;display:flex;flex-direction:column;gap:16px}
-.ocr-modal__section{display:flex;flex-direction:column;gap:8px}
-.ocr-modal__section-title{font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.6px}
-.ocr-modal__ro-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;background:#F8FAFC;border-radius:10px;padding:10px 12px}
-.ocr-modal__ro{display:flex;flex-direction:column;gap:2px;font-size:12px}
-.ocr-modal__ro span{color:#9CA3AF;font-size:10.5px}
-.ocr-modal__ro strong{color:#010136;font-weight:600;word-break:break-word}
+.ocr-modal__body{padding:16px 18px;overflow-y:auto}

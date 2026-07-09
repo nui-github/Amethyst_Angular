@@ -344,6 +344,7 @@ export interface InvoiceLineItem {
   origin?: string;        // ประเทศกำเนิดสินค้า (จาก OCR)
   mfgDate?: string;       // วันที่ผลิต (จาก OCR/production details เมื่อมี)
   expDate?: string;       // วันหมดอายุ (จาก OCR/production details เมื่อมี)
+  declarationItemNumber?: number; // FK → CustomsDeclarationItem.itemNumber เมื่อมี (customs/SPN paths)
 }
 
 // Fields NOT available from OCR — user must key these in per item before the

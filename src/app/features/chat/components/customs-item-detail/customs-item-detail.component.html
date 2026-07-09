@@ -1,0 +1,105 @@
+<div class="cid-section">
+  <span class="cid-section__title">ข้อมูลสินค้า</span>
+  <div class="cid-ro-grid">
+    <div class="cid-ro"><span>ลำดับรายการในใบขน</span><strong>{{ item.declarationLineNumber ?? '—' }}</strong></div>
+    <div class="cid-ro"><span>ลำดับรายการใน Invoice</span><strong>{{ item.invoiceItemNumber ?? '—' }}</strong></div>
+    <div class="cid-ro"><span>ชื่อสินค้า (TH)</span><strong>{{ item.nameTh || '—' }}</strong></div>
+    <div class="cid-ro"><span>ชื่อสินค้า (EN)</span><strong>{{ item.nameEn || '—' }}</strong></div>
+    <div class="cid-ro"><span>พิกัดศุลกากร</span><strong>{{ item.tariffCode || '—' }}</strong></div>
+    <div class="cid-ro"><span>รหัสสถิติ</span><strong>{{ item.statisticalCode || '—' }}</strong></div>
+    <div class="cid-ro"><span>รหัสสินค้าควบคุม</span><strong>{{ item.restrictedGoodsCode || '—' }}</strong></div>
+    <div class="cid-ro"><span>ลักษณะสินค้า</span><strong>{{ item.characteristic || '—' }}</strong></div>
+    <div class="cid-ro"><span>ยี่ห้อ</span><strong>{{ item.brandName || '—' }}</strong></div>
+    <div class="cid-ro"><span>ผู้ผลิต</span><strong>{{ item.manufacture || '—' }}</strong></div>
+  </div>
+</div>
+
+<div class="cid-section">
+  <span class="cid-section__title">ปริมาณ / น้ำหนัก / มูลค่า</span>
+  <div class="cid-ro-grid">
+    <div class="cid-ro"><span>ปริมาณ</span><strong>{{ item.quantity || '—' }} {{ item.quantityUnit }}</strong></div>
+    <div class="cid-ro"><span>น้ำหนักสุทธิ</span><strong>{{ item.netWeight || '—' }} {{ item.netWeightUnit }}</strong></div>
+    <div class="cid-ro"><span>จำนวนหีบห่อ</span><strong>{{ item.packageAmount || '—' }} {{ item.packageUnit }}</strong></div>
+    <div class="cid-ro"><span>ประเทศกำเนิด</span><strong>{{ item.originCountry || '—' }}</strong></div>
+    <div class="cid-ro"><span>ประเทศที่ซื้อ</span><strong>{{ item.purchaseCountry || '—' }}</strong></div>
+    <div class="cid-ro"><span>มูลค่า (สกุลเงินต่างประเทศ)</span><strong>{{ item.invoiceAmountForeign || '—' }} {{ item.currencyCode }}</strong></div>
+    <div class="cid-ro"><span>มูลค่า (บาท)</span><strong>{{ item.invoiceAmountBaht ? ('฿' + item.invoiceAmountBaht) : '—' }}</strong></div>
+    <div class="cid-ro"><span>เลขที่ Invoice</span><strong>{{ item.invoiceNo || '—' }}</strong></div>
+  </div>
+</div>
+
+@if (item.location; as loc) {
+  <div class="cid-section">
+    <span class="cid-section__title">สถานที่เก็บสินค้า</span>
+    <div class="cid-ro-grid">
+      <div class="cid-ro"><span>รหัสคลังสินค้า</span><strong>{{ loc.goodsCode || '—' }}</strong></div>
+      <div class="cid-ro"><span>ชื่อคลังสินค้า</span><strong>{{ loc.goodsName || '—' }}</strong></div>
+      <div class="cid-ro" style="grid-column: 1 / -1"><span>ที่อยู่</span><strong>{{ loc.streetAndNumber || '—' }}</strong></div>
+      <div class="cid-ro"><span>แขวง/ตำบล</span><strong>{{ loc.district || '—' }}</strong></div>
+      <div class="cid-ro"><span>เขต/อำเภอ</span><strong>{{ loc.subProvince || '—' }}</strong></div>
+      <div class="cid-ro"><span>จังหวัด</span><strong>{{ loc.province || '—' }}</strong></div>
+      <div class="cid-ro"><span>รหัสไปรษณีย์</span><strong>{{ loc.postcode || '—' }}</strong></div>
+      <div class="cid-ro"><span>โทรศัพท์</span><strong>{{ loc.phoneNumber || '—' }}</strong></div>
+      <div class="cid-ro"><span>โทรสาร</span><strong>{{ loc.faxNumber || '—' }}</strong></div>
+    </div>
+  </div>
+}
+
+@if (item.dangerousTh || item.dangerousEn || item.dangerousInfo) {
+  <div class="cid-section">
+    <span class="cid-section__title">สินค้าอันตราย</span>
+    <div class="cid-ro-grid">
+      <div class="cid-ro"><span>ชื่อ (TH)</span><strong>{{ item.dangerousTh || '—' }}</strong></div>
+      <div class="cid-ro"><span>ชื่อ (EN)</span><strong>{{ item.dangerousEn || '—' }}</strong></div>
+      <div class="cid-ro" style="grid-column: 1 / -1"><span>ข้อมูลเพิ่มเติม</span><strong>{{ item.dangerousInfo || '—' }}</strong></div>
+    </div>
+  </div>
+}
+
+@if (item.productions?.length) {
+  <div class="cid-section">
+    <span class="cid-section__title">ข้อมูลการผลิต</span>
+    @for (p of item.productions; track $index) {
+      <div class="cid-ro-grid" [style.margin-bottom.px]="8">
+        <div class="cid-ro"><span>Lot No.</span><strong>{{ p.lotNo || '—' }}</strong></div>
+        <div class="cid-ro"><span>วันที่ผลิต</span><strong>{{ p.mfgDate || '—' }}</strong></div>
+        <div class="cid-ro"><span>วันหมดอายุ</span><strong>{{ p.expDate || '—' }}</strong></div>
+        <div class="cid-ro"><span>ปริมาณ</span><strong>{{ p.quantity || '—' }} {{ p.quantityUnit }}</strong></div>
+      </div>
+    }
+  </div>
+}
+
+@if (item.sources?.length) {
+  <div class="cid-section">
+    <span class="cid-section__title">แหล่งที่มา / ใบอนุญาตอ้างอิง</span>
+    @for (s of item.sources; track $index) {
+      <div class="cid-ro-grid" [style.margin-bottom.px]="8">
+        <div class="cid-ro"><span>เลขใบอนุญาต</span><strong>{{ s.licenseNumber || '—' }}</strong></div>
+        <div class="cid-ro"><span>อ้างอิงแหล่งที่มา</span><strong>{{ s.sourceReference || '—' }}</strong></div>
+      </div>
+    }
+  </div>
+}
+
+@if (item.authorities?.length) {
+  <div class="cid-section">
+    <span class="cid-section__title">หน่วยงานที่ออกใบอนุญาต</span>
+    @for (a of item.authorities; track $index) {
+      <div class="cid-ro-grid" [style.margin-bottom.px]="8">
+        <div class="cid-ro"><span>หน่วยงาน</span><strong>{{ a.agency || '—' }}</strong></div>
+        <div class="cid-ro"><span>เลขใบอนุญาต (เลข U)</span><strong>{{ a.licenseNumber || '—' }}</strong></div>
+      </div>
+    }
+  </div>
+}
+
+@if (item.remark || item.certificateAnalysis) {
+  <div class="cid-section">
+    <span class="cid-section__title">อื่นๆ</span>
+    <div class="cid-ro-grid">
+      <div class="cid-ro"><span>Certificate of Analysis</span><strong>{{ item.certificateAnalysis || '—' }}</strong></div>
+      <div class="cid-ro" style="grid-column: 1 / -1"><span>หมายเหตุ</span><strong>{{ item.remark || '—' }}</strong></div>
+    </div>
+  </div>
+}

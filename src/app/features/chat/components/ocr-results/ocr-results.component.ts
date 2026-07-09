@@ -2,49 +2,18 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inpu
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule, CheckCircle } from 'lucide-angular';
 import { OcrResultsData, OcrLineItem, CustomsDeclarationData, CustomsDeclarationItem } from '@app/core/models/types';
+import { CUSTOMS_DECLARATION_HEADER_SECTIONS } from '@app/shared/utils/customs-declaration-sections';
+import { CustomsItemDetailComponent } from '../customs-item-detail/customs-item-detail.component';
 import { ChatService } from '@app/core/services/chat.service';
 
 interface OcrRow { label: string; key: string; accent: boolean; checkNeeded?: boolean; conf?: number; }
 interface OcrSection { title: string; color: string; rows: OcrRow[]; }
 
-// Sections for the structured customsDeclaration display (DocumentControl header fields).
-// Rows with no value are simply skipped — "field ไหนยังไม่มีข้อมูลก็ให้ว่างไว้".
-const DECL_SECTIONS: OcrSection[] = [
-  { title: 'ข้อมูลควบคุมเอกสาร', color: '#0463EF', rows: [
-    { label: 'เลขที่อ้างอิง',      key: 'referenceNumber',         accent: true  },
-    { label: 'ผู้ยื่นคำขอ',        key: 'requestFactName',         accent: false },
-    { label: 'รหัสหน่วยงานควบคุม', key: 'controlAgencyOfficeCode', accent: false },
-  ]},
-  { title: 'ข้อมูลบริษัทผู้นำเข้า', color: '#7C3AED', rows: [
-    { label: 'ชื่อบริษัท',        key: 'companyName',        accent: false },
-    { label: 'เลขผู้เสียภาษี',    key: 'companyTaxNumber',   accent: false },
-    { label: 'สาขาที่',           key: 'companyBranch',      accent: false },
-    { label: 'เลขบัตร ผู้รับมอบอำนาจ', key: 'attorneyIdCard', accent: false },
-  ]},
-  { title: 'ข้อมูลการขนส่ง', color: '#0D8F61', rows: [
-    { label: 'วันที่นำเข้า',       key: 'arrivalDate',        accent: false },
-    { label: 'วันที่ส่งออก',       key: 'departureDate',      accent: false },
-    { label: 'ประเภทใบขน',        key: 'licenseType',        accent: false },
-    { label: 'ชื่อเรือ',           key: 'vesselName',         accent: false },
-    { label: 'ประเทศต้นทาง',      key: 'consignmentCountry', accent: false },
-    { label: 'ประเทศปลายทาง',     key: 'destinationCountry', accent: false },
-    { label: 'รหัสท่าขนถ่าย',      key: 'portDischargeCode',    accent: false },
-    { label: 'รหัสท่าต้นทาง',      key: 'portLoadCode',         accent: false },
-    { label: 'ท่าเรือขนถ่าย',      key: 'controlDischargePort', accent: false },
-    { label: 'ท่าเรือปล่อยสินค้า', key: 'controlReleasePort',   accent: false },
-  ]},
-  { title: 'ผู้แจ้ง', color: '#B45309', rows: [
-    { label: 'ชื่อผู้แจ้ง',        key: 'informantName',   accent: false },
-    { label: 'เลขบัตรผู้แจ้ง',     key: 'informantIdCard', accent: false },
-    { label: 'เลขทะเบียน',        key: 'registrationId',  accent: false },
-  ]},
-];
-
 @Component({
   selector: 'app-ocr-results',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.Default,
-  imports: [CommonModule, LucideAngularModule],
+  imports: [CommonModule, LucideAngularModule, CustomsItemDetailComponent],
   templateUrl: './ocr-results.component.html',
   styleUrl: './ocr-results.component.scss',
 })
@@ -69,7 +38,7 @@ export class OcrResultsComponent {
   readonly cdr  = inject(ChangeDetectorRef);
   readonly el   = inject(ElementRef);
 
-  readonly declSections = DECL_SECTIONS;
+  readonly declSections = CUSTOMS_DECLARATION_HEADER_SECTIONS;
 
   get isManual(): boolean { return !!(this._data as Partial<OcrResultsData>).isManual; }
   get lineItems(): OcrLineItem[] { return this.local.lineItems ?? []; }

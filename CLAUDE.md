@@ -55,11 +55,15 @@ ChatMessage.type → @switch in ChatAreaComponent
   'ocr-results'        → OcrResultsComponent   (editable inline; "ดำเนินการต่อ" triggers item-hs-analysis;
                             when data.customsDeclaration is present, renders the STRUCTURED display —
                             DocumentControl header fields grouped into 4 sections (ข้อมูลควบคุมเอกสาร/
-                            ข้อมูลบริษัทผู้นำเข้า/ข้อมูลการขนส่ง/ผู้แจ้ง, each row editable inline, blank
-                            fields simply omitted) + a "รายการสินค้า" list of GoodsShipment items, each
-                            with a "รายละเอียด" button opening a read-only modal (dangerous-goods info,
-                            production/lot, license source, issuing authority — types.ts
-                            CustomsDeclarationItem). This structure is meant to already be shaped like
+                            ข้อมูลบริษัทผู้นำเข้า/ข้อมูลการขนส่ง/ผู้แจ้ง — CUSTOMS_DECLARATION_HEADER_SECTIONS,
+                            shared/utils/customs-declaration-sections.ts, also used by form-preview's
+                            header; each row editable inline, blank fields simply omitted) + a
+                            "รายการสินค้า" list of GoodsShipment items, each with a "รายละเอียด" button
+                            opening a read-only modal via the shared <app-customs-item-detail>
+                            component (features/chat/components/customs-item-detail — also reused by
+                            form-preview's item modal: dangerous-goods info, production/lot, license
+                            source, issuing authority — types.ts CustomsDeclarationItem). This structure
+                            is meant to already be shaped like
                             the real LPI submission payload; any later upload step (e.g. agency-upload's
                             own OCR pass) merges into the same object via mergeCustomsDeclaration()
                             (shared/utils/helpers.ts) rather than replacing it, so nothing already
@@ -97,13 +101,21 @@ ChatMessage.type → @switch in ChatAreaComponent
   'status-card'        → StatusCardComponent    (isPending=true: รอชำระ / false: สำเร็จ)
   'spn-result'         → SpnResultComponent
   'form-preview'       → FormPreviewComponent   (editable pre-submit data review; "ดำเนินการต่อ" triggers choice-card;
-                            when data.selectedItems present (every path — see selectAllAgencyItems() /
+                            header uses the SAME structured display as ocr-results when
+                            data.customsDeclaration is present — CUSTOMS_DECLARATION_HEADER_SECTIONS
+                            (shared/utils/customs-declaration-sections.ts), editable inline exactly
+                            like ocr-results' decl rows; falls back to the legacy LicenseFormData
+                            sections when absent (e.g. SPN path, which never runs OCR so has no
+                            customsDeclaration — pulls straight from ShippingNet's own record instead).
+                            When data.selectedItems present (every path — see selectAllAgencyItems() /
                             getInvoiceLineItems() below, formData.selectedItems is now set directly with
                             no separate item-selection UI), each item row has a "รายละเอียด" button opening
-                            a modal — OCR-derived fields read-only (now includes Lot No./Mfg. Date/
-                            Exp. Date/Qty., auto-filled from InvoiceLineItem.lotNo/mfgDate/expDate/
-                            quantity/unit — see mfgDate/expDate on InvoiceLineItem, types.ts), plus
-                            only Measurement + Meas. Unit left editable (editableFields in
+                            a modal: if the item has a declarationItemNumber (types.ts InvoiceLineItem —
+                            FK into customsDeclaration.items, set by mapToInvoiceLineItems() for
+                            customs/SPN paths) it renders the full CustomsDeclarationItem via the shared
+                            <app-customs-item-detail> component (same one ocr-results uses); otherwise
+                            falls back to the basic Invoice/HS/origin/qty/lot/value grid. Either way,
+                            only Measurement + Meas. Unit are left editable below it (editableFields in
                             form-preview.component.ts — the only ItemManualDetail fields no upstream
                             document actually captures) the user must fill in and confirm per item;
                             "ดำเนินการต่อ" stays disabled until every selected item is confirmed)
