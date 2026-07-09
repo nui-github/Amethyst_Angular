@@ -53,9 +53,22 @@ ChatMessage.type → @switch in ChatAreaComponent
   'email-draft'        → EmailDraftComponent    (emit: sent)
   'ocr-progress'       → OcrProgressComponent
   'ocr-results'        → OcrResultsComponent   (editable inline; "ดำเนินการต่อ" triggers item-hs-analysis;
-                            when data.lineItems present, shows a grouped "รายการสินค้า" section below the
-                            editable fields — read-only line-item display, not individually editable. All
-                            three OCR mocks (ocr.mock.ts, invoice-ocr.mock.ts) share the same 6 line items)
+                            when data.customsDeclaration is present, renders the STRUCTURED display —
+                            DocumentControl header fields grouped into 4 sections (ข้อมูลควบคุมเอกสาร/
+                            ข้อมูลบริษัทผู้นำเข้า/ข้อมูลการขนส่ง/ผู้แจ้ง, each row editable inline, blank
+                            fields simply omitted) + a "รายการสินค้า" list of GoodsShipment items, each
+                            with a "รายละเอียด" button opening a read-only modal (dangerous-goods info,
+                            production/lot, license source, issuing authority — types.ts
+                            CustomsDeclarationItem). This structure is meant to already be shaped like
+                            the real LPI submission payload; any later upload step (e.g. agency-upload's
+                            own OCR pass) merges into the same object via mergeCustomsDeclaration()
+                            (shared/utils/helpers.ts) rather than replacing it, so nothing already
+                            captured is lost. When customsDeclaration is ABSENT (all historical
+                            queue-mock/sessions-mock replay data), falls back to the legacy flat
+                            fields + optional lineItems grouped display — kept only for backward compat,
+                            do not add new flows using the flat shape. All OCR mocks (ocr.mock.ts,
+                            invoice-ocr.mock.ts) share the same 6 items, now expressed via
+                            INVOICE_CUSTOMS_ITEMS (invoice-ocr.mock.ts) in the CustomsDeclarationItem shape)
   'hs-analysis'        → HsAnalysisComponent   (legacy — only used by the unreachable chooseFullUpload() path
                             and historical queue-mock/sessions-mock message replay; live flows use item-hs-analysis)
   'item-hs-analysis'   → ItemHsAnalysisComponent (used by ALL live analysis flows — invoice path, SPN path, and
@@ -440,9 +453,15 @@ apiUrl: 'https://your-api.com',
 
 Replace in `src/app/core/mock/`:
 - `spn.mock.ts` → `KNOWN_REFS` + `MOCK_FORM_DATA` → `GET /spn/:ref`
-- `ocr.mock.ts` → `MOCK_OCR_RESULT` → `POST /ocr` (multipart)
+- `ocr.mock.ts` → `MOCK_OCR_RESULT` → `POST /ocr` (multipart); include `customsDeclaration`
+  (types.ts `CustomsDeclarationData`) shaped like the real LPI submission payload
+  (DocumentControl header + GoodsShipment items) — this drives the ocr-results card's main
+  display now, not the legacy flat fields. Leave any field the OCR engine couldn't read
+  undefined rather than guessing
 - `invoice-ocr.mock.ts` → `MOCK_INVOICE_OCR_RESULT` → same `POST /ocr` endpoint for the invoice-upload path;
-  response should include a `lineItems[]` array (one row per invoice line) for the ocr-results grouped display
+  also returns `customsDeclaration` — a commercial invoice won't carry customs-manifest fields
+  (vessel/ports/etc.), so expect those to come back blank until an actual customs declaration
+  step happens; `lineItems[]` (legacy, OcrLineItem[]) is kept only for the fallback display
 - `hs-analysis.mock.ts` → `analyzeHsCode()` → supports `agencies[]` for multi-agency HS codes (legacy path only)
 - `product-hs-analysis.mock.ts` → `getProductHsAnalysis()` → per-product HS Code → Smart Tariff → agency lookup;
   shared across invoice/SPN/customs paths, so the real endpoint should return the same per-item breakdown

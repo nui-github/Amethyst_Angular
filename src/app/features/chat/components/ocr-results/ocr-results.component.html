@@ -1,0 +1,253 @@
+<div class="ocr-wrap">
+  <div class="ocr-hdr">
+    <div class="ocr-hdr__icon"><lucide-icon [img]="CheckCircle" [size]="14" color="#0D8F61" /></div>
+    <div>
+      <p class="ocr-hdr__title">{{ isManual ? 'บันทึกข้อมูลเรียบร้อยแล้วครับ' : 'OCR อ่านข้อมูลได้แล้วครับ' }}</p>
+      <p class="ocr-hdr__sub">{{ proceeded() ? 'ยืนยันข้อมูลแล้ว' : 'ตรวจสอบและแก้ไขข้อมูลก่อนดำเนินการต่อ' }}</p>
+    </div>
+  </div>
+
+  @if (declaration) {
+    <!-- Structured customs-declaration display -->
+    @for (section of declSections; track section.title) {
+      @if (sectionHasAnyValue(section)) {
+        <div class="ocr-sec">
+          <div class="ocr-sec__head" [style.border-left-color]="section.color">
+            <span class="ocr-sec__title">{{ section.title }}</span>
+          </div>
+          <div class="ocr-tbl">
+            @for (row of section.rows; track row.key) {
+              @if (declHasValue(row.key)) {
+                <div class="ocr-row"
+                  [class.ocr-row--editing]="editingKey === 'decl:' + row.key"
+                  [class.ocr-row--ro]="proceeded()"
+                  (click)="startDeclEdit(row.key)">
+                  <span class="ocr-row__lbl">{{ row.label }}</span>
+                  <span class="ocr-row__val-wrap">
+                    @if (editingKey === 'decl:' + row.key) {
+                      <input class="ocr-input" [attr.data-decl-key]="row.key" [value]="declValue(row.key)"
+                        (input)="onDeclInput(row.key, $event)" (blur)="commitEdit()" (keydown)="onKeydown($event)" />
+                    } @else {
+                      <span class="ocr-row__val" [class.ocr-row__val--accent]="row.accent">{{ declDisplay(row.key) }}</span>
+                      @if (!proceeded()) {
+                        <span class="ocr-edit-chip">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                        </span>
+                      }
+                    }
+                  </span>
+                </div>
+              }
+            }
+          </div>
+        </div>
+      }
+    }
+
+    @if (declItems.length) {
+      <div class="ocr-sec">
+        <div class="ocr-sec__head" style="border-left-color: #0D8F61">
+          <span class="ocr-sec__title">รายการสินค้า ({{ declItems.length }} รายการ)</span>
+        </div>
+        <div class="ocr-items">
+          @for (item of declItems; track item.itemNumber) {
+            <div class="ocr-item ocr-item--decl">
+              <div class="ocr-item__main">
+                <span class="ocr-item__name">{{ itemTitle(item) }}</span>
+                <span class="ocr-item__meta">
+                  @if (item.tariffCode) { พิกัด {{ item.tariffCode }} }
+                  @if (item.originCountry) { · {{ item.originCountry }} }
+                </span>
+              </div>
+              <span class="ocr-item__qty">{{ item.quantity || '—' }} {{ item.quantityUnit }}</span>
+              <button type="button" class="ocr-item__detail-btn" (click)="openItemDetail(item.itemNumber)">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                รายละเอียด
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  } @else {
+    <!-- Legacy flat display (historical session replay without customsDeclaration) -->
+    @for (section of sections; track section.title) {
+      <div class="ocr-sec">
+        <div class="ocr-sec__head" [style.border-left-color]="section.color">
+          <span class="ocr-sec__title">{{ section.title }}</span>
+        </div>
+        <div class="ocr-tbl">
+          @for (row of section.rows; track row.key) {
+            @if (hasValue(row.key)) {
+              <div class="ocr-row"
+                [class.ocr-row--editing]="editingKey === row.key"
+                [class.ocr-row--ro]="proceeded()"
+                [class.ocr-row--check]="row.checkNeeded && !proceeded()"
+                (click)="startEdit(row.key)">
+                <span class="ocr-row__lbl">
+                  {{ row.label }}
+                  @if (row.checkNeeded && !proceeded()) {
+                    <span class="ocr-check-pill">AI {{ row.conf }}%</span>
+                  }
+                </span>
+                <span class="ocr-row__val-wrap">
+                  @if (editingKey === row.key) {
+                    <input class="ocr-input" [attr.data-key]="row.key" [value]="getValue(row.key)"
+                      (input)="onInput(row.key, $event)" (blur)="commitEdit()" (keydown)="onKeydown($event)" />
+                  } @else {
+                    <span class="ocr-row__val" [class.ocr-row__val--accent]="row.accent" [class.ocr-row__val--warn]="row.checkNeeded && !proceeded()">{{ display(row.key) }}</span>
+                    @if (!proceeded()) {
+                      <span class="ocr-edit-chip">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                      </span>
+                    }
+                  }
+                </span>
+              </div>
+            }
+          }
+        </div>
+      </div>
+    }
+
+    @if (lineItems.length) {
+      <div class="ocr-sec">
+        <div class="ocr-sec__head" style="border-left-color: #0D8F61">
+          <span class="ocr-sec__title">รายการสินค้า ({{ lineItems.length }} รายการ)</span>
+        </div>
+        <div class="ocr-items">
+          @for (item of lineItems; track item.id) {
+            <div class="ocr-item">
+              <span class="ocr-item__name">{{ item.name }}</span>
+              <span class="ocr-item__meta">HS {{ item.hsCode }} · {{ item.origin }}</span>
+              <span class="ocr-item__qty">{{ item.qty }} {{ item.unit }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  }
+
+  @if (!proceeded()) {
+    <div class="ocr-foot">
+      <span class="ocr-foot__hint">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        กดที่ช่องเพื่อแก้ไขข้อมูล
+      </span>
+      <button class="ocr-btn" (click)="proceed()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        ดำเนินการต่อ
+      </button>
+    </div>
+  } @else {
+    <div class="ocr-foot ocr-foot--done">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0D8F61" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      ยืนยันข้อมูลแล้ว
+    </div>
+  }
+</div>
+
+@if (detailItem; as item) {
+  <div class="ocr-modal__backdrop" (click)="closeItemDetail()">
+    <div class="ocr-modal" (click)="$event.stopPropagation()">
+      <div class="ocr-modal__hd">
+        <div>
+          <p class="ocr-modal__title">รายละเอียดสินค้า</p>
+          <p class="ocr-modal__sub">{{ itemTitle(item) }}</p>
+        </div>
+        <button class="ocr-modal__close" (click)="closeItemDetail()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="ocr-modal__body">
+        <div class="ocr-modal__section">
+          <span class="ocr-modal__section-title">ข้อมูลสินค้า</span>
+          <div class="ocr-modal__ro-grid">
+            <div class="ocr-modal__ro"><span>ชื่อสินค้า (TH)</span><strong>{{ item.nameTh || '—' }}</strong></div>
+            <div class="ocr-modal__ro"><span>ชื่อสินค้า (EN)</span><strong>{{ item.nameEn || '—' }}</strong></div>
+            <div class="ocr-modal__ro"><span>พิกัดศุลกากร</span><strong>{{ item.tariffCode || '—' }}</strong></div>
+            <div class="ocr-modal__ro"><span>รหัสสถิติ</span><strong>{{ item.statisticalCode || '—' }}</strong></div>
+            <div class="ocr-modal__ro"><span>รหัสสินค้าควบคุม</span><strong>{{ item.restrictedGoodsCode || '—' }}</strong></div>
+            <div class="ocr-modal__ro"><span>ลักษณะสินค้า</span><strong>{{ item.characteristic || '—' }}</strong></div>
+            <div class="ocr-modal__ro"><span>ยี่ห้อ</span><strong>{{ item.brandName || '—' }}</strong></div>
+            <div class="ocr-modal__ro"><span>ผู้ผลิต</span><strong>{{ item.manufacture || '—' }}</strong></div>
+          </div>
+        </div>
+
+        <div class="ocr-modal__section">
+          <span class="ocr-modal__section-title">ปริมาณ / น้ำหนัก / มูลค่า</span>
+          <div class="ocr-modal__ro-grid">
+            <div class="ocr-modal__ro"><span>ปริมาณ</span><strong>{{ item.quantity || '—' }} {{ item.quantityUnit }}</strong></div>
+            <div class="ocr-modal__ro"><span>น้ำหนักสุทธิ</span><strong>{{ item.netWeight || '—' }} {{ item.netWeightUnit }}</strong></div>
+            <div class="ocr-modal__ro"><span>จำนวนหีบห่อ</span><strong>{{ item.packageAmount || '—' }} {{ item.packageUnit }}</strong></div>
+            <div class="ocr-modal__ro"><span>ประเทศกำเนิด</span><strong>{{ item.originCountry || '—' }}</strong></div>
+            <div class="ocr-modal__ro"><span>ประเทศที่ซื้อ</span><strong>{{ item.purchaseCountry || '—' }}</strong></div>
+            <div class="ocr-modal__ro"><span>มูลค่า (สกุลเงินต่างประเทศ)</span><strong>{{ item.invoiceAmountForeign || '—' }} {{ item.currencyCode }}</strong></div>
+            <div class="ocr-modal__ro"><span>มูลค่า (บาท)</span><strong>{{ item.invoiceAmountBaht ? ('฿' + item.invoiceAmountBaht) : '—' }}</strong></div>
+            <div class="ocr-modal__ro"><span>เลขที่ Invoice</span><strong>{{ item.invoiceNo || '—' }}</strong></div>
+          </div>
+        </div>
+
+        @if (item.dangerousTh || item.dangerousEn || item.dangerousInfo) {
+          <div class="ocr-modal__section">
+            <span class="ocr-modal__section-title">สินค้าอันตราย</span>
+            <div class="ocr-modal__ro-grid">
+              <div class="ocr-modal__ro"><span>ชื่อ (TH)</span><strong>{{ item.dangerousTh || '—' }}</strong></div>
+              <div class="ocr-modal__ro"><span>ชื่อ (EN)</span><strong>{{ item.dangerousEn || '—' }}</strong></div>
+              <div class="ocr-modal__ro" style="grid-column: 1 / -1"><span>ข้อมูลเพิ่มเติม</span><strong>{{ item.dangerousInfo || '—' }}</strong></div>
+            </div>
+          </div>
+        }
+
+        @if (item.productions?.length) {
+          <div class="ocr-modal__section">
+            <span class="ocr-modal__section-title">ข้อมูลการผลิต</span>
+            @for (p of item.productions; track $index) {
+              <div class="ocr-modal__ro-grid" [style.margin-bottom.px]="8">
+                <div class="ocr-modal__ro"><span>Lot No.</span><strong>{{ p.lotNo || '—' }}</strong></div>
+                <div class="ocr-modal__ro"><span>วันที่ผลิต</span><strong>{{ p.mfgDate || '—' }}</strong></div>
+                <div class="ocr-modal__ro"><span>วันหมดอายุ</span><strong>{{ p.expDate || '—' }}</strong></div>
+                <div class="ocr-modal__ro"><span>ปริมาณ</span><strong>{{ p.quantity || '—' }} {{ p.quantityUnit }}</strong></div>
+              </div>
+            }
+          </div>
+        }
+
+        @if (item.sources?.length) {
+          <div class="ocr-modal__section">
+            <span class="ocr-modal__section-title">แหล่งที่มา / ใบอนุญาตอ้างอิง</span>
+            @for (s of item.sources; track $index) {
+              <div class="ocr-modal__ro-grid" [style.margin-bottom.px]="8">
+                <div class="ocr-modal__ro"><span>เลขใบอนุญาต</span><strong>{{ s.licenseNumber || '—' }}</strong></div>
+                <div class="ocr-modal__ro"><span>อ้างอิงแหล่งที่มา</span><strong>{{ s.sourceReference || '—' }}</strong></div>
+              </div>
+            }
+          </div>
+        }
+
+        @if (item.authorities?.length) {
+          <div class="ocr-modal__section">
+            <span class="ocr-modal__section-title">หน่วยงานที่ออกใบอนุญาต</span>
+            @for (a of item.authorities; track $index) {
+              <div class="ocr-modal__ro-grid" [style.margin-bottom.px]="8">
+                <div class="ocr-modal__ro"><span>หน่วยงาน</span><strong>{{ a.agency || '—' }}</strong></div>
+                <div class="ocr-modal__ro"><span>เลขใบอนุญาต</span><strong>{{ a.licenseNumber || '—' }}</strong></div>
+              </div>
+            }
+          </div>
+        }
+
+        @if (item.remark || item.certificateAnalysis) {
+          <div class="ocr-modal__section">
+            <span class="ocr-modal__section-title">อื่นๆ</span>
+            <div class="ocr-modal__ro-grid">
+              <div class="ocr-modal__ro"><span>Certificate of Analysis</span><strong>{{ item.certificateAnalysis || '—' }}</strong></div>
+              <div class="ocr-modal__ro" style="grid-column: 1 / -1"><span>หมายเหตุ</span><strong>{{ item.remark || '—' }}</strong></div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

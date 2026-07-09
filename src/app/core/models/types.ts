@@ -133,6 +133,97 @@ export interface OcrResultsData {
   lineItems?: OcrLineItem[]; // per-product breakdown (invoice-upload path) — grouped display only, not editable inline
   isManual?: boolean;       // true = data came from manual entry, not OCR
   autoProceeded?: boolean;  // true = flow auto-proceeded, hide the button immediately
+  // Structured customs-declaration data extracted by OCR, shaped to match the actual
+  // LPI submission payload (DocumentControl + GoodsShipment). Drives the ocr-results card's
+  // main display; fields OCR couldn't read are simply left undefined/blank. Any later upload
+  // step (e.g. agency-upload's own OCR pass) merges into this same shape via mergeCustomsDeclaration().
+  customsDeclaration?: CustomsDeclarationData;
+}
+
+// One "Source" entry (license backing a controlled item) on a GoodsShipment line
+export interface CustomsDeclarationSource {
+  licenseNumber?: string;
+  sourceReference?: string;
+  radioactiveMaterial?: string;
+  radioactiveQty?: string;
+  radioactiveUnit?: string;
+  amount?: string;
+}
+
+// One "ProductionDetails" entry (lot-level manufacturing info) on a GoodsShipment line
+export interface CustomsDeclarationProduction {
+  lotNo?: string;
+  mfgDate?: string;
+  expDate?: string;
+  measurement?: string;
+  measurementUnit?: string;
+  quantity?: string;
+  quantityUnit?: string;
+}
+
+// One "Authority" entry (permit issued by a specific agency) on a GoodsShipment line
+export interface CustomsDeclarationAuthority {
+  agency?: string;
+  licenseNumber?: string;
+}
+
+// One GoodsShipment line item, flattened from the real ใบขนสินค้า/LPI JSON payload
+export interface CustomsDeclarationItem {
+  itemNumber: number;
+  invoiceNo?: string;
+  invoiceDate?: string;
+  invoiceItemNumber?: number;
+  nameTh?: string;
+  nameEn?: string;
+  dangerousTh?: string;
+  dangerousEn?: string;
+  brandName?: string;
+  dangerousInfo?: string;      // DangerousGoodsAdditionalInformationText (UN no./class/packing group)
+  characteristic?: string;
+  tariffCode?: string;
+  statisticalCode?: string;
+  restrictedGoodsCode?: string;
+  quantity?: string;
+  quantityUnit?: string;
+  netWeight?: string;
+  netWeightUnit?: string;
+  packageAmount?: string;
+  packageUnit?: string;
+  originCountry?: string;
+  purchaseCountry?: string;
+  invoiceAmountForeign?: string;
+  currencyCode?: string;
+  invoiceAmountBaht?: string;
+  manufacture?: string;
+  remark?: string;
+  certificateAnalysis?: string;
+  sources?: CustomsDeclarationSource[];
+  productions?: CustomsDeclarationProduction[];
+  authorities?: CustomsDeclarationAuthority[];
+}
+
+// DocumentControl (header) + GoodsShipment (line items) — the structure ready to submit to the
+// agency, also reused as the pre-submission preview structure (form-preview item detail).
+export interface CustomsDeclarationData {
+  referenceNumber?: string;
+  requestFactName?: string;
+  controlAgencyOfficeCode?: string;
+  companyTaxNumber?: string;
+  companyBranch?: string;
+  companyName?: string;
+  attorneyIdCard?: string;
+  arrivalDate?: string;
+  departureDate?: string;
+  licenseType?: string;
+  vesselName?: string;
+  consignmentCountry?: string;
+  destinationCountry?: string;
+  dischargePort?: string;
+  loadPort?: string;
+  informantIdCard?: string;
+  informantName?: string;
+  registrationId?: string;
+  items: CustomsDeclarationItem[];
 }
 
 export interface FlagItem {
@@ -227,6 +318,7 @@ export interface LicenseFormData {
   drugRegNo?: string;
   importDate?: string;
   selectedItems?: InvoiceLineItem[]; // สินค้าที่เลือกยื่นขอใบอนุญาต (จาก invoice-items step)
+  customsDeclaration?: CustomsDeclarationData; // structured OCR output, merged across every upload step
 }
 
 // รายการสินค้าใน Invoice — field ตามที่กรม (อย./กษ.) ใช้ประกอบคำขอนำเข้า

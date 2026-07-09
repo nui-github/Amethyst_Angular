@@ -17,6 +17,7 @@ import { getProductHsAnalysis, mapToInvoiceLineItems } from '@mock/product-hs-an
 import { InvoiceOcrResult } from '@mock/invoice-ocr.mock';
 import { environment } from '@env/environment';
 import { MOCK_SESSIONS } from '@mock/sessions.mock';
+import { mergeCustomsDeclaration } from '@app/shared/utils/helpers';
 
 let _idCounter = 0;
 const genId = () => `msg_${Date.now()}_${_idCounter++}`;
@@ -346,7 +347,10 @@ export class ChatService {
     this.step.set('ocr');
     this.bot('ocr-progress');
     const result = await this.ocr.startOCR(_files, this.isInvoicePath ? 'invoice' : 'default');
-    this.formData.update(f => ({ ...f, ...result }));
+    this.formData.update(f => ({
+      ...f, ...result,
+      customsDeclaration: mergeCustomsDeclaration(f.customsDeclaration, result.customsDeclaration),
+    }));
     this.promoteActiveSession();
     this.showOCRResults(result);
   }
@@ -360,6 +364,7 @@ export class ChatService {
       hsCode: fd.hsCode ?? '', countryOrigin: fd.countryOrigin ?? '',
       lotNo: fd.lotNo ?? '', uNo: fd.uNo ?? '',
       isManual: true,
+      ...(fd.customsDeclaration ? { customsDeclaration: fd.customsDeclaration } : {}),
     } satisfies OcrResultsData);
     this.withTyping(() => this.continueAfterOCR(), 600);
   }
@@ -385,6 +390,7 @@ export class ChatService {
       lotNo: result.lotNo, uNo: result.uNo,
       ...(withLineItems.qtyUnit ? { qtyUnit: withLineItems.qtyUnit } : {}),
       ...(withLineItems.lineItems ? { lineItems: withLineItems.lineItems } : {}),
+      ...(this.formData().customsDeclaration ? { customsDeclaration: this.formData().customsDeclaration } : {}),
     } satisfies OcrResultsData);
 
     // Skip missing fields check for re-edit paths (post-email, post-flag edit)
@@ -555,7 +561,10 @@ export class ChatService {
       this.bot('ocr-progress');
       const result = await this.ocr.startOCR([file]);
       // Merge: existing fields take priority for fields already filled
-      const merged = { ...result, ...this.formData(), ...extra };
+      const merged = {
+        ...result, ...this.formData(), ...extra,
+        customsDeclaration: mergeCustomsDeclaration(this.formData().customsDeclaration, result.customsDeclaration),
+      };
       this.formData.set(merged);
       const stillMissing = this.getMissingFields(this.formData());
       this.bot('ocr-results', {
@@ -563,6 +572,7 @@ export class ChatService {
         quantity: result.quantity, importer: result.importer, port: result.port,
         hsCode: result.hsCode, countryOrigin: result.countryOrigin,
         lotNo: result.lotNo, uNo: result.uNo,
+        ...(merged.customsDeclaration ? { customsDeclaration: merged.customsDeclaration } : {}),
       } satisfies OcrResultsData);
       if (stillMissing.length > 0) {
         this.withTyping(() => {
