@@ -251,7 +251,7 @@
             @for (a of item.authorities; track $index) {
               <div class="ocr-modal__ro-grid" [style.margin-bottom.px]="8">
                 <div class="ocr-modal__ro"><span>หน่วยงาน</span><strong>{{ a.agency || '—' }}</strong></div>
-                <div class="ocr-modal__ro"><span>เลขใบอนุญาต</span><strong>{{ a.licenseNumber || '—' }}</strong></div>
+                <div class="ocr-modal__ro"><span>เลขใบอนุญาต (เลข U)</span><strong>{{ a.licenseNumber || '—' }}</strong></div>
               </div>
             }
           </div>
