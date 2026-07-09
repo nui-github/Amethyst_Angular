@@ -407,6 +407,28 @@
   &:focus { border-color: #0463EF; }
 }
 
+.fp-modal__input--date {
+  padding: 0;
+  border: none;
+
+  ::ng-deep .ant-picker {
+    width: 100%;
+    font-size: 12px;
+    font-family: inherit;
+    border: 1.5px solid #E5E7EB;
+    border-radius: 7px;
+    padding: 6px 9px;
+
+    &:hover, &.ant-picker-focused { border-color: #0463EF; }
+
+    input {
+      font-size: 12px;
+      font-family: inherit;
+      color: #010136;
+    }
+  }
+}
+
 .fp-modal__ft {
   display: flex;
   align-items: center;

@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { LicenseFormData, InvoiceLineItem, ItemManualDetail, ITEM_MANUAL_DETAIL_FIELDS } from '@app/core/models/types';
 import { ChatService } from '@app/core/services/chat.service';
 
@@ -19,7 +21,7 @@ interface PreviewSection {
   selector: 'app-form-preview',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.Default,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule, NzDatePickerModule],
   templateUrl: './form-preview.component.html',
   styleUrl: './form-preview.component.scss',
 })
@@ -162,6 +164,22 @@ export class FormPreviewComponent {
 
   onManualFieldInput(id: string, key: keyof ItemManualDetail, event: Event): void {
     const val = (event.target as HTMLInputElement).value;
+    this.manualDetails[id] = { ...this.manualDetails[id], [key]: val };
+  }
+
+  /** วว-ดด-ปปปป (พ.ศ.) → Date, for binding the manual-detail date pickers. */
+  manualDateValue(id: string, key: keyof ItemManualDetail): Date | null {
+    const val = this.manualDetails[id]?.[key];
+    if (!val) return null;
+    const [d, m, y] = val.split('-').map(Number);
+    if (!d || !m || !y) return null;
+    return new Date(y - 543, m - 1, d);
+  }
+
+  onManualDateChange(id: string, key: keyof ItemManualDetail, date: Date | null): void {
+    const val = date
+      ? `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear() + 543}`
+      : '';
     this.manualDetails[id] = { ...this.manualDetails[id], [key]: val };
   }
 

@@ -155,9 +155,16 @@
               @for (f of manualFields; track f.key) {
                 <label class="fp-modal__field">
                   <span class="fp-modal__field-label">{{ f.label }} <em>*</em></span>
-                  <input class="fp-modal__input" [placeholder]="f.placeholder"
-                    [value]="manualDetails[item.id][f.key]"
-                    (input)="onManualFieldInput(item.id, f.key, $event)" />
+                  @if (f.type === 'date') {
+                    <nz-date-picker class="fp-modal__input fp-modal__input--date"
+                      nzFormat="dd-MM-yyyy" nzPlaceHolder="วว-ดด-ปปปป"
+                      [ngModel]="manualDateValue(item.id, f.key)"
+                      (ngModelChange)="onManualDateChange(item.id, f.key, $event)" />
+                  } @else {
+                    <input class="fp-modal__input" [placeholder]="f.placeholder"
+                      [value]="manualDetails[item.id][f.key]"
+                      (input)="onManualFieldInput(item.id, f.key, $event)" />
+                  }
                 </label>
               }
             </div>

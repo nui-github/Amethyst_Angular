@@ -254,10 +254,10 @@ export interface ItemManualDetail {
   qtyUnit: string;    // Qty. Unit
 }
 
-export const ITEM_MANUAL_DETAIL_FIELDS: { key: keyof ItemManualDetail; label: string; placeholder: string }[] = [
+export const ITEM_MANUAL_DETAIL_FIELDS: { key: keyof ItemManualDetail; label: string; placeholder: string; type?: 'date' }[] = [
   { key: 'lotNo',       label: 'Lot Number',   placeholder: 'เช่น CLA-2024-0091' },
-  { key: 'mfgDate',     label: 'Mfg. Date',    placeholder: 'วว-ดด-ปปปป' },
-  { key: 'expDate',     label: 'Exp. Date',    placeholder: 'วว-ดด-ปปปป' },
+  { key: 'mfgDate',     label: 'Mfg. Date',    placeholder: 'วว-ดด-ปปปป', type: 'date' },
+  { key: 'expDate',     label: 'Exp. Date',    placeholder: 'วว-ดด-ปปปป', type: 'date' },
   { key: 'measurement', label: 'Measurement',  placeholder: 'เช่น 150' },
   { key: 'measUnit',    label: 'Meas. Unit',   placeholder: 'เช่น กก.' },
   { key: 'qty',         label: 'Qty.',         placeholder: 'เช่น 30' },
