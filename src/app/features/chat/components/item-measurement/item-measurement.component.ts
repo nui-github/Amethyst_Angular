@@ -19,6 +19,10 @@ export class ItemMeasurementComponent {
       measurement: item.measurement ?? '',
       measUnit: item.measUnit ?? '',
     }));
+    // Once confirmed, ChatService writes data.confirmed = true back into this message — so a
+    // re-render right after confirm, or a queue-history replay, shows the same filled-in table
+    // read-only instead of resetting to blank inputs.
+    this.saved = !!val.confirmed;
   }
   get data(): ItemMeasurementData { return this._data; }
   private _data!: ItemMeasurementData;
@@ -27,6 +31,7 @@ export class ItemMeasurementComponent {
 
   rows: { item: InvoiceLineItem; measurement: string; measUnit: string }[] = [];
   saved = false;
+  confirming = false;
 
   declarationItem(item: InvoiceLineItem): CustomsDeclarationItem | undefined {
     if (item.declarationItemNumber == null) return undefined;
@@ -61,9 +66,19 @@ export class ItemMeasurementComponent {
     return this.rows.every(r => r.measurement.trim().length > 0 && r.measUnit.trim().length > 0);
   }
 
+  requestConfirm(): void {
+    if (this.saved || !this.allFilled()) return;
+    this.confirming = true;
+  }
+
+  cancelConfirm(): void {
+    this.confirming = false;
+  }
+
   confirm(): void {
     if (this.saved || !this.allFilled()) return;
     this.saved = true;
+    this.confirming = false;
     const items = this.rows.map(r => ({ ...r.item, measurement: r.measurement, measUnit: r.measUnit }));
     this.confirmed.emit(items);
   }

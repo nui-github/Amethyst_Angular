@@ -57,7 +57,7 @@
       } @else {
         <span></span>
       }
-      <button class="im-confirm-btn" [disabled]="!allFilled()" (click)="confirm()">
+      <button class="im-confirm-btn" [disabled]="!allFilled()" (click)="requestConfirm()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
         ยืนยันข้อมูลครบถ้วน
       </button>
@@ -69,3 +69,22 @@
     </div>
   }
 </div>
+
+@if (confirming) {
+  <div class="im-dialog__backdrop" (click)="cancelConfirm()">
+    <div class="im-dialog" (click)="$event.stopPropagation()">
+      <p class="im-dialog__title">ยืนยันข้อมูล Measurement</p>
+      <p class="im-dialog__body">
+        กรุณาตรวจสอบว่า Measurement และ Meas. Unit ของทุกรายการถูกต้องแล้ว
+        เนื่องจากหลังยืนยันจะไม่สามารถย้อนกลับมาแก้ไขข้อมูลในกล่องนี้ได้อีก
+      </p>
+      <div class="im-dialog__actions">
+        <button type="button" class="im-dialog__btn im-dialog__btn--cancel" (click)="cancelConfirm()">ยกเลิก</button>
+        <button type="button" class="im-dialog__btn im-dialog__btn--confirm" (click)="confirm()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          ข้อมูลถูกต้อง ยืนยัน
+        </button>
+      </div>
+    </div>
+  </div>
+}

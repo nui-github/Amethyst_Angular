@@ -234,13 +234,9 @@
             }
 
             @case ('item-measurement') {
-              @if (!readOnly && !msg.isReadOnly) {
-                <app-item-measurement
-                  [data]="asItemMeasurement(msg.data)"
-                  (confirmed)="onItemMeasurementConfirmed(msg.id, $event)" />
-              } @else {
-                <span class="readonly-tag">✓ ยืนยัน Measurement ครบทุกรายการแล้ว</span>
-              }
+              <app-item-measurement
+                [data]="asItemMeasurement(msg.data)"
+                (confirmed)="onItemMeasurementConfirmed(msg.id, $event)" />
             }
 
           }

@@ -706,7 +706,14 @@ export class ChatService {
 
   /** Called from ItemMeasurementComponent when every row's Measurement/Meas. Unit is confirmed */
   onItemMeasurementConfirmed(msgId: string, items: InvoiceLineItem[]): void {
-    this.messages.update(ms => ms.map(m => m.id === msgId ? { ...m, isReadOnly: true } : m));
+    // Keep the card visible (not swapped for a readonly-tag) so the user can scroll back up and
+    // see what they entered — write the confirmed items back into the message's own data so a
+    // re-render (or queue-history replay) shows the same values, not a blank table again.
+    this.messages.update(ms => ms.map(m =>
+      m.id === msgId && m.type === 'item-measurement'
+        ? { ...m, isReadOnly: true, data: { ...(m.data as ItemMeasurementData), items, confirmed: true } }
+        : m
+    ));
     this.user('ยืนยันข้อมูล Measurement ครบทุกรายการแล้ว');
     this.formData.update(f => ({ ...f, selectedItems: items }));
     this.withTyping(() => this.afterFlagsConfirmed(), 500);

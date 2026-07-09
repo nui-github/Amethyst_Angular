@@ -108,10 +108,16 @@ ChatMessage.type → @switch in ChatAreaComponent
                             CustomsDeclarationItem in formData.customsDeclaration (falls back to the plain
                             InvoiceLineItem fields if unlinked); Measurement + Meas. Unit are the only
                             inputs — no upstream document captures them — and "ยืนยันข้อมูลครบถ้วน" stays
-                            disabled until every row has both filled. Confirming emits the updated
+                            disabled until every row has both filled. Clicking it opens a confirm dialog
+                            ("กรุณาตรวจสอบว่า...ถูกต้องแล้ว...ไม่สามารถย้อนกลับมาแก้ไขได้อีก") — cancel
+                            keeps the row editable, confirm locks it in. Confirming emits the updated
                             InvoiceLineItem[] (now carrying measurement/measUnit) back to
-                            onItemMeasurementConfirmed() (chat.service.ts), which merges them into
-                            formData.selectedItems and continues the flow (missing-fields check → proceed
+                            onItemMeasurementConfirmed() (chat.service.ts), which writes data.confirmed =
+                            true + the filled items back onto the message itself (so the card is never
+                            swapped for a readonly-tag — chat-area always renders it; ItemMeasurementData.
+                            confirmed drives ItemMeasurementComponent's own saved/read-only display, so the
+                            user can still scroll up and see exactly what they entered) and merges them into
+                            formData.selectedItems, continuing the flow (missing-fields check → proceed
                             choice) exactly where onAllFlagsConfirmed() used to go directly. form-preview's
                             per-item modal pre-fills its own Measurement/Meas. Unit fields from
                             item.measurement/measUnit when already set here, so paths that pass through

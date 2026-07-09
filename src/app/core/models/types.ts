@@ -357,6 +357,7 @@ export interface InvoiceLineItem {
 export interface ItemMeasurementData {
   items: InvoiceLineItem[];
   customsDeclaration?: CustomsDeclarationData;
+  confirmed?: boolean; // set once the user confirms — card stays visible read-only, not swapped out
 }
 
 // Fields NOT available from OCR — user must key these in per item before the
