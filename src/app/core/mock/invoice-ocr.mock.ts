@@ -25,6 +25,8 @@ export const INVOICE_CUSTOMS_ITEMS: CustomsDeclarationItem[] = [
     originCountry: 'ไอร์แลนด์ (IE)', purchaseCountry: 'ไอร์แลนด์ (IE)',
     invoiceAmountForeign: '18500.00', currencyCode: 'EUR', invoiceAmountBaht: '712400.00',
     manufacture: 'Ethos Vascular Devices Ltd., Dublin, Ireland',
+    remark: 'นำเข้าเพื่อจำหน่ายในโรงพยาบาลเอกชน',
+    certificateAnalysis: 'COA-ETBF2313-C145EE-2568',
     location: {
       goodsCode: 'WH-HLTH-01', goodsName: 'คลังสินค้าเฮลท์ฟาร์มา (สาขาบางนา)',
       streetAndNumber: '99/1 ถนนสุขุมวิท', district: 'บางนาเหนือ', subProvince: 'บางนา',
@@ -40,6 +42,7 @@ export const INVOICE_CUSTOMS_ITEMS: CustomsDeclarationItem[] = [
     originCountry: 'ไอร์แลนด์ (IE)', purchaseCountry: 'ไอร์แลนด์ (IE)',
     invoiceAmountForeign: '429060.45', currencyCode: 'USD', invoiceAmountBaht: '15330900.00',
     manufacture: 'CardioTech Manufacturing Ltd., Cork, Ireland',
+    certificateAnalysis: 'COA-TRCR30015X-2568',
     productions: [{ lotNo: 'TRCR30015X', mfgDate: '15-01-2568', expDate: '15-01-2571', measurement: '39', measurementUnit: 'ชิ้น', quantity: '39', quantityUnit: 'ชิ้น' }],
   },
   {
@@ -50,6 +53,7 @@ export const INVOICE_CUSTOMS_ITEMS: CustomsDeclarationItem[] = [
     originCountry: 'ไอร์แลนด์ (IE)', purchaseCountry: 'ไอร์แลนด์ (IE)',
     invoiceAmountForeign: '84300.00', currencyCode: 'USD', invoiceAmountBaht: '3011300.00',
     manufacture: 'Ethos Vascular Devices Ltd., Dublin, Ireland',
+    certificateAnalysis: 'COA-SENSH1628W-2568',
     productions: [{ lotNo: 'SENSH1628W', mfgDate: '20-01-2568', expDate: '20-01-2571', measurement: '29', measurementUnit: 'ชิ้น', quantity: '29', quantityUnit: 'ชิ้น' }],
   },
   {
@@ -60,6 +64,7 @@ export const INVOICE_CUSTOMS_ITEMS: CustomsDeclarationItem[] = [
     originCountry: 'เม็กซิโก (MX)', purchaseCountry: 'เม็กซิโก (MX)',
     invoiceAmountForeign: '371625.03', currencyCode: 'USD', invoiceAmountBaht: '13268400.00',
     manufacture: 'MedFlow Manufacturing S.A., Tijuana, Mexico',
+    certificateAnalysis: 'COA-SPL20015X-2568',
     productions: [{ lotNo: 'SPL20015X', mfgDate: '10-02-2568', expDate: '10-02-2571', measurement: '189', measurementUnit: 'ชิ้น', quantity: '189', quantityUnit: 'ชิ้น' }],
   },
   {
@@ -70,6 +75,7 @@ export const INVOICE_CUSTOMS_ITEMS: CustomsDeclarationItem[] = [
     originCountry: 'ไอร์แลนด์ (IE)', purchaseCountry: 'ไอร์แลนด์ (IE)',
     invoiceAmountForeign: '5246.59', currencyCode: 'USD', invoiceAmountBaht: '187300.00',
     manufacture: 'Ethos Vascular Devices Ltd., Dublin, Ireland',
+    certificateAnalysis: 'COA-SBI06012013P-2568',
     productions: [{ lotNo: 'SBI06012013P', mfgDate: '05-02-2568', expDate: '05-02-2571', measurement: '1', measurementUnit: 'ชิ้น', quantity: '1', quantityUnit: 'ชิ้น' }],
   },
   {
