@@ -61,14 +61,16 @@ export class QueuePageComponent {
   readonly filteredQueue = computed(() => {
     const term = this.searchTerm().toLowerCase();
     const tab  = this.activeTab();
-    return this.q.queue().filter(s => {
-      const matchTab  = tab === 'all' || s.statusKey === tab;
-      const matchTerm = !term ||
-        s.customsNo.toLowerCase().includes(term) ||
-        s.goods.toLowerCase().includes(term) ||
-        (s.customer ?? '').toLowerCase().includes(term);
-      return matchTab && matchTerm;
-    });
+    return this.q.queue()
+      .filter(s => {
+        const matchTab  = tab === 'all' || s.statusKey === tab;
+        const matchTerm = !term ||
+          s.customsNo.toLowerCase().includes(term) ||
+          s.goods.toLowerCase().includes(term) ||
+          (s.customer ?? '').toLowerCase().includes(term);
+        return matchTab && matchTerm;
+      })
+      .sort((a, b) => b.createdAt - a.createdAt);
   });
 
   readonly openShipment = computed<Shipment | null>(() => {

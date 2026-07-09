@@ -325,6 +325,7 @@ export interface Shipment {
   hs: string;
   origin: string;
   importedAt: string;
+  createdAt: number; // epoch ms — used to sort the queue list newest-first
   owner: string;
   permitNeeded: boolean;
   agency: AgencyKey;
