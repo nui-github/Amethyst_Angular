@@ -118,9 +118,9 @@ const ITEM_COMMERCIAL: Record<string, { quantity: string; unit: string; unitPric
   p6: { quantity: '1',   unit: 'ชิ้น', unitPrice: 1962.24,  amount: 1962.24,   lotNo: 'SPL30020X' },
 };
 
-/** Convert confirmed item-hs-analysis rows into the InvoiceLineItem shape used by the
- *  invoice-items selection step (SPN / customs paths — selecting which of the AI-analyzed,
- *  agency-grouped items to actually submit). */
+/** Convert confirmed item-hs-analysis rows into the InvoiceLineItem shape used as
+ *  formData.selectedItems (SPN / customs paths — every item AI grouped under the chosen
+ *  agency during item-hs-analysis is the request, no separate re-selection step). */
 export function mapToInvoiceLineItems(items: ProductHsAnalysis[]): InvoiceLineItem[] {
   return items.map(p => {
     const c = ITEM_COMMERCIAL[p.id] ?? { quantity: '1', unit: 'ชิ้น', unitPrice: 0, amount: 0, lotNo: p.id };

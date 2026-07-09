@@ -222,17 +222,6 @@
               }
             }
 
-            <!-- Select invoice line items to submit for this agency's permit -->
-            @case ('invoice-items') {
-              @if (!readOnly && !msg.isReadOnly) {
-                <app-invoice-items
-                  [data]="asInvoiceItems(msg.data)"
-                  (confirmed)="onInvoiceItemsConfirmed(msg.id, $event)" />
-              } @else {
-                <span class="readonly-tag">✓ เลือกรายการสินค้าแล้ว</span>
-              }
-            }
-
             <!-- Per-product HS Code + Smart Tariff → agency analysis, user confirms/corrects each row -->
             @case ('item-hs-analysis') {
               @if (!readOnly && !msg.isReadOnly) {

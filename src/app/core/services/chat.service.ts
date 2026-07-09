@@ -4,7 +4,7 @@ import {
   FlagCardData, FlagItem, ChoiceCardData, EmailDraftData,
   StatusCardData, OcrResultsData, SpnResultData, Shipment,
   MissingField, MissingFieldsData, PaymentQrData, PaymentSlipData, HsAnalysisData,
-  InvoiceItemsData, InvoiceLineItem, ItemHsAnalysisData, ProductHsAnalysis,
+  InvoiceLineItem, ItemHsAnalysisData, ProductHsAnalysis,
 } from '@app/core/models/types';
 import { OcrService } from './ocr.service';
 import { QueueService } from './queue.service';
@@ -434,7 +434,9 @@ export class ChatService {
     if (this.isAgencyDocsUpload) {
       this.isAgencyDocsUpload = false;
       this.checkMissingAfterFlags = true;   // invoice path: check missing fields after flags confirmed
-      this.withTyping(() => this.showInvoiceItemsSelection(), 600);
+      // No separate item-selection step — every line item on the uploaded invoice is the request
+      this.formData.update(f => ({ ...f, selectedItems: getInvoiceLineItems(this.formData().invoiceNo) }));
+      this.withTyping(() => this.showFlags(), 600);
       return;
     }
     // Customs single-upload: skip flags, hs-analysis → profile → agency choice (same as invoice)
@@ -533,11 +535,13 @@ export class ChatService {
         }, 400), 600);
       }, 500);
     } else if (this.pendingAfterFlow === 'form-preview') {
-      // Customs path: select which of this agency's AI-analyzed items to submit → form-preview
-      this.withTyping(() => this.showAgencyItemsSelection('form-preview'), 500);
+      // Customs path: every item AI grouped under this agency is the request — no re-selection
+      this.selectAllAgencyItems();
+      this.withTyping(() => this.showPreview(), 500);
     } else {
-      // SPN path: select which of this agency's AI-analyzed items to submit → proceed choice
-      this.withTyping(() => this.showAgencyItemsSelection('proceed'), 500);
+      // SPN path: every item AI grouped under this agency is the request — no re-selection
+      this.selectAllAgencyItems();
+      this.withTyping(() => this.showProceedChoice(), 500);
     }
   }
 
@@ -631,45 +635,12 @@ export class ChatService {
     this.withTyping(() => this.showAgencyChoice(requiredAgencies[0]), 600);
   }
 
-  /** What to do once the user finishes the invoice-items selection step. */
-  private itemsSelectionPurpose: 'invoice-flags' | 'form-preview' | 'proceed' = 'invoice-flags';
-
-  // ── Invoice line-item selection (invoice path, after agency-docs OCR) ───────
-  private showInvoiceItemsSelection(): void {
-    this.itemsSelectionPurpose = 'invoice-flags';
-    this.bot('invoice-items', {
-      agency: this.currentAgency,
-      items: getInvoiceLineItems(this.formData().invoiceNo),
-    } satisfies InvoiceItemsData);
-  }
-
-  /** Customs-declaration / SPN paths: item-selection scoped to the chosen agency's
-   *  AI-analyzed group, shown before form-preview / the proceed choice. */
-  private showAgencyItemsSelection(purpose: 'form-preview' | 'proceed'): void {
-    this.itemsSelectionPurpose = purpose;
+  /** Customs-declaration / SPN paths: every item AI grouped under the chosen agency during
+   *  item-hs-analysis IS the request — set formData.selectedItems directly, no separate
+   *  re-selection step for the user. */
+  private selectAllAgencyItems(): void {
     const agencyItems = this.confirmedProductItems.filter(i => i.requiresPermit && i.agency === this.currentAgency);
-    this.bot('invoice-items', {
-      agency: this.currentAgency,
-      items: mapToInvoiceLineItems(agencyItems),
-    } satisfies InvoiceItemsData);
-  }
-
-  onInvoiceItemsConfirmed(msgId: string, items: InvoiceLineItem[]): void {
-    this.messages.update(ms => ms.map(m =>
-      m.id === msgId && m.type === 'invoice-items'
-        ? { ...m, data: { ...(m.data as InvoiceItemsData), selectedIds: items.map(i => i.id) } }
-        : m
-    ));
-    this.formData.update(f => ({ ...f, selectedItems: items }));
-    this.user(`เลือกสินค้า ${items.length} รายการ`);
-
-    if (this.itemsSelectionPurpose === 'form-preview') {
-      this.withTyping(() => this.showPreview(), 500);
-    } else if (this.itemsSelectionPurpose === 'proceed') {
-      this.withTyping(() => this.showProceedChoice(), 500);
-    } else {
-      this.withTyping(() => this.showFlags(), 500);
-    }
+    this.formData.update(f => ({ ...f, selectedItems: mapToInvoiceLineItems(agencyItems) }));
   }
 
   // ── Flag confirm flow ──────────────────────────────────────────────────────
@@ -1100,7 +1071,6 @@ export class ChatService {
     }
     if (hasType('form-preview'))   return 'ตรวจสอบก่อนส่งกรม';
     if (hasType('flag-card'))      return 'ยืนยัน flags';
-    if (hasType('invoice-items'))  return 'เลือกรายการสินค้า';
     if (hasType('item-hs-analysis') || hasType('hs-analysis')) return 'วิเคราะห์ HS Code';
     if (hasType('ocr-results'))    return 'OCR เสร็จแล้ว';
     if (hasType('ocr-progress'))   return 'กำลัง OCR';

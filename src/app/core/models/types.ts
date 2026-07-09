@@ -33,14 +33,7 @@ export type MessageType =
   | 'permit-status'     // status overview of all submitted permit requests
   | 'payment-qr'       // QR payment card (fee required by agency)
   | 'payment-slip'     // upload payment slip after scanning QR
-  | 'invoice-items'    // select which invoice line items to submit for this agency's permit
   | 'item-hs-analysis';// invoice path: per-product HS Code + Smart Tariff → agency lookup, user must confirm/correct each row
-
-export interface InvoiceItemsData {
-  agency: string;
-  items: InvoiceLineItem[];
-  selectedIds?: string[]; // set once confirmed (isReadOnly display)
-}
 
 // One alternative HS Code suggestion offered when the user edits an item's classification —
 // invoices from real users typically carry no HS Code at all, so AI classifies purely from the
@@ -317,7 +310,7 @@ export interface LicenseFormData {
   uNo?: string;
   drugRegNo?: string;
   importDate?: string;
-  selectedItems?: InvoiceLineItem[]; // สินค้าที่เลือกยื่นขอใบอนุญาต (จาก invoice-items step)
+  selectedItems?: InvoiceLineItem[]; // สินค้าที่ยื่นขอใบอนุญาต (ทั้งกลุ่มที่ AI จัดไว้ให้กรมนี้)
   customsDeclaration?: CustomsDeclarationData; // structured OCR output, merged across every upload step
 }
 
@@ -436,9 +429,9 @@ export interface Shipment {
   documents?: ShipmentDocument[];
   email?: { toName: string; to: string; subject: string; body: string; attName: string };
   items?: ShipmentItem[]; // per-product line items from the invoice/customs doc used for this LPI request
-  itemsSelected?: boolean; // true once the shipment's flow has passed the item-selection step (invoice-items
-                           // confirmed) — the queue detail view's item list card only renders when this is true,
-                           // since `items` may be populated ahead of that step existing in mock data
+  itemsSelected?: boolean; // true once the shipment's flow has confirmed its item group (item-hs-analysis) —
+                           // the queue detail view's item list card only renders when this is true, since
+                           // `items` may be populated ahead of that step existing in mock data
 }
 
 // A product line item as captured from the invoice/customs upload during the LPI request —
