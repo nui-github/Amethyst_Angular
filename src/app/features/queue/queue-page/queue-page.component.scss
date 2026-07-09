@@ -175,6 +175,30 @@
   }
 }
 
+.qt-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.qt-filter {
+  height: 36px;
+  padding: 0 10px;
+  border: 1.5px solid #E5E7EB;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 13px;
+  font-family: inherit;
+  color: #374151;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+
+  &:focus, &:hover {
+    border-color: #0463EF;
+  }
+}
+
 .qt-search {
   display: flex;
   align-items: center;
@@ -531,6 +555,12 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 230px;
+}
+
+// ── Updated column ─────────────────────────────────────────────────────────────
+.updated-at {
+  font-size: 12.5px;
+  color: var(--bizx-n600, #4B5563);
 }
 
 // ── AI assess column ──────────────────────────────────────────────────────────

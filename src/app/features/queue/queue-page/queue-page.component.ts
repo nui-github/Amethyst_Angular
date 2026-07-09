@@ -39,9 +39,10 @@ export class QueuePageComponent {
   readonly icSearch = Search;
   readonly icBack   = ChevronLeft;
 
-  collapsed   = signal(false);
-  searchTerm  = signal('');
-  activeTab   = signal<TabValue>('all');
+  collapsed    = signal(false);
+  searchTerm   = signal('');
+  activeTab    = signal<TabValue>('all');
+  permitFilter = signal<'all' | 'IMP' | 'EXP'>('all');
   pageSize  = signal(10);
   pageIndex = signal(1);
 
@@ -59,16 +60,18 @@ export class QueuePageComponent {
   ];
 
   readonly filteredQueue = computed(() => {
-    const term = this.searchTerm().toLowerCase();
-    const tab  = this.activeTab();
+    const term    = this.searchTerm().toLowerCase();
+    const tab     = this.activeTab();
+    const permit  = this.permitFilter();
     return this.q.queue()
       .filter(s => {
-        const matchTab  = tab === 'all' || s.statusKey === tab;
-        const matchTerm = !term ||
+        const matchTab    = tab === 'all' || s.statusKey === tab;
+        const matchPermit = permit === 'all' || s.type === permit;
+        const matchTerm   = !term ||
           s.customsNo.toLowerCase().includes(term) ||
           s.goods.toLowerCase().includes(term) ||
           (s.customer ?? '').toLowerCase().includes(term);
-        return matchTab && matchTerm;
+        return matchTab && matchPermit && matchTerm;
       })
       .sort((a, b) => b.createdAt - a.createdAt);
   });
@@ -113,6 +116,21 @@ export class QueuePageComponent {
     const doc = docs.find(d => d.category === 'customs') ?? docs.find(d => d.category === 'invoice');
     if (!doc) return '—';
     return doc.name.replace(/^(Invoice|ใบขนสินค้าขาเข้า|ใบขนสินค้า)\s*/i, '').trim();
+  }
+
+  /** Relative "updated" time, derived from Shipment.createdAt (epoch ms). */
+  relativeTime(ts: number): string {
+    const diffMs = Date.now() - ts;
+    const min = Math.floor(diffMs / 60_000);
+    if (min < 1)  return 'เมื่อสักครู่';
+    if (min < 60) return `${min} นาทีที่แล้ว`;
+    const hr = Math.floor(min / 60);
+    if (hr < 24)  return `${hr} ชม.ที่แล้ว`;
+    const day = Math.floor(hr / 24);
+    if (day < 7)  return `${day} วันที่แล้ว`;
+    const wk = Math.floor(day / 7);
+    if (wk < 5)   return `${wk} สัปดาห์ที่แล้ว`;
+    return new Date(ts).toLocaleDateString('th-TH', { day: 'numeric', month: 'short' });
   }
 
   confColor(conf: number): string {
