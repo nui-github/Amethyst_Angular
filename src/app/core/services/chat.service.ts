@@ -12,7 +12,7 @@ import { analyzeHsCode } from '@mock/hs-analysis.mock';
 import { getAgencyPayment } from '@mock/payment.mock';
 import { KNOWN_REFS, MOCK_FORM_DATA, MOCK_SPN_LIST } from '@mock/spn.mock';
 import { MOCK_SPN_PROFILES } from '@mock/spn-companies.mock';
-import { getInvoiceLineItems } from '@mock/invoice-items.mock';
+import { getInvoiceLineItems, INVOICE_ITEMS_DECLARATION } from '@mock/invoice-items.mock';
 import { getProductHsAnalysis, mapToInvoiceLineItems } from '@mock/product-hs-analysis.mock';
 import { InvoiceOcrResult } from '@mock/invoice-ocr.mock';
 import { environment } from '@env/environment';
@@ -434,8 +434,15 @@ export class ChatService {
     if (this.isAgencyDocsUpload) {
       this.isAgencyDocsUpload = false;
       this.checkMissingAfterFlags = true;   // invoice path: check missing fields after flags confirmed
-      // No separate item-selection step — every line item on the uploaded invoice is the request
-      this.formData.update(f => ({ ...f, selectedItems: getInvoiceLineItems(this.formData().invoiceNo) }));
+      // No separate item-selection step — every line item on the uploaded invoice is the request.
+      // These items are a different shipment from the shared medical-device customsDeclaration
+      // (itemNumber 1-6), so their own CustomsDeclarationItem records (101-104) merge in alongside
+      // it rather than replacing it — form-preview's item modal can then show the full schema too.
+      this.formData.update(f => ({
+        ...f,
+        selectedItems: getInvoiceLineItems(this.formData().invoiceNo),
+        customsDeclaration: mergeCustomsDeclaration(f.customsDeclaration, { items: INVOICE_ITEMS_DECLARATION }),
+      }));
       this.withTyping(() => this.showFlags(), 600);
       return;
     }

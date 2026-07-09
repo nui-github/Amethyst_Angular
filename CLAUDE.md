@@ -184,7 +184,14 @@ src/
 │   │   │   ├── agency-docs.mock.ts    ← required docs per agency (อย./กษ./ปส.) + manualFields
 │   │   │   ├── invoice-items.mock.ts  ← invoice line items (getInvoiceLineItems) — invoice path's own
 │   │   │   │                            agency-upload step; set directly as formData.selectedItems, no
-│   │   │   │                            separate selection UI (customs/SPN use mapToInvoiceLineItems() above)
+│   │   │   │                            separate selection UI (customs/SPN use mapToInvoiceLineItems() above).
+│   │   │   │                            Also exports INVOICE_ITEMS_DECLARATION — the same 4 items in full
+│   │   │   │                            CustomsDeclarationItem shape (itemNumber 101-104, kept out of the
+│   │   │   │                            1-6 range used by the shared medical-device dataset since this is a
+│   │   │   │                            different shipment/invoice entirely); merged into
+│   │   │   │                            formData.customsDeclaration.items in continueAfterOCR()
+│   │   │   │                            (chat.service.ts) so form-preview's item modal can show the full
+│   │   │   │                            schema for these items too, not just the medical-device ones
 │   │   │   └── payment.mock.ts        ← fee config per agency (requiresFee, amount) — อย./กษ./ปส./etc.
 │   │   ├── models/types.ts            ← ALL interfaces + MessageType union
 │   │   └── services/
