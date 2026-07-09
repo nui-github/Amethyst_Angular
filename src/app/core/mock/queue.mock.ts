@@ -252,7 +252,7 @@ export const MOCK_QUEUE: Shipment[] = [
       }),
     ],
     documents: [
-      doc('d4a', 'ใบขนสินค้าขาเข้า AGRI000000004', 'customs'),
+      doc('d4a', 'ใบขนสินค้าขาเข้า A00516907M8Q2Z', 'customs'),
       doc('d4b', 'Packing List', 'packing_list'),
       doc('d4c', 'Material Safety Data Sheet (MSDS)', 'other', 'pdf', 'doa'),
     ],
@@ -359,7 +359,7 @@ export const MOCK_QUEUE: Shipment[] = [
       }),
     ],
     documents: [
-      doc('d6a', 'ใบขนสินค้าขาเข้า HLTH000000006', 'customs'),
+      doc('d6a', 'ใบขนสินค้าขาเข้า A02016906T5H9L', 'customs'),
       doc('d6b', 'Certificate of Analysis (CoA)', 'coa'),
       doc('d6c', 'MSDS — Ethanol 99.5%', 'other', 'pdf', 'diw'),
     ],
@@ -566,7 +566,7 @@ export const MOCK_QUEUE: Shipment[] = [
       }),
     ],
     documents: [
-      doc('d10a', 'ใบขนสินค้าขาเข้า AGRD000000010', 'customs'),
+      doc('d10a', 'ใบขนสินค้าขาเข้า A01516905W2K6D', 'customs'),
       doc('d10b', 'Invoice AU-2024-1000', 'invoice'),
       doc('d10c', 'MSDS — Sodium Hypochlorite 10%', 'other', 'pdf', 'diw'),
     ],
@@ -613,7 +613,7 @@ export const MOCK_QUEUE: Shipment[] = [
       }),
     ],
     documents: [
-      doc('d11a', 'ใบขนสินค้าขาเข้า HLTH000000011', 'customs'),
+      doc('d11a', 'ใบขนสินค้าขาเข้า A00916907K3P7X', 'customs'),
       doc('d11b', 'Packing List', 'packing_list'),
     ],
     itemsSelected: false,
