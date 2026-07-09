@@ -195,36 +195,49 @@
           }
 
           <div class="fp-modal__section">
-            <span class="fp-modal__section-title">ข้อมูลที่ต้องกรอกเพิ่มเติม</span>
-            <div class="fp-modal__form-grid">
-              @for (f of editableFields; track f.key) {
-                <label class="fp-modal__field">
-                  <span class="fp-modal__field-label">{{ f.label }} <em>*</em></span>
-                  @if (f.type === 'date') {
-                    <nz-date-picker class="fp-modal__input fp-modal__input--date"
-                      nzFormat="dd-MM-yyyy" nzPlaceHolder="วว-ดด-ปปปป"
-                      [ngModel]="manualDateValue(item.id, f.key)"
-                      (ngModelChange)="onManualDateChange(item.id, f.key, $event)" />
-                  } @else {
-                    <input class="fp-modal__input" [placeholder]="f.placeholder"
-                      [value]="manualDetails[item.id][f.key]"
-                      (input)="onManualFieldInput(item.id, f.key, $event)" />
-                  }
-                </label>
-              }
-            </div>
+            <span class="fp-modal__section-title">
+              {{ isItemConfirmed(item.id) ? 'Measurement / Meas. Unit' : 'ข้อมูลที่ต้องกรอกเพิ่มเติม' }}
+            </span>
+            @if (isItemConfirmed(item.id)) {
+              <!-- Already captured in the item-measurement step right after flags — display only -->
+              <div class="fp-modal__ro-grid">
+                @for (f of editableFields; track f.key) {
+                  <div class="fp-modal__ro"><span>{{ f.label }}</span><strong>{{ manualDetails[item.id][f.key] || '—' }}</strong></div>
+                }
+              </div>
+            } @else {
+              <div class="fp-modal__form-grid">
+                @for (f of editableFields; track f.key) {
+                  <label class="fp-modal__field">
+                    <span class="fp-modal__field-label">{{ f.label }} <em>*</em></span>
+                    @if (f.type === 'date') {
+                      <nz-date-picker class="fp-modal__input fp-modal__input--date"
+                        nzFormat="dd-MM-yyyy" nzPlaceHolder="วว-ดด-ปปปป"
+                        [ngModel]="manualDateValue(item.id, f.key)"
+                        (ngModelChange)="onManualDateChange(item.id, f.key, $event)" />
+                    } @else {
+                      <input class="fp-modal__input" [placeholder]="f.placeholder"
+                        [value]="manualDetails[item.id][f.key]"
+                        (input)="onManualFieldInput(item.id, f.key, $event)" />
+                    }
+                  </label>
+                }
+              </div>
+            }
           </div>
         </div>
 
-        <div class="fp-modal__ft">
-          @if (!isManualDetailComplete(item.id)) {
-            <span class="fp-modal__ft-hint">กรอกข้อมูลที่มี <em>*</em> ให้ครบทุกช่อง</span>
-          }
-          <button class="fp-modal__confirm-btn" [disabled]="!isManualDetailComplete(item.id)" (click)="confirmItemDetail(item.id)">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            ยืนยันข้อมูลสินค้า
-          </button>
-        </div>
+        @if (!isItemConfirmed(item.id)) {
+          <div class="fp-modal__ft">
+            @if (!isManualDetailComplete(item.id)) {
+              <span class="fp-modal__ft-hint">กรอกข้อมูลที่มี <em>*</em> ให้ครบทุกช่อง</span>
+            }
+            <button class="fp-modal__confirm-btn" [disabled]="!isManualDetailComplete(item.id)" (click)="confirmItemDetail(item.id)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              ยืนยันข้อมูลสินค้า
+            </button>
+          </div>
+        }
       </div>
     </div>
   }

@@ -44,6 +44,12 @@ export class FormPreviewComponent {
         measurement: item.measurement ?? '', measUnit: item.measUnit ?? '',
         qty: item.quantity ?? '', qtyUnit: item.unit ?? '',
       };
+      // Items whose Measurement/Meas. Unit already arrived pre-filled (item-measurement step,
+      // right after flags) need no further action from the user here — auto-confirm so
+      // "ดำเนินการต่อ" is enabled immediately instead of asking them to re-confirm each row.
+      if (this.editableFields.every(f => (this.manualDetails[item.id][f.key] ?? '').trim().length > 0)) {
+        this.confirmedItemIds.add(item.id);
+      }
     }
   }
   get data(): LicenseFormData { return this._data; }
