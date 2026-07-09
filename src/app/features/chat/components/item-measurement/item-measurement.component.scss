@@ -1,0 +1,135 @@
+.im-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.im-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+
+  &__icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    background: rgba(4, 99, 239, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+}
+
+.im-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--bizx-navy);
+  margin: 0 0 2px;
+}
+
+.im-sub {
+  font-size: 11px;
+  color: var(--bizx-n500);
+  margin: 0;
+}
+
+.im-table-wrap {
+  overflow-x: auto;
+  border: 1.5px solid var(--bizx-n200);
+  border-radius: 10px;
+}
+
+.im-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11.5px;
+  min-width: 620px;
+
+  th {
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--bizx-n500);
+    background: #FAFBFF;
+    padding: 8px 10px;
+    border-bottom: 1.5px solid var(--bizx-n200);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 7px 10px;
+    border-bottom: 1px solid #F5F6FA;
+    color: var(--bizx-navy);
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  &__name {
+    max-width: 220px;
+    white-space: normal;
+    line-height: 1.4;
+  }
+}
+
+.im-input {
+  width: 100px;
+  font-size: 11px;
+  font-family: inherit;
+  padding: 6px 8px;
+  border-radius: 7px;
+  border: 1.5px solid #E5E7EB;
+  outline: none;
+  color: var(--bizx-navy);
+
+  &:focus { border-color: #0463EF; }
+  &::placeholder { color: var(--bizx-n400); }
+}
+
+.im-value {
+  font-weight: 600;
+  color: var(--bizx-navy);
+}
+
+.im-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  &--saved {
+    font-size: 12px;
+    font-weight: 600;
+    color: #0D8F61;
+    display: flex;
+    gap: 6px;
+    justify-content: flex-start;
+  }
+}
+
+.im-footer__hint {
+  font-size: 11px;
+  color: #B45309;
+}
+
+.im-confirm-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background: var(--bizx-blue);
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.14s;
+  margin-left: auto;
+
+  &:hover:not(:disabled) { background: #034DBA; }
+  &:disabled { opacity: 0.45; cursor: default; }
+}

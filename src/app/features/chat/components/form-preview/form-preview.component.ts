@@ -37,9 +37,12 @@ export class FormPreviewComponent {
     for (const item of val.selectedItems ?? []) {
       // Lot/Mfg/Exp/Qty are already known from OCR — only Measurement + Meas. Unit need the
       // user to key in, since no document captures the declared measurement/unit for LPI.
+      // Paths that already collected them upstream (item-measurement, right after flags) pass
+      // item.measurement/measUnit through — pre-fill so the item isn't asked twice.
       this.manualDetails[item.id] = {
         lotNo: item.lotNo ?? '', mfgDate: item.mfgDate ?? '', expDate: item.expDate ?? '',
-        measurement: '', measUnit: '', qty: item.quantity ?? '', qtyUnit: item.unit ?? '',
+        measurement: item.measurement ?? '', measUnit: item.measUnit ?? '',
+        qty: item.quantity ?? '', qtyUnit: item.unit ?? '',
       };
     }
   }

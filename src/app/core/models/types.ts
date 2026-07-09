@@ -33,7 +33,10 @@ export type MessageType =
   | 'permit-status'     // status overview of all submitted permit requests
   | 'payment-qr'       // QR payment card (fee required by agency)
   | 'payment-slip'     // upload payment slip after scanning QR
-  | 'item-hs-analysis';// invoice path: per-product HS Code + Smart Tariff → agency lookup, user must confirm/correct each row
+  | 'item-hs-analysis' // invoice path: per-product HS Code + Smart Tariff → agency lookup, user must confirm/correct each row
+  | 'item-measurement';// after flags confirmed: table of every item being submitted (TH/EN name,
+                        // tariff code, Lot No. from OCR) + Measurement/Meas. Unit the user must key in
+                        // per row before proceeding — the only fields no upstream document captures
 
 // One alternative HS Code suggestion offered when the user edits an item's classification —
 // invoices from real users typically carry no HS Code at all, so AI classifies purely from the
@@ -345,6 +348,15 @@ export interface InvoiceLineItem {
   mfgDate?: string;       // วันที่ผลิต (จาก OCR/production details เมื่อมี)
   expDate?: string;       // วันหมดอายุ (จาก OCR/production details เมื่อมี)
   declarationItemNumber?: number; // FK → CustomsDeclarationItem.itemNumber เมื่อมี (customs/SPN paths)
+  measurement?: string;   // ปริมาณที่แจ้ง — กรอกโดย user ในกล่อง item-measurement (ไม่มีเอกสารต้นทางระบุ)
+  measUnit?: string;      // หน่วยของ measurement
+}
+
+// ตารางสรุปรายการสินค้าที่ยื่นขอใบอนุญาต แสดงหลังยืนยัน flag-card — ผู้ใช้กรอก
+// Measurement/Meas. Unit ต่อแถวก่อนกดยืนยันเพื่อไปขั้นตอนถัดไป
+export interface ItemMeasurementData {
+  items: InvoiceLineItem[];
+  customsDeclaration?: CustomsDeclarationData;
 }
 
 // Fields NOT available from OCR — user must key these in per item before the

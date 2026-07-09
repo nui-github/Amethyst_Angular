@@ -3,7 +3,7 @@ import {
   ElementRef, Input, OnChanges, ViewChild, inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ChatMessage, FlagCardData, EmailDraftData, ChoiceCardData, ItemHsAnalysisData, ProductHsAnalysis } from '@app/core/models/types';
+import { ChatMessage, FlagCardData, EmailDraftData, ChoiceCardData, ItemHsAnalysisData, ProductHsAnalysis, ItemMeasurementData, InvoiceLineItem } from '@app/core/models/types';
 import { ChatService } from '@app/core/services/chat.service';
 import { OcrService } from '@app/core/services/ocr.service';
 import { SafeHtmlPipe } from '@app/shared/pipes/safe-html.pipe';
@@ -31,6 +31,7 @@ import { PermitStatusComponent } from '../permit-status/permit-status.component'
 import { PaymentQrComponent } from '../payment-qr/payment-qr.component';
 import { PaymentSlipComponent } from '../payment-slip/payment-slip.component';
 import { ItemHsAnalysisComponent } from '../item-hs-analysis/item-hs-analysis.component';
+import { ItemMeasurementComponent } from '../item-measurement/item-measurement.component';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 
 /**
@@ -55,7 +56,7 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
     StatusCardComponent, OcrProgressComponent, ImportLicenseMenuComponent,
     ConnectPanelComponent, FullUploadComponent, SingleUploadComponent, EmailDraftComponent, FormPanelComponent,
     SpnConnectComponent, HsAnalysisComponent, FormPreviewComponent, MissingFieldsComponent, AgencyUploadComponent, ProfileSelectComponent, PermitStatusComponent,
-    PaymentQrComponent, PaymentSlipComponent, ItemHsAnalysisComponent,
+    PaymentQrComponent, PaymentSlipComponent, ItemHsAnalysisComponent, ItemMeasurementComponent,
   ],
   templateUrl: './chat-area.component.html',
   styleUrl: './chat-area.component.scss',
@@ -85,10 +86,15 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked {
   asEmailDraft(data: unknown)     { return data as EmailDraftData; }
   asChoiceCard(data: unknown)     { return data as ChoiceCardData; }
   asItemHsAnalysis(data: unknown) { return data as ItemHsAnalysisData; }
+  asItemMeasurement(data: unknown) { return data as ItemMeasurementData; }
   asAny(data: unknown)            { return data as Record<string, unknown>; }
 
   onItemHsAnalysisConfirmed(msgId: string, items: ProductHsAnalysis[]): void {
     this.chat.onItemHsAnalysisConfirmed(msgId, items);
+  }
+
+  onItemMeasurementConfirmed(msgId: string, items: InvoiceLineItem[]): void {
+    this.chat.onItemMeasurementConfirmed(msgId, items);
   }
   hasRewindableChoice(): boolean {
     const msgs = this.messages;

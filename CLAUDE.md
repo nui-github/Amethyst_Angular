@@ -98,6 +98,25 @@ ChatMessage.type → @switch in ChatAreaComponent
                             ถูกต้อง" opens a confirm dialog ("ได้ตรวจสอบ...ครบถ้วนแล้วใช่หรือไม่?") before
                             actually locking the group — cancel closes it with no change, confirm calls
                             confirmGroup(). All groups must be confirmed before "ดำเนินการต่อ")
+  'item-measurement'   → ItemMeasurementComponent (shown right after flag-card is fully confirmed, ONLY
+                            when formData.selectedItems is non-empty — currently the full-upload and
+                            invoice-path agency-docs flows, the two paths that actually reach flags; the
+                            customs-declaration and SPN paths go straight from OCR/agency-choice to
+                            form-preview without ever showing flags, so they never show this box either.
+                            One table row per selected item: ชื่อสินค้า (TH)/ชื่อสินค้า (EN)/พิกัดศุลกากร/
+                            Lot No. are read-only, resolved via item.declarationItemNumber → the matching
+                            CustomsDeclarationItem in formData.customsDeclaration (falls back to the plain
+                            InvoiceLineItem fields if unlinked); Measurement + Meas. Unit are the only
+                            inputs — no upstream document captures them — and "ยืนยันข้อมูลครบถ้วน" stays
+                            disabled until every row has both filled. Confirming emits the updated
+                            InvoiceLineItem[] (now carrying measurement/measUnit) back to
+                            onItemMeasurementConfirmed() (chat.service.ts), which merges them into
+                            formData.selectedItems and continues the flow (missing-fields check → proceed
+                            choice) exactly where onAllFlagsConfirmed() used to go directly. form-preview's
+                            per-item modal pre-fills its own Measurement/Meas. Unit fields from
+                            item.measurement/measUnit when already set here, so paths that pass through
+                            this box are never asked twice; paths that skip it (customs/SPN) still collect
+                            Measurement/Meas. Unit inside form-preview's modal as before)
   'form'               → FormPanelComponent
   'full-upload'        → FullUploadComponent
   'single-upload'      → SingleUploadComponent
@@ -285,6 +304,11 @@ import-license-menu → 2 choices (chooseFullUpload()/full-upload card removed f
               ├─ remaining agencies? → "เสร็จสิ้น / ขอใบอนุญาตเพิ่ม"
               ├─ ขอใบอนุญาตเพิ่ม → agency selector → repeat agency flow
               └─ no remaining agencies → completion text + "ตรวจสอบสถานะใบอนุญาต" → permit-status
+
+After flags confirmed (both full-upload and invoice paths — the only two that reach flags) →
+  item-measurement (ONLY when formData.selectedItems is non-empty, i.e. the invoice path; skipped
+  for full-upload since it has no selectedItems) → user fills Measurement/Meas. Unit per row →
+  "ยืนยันข้อมูลครบถ้วน" → onItemMeasurementConfirmed() → afterFlagsConfirmed():
 
 After flags confirmed (full-upload path) → form-preview (editable) → "ดำเนินการต่อ" → choice-card(submit/edit) → submit
 

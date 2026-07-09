@@ -4,7 +4,7 @@ import {
   FlagCardData, FlagItem, ChoiceCardData, EmailDraftData,
   StatusCardData, OcrResultsData, SpnResultData, Shipment,
   MissingField, MissingFieldsData, PaymentQrData, PaymentSlipData, HsAnalysisData,
-  InvoiceLineItem, ItemHsAnalysisData, ProductHsAnalysis,
+  InvoiceLineItem, ItemHsAnalysisData, ProductHsAnalysis, ItemMeasurementData,
 } from '@app/core/models/types';
 import { OcrService } from './ocr.service';
 import { QueueService } from './queue.service';
@@ -691,6 +691,28 @@ export class ChatService {
   onAllFlagsConfirmed(): void {
     this.user('ยืนยันข้อมูลทั้งหมดแล้ว');
     this.promoteActiveSession();
+    const items = this.formData().selectedItems;
+    if (items && items.length > 0) {
+      this.withTyping(() => {
+        this.bot('item-measurement', {
+          items,
+          customsDeclaration: this.formData().customsDeclaration,
+        } satisfies ItemMeasurementData);
+      }, 700);
+      return;
+    }
+    this.afterFlagsConfirmed();
+  }
+
+  /** Called from ItemMeasurementComponent when every row's Measurement/Meas. Unit is confirmed */
+  onItemMeasurementConfirmed(msgId: string, items: InvoiceLineItem[]): void {
+    this.messages.update(ms => ms.map(m => m.id === msgId ? { ...m, isReadOnly: true } : m));
+    this.user('ยืนยันข้อมูล Measurement ครบทุกรายการแล้ว');
+    this.formData.update(f => ({ ...f, selectedItems: items }));
+    this.withTyping(() => this.afterFlagsConfirmed(), 500);
+  }
+
+  private afterFlagsConfirmed(): void {
     if (this.checkMissingAfterFlags) {
       this.checkMissingAfterFlags = false;
       const missing = this.getMissingFields(this.formData());
