@@ -33,7 +33,12 @@ export class FormPreviewComponent {
     this.manualDetails = {};
     this.confirmedItemIds = new Set();
     for (const item of val.selectedItems ?? []) {
-      this.manualDetails[item.id] = { lotNo: '', mfgDate: '', expDate: '', measurement: '', measUnit: '', qty: '', qtyUnit: '' };
+      // Lot/Mfg/Exp/Qty are already known from OCR — only Measurement + Meas. Unit need the
+      // user to key in, since no document captures the declared measurement/unit for LPI.
+      this.manualDetails[item.id] = {
+        lotNo: item.lotNo ?? '', mfgDate: item.mfgDate ?? '', expDate: item.expDate ?? '',
+        measurement: '', measUnit: '', qty: item.quantity ?? '', qtyUnit: item.unit ?? '',
+      };
     }
   }
   get data(): LicenseFormData { return this._data; }
@@ -42,6 +47,9 @@ export class FormPreviewComponent {
   local: LicenseFormData = {};
 
   readonly manualFields = ITEM_MANUAL_DETAIL_FIELDS;
+  // Lot Number / Mfg. Date / Exp. Date / Qty. / Qty. Unit are auto-filled from OCR (see `data`
+  // setter above) — only Measurement + Meas. Unit are left for the user to key in by hand.
+  readonly editableFields = ITEM_MANUAL_DETAIL_FIELDS.filter(f => f.key === 'measurement' || f.key === 'measUnit');
   manualDetails: Record<string, ItemManualDetail> = {};
   confirmedItemIds = new Set<string>();
   detailItemId: string | null = null;
@@ -145,7 +153,10 @@ export class FormPreviewComponent {
   isManualDetailComplete(id: string): boolean {
     const d = this.manualDetails[id];
     if (!d) return false;
-    return this.manualFields.every(f => (d[f.key] ?? '').trim().length > 0);
+    // Only the user-editable fields gate completion — Lot/Mfg/Exp/Qty are auto-filled from OCR
+    // and may legitimately stay blank when the source document simply didn't have them (e.g. no
+    // production/lot details on file for a given item).
+    return this.editableFields.every(f => (d[f.key] ?? '').trim().length > 0);
   }
 
   allItemDetailsConfirmed(): boolean {

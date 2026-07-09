@@ -342,6 +342,8 @@ export interface InvoiceLineItem {
   lotNo: string;          // Lot/Batch No.
   hsCode: string;
   origin?: string;        // ประเทศกำเนิดสินค้า (จาก OCR)
+  mfgDate?: string;       // วันที่ผลิต (จาก OCR/production details เมื่อมี)
+  expDate?: string;       // วันหมดอายุ (จาก OCR/production details เมื่อมี)
 }
 
 // Fields NOT available from OCR — user must key these in per item before the

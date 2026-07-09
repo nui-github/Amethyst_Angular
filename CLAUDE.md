@@ -100,9 +100,13 @@ ChatMessage.type → @switch in ChatAreaComponent
                             when data.selectedItems present (every path — see selectAllAgencyItems() /
                             getInvoiceLineItems() below, formData.selectedItems is now set directly with
                             no separate item-selection UI), each item row has a "รายละเอียด" button opening
-                            a modal — OCR-derived fields read-only, plus ItemManualDetail fields (types.ts)
-                            the user must fill in and confirm per item; "ดำเนินการต่อ" stays disabled until
-                            every selected item is confirmed via the modal)
+                            a modal — OCR-derived fields read-only (now includes Lot No./Mfg. Date/
+                            Exp. Date/Qty., auto-filled from InvoiceLineItem.lotNo/mfgDate/expDate/
+                            quantity/unit — see mfgDate/expDate on InvoiceLineItem, types.ts), plus
+                            only Measurement + Meas. Unit left editable (editableFields in
+                            form-preview.component.ts — the only ItemManualDetail fields no upstream
+                            document actually captures) the user must fill in and confirm per item;
+                            "ดำเนินการต่อ" stays disabled until every selected item is confirmed)
   'missing-fields'     → MissingFieldsComponent (incomplete OCR → fill + optional re-upload)
   'agency-upload'      → AgencyUploadComponent  (per-agency doc slots; upload file OR manual entry per slot)
   'profile-select'     → ProfileSelectComponent (pick/confirm ShippingNet profile; mode: 'select'|'confirm')

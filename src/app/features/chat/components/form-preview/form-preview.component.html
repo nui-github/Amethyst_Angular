@@ -145,6 +145,8 @@
               <div class="fp-modal__ro"><span>ประเทศกำเนิด</span><strong>{{ item.origin || '—' }}</strong></div>
               <div class="fp-modal__ro"><span>ปริมาณ</span><strong>{{ item.quantity }} {{ item.unit }}</strong></div>
               <div class="fp-modal__ro"><span>Lot No.</span><strong>{{ item.lotNo }}</strong></div>
+              <div class="fp-modal__ro"><span>วันที่ผลิต (Mfg. Date)</span><strong>{{ item.mfgDate || '—' }}</strong></div>
+              <div class="fp-modal__ro"><span>วันหมดอายุ (Exp. Date)</span><strong>{{ item.expDate || '—' }}</strong></div>
               <div class="fp-modal__ro"><span>มูลค่า</span><strong>฿{{ item.amount | number }}</strong></div>
             </div>
           </div>
@@ -152,7 +154,7 @@
           <div class="fp-modal__section">
             <span class="fp-modal__section-title">ข้อมูลที่ต้องกรอกเพิ่มเติม</span>
             <div class="fp-modal__form-grid">
-              @for (f of manualFields; track f.key) {
+              @for (f of editableFields; track f.key) {
                 <label class="fp-modal__field">
                   <span class="fp-modal__field-label">{{ f.label }} <em>*</em></span>
                   @if (f.type === 'date') {
