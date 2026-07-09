@@ -31,7 +31,7 @@ export class FormPreviewComponent {
     this.manualDetails = {};
     this.confirmedItemIds = new Set();
     for (const item of val.selectedItems ?? []) {
-      this.manualDetails[item.id] = { nameTh: '', netWeight: '', manufacturerName: '', mfgDate: '', expDate: '', remarks: '' };
+      this.manualDetails[item.id] = { lotNo: '', mfgDate: '', expDate: '', measurement: '', measUnit: '', qty: '', qtyUnit: '' };
     }
   }
   get data(): LicenseFormData { return this._data; }

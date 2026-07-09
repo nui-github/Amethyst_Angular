@@ -88,7 +88,7 @@ export const MOCK_QUEUE: Shipment[] = [
     itemsSelected: true,
     items: [
       { id: 'i1', name: 'Amoxicillin Trihydrate', hsCode: '2941.10.00', origin: 'อินเดีย', quantity: '250', unit: 'กก.', lotNo: 'AMX-2024-0617', amount: 63000,
-        detail: { nameTh: 'ยาปฏิชีวนะชนิดผง (อะม็อกซีซิลลิน)', netWeight: '250', manufacturerName: 'Advent Pharma India Pvt. Ltd.', mfgDate: '01-05-2568', expDate: '01-05-2570', remarks: 'รอยืนยันปริมาณและเลข GMP' } },
+        detail: { lotNo: 'LOT-01052568', mfgDate: '01-05-2568', expDate: '01-05-2570', measurement: '250', measUnit: 'กก.', qty: '1', qtyUnit: 'ลัง' } },
     ],
   },
 
@@ -148,9 +148,9 @@ export const MOCK_QUEUE: Shipment[] = [
     itemsSelected: true,
     items: [
       { id: 'i2a', name: 'Human Insulin (สำเร็จรูป) — Regular', hsCode: '2941.10.00', origin: 'เยอรมนี', quantity: '100', unit: 'ไวอัล', lotNo: 'INS-2024-DE001', amount: 420000,
-        detail: { nameTh: 'อินซูลินสำเร็จรูปสำหรับฉีด (Regular)', netWeight: '10', manufacturerName: 'Deutsche Insulin GmbH', mfgDate: '05-04-2568', expDate: '30-11-2568', remarks: 'ตรวจสอบวันหมดอายุระหว่าง CoA และฉลากแล้ว' } },
+        detail: { lotNo: 'LOT-05042568', mfgDate: '05-04-2568', expDate: '30-11-2568', measurement: '10', measUnit: 'กก.', qty: '1', qtyUnit: 'ลัง' } },
       { id: 'i2b', name: 'Human Insulin (สำเร็จรูป) — NPH', hsCode: '2941.10.00', origin: 'เยอรมนี', quantity: '80', unit: 'ไวอัล', lotNo: 'INS-2024-DE002', amount: 336000,
-        detail: { nameTh: 'อินซูลินสำเร็จรูปสำหรับฉีด (NPH)', netWeight: '8', manufacturerName: 'Deutsche Insulin GmbH', mfgDate: '05-04-2568', expDate: '30-11-2568', remarks: 'ตรวจสอบวันหมดอายุระหว่าง CoA และฉลากแล้ว' } },
+        detail: { lotNo: 'LOT-05042568', mfgDate: '05-04-2568', expDate: '30-11-2568', measurement: '8', measUnit: 'กก.', qty: '1', qtyUnit: 'ลัง' } },
       { id: 'i2c', name: 'Human Insulin Pen Cartridge', hsCode: '2941.10.00', origin: 'เยอรมนี', quantity: '150', unit: 'ไวอัล', lotNo: 'INS-2024-DE003', amount: 510000 },
       { id: 'i2d', name: 'Insulin Syringe (จำหน่ายคู่)', hsCode: '9018.31.10', origin: 'เยอรมนี', quantity: '500', unit: 'ชิ้น', lotNo: 'SYR-2024-DE004', amount: 42000 },
       { id: 'i2e', name: 'Insulin Cooling Case', hsCode: '3923.10.00', origin: 'เยอรมนี', quantity: '50', unit: 'ชิ้น', lotNo: 'CASE-2024-DE005', amount: 18000 },
@@ -259,9 +259,9 @@ export const MOCK_QUEUE: Shipment[] = [
     itemsSelected: true,
     items: [
       { id: 'i4a', name: 'Glyphosate Technical 95%', hsCode: '2931.39.00', origin: 'จีน', quantity: '1,000', unit: 'ลิตร', lotNo: 'GLY-CN-0601', amount: 850000,
-        detail: { nameTh: 'สารกำจัดวัชพืชไกลโฟเสท (เทคนิคอล) 95%', netWeight: '1,000', manufacturerName: 'Sino Agro Chem Co., Ltd.', mfgDate: '10-05-2568', expDate: '10-05-2570', remarks: 'ยื่นกรม กษ. เรียบร้อยแล้ว' } },
+        detail: { lotNo: 'LOT-10052568', mfgDate: '10-05-2568', expDate: '10-05-2570', measurement: '1,000', measUnit: 'กก.', qty: '1', qtyUnit: 'ลัง' } },
       { id: 'i4b', name: 'Glyphosate IPA Salt 62%', hsCode: '2931.39.00', origin: 'จีน', quantity: '800', unit: 'ลิตร', lotNo: 'GLY-CN-0602', amount: 640000,
-        detail: { nameTh: 'สารกำจัดวัชพืชไกลโฟเสท ไอโซโพรพิลามีนซอลต์ 62%', netWeight: '800', manufacturerName: 'Sino Agro Chem Co., Ltd.', mfgDate: '10-05-2568', expDate: '10-05-2570', remarks: 'ยื่นกรม กษ. เรียบร้อยแล้ว' } },
+        detail: { lotNo: 'LOT-10052568', mfgDate: '10-05-2568', expDate: '10-05-2570', measurement: '800', measUnit: 'กก.', qty: '1', qtyUnit: 'ลัง' } },
       { id: 'i4c', name: 'Paraquat Dichloride 27.6%', hsCode: '2933.39.90', origin: 'จีน', quantity: '600', unit: 'ลิตร', lotNo: 'PQ-CN-0603', amount: 480000 },
       { id: 'i4d', name: '2,4-D Amine Salt 72%', hsCode: '2918.99.90', origin: 'จีน', quantity: '500', unit: 'ลิตร', lotNo: '24D-CN-0604', amount: 320000 },
       { id: 'i4e', name: 'Atrazine 90% WDG', hsCode: '2933.69.00', origin: 'จีน', quantity: '400', unit: 'กก.', lotNo: 'ATZ-CN-0605', amount: 260000 },
@@ -366,9 +366,9 @@ export const MOCK_QUEUE: Shipment[] = [
     itemsSelected: true,
     items: [
       { id: 'i6a', name: 'Ethanol 99.5% (Absolute Ethanol)', hsCode: '2207.10.00', origin: 'ยุโรป', quantity: '1,000', unit: 'ลิตร', lotNo: 'ETH-EU-0731', amount: 320000,
-        detail: { nameTh: 'เอทานอลบริสุทธิ์ 99.5% สำหรับอุตสาหกรรม', netWeight: '1000', manufacturerName: 'EuroChem Distillers B.V.', mfgDate: '15-06-2568', expDate: '15-06-2573', remarks: 'ยื่นกรม วอ. เรียบร้อยแล้ว' } },
+        detail: { lotNo: 'LOT-15062568', mfgDate: '15-06-2568', expDate: '15-06-2573', measurement: '1000', measUnit: 'กก.', qty: '1', qtyUnit: 'ลัง' } },
       { id: 'i6b', name: 'Ethanol 96% (Denatured)', hsCode: '2207.10.00', origin: 'ยุโรป', quantity: '980', unit: 'ลิตร', lotNo: 'ETH-EU-0732', amount: 312000,
-        detail: { nameTh: 'เอทานอลแปลงสภาพ 96% สำหรับอุตสาหกรรม', netWeight: '980', manufacturerName: 'EuroChem Distillers B.V.', mfgDate: '15-06-2568', expDate: '15-06-2573', remarks: 'ยื่นกรม วอ. เรียบร้อยแล้ว' } },
+        detail: { lotNo: 'LOT-15062568', mfgDate: '15-06-2568', expDate: '15-06-2573', measurement: '980', measUnit: 'กก.', qty: '1', qtyUnit: 'ลัง' } },
       { id: 'i6c', name: 'Isopropyl Alcohol 99%', hsCode: '2207.10.00', origin: 'ยุโรป', quantity: '960', unit: 'ลิตร', lotNo: 'ETH-EU-0733', amount: 304000 },
       { id: 'i6d', name: 'Methanol Technical Grade', hsCode: '2905.11.00', origin: 'ยุโรป', quantity: '940', unit: 'ลิตร', lotNo: 'ETH-EU-0734', amount: 296000 },
       { id: 'i6e', name: 'Acetone Industrial Grade', hsCode: '2914.11.00', origin: 'ยุโรป', quantity: '920', unit: 'ลิตร', lotNo: 'ETH-EU-0735', amount: 288000 },
@@ -483,7 +483,7 @@ export const MOCK_QUEUE: Shipment[] = [
     itemsSelected: true,
     items: [
       { id: 'i8', name: 'Zinc Oxide (Nano Grade)', hsCode: '2817.00.00', origin: 'เกาหลีใต้', quantity: '200', unit: 'กก.', lotNo: 'ZNO-KR-0520', amount: 180000,
-        detail: { nameTh: 'ซิงค์ออกไซด์เกรดนาโน สำหรับเครื่องสำอาง', netWeight: '200', manufacturerName: 'Korea Nano Materials Co.', mfgDate: '01-05-2568', expDate: '01-05-2571', remarks: 'ยื่นกรม อย. เรียบร้อยแล้ว' } },
+        detail: { lotNo: 'LOT-01052568', mfgDate: '01-05-2568', expDate: '01-05-2571', measurement: '200', measUnit: 'กก.', qty: '1', qtyUnit: 'ลัง' } },
     ],
   },
 
@@ -573,7 +573,7 @@ export const MOCK_QUEUE: Shipment[] = [
     itemsSelected: true,
     items: [
       { id: 'i10', name: 'Sodium Hypochlorite 10% Solution', hsCode: '2828.90.10', origin: 'ออสเตรเลีย', quantity: '2,000', unit: 'กก.', lotNo: 'NACL-AU-1000', amount: 60000,
-        detail: { nameTh: 'โซเดียมไฮโปคลอไรท์ 10% สารละลายสำหรับฆ่าเชื้อ', netWeight: '2,000', manufacturerName: 'AusChem Industries Pty Ltd.', mfgDate: '01-05-2568', expDate: '01-11-2568', remarks: 'ยื่นกรม วอ. เรียบร้อยแล้ว' } },
+        detail: { lotNo: 'LOT-01052568', mfgDate: '01-05-2568', expDate: '01-11-2568', measurement: '2,000', measUnit: 'กก.', qty: '1', qtyUnit: 'ลัง' } },
     ],
   },
 
@@ -677,7 +677,7 @@ export const MOCK_QUEUE: Shipment[] = [
     itemsSelected: true,
     items: [
       { id: 'i12_001', name: 'Titanium Dioxide (Rutile) — Lot 1', hsCode: '3206.11.00', origin: 'เยอรมนี', quantity: '300', unit: 'กก.', lotNo: 'TiO2-DE-0531', amount: 135000,
-        detail: { nameTh: 'ไทเทเนียมไดออกไซด์ (สีขาวสำหรับเครื่องสำอาง)', netWeight: '300', manufacturerName: 'Rhein Pigment Werke GmbH', mfgDate: '20-04-2568', expDate: '20-04-2572', remarks: 'แก้ไขชื่อสินค้าให้ตรงกับ CoA แล้ว (Rutile)' } },
+        detail: { lotNo: 'LOT-20042568', mfgDate: '20-04-2568', expDate: '20-04-2572', measurement: '300', measUnit: 'กก.', qty: '1', qtyUnit: 'ลัง' } },
       { id: 'i12_002', name: 'Titanium Dioxide (Anatase) — Lot 2', hsCode: '3206.11.00', origin: 'เยอรมนี', quantity: '298', unit: 'กก.', lotNo: 'TiO2-DE-0532', amount: 134100 },
       { id: 'i12_003', name: 'Titanium Dioxide (Rutile Coated) — Lot 3', hsCode: '3206.11.00', origin: 'เยอรมนี', quantity: '296', unit: 'กก.', lotNo: 'TiO2-DE-0533', amount: 133200 },
       { id: 'i12_004', name: 'Titanium Dioxide (Anatase Untreated) — Lot 4', hsCode: '3206.11.00', origin: 'เยอรมนี', quantity: '294', unit: 'กก.', lotNo: 'TiO2-DE-0534', amount: 132300 },

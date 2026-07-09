@@ -245,21 +245,23 @@ export interface InvoiceLineItem {
 // Fields NOT available from OCR — user must key these in per item before the
 // form-preview step (invoice path) can proceed. All required.
 export interface ItemManualDetail {
-  nameTh: string;          // ชื่อสินค้าภาษาไทย
-  netWeight: string;       // น้ำหนักสุทธิ (กก.)
-  manufacturerName: string; // ชื่อผู้ผลิต
-  mfgDate: string;         // วันที่ผลิต
-  expDate: string;         // วันหมดอายุ
-  remarks: string;         // หมายเหตุ
+  lotNo: string;      // Lot Number
+  mfgDate: string;    // Mfg. Date
+  expDate: string;    // Exp. Date
+  measurement: string; // Measurement
+  measUnit: string;   // Meas. Unit
+  qty: string;        // Qty.
+  qtyUnit: string;    // Qty. Unit
 }
 
 export const ITEM_MANUAL_DETAIL_FIELDS: { key: keyof ItemManualDetail; label: string; placeholder: string }[] = [
-  { key: 'nameTh',           label: 'ชื่อสินค้าภาษาไทย',   placeholder: 'เช่น ยาปฏิชีวนะชนิดผง' },
-  { key: 'netWeight',        label: 'น้ำหนักสุทธิ (กก.)',  placeholder: 'เช่น 150' },
-  { key: 'manufacturerName', label: 'ชื่อผู้ผลิต',          placeholder: 'เช่น XYZ Pharma Ltd.' },
-  { key: 'mfgDate',          label: 'วันที่ผลิต',           placeholder: 'วว-ดด-ปปปป' },
-  { key: 'expDate',          label: 'วันหมดอายุ',          placeholder: 'วว-ดด-ปปปป' },
-  { key: 'remarks',          label: 'หมายเหตุ',            placeholder: 'เช่น N/A' },
+  { key: 'lotNo',       label: 'Lot Number',   placeholder: 'เช่น CLA-2024-0091' },
+  { key: 'mfgDate',     label: 'Mfg. Date',    placeholder: 'วว-ดด-ปปปป' },
+  { key: 'expDate',     label: 'Exp. Date',    placeholder: 'วว-ดด-ปปปป' },
+  { key: 'measurement', label: 'Measurement',  placeholder: 'เช่น 150' },
+  { key: 'measUnit',    label: 'Meas. Unit',   placeholder: 'เช่น กก.' },
+  { key: 'qty',         label: 'Qty.',         placeholder: 'เช่น 30' },
+  { key: 'qtyUnit',     label: 'Qty. Unit',    placeholder: 'เช่น กล่อง' },
 ];
 
 export type ChatStep =
