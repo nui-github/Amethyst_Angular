@@ -18,17 +18,22 @@ export const INVOICE_LINE_ITEMS: OcrLineItem[] = [
 // left undefined — they only get filled in later, once classification/agency selection happens.
 export const INVOICE_CUSTOMS_ITEMS: CustomsDeclarationItem[] = [
   {
-    itemNumber: 1, invoiceNo: 'INVNO0004', invoiceDate: '2025-04-22', invoiceItemNumber: 1,
+    itemNumber: 1, invoiceNo: 'INVNO0004', invoiceDate: '2025-04-22', invoiceItemNumber: 1, declarationLineNumber: 1,
     nameTh: 'สเตนต์กราฟท์หลอดเลือด', nameEn: 'Stent Graft (ETBF2313C145EE)',
     tariffCode: '9021390000', quantity: '1', quantityUnit: 'ชิ้น',
     netWeight: '0.450', netWeightUnit: 'KGM', packageAmount: '1', packageUnit: 'BOX',
     originCountry: 'ไอร์แลนด์ (IE)', purchaseCountry: 'ไอร์แลนด์ (IE)',
     invoiceAmountForeign: '18500.00', currencyCode: 'EUR', invoiceAmountBaht: '712400.00',
     manufacture: 'Ethos Vascular Devices Ltd., Dublin, Ireland',
+    location: {
+      goodsCode: 'WH-HLTH-01', goodsName: 'คลังสินค้าเฮลท์ฟาร์มา (สาขาบางนา)',
+      streetAndNumber: '99/1 ถนนสุขุมวิท', district: 'บางนาเหนือ', subProvince: 'บางนา',
+      province: 'กรุงเทพมหานคร', postcode: '10260', phoneNumber: '02-123-4567', faxNumber: '02-123-4568',
+    },
     productions: [{ lotNo: 'ETBF-2313-C145EE', mfgDate: '01-02-2568', expDate: '01-02-2571', measurement: '1', measurementUnit: 'ชิ้น', quantity: '1', quantityUnit: 'ชิ้น' }],
   },
   {
-    itemNumber: 2, invoiceNo: 'INVNO0004', invoiceDate: '2025-04-22', invoiceItemNumber: 2,
+    itemNumber: 2, invoiceNo: 'INVNO0004', invoiceDate: '2025-04-22', invoiceItemNumber: 2, declarationLineNumber: 2,
     nameTh: 'ขดลวดค้ำยันหลอดเลือดหัวใจ', nameEn: 'Coronary Stent (TRCR30015X)',
     tariffCode: '9018909090', quantity: '39', quantityUnit: 'ชิ้น',
     netWeight: '3.900', netWeightUnit: 'KGM', packageAmount: '2', packageUnit: 'BOX',
@@ -38,7 +43,7 @@ export const INVOICE_CUSTOMS_ITEMS: CustomsDeclarationItem[] = [
     productions: [{ lotNo: 'TRCR30015X', mfgDate: '15-01-2568', expDate: '15-01-2571', measurement: '39', measurementUnit: 'ชิ้น', quantity: '39', quantityUnit: 'ชิ้น' }],
   },
   {
-    itemNumber: 3, invoiceNo: 'INVNO0004', invoiceDate: '2025-04-22', invoiceItemNumber: 3,
+    itemNumber: 3, invoiceNo: 'INVNO0004', invoiceDate: '2025-04-22', invoiceItemNumber: 3, declarationLineNumber: 3,
     nameTh: 'อุปกรณ์นำสายสวนหลอดเลือด', nameEn: 'Introducer Sheath (SENSH1628W)',
     tariffCode: '9018399090', quantity: '29', quantityUnit: 'ชิ้น',
     netWeight: '2.100', netWeightUnit: 'KGM', packageAmount: '2', packageUnit: 'BOX',
@@ -48,7 +53,7 @@ export const INVOICE_CUSTOMS_ITEMS: CustomsDeclarationItem[] = [
     productions: [{ lotNo: 'SENSH1628W', mfgDate: '20-01-2568', expDate: '20-01-2571', measurement: '29', measurementUnit: 'ชิ้น', quantity: '29', quantityUnit: 'ชิ้น' }],
   },
   {
-    itemNumber: 4, invoiceNo: 'INVNO0004', invoiceDate: '2025-04-22', invoiceItemNumber: 4,
+    itemNumber: 4, invoiceNo: 'INVNO0004', invoiceDate: '2025-04-22', invoiceItemNumber: 4, declarationLineNumber: 4,
     nameTh: 'สายสวนขยายหลอดเลือดด้วยบอลลูน', nameEn: 'Balloon Catheter (SPL20015X)',
     tariffCode: '9018399090', quantity: '189', quantityUnit: 'ชิ้น',
     netWeight: '18.900', netWeightUnit: 'KGM', packageAmount: '8', packageUnit: 'BOX',
@@ -58,7 +63,7 @@ export const INVOICE_CUSTOMS_ITEMS: CustomsDeclarationItem[] = [
     productions: [{ lotNo: 'SPL20015X', mfgDate: '10-02-2568', expDate: '10-02-2571', measurement: '189', measurementUnit: 'ชิ้น', quantity: '189', quantityUnit: 'ชิ้น' }],
   },
   {
-    itemNumber: 5, invoiceNo: 'INVNO0004', invoiceDate: '2025-04-22', invoiceItemNumber: 5,
+    itemNumber: 5, invoiceNo: 'INVNO0004', invoiceDate: '2025-04-22', invoiceItemNumber: 5, declarationLineNumber: 5,
     nameTh: 'บอลลูนเคลือบยาขยายหลอดเลือด', nameEn: 'Drug-Coated Balloon (SBI06012013P)',
     tariffCode: '9018399090', quantity: '1', quantityUnit: 'ชิ้น',
     netWeight: '0.100', netWeightUnit: 'KGM', packageAmount: '1', packageUnit: 'BOX',
@@ -68,7 +73,7 @@ export const INVOICE_CUSTOMS_ITEMS: CustomsDeclarationItem[] = [
     productions: [{ lotNo: 'SBI06012013P', mfgDate: '05-02-2568', expDate: '05-02-2571', measurement: '1', measurementUnit: 'ชิ้น', quantity: '1', quantityUnit: 'ชิ้น' }],
   },
   {
-    itemNumber: 6, invoiceNo: 'INVNO0004', invoiceDate: '2025-04-22', invoiceItemNumber: 6,
+    itemNumber: 6, invoiceNo: 'INVNO0004', invoiceDate: '2025-04-22', invoiceItemNumber: 6, declarationLineNumber: 6,
     nameTh: 'อุปกรณ์บรรจุภัณฑ์เสริมสำหรับสายสวนบอลลูน', nameEn: 'Balloon Catheter Packaging Accessory (SPL30020X)',
     tariffCode: '3926909914', quantity: '1', quantityUnit: 'ชิ้น',
     netWeight: '0.050', netWeightUnit: 'KGM', packageAmount: '1', packageUnit: 'BOX',
@@ -95,8 +100,10 @@ export const MOCK_INVOICE_CUSTOMS_DECLARATION: CustomsDeclarationData = {
   vesselName:             '',
   consignmentCountry:     'IE',
   destinationCountry:     'TH',
-  dischargePort:          'THBKK',
-  loadPort:               '',
+  portDischargeCode:      '',
+  portLoadCode:           '',
+  controlDischargePort:   'THBKK',
+  controlReleasePort:     '',
   informantIdCard:        '',
   informantName:          '',
   registrationId:         '',

@@ -164,6 +164,8 @@
         <div class="ocr-modal__section">
           <span class="ocr-modal__section-title">ข้อมูลสินค้า</span>
           <div class="ocr-modal__ro-grid">
+            <div class="ocr-modal__ro"><span>ลำดับรายการในใบขน</span><strong>{{ item.declarationLineNumber ?? '—' }}</strong></div>
+            <div class="ocr-modal__ro"><span>ลำดับรายการใน Invoice</span><strong>{{ item.invoiceItemNumber ?? '—' }}</strong></div>
             <div class="ocr-modal__ro"><span>ชื่อสินค้า (TH)</span><strong>{{ item.nameTh || '—' }}</strong></div>
             <div class="ocr-modal__ro"><span>ชื่อสินค้า (EN)</span><strong>{{ item.nameEn || '—' }}</strong></div>
             <div class="ocr-modal__ro"><span>พิกัดศุลกากร</span><strong>{{ item.tariffCode || '—' }}</strong></div>
@@ -188,6 +190,23 @@
             <div class="ocr-modal__ro"><span>เลขที่ Invoice</span><strong>{{ item.invoiceNo || '—' }}</strong></div>
           </div>
         </div>
+
+        @if (item.location; as loc) {
+          <div class="ocr-modal__section">
+            <span class="ocr-modal__section-title">สถานที่เก็บสินค้า</span>
+            <div class="ocr-modal__ro-grid">
+              <div class="ocr-modal__ro"><span>รหัสคลังสินค้า</span><strong>{{ loc.goodsCode || '—' }}</strong></div>
+              <div class="ocr-modal__ro"><span>ชื่อคลังสินค้า</span><strong>{{ loc.goodsName || '—' }}</strong></div>
+              <div class="ocr-modal__ro" style="grid-column: 1 / -1"><span>ที่อยู่</span><strong>{{ loc.streetAndNumber || '—' }}</strong></div>
+              <div class="ocr-modal__ro"><span>แขวง/ตำบล</span><strong>{{ loc.district || '—' }}</strong></div>
+              <div class="ocr-modal__ro"><span>เขต/อำเภอ</span><strong>{{ loc.subProvince || '—' }}</strong></div>
+              <div class="ocr-modal__ro"><span>จังหวัด</span><strong>{{ loc.province || '—' }}</strong></div>
+              <div class="ocr-modal__ro"><span>รหัสไปรษณีย์</span><strong>{{ loc.postcode || '—' }}</strong></div>
+              <div class="ocr-modal__ro"><span>โทรศัพท์</span><strong>{{ loc.phoneNumber || '—' }}</strong></div>
+              <div class="ocr-modal__ro"><span>โทรสาร</span><strong>{{ loc.faxNumber || '—' }}</strong></div>
+            </div>
+          </div>
+        }
 
         @if (item.dangerousTh || item.dangerousEn || item.dangerousInfo) {
           <div class="ocr-modal__section">

@@ -160,12 +160,26 @@ export interface CustomsDeclarationAuthority {
   licenseNumber?: string;
 }
 
+// LocationInfo — warehouse/storage location for this GoodsShipment line
+export interface CustomsDeclarationLocation {
+  goodsCode?: string;
+  goodsName?: string;
+  streetAndNumber?: string;
+  district?: string;
+  subProvince?: string;
+  province?: string;
+  postcode?: string;
+  phoneNumber?: string;
+  faxNumber?: string;
+}
+
 // One GoodsShipment line item, flattened from the real ใบขนสินค้า/LPI JSON payload
 export interface CustomsDeclarationItem {
   itemNumber: number;
   invoiceNo?: string;
   invoiceDate?: string;
   invoiceItemNumber?: number;
+  declarationLineNumber?: number;
   nameTh?: string;
   nameEn?: string;
   dangerousTh?: string;
@@ -190,6 +204,7 @@ export interface CustomsDeclarationItem {
   manufacture?: string;
   remark?: string;
   certificateAnalysis?: string;
+  location?: CustomsDeclarationLocation;
   sources?: CustomsDeclarationSource[];
   productions?: CustomsDeclarationProduction[];
   authorities?: CustomsDeclarationAuthority[];
@@ -211,8 +226,10 @@ export interface CustomsDeclarationData {
   vesselName?: string;
   consignmentCountry?: string;
   destinationCountry?: string;
-  dischargePort?: string;
-  loadPort?: string;
+  portDischargeCode?: string;      // PortInfo.Discharge — numeric port code
+  portLoadCode?: string;           // PortInfo.Load — numeric port code
+  controlDischargePort?: string;   // ControlAgencyInfo.DischargePort — UN/LOCODE (e.g. THBKK)
+  controlReleasePort?: string;     // ControlAgencyInfo.ReleasePort — UN/LOCODE (e.g. THLCH)
   informantIdCard?: string;
   informantName?: string;
   registrationId?: string;

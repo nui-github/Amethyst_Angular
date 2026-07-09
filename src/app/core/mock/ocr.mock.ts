@@ -19,11 +19,13 @@ export const MOCK_CUSTOMS_DECLARATION: CustomsDeclarationData = {
   vesselName:             '',              // ไม่พบในใบขน — ทิ้งว่างไว้
   consignmentCountry:     'IE',
   destinationCountry:     'TH',
-  dischargePort:          'THLCH',
-  loadPort:               '',              // ไม่พบในเอกสาร — ทิ้งว่างไว้
-  informantIdCard:        '',
-  informantName:          '',
-  registrationId:         '',
+  portDischargeCode:      '1001',
+  portLoadCode:           '2010',
+  controlDischargePort:   'THLCH',
+  controlReleasePort:     'THLCH',
+  informantIdCard:        '1102003456789',
+  informantName:          'นายสมชาย ใจดี',
+  registrationId:         'REG-LPI-0105558012345',
   items: INVOICE_CUSTOMS_ITEMS,
 };
 

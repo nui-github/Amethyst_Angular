@@ -28,8 +28,10 @@ const DECL_SECTIONS: OcrSection[] = [
     { label: 'ชื่อเรือ',           key: 'vesselName',         accent: false },
     { label: 'ประเทศต้นทาง',      key: 'consignmentCountry', accent: false },
     { label: 'ประเทศปลายทาง',     key: 'destinationCountry', accent: false },
-    { label: 'ท่าเรือขนถ่าย',      key: 'dischargePort',      accent: false },
-    { label: 'ท่าเรือต้นทาง',      key: 'loadPort',           accent: false },
+    { label: 'รหัสท่าขนถ่าย',      key: 'portDischargeCode',    accent: false },
+    { label: 'รหัสท่าต้นทาง',      key: 'portLoadCode',         accent: false },
+    { label: 'ท่าเรือขนถ่าย',      key: 'controlDischargePort', accent: false },
+    { label: 'ท่าเรือปล่อยสินค้า', key: 'controlReleasePort',   accent: false },
   ]},
   { title: 'ผู้แจ้ง', color: '#B45309', rows: [
     { label: 'ชื่อผู้แจ้ง',        key: 'informantName',   accent: false },
