@@ -44,6 +44,7 @@ export class OcrResultsComponent {
 
   get isManual(): boolean { return !!(this._data as Partial<OcrResultsData>).isManual; }
   get declarationComplete(): boolean { return !!this.local.declarationComplete; }
+  get declarationGateRequired(): boolean { return !!this.local.declarationGateRequired; }
 
   openEditor(): void { this.chat.openDeclarationEditor(this.msgId); }
 

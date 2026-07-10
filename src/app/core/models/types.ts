@@ -137,6 +137,13 @@ export interface OcrResultsData {
   // true once the user has filled every required field via the full-screen "กรอกข้อมูลเพิ่มเติม"
   // declaration-editor panel (customs-declaration-editor) — only then does "ดำเนินการต่อ" appear.
   declarationComplete?: boolean;
+  // true when this particular ocr-results card should force the declarationComplete gate before
+  // "ดำเนินการต่อ" is allowed — set only for OCR passes meant to be the FINAL/complete declaration
+  // (customs-only single-upload; the second, agency-upload OCR pass in the invoice path). The
+  // invoice path's first OCR pass (invoice doc alone, before COA/เลข U are even uploaded) leaves
+  // this unset — a plain commercial invoice can't carry full customs-manifest data yet, so forcing
+  // full completion there just blocks the user on fields no document has supplied yet.
+  declarationGateRequired?: boolean;
 }
 
 // One "Source" entry (license backing a controlled item) on a GoodsShipment line

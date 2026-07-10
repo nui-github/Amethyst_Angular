@@ -54,11 +54,18 @@ ChatMessage.type → @switch in ChatAreaComponent
   'ocr-progress'       → OcrProgressComponent
   'ocr-results'        → OcrResultsComponent   (editable inline; "ดำเนินการต่อ" triggers item-hs-analysis
                             — when data.customsDeclaration is ABSENT (legacy flat display, see below).
-                            When it IS present (structured display), the footer instead shows
-                            "กรอกข้อมูลเพิ่มเติม" — the whole declaration must be completed through the
-                            full-screen editor panel (see 'customs-declaration-editor' below) before
-                            "ดำเนินการต่อ" appears at all; both buttons then show together so the user
-                            can still reopen the editor to adjust something before actually proceeding.
+                            When it IS present AND data.declarationGateRequired is true, the footer
+                            instead shows "กรอกข้อมูลเพิ่มเติม" — the whole declaration must be completed
+                            through the full-screen editor panel (see 'customs-declaration-editor'
+                            below) before "ดำเนินการต่อ" appears at all; both buttons then show together
+                            so the user can still reopen the editor to adjust something before actually
+                            proceeding. declarationGateRequired (chat.service.ts showOCRResults/
+                            skipOCRManualOnly) is true only for OCR passes meant to be the FINAL/complete
+                            declaration — the customs-only single-upload pass, and the invoice path's
+                            2nd (agency-upload, COA/เลข U) pass; the invoice path's 1st pass (invoice
+                            doc alone) leaves it false, since a plain commercial invoice can't carry
+                            full customs-manifest data yet — that card just shows a plain "ดำเนินการต่อ"
+                            like before, no gate.
                             when data.customsDeclaration is present, renders the STRUCTURED display —
                             DocumentControl header fields grouped into 4 sections (ข้อมูลควบคุมเอกสาร/
                             ข้อมูลบริษัทผู้นำเข้า/ข้อมูลการขนส่ง/ผู้แจ้ง — CUSTOMS_DECLARATION_HEADER_SECTIONS,
