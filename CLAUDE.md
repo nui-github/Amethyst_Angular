@@ -187,7 +187,12 @@ ChatService      → src/app/core/services/chat.service.ts
     declarationEditorOpen())`, NOT nested inside the ocr-results message bubble — needs
     near-fullscreen width). openDeclarationEditor(msgId) / closeDeclarationEditor() /
     saveDeclarationEditor(updated) — save writes into both formData.customsDeclaration and the
-    originating message's own data (+ data.declarationComplete = true)
+    originating message's own data (+ data.declarationComplete = true). Besides the header +
+    per-item core-field table, the panel also has two flattened per-item sub-tables — "ข้อมูลการผลิต
+    / ล็อต (COA)" (CustomsDeclarationItem.productions[]: Lot No./Mfg./Exp. Date/Qty. come from the
+    COA OCR read, only Measurement + Meas. Unit are required user input) and "หน่วยงานที่ออกใบอนุญาต
+    (เลข U)" (CustomsDeclarationItem.authorities[]: License Number from OCR + an Agency dropdown,
+    not yet required) — each with a "รายการที่" item-picker + add button, and a delete icon per row
 QueueService     → src/app/core/services/queue.service.ts
   - open(id) seals ship.messages as isReadOnly=true before setting openId
 OcrService       → src/app/core/services/ocr.service.ts
