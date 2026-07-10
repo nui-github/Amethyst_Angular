@@ -134,6 +134,9 @@ export interface OcrResultsData {
   // main display; fields OCR couldn't read are simply left undefined/blank. Any later upload
   // step (e.g. agency-upload's own OCR pass) merges into this same shape via mergeCustomsDeclaration().
   customsDeclaration?: CustomsDeclarationData;
+  // true once the user has filled every required field via the full-screen "กรอกข้อมูลเพิ่มเติม"
+  // declaration-editor panel (customs-declaration-editor) — only then does "ดำเนินการต่อ" appear.
+  declarationComplete?: boolean;
 }
 
 // One "Source" entry (license backing a controlled item) on a GoodsShipment line

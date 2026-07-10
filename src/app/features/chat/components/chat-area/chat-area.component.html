@@ -72,7 +72,7 @@
 
             <!-- OCR results summary -->
             @case ('ocr-results') {
-              <app-ocr-results [data]="asAny(msg.data)" />
+              <app-ocr-results [data]="asAny(msg.data)" [msgId]="msg.id" />
             }
 
             <!-- Flag confirmation (interactive) -->

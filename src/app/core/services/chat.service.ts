@@ -4,7 +4,7 @@ import {
   FlagCardData, FlagItem, ChoiceCardData, EmailDraftData,
   StatusCardData, OcrResultsData, SpnResultData, Shipment,
   MissingField, MissingFieldsData, PaymentQrData, PaymentSlipData, HsAnalysisData,
-  InvoiceLineItem, ItemHsAnalysisData, ProductHsAnalysis, ItemMeasurementData,
+  InvoiceLineItem, ItemHsAnalysisData, ProductHsAnalysis, ItemMeasurementData, CustomsDeclarationData,
 } from '@app/core/models/types';
 import { OcrService } from './ocr.service';
 import { QueueService } from './queue.service';
@@ -44,6 +44,12 @@ export class ChatService {
   readonly sidebarActive    = signal<'chatbot' | 'queue'>('chatbot');
   readonly sidebarCollapsed = signal(false);
   readonly queueShipmentId  = signal<string | null>(null);
+
+  // Full-screen "กรอกข้อมูลเพิ่มเติม" declaration-editor panel (customs-declaration-editor) —
+  // global overlay rendered from ChatPageComponent, opened from any ocr-results card that has a
+  // structured customsDeclaration. declarationEditorMsgId tracks which message to write back into.
+  readonly declarationEditorOpen  = signal(false);
+  readonly declarationEditorMsgId = signal<string | null>(null);
 
   readonly needsYouCount = computed(() => this.queue.needsYouCount());
 
@@ -420,6 +426,33 @@ export class ChatService {
       }, 600);
     }
     // else: user clicks "ดำเนินการต่อ" in OcrResultsComponent → onOcrResultsProceed()
+  }
+
+  // ── Full-screen declaration-editor panel ─────────────────────────────────────
+  openDeclarationEditor(msgId: string): void {
+    this.declarationEditorMsgId.set(msgId);
+    this.declarationEditorOpen.set(true);
+  }
+
+  closeDeclarationEditor(): void {
+    this.declarationEditorOpen.set(false);
+  }
+
+  /** Called from CustomsDeclarationEditorComponent when the user saves — every required field
+   *  was already validated there. Writes the edited declaration back into both the shared
+   *  formData (so downstream steps see it) and the originating ocr-results message's own data
+   *  (so "ดำเนินการต่อ" appears on that card and "กรอกข้อมูลเพิ่มเติม" can re-open with the same values). */
+  saveDeclarationEditor(updated: CustomsDeclarationData): void {
+    const msgId = this.declarationEditorMsgId();
+    this.formData.update(f => ({ ...f, customsDeclaration: updated }));
+    if (msgId) {
+      this.messages.update(ms => ms.map(m =>
+        m.id === msgId && m.type === 'ocr-results'
+          ? { ...m, data: { ...(m.data as OcrResultsData), customsDeclaration: updated, declarationComplete: true } }
+          : m
+      ));
+    }
+    this.declarationEditorOpen.set(false);
   }
 
   /** Called from OcrResultsComponent "ดำเนินการต่อ" button */

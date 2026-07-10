@@ -1,0 +1,217 @@
+.cde-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(1, 1, 54, 0.35);
+  z-index: 2000;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.cde-panel {
+  width: 94%;
+  max-width: 1400px;
+  height: 100%;
+  background: #fff;
+  box-shadow: -8px 0 32px rgba(1, 1, 54, 0.18);
+  display: flex;
+  flex-direction: column;
+  animation: cde-slide-in 0.22s ease;
+}
+
+@keyframes cde-slide-in {
+  from { transform: translateX(24px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+.cde-hd {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 28px;
+  border-bottom: 1px solid #EEF0F6;
+  flex-shrink: 0;
+}
+
+.cde-hd__title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--bizx-navy);
+  margin: 0 0 3px;
+}
+
+.cde-hd__sub {
+  font-size: 12px;
+  color: var(--bizx-n500);
+  margin: 0;
+}
+
+.cde-close {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: #F4F5F9;
+  color: var(--bizx-n500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.12s;
+
+  &:hover { background: #E5E7EB; }
+}
+
+.cde-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 28px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cde-sec {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cde-sec__head {
+  border-left: 3px solid;
+  padding-left: 10px;
+}
+
+.cde-sec__title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--bizx-navy);
+}
+
+.cde-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px 16px;
+}
+
+.cde-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &--missing .cde-field__input { border-color: #F59E0B; background: rgba(245, 158, 11, 0.05); }
+}
+
+.cde-field__label {
+  font-size: 11px;
+  color: var(--bizx-n500);
+  font-weight: 500;
+
+  em { color: #EF4444; font-style: normal; margin-left: 2px; }
+}
+
+.cde-field__input {
+  font-size: 12.5px;
+  font-family: inherit;
+  color: var(--bizx-navy);
+  font-weight: 500;
+  border: 1.5px solid #E5E7EB;
+  border-radius: 8px;
+  padding: 8px 10px;
+  outline: none;
+  background: #fff;
+
+  &:focus { border-color: #0463EF; }
+}
+
+.cde-table-wrap {
+  overflow-x: auto;
+  border: 1.5px solid #E5E7EB;
+  border-radius: 10px;
+}
+
+.cde-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11.5px;
+  min-width: 1400px;
+
+  th {
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--bizx-n500);
+    background: #FAFBFF;
+    padding: 8px 10px;
+    border-bottom: 1.5px solid #E5E7EB;
+    white-space: nowrap;
+
+    em { color: #EF4444; font-style: normal; margin-left: 2px; }
+  }
+
+  td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #F5F6FA;
+    vertical-align: middle;
+
+    &.cde-td--missing { background: rgba(245, 158, 11, 0.06); }
+  }
+
+  tr:last-child td { border-bottom: none; }
+}
+
+.cde-table__input {
+  width: 130px;
+  font-size: 11px;
+  font-family: inherit;
+  color: var(--bizx-navy);
+  border: 1.5px solid #E5E7EB;
+  border-radius: 6px;
+  padding: 5px 7px;
+  outline: none;
+  background: #fff;
+
+  &:focus { border-color: #0463EF; }
+  &--unit { width: 70px; margin-left: 4px; }
+}
+
+.cde-ft {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  padding: 14px 28px;
+  border-top: 1px solid #EEF0F6;
+  flex-shrink: 0;
+  background: #FAFBFF;
+}
+
+.cde-ft__hint {
+  font-size: 11.5px;
+  color: #B45309;
+  margin-right: auto;
+
+  em { font-style: normal; color: #EF4444; }
+
+  &--ok { color: #0D8F61; }
+}
+
+.cde-save-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 20px;
+  border-radius: 8px;
+  border: none;
+  background: var(--bizx-blue);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.14s;
+
+  &:hover:not(:disabled) { background: #034DBA; }
+  &:disabled { opacity: 0.45; cursor: default; }
+}

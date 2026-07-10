@@ -18,6 +18,8 @@ interface OcrSection { title: string; color: string; rows: OcrRow[]; }
   styleUrl: './ocr-results.component.scss',
 })
 export class OcrResultsComponent {
+  @Input() msgId = '';
+
   @Input({ required: true }) set data(val: Record<string, unknown>) {
     this._data = val;
     this.local = { ...(val as Partial<OcrResultsData>) };
@@ -41,6 +43,10 @@ export class OcrResultsComponent {
   readonly declSections = CUSTOMS_DECLARATION_HEADER_SECTIONS;
 
   get isManual(): boolean { return !!(this._data as Partial<OcrResultsData>).isManual; }
+  get declarationComplete(): boolean { return !!this.local.declarationComplete; }
+
+  openEditor(): void { this.chat.openDeclarationEditor(this.msgId); }
+
   get lineItems(): OcrLineItem[] { return this.local.lineItems ?? []; }
   get declaration(): CustomsDeclarationData | undefined { return this.local.customsDeclaration; }
   get declItems(): CustomsDeclarationItem[] { return this.declaration?.items ?? []; }

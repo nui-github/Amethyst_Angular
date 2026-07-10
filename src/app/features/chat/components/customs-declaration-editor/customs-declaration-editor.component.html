@@ -1,0 +1,81 @@
+<div class="cde-backdrop" (click)="close()">
+  <div class="cde-panel" (click)="$event.stopPropagation()">
+
+    <div class="cde-hd">
+      <div>
+        <p class="cde-hd__title">กรอกข้อมูลเพิ่มเติม</p>
+        <p class="cde-hd__sub">ข้อมูลตามแบบฟอร์มที่ต้องยื่นต่อกรม — บางส่วนดึงมาจาก OCR ให้แล้ว ที่เหลือกรุณากรอกให้ครบ</p>
+      </div>
+      <button class="cde-close" (click)="close()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="cde-body">
+      @for (section of declSections; track section.title) {
+        <div class="cde-sec">
+          <div class="cde-sec__head" [style.border-left-color]="section.color">
+            <span class="cde-sec__title">{{ section.title }}</span>
+          </div>
+          <div class="cde-form-grid">
+            @for (row of section.rows; track row.key) {
+              <label class="cde-field" [class.cde-field--missing]="isHeaderMissing(row)">
+                <span class="cde-field__label">{{ row.label }} @if (row.required) { <em>*</em> }</span>
+                <input class="cde-field__input" [value]="headerValue(row.key)" (input)="onHeaderInput(row.key, $event)" />
+              </label>
+            }
+          </div>
+        </div>
+      }
+
+      <div class="cde-sec">
+        <div class="cde-sec__head" style="border-left-color:#0D8F61">
+          <span class="cde-sec__title">รายการสินค้า ({{ local.items.length }} รายการ)</span>
+        </div>
+        <div class="cde-table-wrap">
+          <table class="cde-table">
+            <thead>
+              <tr>
+                @for (col of itemCols; track col.key) {
+                  <th>{{ col.label }} @if (col.required) { <em>*</em> }</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of local.items; track item.itemNumber) {
+                <tr>
+                  @for (col of itemCols; track col.key) {
+                    <td [class.cde-td--missing]="isItemFieldMissing(item, col.key)">
+                      <input class="cde-table__input" [value]="itemValue(item, col.key)" (input)="onItemInput(item, col.key, $event)" />
+                      @if (col.unitKey) {
+                        <input class="cde-table__input cde-table__input--unit" [value]="itemValue(item, col.unitKey)" (input)="onItemInput(item, col.unitKey!, $event)" />
+                      }
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="cde-ft">
+      @if (!isComplete) {
+        <span class="cde-ft__hint">
+          กรุณากรอกข้อมูลที่มี <em>*</em> ให้ครบ
+          @if (missingHeaderCount + missingItemCount > 0) {
+            (เหลืออีก {{ missingHeaderCount + missingItemCount }} ช่อง)
+          }
+        </span>
+      } @else {
+        <span class="cde-ft__hint cde-ft__hint--ok">ข้อมูลครบถ้วนแล้ว พร้อมบันทึก</span>
+      }
+      <button class="cde-save-btn" [disabled]="!isComplete" (click)="save()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        บันทึก
+      </button>
+    </div>
+
+  </div>
+</div>

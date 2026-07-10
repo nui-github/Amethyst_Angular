@@ -52,7 +52,13 @@ ChatMessage.type → @switch in ChatAreaComponent
   'choice-card'        → ChoiceCardComponent    (emit: chosen)
   'email-draft'        → EmailDraftComponent    (emit: sent)
   'ocr-progress'       → OcrProgressComponent
-  'ocr-results'        → OcrResultsComponent   (editable inline; "ดำเนินการต่อ" triggers item-hs-analysis;
+  'ocr-results'        → OcrResultsComponent   (editable inline; "ดำเนินการต่อ" triggers item-hs-analysis
+                            — when data.customsDeclaration is ABSENT (legacy flat display, see below).
+                            When it IS present (structured display), the footer instead shows
+                            "กรอกข้อมูลเพิ่มเติม" — the whole declaration must be completed through the
+                            full-screen editor panel (see 'customs-declaration-editor' below) before
+                            "ดำเนินการต่อ" appears at all; both buttons then show together so the user
+                            can still reopen the editor to adjust something before actually proceeding.
                             when data.customsDeclaration is present, renders the STRUCTURED display —
                             DocumentControl header fields grouped into 4 sections (ข้อมูลควบคุมเอกสาร/
                             ข้อมูลบริษัทผู้นำเข้า/ข้อมูลการขนส่ง/ผู้แจ้ง — CUSTOMS_DECLARATION_HEADER_SECTIONS,
@@ -169,6 +175,12 @@ ChatMessage.type → @switch in ChatAreaComponent
 ChatService      → src/app/core/services/chat.service.ts
   - queueShipmentId: signal<string|null>  ← set when loading a queue session
   - loadQueueSession(ship)                ← seals existing messages as isReadOnly, loads into chat
+  - declarationEditorOpen/declarationEditorMsgId: signals ← drive the global full-screen
+    customs-declaration-editor panel (mounted once in ChatPageComponent, `@if (chat.
+    declarationEditorOpen())`, NOT nested inside the ocr-results message bubble — needs
+    near-fullscreen width). openDeclarationEditor(msgId) / closeDeclarationEditor() /
+    saveDeclarationEditor(updated) — save writes into both formData.customsDeclaration and the
+    originating message's own data (+ data.declarationComplete = true)
 QueueService     → src/app/core/services/queue.service.ts
   - open(id) seals ship.messages as isReadOnly=true before setting openId
 OcrService       → src/app/core/services/ocr.service.ts

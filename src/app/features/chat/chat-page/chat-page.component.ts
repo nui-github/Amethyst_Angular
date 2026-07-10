@@ -8,6 +8,7 @@ import { ChatService } from '@app/core/services/chat.service';
 import { QueueService } from '@app/core/services/queue.service';
 import { ChatAreaComponent } from '../components/chat-area/chat-area.component';
 import { SidebarComponent } from '../components/sidebar/sidebar.component';
+import { CustomsDeclarationEditorComponent } from '../components/customs-declaration-editor/customs-declaration-editor.component';
 
 @Component({
   selector: 'app-chat-page',
@@ -16,7 +17,7 @@ import { SidebarComponent } from '../components/sidebar/sidebar.component';
   imports: [
     CommonModule, FormsModule, RouterModule,
     NzInputModule, LucideAngularModule,
-    ChatAreaComponent, SidebarComponent,
+    ChatAreaComponent, SidebarComponent, CustomsDeclarationEditorComponent,
   ],
   templateUrl: './chat-page.component.html',
   styleUrl:    './chat-page.component.scss',
