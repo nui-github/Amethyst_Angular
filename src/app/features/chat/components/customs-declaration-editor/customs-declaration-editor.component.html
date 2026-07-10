@@ -46,10 +46,12 @@
                 <tr>
                   @for (col of itemCols; track col.key) {
                     <td [class.cde-td--missing]="isItemFieldMissing(item, col.key)">
-                      <input class="cde-table__input" [value]="itemValue(item, col.key)" (input)="onItemInput(item, col.key, $event)" />
-                      @if (col.unitKey) {
-                        <input class="cde-table__input cde-table__input--unit" [value]="itemValue(item, col.unitKey)" (input)="onItemInput(item, col.unitKey!, $event)" />
-                      }
+                      <div class="cde-cell">
+                        <input class="cde-table__input" [style.width.px]="col.width" [value]="itemValue(item, col.key)" (input)="onItemInput(item, col.key, $event)" />
+                        @if (col.unitKey) {
+                          <input class="cde-table__input cde-table__input--unit" [style.width.px]="col.unitWidth" [value]="itemValue(item, col.unitKey)" (input)="onItemInput(item, col.unitKey!, $event)" />
+                        }
+                      </div>
                     </td>
                   }
                 </tr>

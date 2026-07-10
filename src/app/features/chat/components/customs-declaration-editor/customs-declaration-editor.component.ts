@@ -9,7 +9,7 @@ import {
   CustomsDeclRow,
 } from '@app/shared/utils/customs-declaration-sections';
 
-interface ItemCol { label: string; key: string; unitKey?: string; required?: boolean; }
+interface ItemCol { label: string; key: string; width: number; unitKey?: string; unitWidth?: number; required?: boolean; }
 interface FlatProductionRow { item: CustomsDeclarationItem; index: number; p: CustomsDeclarationProduction; }
 interface FlatAuthorityRow { item: CustomsDeclarationItem; index: number; a: CustomsDeclarationAuthority; }
 
@@ -35,19 +35,22 @@ export class CustomsDeclarationEditorComponent {
   readonly declSections = CUSTOMS_DECLARATION_HEADER_SECTIONS;
   readonly itemRequiredFields = CUSTOMS_DECLARATION_ITEM_REQUIRED_FIELDS;
 
+  // Widths are sized to what each field actually holds — short numeric/code fields get just
+  // enough room, free-text fields (names, manufacturer) get more — so every item renders as one
+  // clean row instead of value/unit pairs wrapping onto a second line.
   readonly itemCols: ItemCol[] = [
-    { label: 'ชื่อสินค้า (TH)', key: 'nameTh', required: true },
-    { label: 'ชื่อสินค้า (EN)', key: 'nameEn', required: true },
-    { label: 'พิกัดศุลกากร', key: 'tariffCode', required: true },
-    { label: 'ปริมาณ', key: 'quantity', unitKey: 'quantityUnit', required: true },
-    { label: 'น้ำหนักสุทธิ', key: 'netWeight', unitKey: 'netWeightUnit' },
-    { label: 'จำนวนหีบห่อ', key: 'packageAmount', unitKey: 'packageUnit' },
-    { label: 'ประเทศกำเนิด', key: 'originCountry', required: true },
-    { label: 'ประเทศที่ซื้อ', key: 'purchaseCountry' },
-    { label: 'มูลค่า (ตปท.)', key: 'invoiceAmountForeign', unitKey: 'currencyCode' },
-    { label: 'มูลค่า (บาท)', key: 'invoiceAmountBaht' },
-    { label: 'เลขที่ Invoice', key: 'invoiceNo' },
-    { label: 'ผู้ผลิต', key: 'manufacture' },
+    { label: 'ชื่อสินค้า (TH)', key: 'nameTh', width: 170, required: true },
+    { label: 'ชื่อสินค้า (EN)', key: 'nameEn', width: 190, required: true },
+    { label: 'พิกัดศุลกากร', key: 'tariffCode', width: 100, required: true },
+    { label: 'ปริมาณ', key: 'quantity', width: 60, unitKey: 'quantityUnit', unitWidth: 52, required: true },
+    { label: 'น้ำหนักสุทธิ', key: 'netWeight', width: 70, unitKey: 'netWeightUnit', unitWidth: 52 },
+    { label: 'จำนวนหีบห่อ', key: 'packageAmount', width: 55, unitKey: 'packageUnit', unitWidth: 52 },
+    { label: 'ประเทศกำเนิด', key: 'originCountry', width: 100, required: true },
+    { label: 'ประเทศที่ซื้อ', key: 'purchaseCountry', width: 100 },
+    { label: 'มูลค่า (ตปท.)', key: 'invoiceAmountForeign', width: 85, unitKey: 'currencyCode', unitWidth: 55 },
+    { label: 'มูลค่า (บาท)', key: 'invoiceAmountBaht', width: 90 },
+    { label: 'เลขที่ Invoice', key: 'invoiceNo', width: 110 },
+    { label: 'ผู้ผลิต', key: 'manufacture', width: 220 },
   ];
 
   readonly agencyOptions = ['อย.', 'กษ.', 'ปส.'];

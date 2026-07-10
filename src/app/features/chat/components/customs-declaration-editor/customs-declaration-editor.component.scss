@@ -151,7 +151,7 @@
   }
 
   td {
-    padding: 6px 8px;
+    padding: 5px 6px;
     border-bottom: 1px solid #F5F6FA;
     vertical-align: middle;
 
@@ -161,8 +161,17 @@
   tr:last-child td { border-bottom: none; }
 }
 
+.cde-cell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: nowrap;
+}
+
 .cde-table__input {
-  width: 130px;
+  width: 110px;
+  min-width: 0;
+  flex-shrink: 0;
   font-size: 11px;
   font-family: inherit;
   color: var(--bizx-navy);
@@ -173,7 +182,6 @@
   background: #fff;
 
   &:focus { border-color: #0463EF; }
-  &--unit { width: 70px; margin-left: 4px; }
 }
 
 .cde-table__select {
