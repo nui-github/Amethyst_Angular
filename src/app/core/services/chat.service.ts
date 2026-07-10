@@ -467,8 +467,12 @@ export class ChatService {
   }
 
   private continueAfterOCR(): void {
-    // Agency docs upload (2nd doc in invoice path): skip hs-analysis, go straight to
-    // item selection → flags
+    // Agency docs upload (2nd doc in invoice path): skip hs-analysis AND flags/item-measurement —
+    // the declaration-editor panel (gated on this very OCR pass, see declarationGateRequired)
+    // already made the user fill in everything (including Measurement/Meas. Unit per item and any
+    // flagged discrepancies) before "ดำเนินการต่อ" was even reachable, so re-asking via flag-card /
+    // item-measurement here would just be duplicate work. Go straight to the same missing-fields
+    // check / proceed-choice those two steps used to lead into.
     if (this.isAgencyDocsUpload) {
       this.isAgencyDocsUpload = false;
       this.checkMissingAfterFlags = true;   // invoice path: check missing fields after flags confirmed
@@ -481,7 +485,7 @@ export class ChatService {
         selectedItems: getInvoiceLineItems(this.formData().invoiceNo),
         customsDeclaration: mergeCustomsDeclaration(f.customsDeclaration, { items: INVOICE_ITEMS_DECLARATION }),
       }));
-      this.withTyping(() => this.showFlags(), 600);
+      this.withTyping(() => this.afterFlagsConfirmed(), 600);
       return;
     }
     // Customs single-upload: skip flags, hs-analysis → profile → agency choice (same as invoice)

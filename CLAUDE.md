@@ -48,7 +48,11 @@ Interactive components check **both** `!readOnly` (global) **and** `!msg.isReadO
 
 ```
 ChatMessage.type → @switch in ChatAreaComponent
-  'flag-card'          → FlagCardComponent      (emit: flagConfirmed, allConfirmed)
+  'flag-card'          → FlagCardComponent      (emit: flagConfirmed, allConfirmed — legacy, only shown by
+                            the unreachable chooseFullUpload() path and historical queue-mock/sessions-mock
+                            message replay; the invoice path used to show it too, but the declaration-editor
+                            panel now collects/reconciles everything upfront so it was cut from that flow —
+                            see 'item-measurement' below)
   'choice-card'        → ChoiceCardComponent    (emit: chosen)
   'email-draft'        → EmailDraftComponent    (emit: sent)
   'ocr-progress'       → OcrProgressComponent
@@ -117,11 +121,18 @@ ChatMessage.type → @switch in ChatAreaComponent
                             ถูกต้อง" opens a confirm dialog ("ได้ตรวจสอบ...ครบถ้วนแล้วใช่หรือไม่?") before
                             actually locking the group — cancel closes it with no change, confirm calls
                             confirmGroup(). All groups must be confirmed before "ดำเนินการต่อ")
-  'item-measurement'   → ItemMeasurementComponent (shown right after flag-card is fully confirmed, ONLY
-                            when formData.selectedItems is non-empty — currently the full-upload and
-                            invoice-path agency-docs flows, the two paths that actually reach flags; the
-                            customs-declaration and SPN paths go straight from OCR/agency-choice to
-                            form-preview without ever showing flags, so they never show this box either.
+  'item-measurement'   → ItemMeasurementComponent (legacy — like flag-card above, only reachable via the
+                            unreachable chooseFullUpload() path (which never actually set selectedItems, so
+                            in practice this box never showed there either) and historical queue-mock/
+                            sessions-mock message replay. Previously shown right after flag-card was fully
+                            confirmed, ONLY when formData.selectedItems was non-empty — that was the
+                            invoice-path agency-docs flow specifically; continueAfterOCR()'s isAgencyDocsUpload
+                            branch now calls afterFlagsConfirmed() directly instead of showFlags(), skipping
+                            both boxes, since the declaration-editor panel gated on that same OCR pass
+                            (declarationGateRequired) already made the user fill in Measurement/Meas. Unit
+                            and reconcile any discrepancies before "ดำเนินการต่อ" was reachable — re-asking
+                            via flag-card/item-measurement afterward was pure duplicate work. Kept in the
+                            codebase (not deleted) only for historical message replay compatibility.
                             One table row per selected item: ชื่อสินค้า (TH)/ชื่อสินค้า (EN)/พิกัดศุลกากร/
                             Lot No. are read-only, resolved via item.declarationItemNumber → the matching
                             CustomsDeclarationItem in formData.customsDeclaration (falls back to the plain
@@ -335,22 +346,23 @@ import-license-menu → 2 choices (chooseFullUpload()/full-upload card removed f
   └─ chooseInvoiceFirst()  → single-upload(invoice) → OCR
         → item-hs-analysis (จัดกลุ่มสินค้าตามกรมที่ AI แนะนำ; user ยืนยันทีละกลุ่มก่อนไปต่อ)
         → เลือกกรม (จาก union ของกรมที่ต้องขอทุกรายการ) → เลือกโปรไฟล์
-        → agency-upload (per-agency file slots) → OCR → formData.selectedItems set to every line item
-          on the invoice (getInvoiceLineItems(), no separate selection UI) → flags
+        → agency-upload (per-agency file slots) → OCR (2nd ocr-results, declarationGateRequired=true
+          → gated through the declaration-editor panel, see 'ocr-results'/'customs-declaration-editor'
+          above) → formData.selectedItems set to every line item on the invoice (getInvoiceLineItems(),
+          no separate selection UI) → afterFlagsConfirmed() directly (flag-card/item-measurement are
+          skipped for this path now — see 'item-measurement' above for why)
         → form-preview (editable, shows selected items table) → "ดำเนินการต่อ"
         → choice-card(submit/edit) → submit → showNextAgencyIfAny()
               ├─ remaining agencies? → "เสร็จสิ้น / ขอใบอนุญาตเพิ่ม"
               ├─ ขอใบอนุญาตเพิ่ม → agency selector → repeat agency flow
               └─ no remaining agencies → completion text + "ตรวจสอบสถานะใบอนุญาต" → permit-status
 
-After flags confirmed (both full-upload and invoice paths — the only two that reach flags) →
-  item-measurement (ONLY when formData.selectedItems is non-empty, i.e. the invoice path; skipped
-  for full-upload since it has no selectedItems) → user fills Measurement/Meas. Unit per row →
-  "ยืนยันข้อมูลครบถ้วน" → onItemMeasurementConfirmed() → afterFlagsConfirmed():
+After flags confirmed (full-upload path only now — see 'flag-card'/'item-measurement' above for why
+  the invoice path no longer reaches flags at all) → form-preview (editable) → "ดำเนินการต่อ" →
+  choice-card(submit/edit) → submit
 
-After flags confirmed (full-upload path) → form-preview (editable) → "ดำเนินการต่อ" → choice-card(submit/edit) → submit
-
-After flags confirmed (invoice path) → checkMissingAfterFlags:
+afterFlagsConfirmed() / checkMissingAfterFlags (invoice path, called directly from continueAfterOCR()'s
+  isAgencyDocsUpload branch now):
   ├─ missing required fields? → missing-fields form → fill → showProceedChoice()
   └─ complete → showProceedChoice() directly
 
