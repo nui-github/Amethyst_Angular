@@ -161,7 +161,7 @@
       </div>
 
       <div class="ocr-modal__body">
-        <app-customs-item-detail [item]="item" />
+        <app-customs-item-detail [item]="item" [readOnly]="proceeded()" (itemChange)="onItemDetailChange($event)" />
       </div>
     </div>
   </div>

@@ -175,7 +175,7 @@
 
         <div class="fp-modal__body">
           @if (declarationItem(item); as declItem) {
-            <app-customs-item-detail [item]="declItem" />
+            <app-customs-item-detail [item]="declItem" [readOnly]="saved" (itemChange)="onItemDetailChange($event)" />
           } @else {
             <div class="fp-modal__section">
               <span class="fp-modal__section-title">ข้อมูลจาก OCR (แก้ไขไม่ได้)</span>

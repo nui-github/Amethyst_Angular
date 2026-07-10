@@ -59,11 +59,17 @@ ChatMessage.type → @switch in ChatAreaComponent
                             shared/utils/customs-declaration-sections.ts, also used by form-preview's
                             header; each row editable inline, blank fields simply omitted) + a
                             "รายการสินค้า" list of GoodsShipment items, each with a "รายละเอียด" button
-                            opening a read-only modal via the shared <app-customs-item-detail>
-                            component (features/chat/components/customs-item-detail — also reused by
-                            form-preview's item modal: dangerous-goods info, production/lot, license
-                            source, issuing authority — types.ts CustomsDeclarationItem). This structure
-                            is meant to already be shaped like
+                            opening a modal via the shared <app-customs-item-detail> component
+                            (features/chat/components/customs-item-detail — also reused by form-preview's
+                            item modal): every GoodsShipment field is click-to-edit inline (dangerous-goods
+                            info, production/lot, license source, issuing authority — types.ts
+                            CustomsDeclarationItem), same edit-chip UX as the header rows; edits emit
+                            (itemChange) which the host merges back into its local customsDeclaration.items
+                            by itemNumber (ocr-results also pushes straight into chat.formData, matching
+                            its header-row onDeclInput; form-preview accumulates into `local` and only
+                            pushes on "ดำเนินการต่อ", matching its header rows too) — each host passes
+                            [readOnly]="proceeded()"/"saved" so editing locks once that card is confirmed.
+                            This structure is meant to already be shaped like
                             the real LPI submission payload; any later upload step (e.g. agency-upload's
                             own OCR pass) merges into the same object via mergeCustomsDeclaration()
                             (shared/utils/helpers.ts) rather than replacing it, so nothing already

@@ -111,6 +111,19 @@ export class OcrResultsComponent {
   openItemDetail(itemNumber: number): void { this.detailItemNumber = itemNumber; }
   closeItemDetail(): void { this.detailItemNumber = null; }
 
+  onItemDetailChange(updated: CustomsDeclarationItem): void {
+    if (!this.local.customsDeclaration) return;
+    const items = this.local.customsDeclaration.items.map(i => i.itemNumber === updated.itemNumber ? updated : i);
+    this.local.customsDeclaration = { ...this.local.customsDeclaration, items };
+    this.chat.formData.update(f => f.customsDeclaration ? {
+      ...f,
+      customsDeclaration: {
+        ...f.customsDeclaration,
+        items: f.customsDeclaration.items.map(i => i.itemNumber === updated.itemNumber ? updated : i),
+      },
+    } : f);
+  }
+
   itemTitle(item: CustomsDeclarationItem): string {
     return item.nameTh || item.nameEn || `รายการที่ ${item.itemNumber}`;
   }

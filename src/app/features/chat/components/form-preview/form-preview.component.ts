@@ -108,6 +108,12 @@ export class FormPreviewComponent {
     return this.declaration?.items.find(i => i.itemNumber === item.declarationItemNumber);
   }
 
+  onItemDetailChange(updated: CustomsDeclarationItem): void {
+    if (!this.local.customsDeclaration) return;
+    const items = this.local.customsDeclaration.items.map(i => i.itemNumber === updated.itemNumber ? updated : i);
+    this.local.customsDeclaration = { ...this.local.customsDeclaration, items };
+  }
+
   readonly sections: PreviewSection[] = [
     {
       title: 'ข้อมูลใบขนสินค้า', color: '#0463EF',
