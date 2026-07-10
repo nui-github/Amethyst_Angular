@@ -192,7 +192,9 @@ ChatService      → src/app/core/services/chat.service.ts
     / ล็อต (COA)" (CustomsDeclarationItem.productions[]: Lot No./Mfg./Exp. Date/Qty. come from the
     COA OCR read, only Measurement + Meas. Unit are required user input) and "หน่วยงานที่ออกใบอนุญาต
     (เลข U)" (CustomsDeclarationItem.authorities[]: License Number from OCR + an Agency dropdown,
-    not yet required) — each with a "รายการที่" item-picker + add button, and a delete icon per row
+    not yet required) — each with a "รายการที่" item-picker + add button, and a delete icon per row.
+    "บันทึก" opens a confirm dialog ("กรุณาตรวจสอบความถูกต้องของข้อมูลทั้งหมด...") before actually
+    saving — "ตรวจสอบอีกครั้ง" closes it with no change, confirm calls the real save
 QueueService     → src/app/core/services/queue.service.ts
   - open(id) seals ship.messages as isReadOnly=true before setting openId
 OcrService       → src/app/core/services/ocr.service.ts

@@ -184,12 +184,24 @@ export class CustomsDeclarationEditorComponent {
       && this.missingProductionCount === 0;
   }
 
+  confirming = false;
+
   close(): void {
     this.chat.closeDeclarationEditor();
   }
 
+  requestSave(): void {
+    if (!this.isComplete) return;
+    this.confirming = true;
+  }
+
+  cancelSave(): void {
+    this.confirming = false;
+  }
+
   save(): void {
     if (!this.isComplete) return;
+    this.confirming = false;
     this.chat.saveDeclarationEditor(this.local);
   }
 }
