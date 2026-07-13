@@ -153,6 +153,24 @@ ChatMessage.type → @switch in ChatAreaComponent
                             item.measurement/measUnit when already set here, so paths that pass through
                             this box are never asked twice; paths that skip it (customs/SPN) still collect
                             Measurement/Meas. Unit inside form-preview's modal as before)
+  'invoice-select'     → InvoiceSelectComponent (invoice path only — shown when the uploaded file's
+                            OCR pass detects more than one commercial invoice bundled inside it, e.g.
+                            a combined PDF from the shipping agent. Demo/QA trigger: name the uploaded
+                            file with "multi" anywhere in it, case-insensitive, e.g.
+                            "Combined_Invoice_MULTI.pdf" — MULTI_INVOICE_TRIGGER in ocr.service.ts,
+                            same KNOWN_REFS-style convention as spn.mock.ts. Rendered right after the
+                            ocr-progress animation, BEFORE any ocr-results card — single-select list
+                            (invoiceNo/date/item count/total amount per option, from
+                            toInvoiceSummaryOption() in invoice-ocr.mock.ts), locks read-only once
+                            chosen (ChatService.onInvoiceSelected()). The rest of the flow — OCR merge,
+                            item-hs-analysis, agency/profile selection, agency-upload, form-preview,
+                            submit — then proceeds using ONLY the chosen invoice's OcrResult
+                            (MOCK_INVOICE_OCR_RESULT vs MOCK_INVOICE_OCR_RESULT_2 in
+                            invoice-ocr.mock.ts), exactly as if that had been the only invoice in the
+                            file to begin with. A normal single-invoice upload never shows this card —
+                            ocr.service.ts only returns the MultiInvoiceDetection sentinel when the
+                            trigger matches, so ChatService.startOCR() falls through to the ordinary
+                            ocr-results path otherwise)
   'form'               → FormPanelComponent
   'full-upload'        → FullUploadComponent
   'single-upload'      → SingleUploadComponent
@@ -352,6 +370,9 @@ import-license-menu → 2 choices (chooseFullUpload()/full-upload card removed f
   │                            selection UI) → form-preview (shows selected items + per-item detail modal,
   │                            same as invoice path) → submit → next-agency (repeats for each remaining agency)
   └─ chooseInvoiceFirst()  → single-upload(invoice) → OCR
+        → [if the uploaded file contains >1 invoice] invoice-select → user picks one → OCR
+          continues using ONLY that invoice's data for the rest of the flow (see 'invoice-select'
+          below) — this step is skipped entirely for a normal single-invoice file
         → item-hs-analysis (จัดกลุ่มสินค้าตามกรมที่ AI แนะนำ; user ยืนยันทีละกลุ่มก่อนไปต่อ)
         → เลือกกรม (จาก union ของกรมที่ต้องขอทุกรายการ) → เลือกโปรไฟล์
         → agency-upload (per-agency file slots) → OCR (2nd ocr-results, declarationGateRequired=true

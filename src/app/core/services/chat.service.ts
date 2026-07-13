@@ -5,8 +5,9 @@ import {
   StatusCardData, OcrResultsData, SpnResultData, Shipment,
   MissingField, MissingFieldsData, PaymentQrData, PaymentSlipData, HsAnalysisData,
   InvoiceLineItem, ItemHsAnalysisData, ProductHsAnalysis, ItemMeasurementData, CustomsDeclarationData,
+  InvoiceSelectData,
 } from '@app/core/models/types';
-import { OcrService } from './ocr.service';
+import { OcrService, MultiInvoiceDetection } from './ocr.service';
 import { QueueService } from './queue.service';
 import { analyzeHsCode } from '@mock/hs-analysis.mock';
 import { getAgencyPayment } from '@mock/payment.mock';
@@ -14,7 +15,7 @@ import { KNOWN_REFS, MOCK_FORM_DATA, MOCK_SPN_LIST } from '@mock/spn.mock';
 import { MOCK_SPN_PROFILES } from '@mock/spn-companies.mock';
 import { getInvoiceLineItems, INVOICE_ITEMS_DECLARATION } from '@mock/invoice-items.mock';
 import { getProductHsAnalysis, mapToInvoiceLineItems } from '@mock/product-hs-analysis.mock';
-import { InvoiceOcrResult } from '@mock/invoice-ocr.mock';
+import { InvoiceOcrResult, toInvoiceSummaryOption } from '@mock/invoice-ocr.mock';
 import { environment } from '@env/environment';
 import { MOCK_SESSIONS } from '@mock/sessions.mock';
 import { mergeCustomsDeclaration } from '@app/shared/utils/helpers';
@@ -349,16 +350,58 @@ export class ChatService {
   }
 
   // ── OCR flow ───────────────────────────────────────────────────────────────
+  private pendingInvoiceOptions: InvoiceOcrResult[] = [];
+
   async startOCR(_files?: unknown[]): Promise<void> {
     this.step.set('ocr');
     this.bot('ocr-progress');
     const result = await this.ocr.startOCR(_files, this.isInvoicePath ? 'invoice' : 'default');
+
+    if ('multiInvoice' in result) {
+      this.showInvoiceSelect(result);
+      return;
+    }
+
     this.formData.update(f => ({
       ...f, ...result,
       customsDeclaration: mergeCustomsDeclaration(f.customsDeclaration, result.customsDeclaration),
     }));
     this.promoteActiveSession();
     this.showOCRResults(result);
+  }
+
+  /** File OCR detected more than one invoice inside it — let the user pick which one to work
+   *  with before showing the ocr-results card at all; the rest of the flow then proceeds using
+   *  only that chosen invoice's data, exactly like a normal single-invoice upload. */
+  private showInvoiceSelect(detection: MultiInvoiceDetection): void {
+    this.pendingInvoiceOptions = detection.invoices;
+    this.promoteActiveSession();
+    this.bot('invoice-select', {
+      invoices: detection.invoices.map(toInvoiceSummaryOption),
+    } satisfies InvoiceSelectData);
+  }
+
+  /** Called from InvoiceSelectComponent once the user picks one of the detected invoices. */
+  onInvoiceSelected(invoiceId: string): void {
+    const chosen = this.pendingInvoiceOptions.find(inv => inv.invoiceNo === invoiceId);
+    if (!chosen) return;
+    this.user(`เลือก ${invoiceId}`);
+    this.pendingInvoiceOptions = [];
+
+    this.messages.update(ms => {
+      const last = [...ms].reverse().find(m => m.type === 'invoice-select');
+      if (!last) return ms;
+      return ms.map(m => m.id === last.id
+        ? { ...m, data: { ...(m.data as InvoiceSelectData), selectedId: invoiceId } }
+        : m);
+    });
+
+    this.formData.update(f => ({
+      ...f, ...chosen,
+      customsDeclaration: mergeCustomsDeclaration(f.customsDeclaration, chosen.customsDeclaration),
+    }));
+    this.promoteActiveSession();
+    this.withTyping(() => this.showOCRResults(chosen), 400);
   }
 
   /** Called when agency-upload uses only manual entry — skip OCR progress, show manual summary */
@@ -612,7 +655,11 @@ export class ChatService {
       // OCR the additional file, merge, then re-check
       this.bot('text', undefined, 'กำลัง OCR เอกสารที่อัปโหลดเพิ่ม...');
       this.bot('ocr-progress');
-      const result = await this.ocr.startOCR([file]);
+      const ocrResult = await this.ocr.startOCR([file]);
+      // This re-upload path only ever runs default-variant OCR (customs/full-upload flows),
+      // never 'invoice', so multi-invoice detection is not reachable here.
+      if ('multiInvoice' in ocrResult) return;
+      const result = ocrResult;
       // Merge: existing fields take priority for fields already filled
       const merged = {
         ...result, ...this.formData(), ...extra,

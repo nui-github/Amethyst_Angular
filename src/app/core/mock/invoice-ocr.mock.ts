@@ -1,4 +1,4 @@
-import { OcrLineItem, CustomsDeclarationItem, CustomsDeclarationData } from '@app/core/models/types';
+import { OcrLineItem, CustomsDeclarationItem, CustomsDeclarationData, InvoiceSummaryOption } from '@app/core/models/types';
 
 // Mock OCR result for the invoice-upload path — mirrors a real commercial invoice
 // (medical device shipment, multiple HS codes/origins per line item)
@@ -138,3 +138,109 @@ export const MOCK_INVOICE_OCR_RESULT = {
 };
 
 export type InvoiceOcrResult = typeof MOCK_INVOICE_OCR_RESULT;
+
+// ─── Second invoice (multi-invoice-in-one-file scenario) ──────────────────────
+// Some uploaded files (e.g. a combined PDF from the shipping agent) bundle more than one
+// commercial invoice. When ocr.service.ts detects that (see MULTI_INVOICE_TRIGGER), the user is
+// shown a picker (invoice-select) before any ocr-results card appears — this is that second option.
+const INVOICE_LINE_ITEMS_2: OcrLineItem[] = [
+  { id: 'm1', name: 'Surgical Gauze Roll (SGR-4045)',   hsCode: '3005.90.90', origin: 'ญี่ปุ่น (JP)', qty: '500', unit: 'ม้วน' },
+  { id: 'm2', name: 'Disposable Syringe 5ml (DSY-5000)', hsCode: '9018.31.90', origin: 'ญี่ปุ่น (JP)', qty: '2000', unit: 'ชิ้น' },
+  { id: 'm3', name: 'Surgical Face Mask (SFM-3P90)',     hsCode: '6307.90.40', origin: 'จีน (CN)',   qty: '10000', unit: 'ชิ้น' },
+];
+
+const INVOICE_CUSTOMS_ITEMS_2: CustomsDeclarationItem[] = [
+  {
+    itemNumber: 1, invoiceNo: 'INVNO0005', invoiceDate: '2025-04-24', invoiceItemNumber: 1, declarationLineNumber: 1,
+    nameTh: 'ผ้าก๊อซทำแผล', nameEn: 'Surgical Gauze Roll (SGR-4045)',
+    tariffCode: '3005909090', quantity: '500', quantityUnit: 'ม้วน',
+    netWeight: '75.000', netWeightUnit: 'KGM', packageAmount: '10', packageUnit: 'CTN',
+    originCountry: 'ญี่ปุ่น (JP)', purchaseCountry: 'ญี่ปุ่น (JP)',
+    invoiceAmountForeign: '3500.00', currencyCode: 'USD', invoiceAmountBaht: '125000.00',
+    manufacture: 'Nippon Medical Supply Co., Osaka, Japan',
+    productions: [{ lotNo: 'SGR4045-25A', mfgDate: '01-03-2568', expDate: '01-03-2573', measurement: '500', measurementUnit: 'ม้วน', quantity: '500', quantityUnit: 'ม้วน' }],
+  },
+  {
+    itemNumber: 2, invoiceNo: 'INVNO0005', invoiceDate: '2025-04-24', invoiceItemNumber: 2, declarationLineNumber: 2,
+    nameTh: 'เข็มฉีดยาใช้แล้วทิ้ง ขนาด 5 มล.', nameEn: 'Disposable Syringe 5ml (DSY-5000)',
+    tariffCode: '9018319090', quantity: '2000', quantityUnit: 'ชิ้น',
+    netWeight: '40.000', netWeightUnit: 'KGM', packageAmount: '20', packageUnit: 'CTN',
+    originCountry: 'ญี่ปุ่น (JP)', purchaseCountry: 'ญี่ปุ่น (JP)',
+    invoiceAmountForeign: '1800.00', currencyCode: 'USD', invoiceAmountBaht: '64300.00',
+    manufacture: 'Nippon Medical Supply Co., Osaka, Japan',
+    productions: [{ lotNo: 'DSY5000-25B', mfgDate: '05-03-2568', expDate: '05-03-2571', measurement: '2000', measurementUnit: 'ชิ้น', quantity: '2000', quantityUnit: 'ชิ้น' }],
+  },
+  {
+    itemNumber: 3, invoiceNo: 'INVNO0005', invoiceDate: '2025-04-24', invoiceItemNumber: 3, declarationLineNumber: 3,
+    nameTh: 'หน้ากากอนามัยทางการแพทย์', nameEn: 'Surgical Face Mask (SFM-3P90)',
+    tariffCode: '6307904000', quantity: '10000', quantityUnit: 'ชิ้น',
+    netWeight: '150.000', netWeightUnit: 'KGM', packageAmount: '50', packageUnit: 'CTN',
+    originCountry: 'จีน (CN)', purchaseCountry: 'จีน (CN)',
+    invoiceAmountForeign: '2200.00', currencyCode: 'USD', invoiceAmountBaht: '78500.00',
+    manufacture: 'Guangzhou Medi-Guard Co., Ltd., Guangzhou, China',
+  },
+];
+
+const MOCK_INVOICE_CUSTOMS_DECLARATION_2: CustomsDeclarationData = {
+  referenceNumber:        '',
+  requestFactName:        'TEST COMPANY LIMITED',
+  controlAgencyOfficeCode: '',
+  companyTaxNumber:       '',
+  companyBranch:          '',
+  companyName:            'TEST COMPANY LIMITED',
+  attorneyIdCard:         '',
+  arrivalDate:            '',
+  departureDate:          '',
+  licenseType:            '',
+  vesselName:             '',
+  consignmentCountry:     'JP',
+  destinationCountry:     'TH',
+  portDischargeCode:      '',
+  portLoadCode:           '',
+  controlDischargePort:   'THBKK',
+  controlReleasePort:     '',
+  informantIdCard:        '',
+  informantName:          '',
+  registrationId:         '',
+  items: INVOICE_CUSTOMS_ITEMS_2,
+};
+
+export const MOCK_INVOICE_OCR_RESULT_2 = {
+  invoiceNo:       'INVNO0005',
+  invoiceDate:     '24/04/2025',
+  importDate:      '',
+  declarationDate: '',
+  quantity:        '12500',
+  qtyUnit:         'ชิ้น',
+  lotNo:           'HOUSE06003',
+  uNo:             'MASTER20260606',
+  importer:        'TEST COMPANY LIMITED',
+  declarant:       'NETBAY PUBLIC COMPANY LIMITED',
+  goodsDesc:       'เวชภัณฑ์สิ้นเปลืองทางการแพทย์ (Medical Consumables) — Gauze / Syringe / Face Mask',
+  port:            'ท่าเรือกรุงเทพ (BKK)',
+  hsCode:          '3005.90.90',
+  countryOrigin:   'ญี่ปุ่น (JP) / จีน (CN)',
+  licenseType:     '',
+  drugRegNo:       '',
+  lineItems:       INVOICE_LINE_ITEMS_2,
+  customsDeclaration: MOCK_INVOICE_CUSTOMS_DECLARATION_2,
+};
+
+// The set of invoices found inside one uploaded file when MULTI_INVOICE_TRIGGER matches —
+// ocr.service.ts returns this array instead of a single InvoiceOcrResult, and ChatService shows
+// the invoice-select picker before continuing the flow with whichever one the user chooses.
+export const MOCK_INVOICE_OCR_RESULTS: InvoiceOcrResult[] = [MOCK_INVOICE_OCR_RESULT, MOCK_INVOICE_OCR_RESULT_2];
+
+export function toInvoiceSummaryOption(result: InvoiceOcrResult): InvoiceSummaryOption {
+  const totalBaht = result.customsDeclaration.items.reduce(
+    (sum, item) => sum + (parseFloat(item.invoiceAmountBaht ?? '0') || 0), 0,
+  );
+  return {
+    id: result.invoiceNo,
+    invoiceNo: result.invoiceNo,
+    invoiceDate: result.invoiceDate,
+    itemCount: result.lineItems.length,
+    totalAmount: totalBaht.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+    currency: 'THB',
+  };
+}

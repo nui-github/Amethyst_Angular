@@ -3,7 +3,7 @@ import {
   ElementRef, Input, OnChanges, ViewChild, inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ChatMessage, FlagCardData, EmailDraftData, ChoiceCardData, ItemHsAnalysisData, ProductHsAnalysis, ItemMeasurementData, InvoiceLineItem } from '@app/core/models/types';
+import { ChatMessage, FlagCardData, EmailDraftData, ChoiceCardData, ItemHsAnalysisData, ProductHsAnalysis, ItemMeasurementData, InvoiceLineItem, InvoiceSelectData } from '@app/core/models/types';
 import { ChatService } from '@app/core/services/chat.service';
 import { OcrService } from '@app/core/services/ocr.service';
 import { SafeHtmlPipe } from '@app/shared/pipes/safe-html.pipe';
@@ -32,6 +32,7 @@ import { PaymentQrComponent } from '../payment-qr/payment-qr.component';
 import { PaymentSlipComponent } from '../payment-slip/payment-slip.component';
 import { ItemHsAnalysisComponent } from '../item-hs-analysis/item-hs-analysis.component';
 import { ItemMeasurementComponent } from '../item-measurement/item-measurement.component';
+import { InvoiceSelectComponent } from '../invoice-select/invoice-select.component';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 
 /**
@@ -57,6 +58,7 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
     ConnectPanelComponent, FullUploadComponent, SingleUploadComponent, EmailDraftComponent, FormPanelComponent,
     SpnConnectComponent, HsAnalysisComponent, FormPreviewComponent, MissingFieldsComponent, AgencyUploadComponent, ProfileSelectComponent, PermitStatusComponent,
     PaymentQrComponent, PaymentSlipComponent, ItemHsAnalysisComponent, ItemMeasurementComponent,
+    InvoiceSelectComponent,
   ],
   templateUrl: './chat-area.component.html',
   styleUrl: './chat-area.component.scss',
@@ -87,6 +89,7 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked {
   asChoiceCard(data: unknown)     { return data as ChoiceCardData; }
   asItemHsAnalysis(data: unknown) { return data as ItemHsAnalysisData; }
   asItemMeasurement(data: unknown) { return data as ItemMeasurementData; }
+  asInvoiceSelect(data: unknown)  { return data as InvoiceSelectData; }
   asAny(data: unknown)            { return data as Record<string, unknown>; }
 
   onItemHsAnalysisConfirmed(msgId: string, items: ProductHsAnalysis[]): void {
@@ -95,6 +98,10 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked {
 
   onItemMeasurementConfirmed(msgId: string, items: InvoiceLineItem[]): void {
     this.chat.onItemMeasurementConfirmed(msgId, items);
+  }
+
+  onInvoiceSelected(invoiceId: string): void {
+    this.chat.onInvoiceSelected(invoiceId);
   }
   hasRewindableChoice(): boolean {
     const msgs = this.messages;

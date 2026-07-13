@@ -34,9 +34,14 @@ export type MessageType =
   | 'payment-qr'       // QR payment card (fee required by agency)
   | 'payment-slip'     // upload payment slip after scanning QR
   | 'item-hs-analysis' // invoice path: per-product HS Code + Smart Tariff → agency lookup, user must confirm/correct each row
-  | 'item-measurement';// after flags confirmed: table of every item being submitted (TH/EN name,
+  | 'item-measurement' // after flags confirmed: table of every item being submitted (TH/EN name,
                         // tariff code, Lot No. from OCR) + Measurement/Meas. Unit the user must key in
                         // per row before proceeding — the only fields no upstream document captures
+  | 'invoice-select';   // invoice path only: shown when the uploaded file's OCR detects more than
+                        // one invoice inside it (see ocr.service.ts MULTI_INVOICE_TRIGGER) — user
+                        // picks exactly one before the ocr-results card appears; the rest of the
+                        // flow then proceeds using only that chosen invoice's data, same as a
+                        // normal single-invoice upload
 
 // One alternative HS Code suggestion offered when the user edits an item's classification —
 // invoices from real users typically carry no HS Code at all, so AI classifies purely from the
@@ -81,6 +86,22 @@ export interface MissingFieldsData {
   missingFields: MissingField[];
   existingData: LicenseFormData;
   round: number;
+}
+
+// One invoice found inside the uploaded file, summarized for the picker card — full data for
+// the chosen one lives in InvoiceOcrResult (invoice-ocr.mock.ts), looked up by `id` once selected.
+export interface InvoiceSummaryOption {
+  id: string;
+  invoiceNo: string;
+  invoiceDate: string;
+  itemCount: number;
+  totalAmount: string;
+  currency: string;
+}
+
+export interface InvoiceSelectData {
+  invoices: InvoiceSummaryOption[];
+  selectedId?: string; // set once the user has chosen, drives the read-only/locked display
 }
 
 export interface ChatMessage {

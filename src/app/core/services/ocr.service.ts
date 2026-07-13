@@ -1,8 +1,18 @@
 import { Injectable, signal } from '@angular/core';
 import { MOCK_OCR_RESULT, OcrResult } from '@mock/ocr.mock';
-import { MOCK_INVOICE_OCR_RESULT, InvoiceOcrResult } from '@mock/invoice-ocr.mock';
+import { MOCK_INVOICE_OCR_RESULT, MOCK_INVOICE_OCR_RESULTS, InvoiceOcrResult } from '@mock/invoice-ocr.mock';
 
 const OCR_STAGES = ['อ่านเอกสาร', 'วิเคราะห์ข้อมูล', 'ตรวจสอบ HS Code', 'ร่างคำขอ'];
+
+// Demo/QA hook: name the uploaded file with this substring (case-insensitive) to simulate a
+// file that bundles more than one commercial invoice — e.g. "Combined_Invoice_MULTI.pdf".
+// Mirrors the KNOWN_REFS-style trigger convention used elsewhere (spn.mock.ts).
+const MULTI_INVOICE_TRIGGER = 'multi';
+
+export interface MultiInvoiceDetection {
+  multiInvoice: true;
+  invoices: InvoiceOcrResult[];
+}
 
 @Injectable({ providedIn: 'root' })
 export class OcrService {
@@ -16,7 +26,7 @@ export class OcrService {
     this.isOCRing.set(false);
   }
 
-  async startOCR(_files?: unknown[], variant: 'default' | 'invoice' = 'default'): Promise<OcrResult | InvoiceOcrResult> {
+  async startOCR(_files?: unknown[], variant: 'default' | 'invoice' = 'default'): Promise<OcrResult | InvoiceOcrResult | MultiInvoiceDetection> {
     this.reset();
     this.isOCRing.set(true);
 
@@ -27,7 +37,14 @@ export class OcrService {
     }
 
     this.isOCRing.set(false);
-    return variant === 'invoice' ? MOCK_INVOICE_OCR_RESULT : MOCK_OCR_RESULT;
+
+    if (variant === 'invoice') {
+      const files = (_files ?? []) as { name?: string }[];
+      const isMulti = files.some(f => (f?.name ?? '').toLowerCase().includes(MULTI_INVOICE_TRIGGER));
+      if (isMulti) return { multiInvoice: true, invoices: MOCK_INVOICE_OCR_RESULTS };
+      return MOCK_INVOICE_OCR_RESULT;
+    }
+    return MOCK_OCR_RESULT;
   }
 
   private delay(ms: number): Promise<void> {

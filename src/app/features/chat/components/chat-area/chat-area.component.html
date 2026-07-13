@@ -239,6 +239,13 @@
                 (confirmed)="onItemMeasurementConfirmed(msg.id, $event)" />
             }
 
+            <!-- File OCR found >1 invoice inside it — user picks one before ocr-results appears -->
+            @case ('invoice-select') {
+              <app-invoice-select
+                [data]="asInvoiceSelect(msg.data)"
+                (chosen)="onInvoiceSelected($event)" />
+            }
+
           }
         </div>
 

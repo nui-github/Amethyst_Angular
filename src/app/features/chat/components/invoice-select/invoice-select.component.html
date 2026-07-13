@@ -1,0 +1,40 @@
+<div class="is-wrap">
+  <div class="is-hd">
+    <div class="is-hd__icon">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0463EF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+        <line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="12" y2="17"/>
+      </svg>
+    </div>
+    <div>
+      <p class="is-hd__title">พบ Invoice หลายฉบับในไฟล์นี้</p>
+      <p class="is-hd__sub">กรุณาเลือก Invoice ที่ต้องการดำเนินการ — ระบบจะใช้ข้อมูลจากฉบับนี้ตลอด flow</p>
+    </div>
+  </div>
+
+  <div class="is-list" [class.is-list--locked]="locked">
+    @for (inv of data.invoices; track inv.id) {
+      <button class="is-card"
+        [class.is-card--selected]="data.selectedId === inv.id"
+        [class.is-card--faded]="locked && data.selectedId !== inv.id"
+        [disabled]="locked"
+        (click)="select(inv.id)">
+        <span class="is-card__icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </span>
+        <span class="is-card__body">
+          <span class="is-card__row">
+            <span class="is-card__no">{{ inv.invoiceNo }}</span>
+            <span class="is-card__date">{{ inv.invoiceDate }}</span>
+          </span>
+          <span class="is-card__meta">{{ inv.itemCount }} รายการสินค้า · มูลค่ารวม ฿{{ inv.totalAmount }} {{ inv.currency }}</span>
+        </span>
+        @if (data.selectedId === inv.id) {
+          <svg class="is-card__check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0463EF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        } @else {
+          <svg class="is-card__arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        }
+      </button>
+    }
+  </div>
+</div>
