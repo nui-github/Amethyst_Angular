@@ -198,13 +198,6 @@
   &:focus { border-color: #0463EF; }
 }
 
-.cde-td--num {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--bizx-n500);
-  white-space: nowrap;
-}
-
 .cde-row-del {
   display: flex;
   align-items: center;
@@ -221,37 +214,93 @@
   &:hover { color: #EF4444; background: rgba(239, 68, 68, 0.08); }
 }
 
-.cde-subadd {
+// ── Per-item grouped COA / เลข U cards ─────────────────────────────────────────
+.cde-item-groups {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 8px;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.cde-subadd__select {
-  font-size: 11.5px;
-  font-family: inherit;
-  color: var(--bizx-navy);
+.cde-item-group {
   border: 1.5px solid #E5E7EB;
-  border-radius: 8px;
-  padding: 7px 9px;
-  outline: none;
-  background: #fff;
-  max-width: 240px;
-
-  &:focus { border-color: #0463EF; }
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #FAFBFF;
 }
 
-.cde-subadd__btn {
+.cde-item-group__head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cde-item-group__name {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--bizx-navy);
+}
+
+.cde-item-group__meta {
+  font-size: 10.5px;
+  color: var(--bizx-n500);
+}
+
+.cde-item-group__sub {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cde-item-group__sub-title {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--bizx-n500);
+}
+
+.cde-mini-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11.5px;
+
+  th {
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--bizx-n500);
+    background: #F4F6FB;
+    padding: 7px 8px;
+    border-bottom: 1.5px solid #E5E7EB;
+    white-space: nowrap;
+
+    em { color: #EF4444; font-style: normal; margin-left: 2px; }
+  }
+
+  td {
+    padding: 5px 6px;
+    border-bottom: 1px solid #F0F1F8;
+    vertical-align: middle;
+    background: #fff;
+
+    &.cde-td--missing { background: rgba(245, 158, 11, 0.06); }
+  }
+
+  tr:last-child td { border-bottom: none; }
+}
+
+.cde-mini-add {
+  align-self: flex-start;
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  flex-shrink: 0;
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 700;
   font-family: inherit;
-  padding: 7px 12px;
-  border-radius: 8px;
+  padding: 6px 11px;
+  border-radius: 7px;
   border: 1.5px dashed #C7D2FE;
   background: #EEF2FF;
   color: var(--bizx-blue);

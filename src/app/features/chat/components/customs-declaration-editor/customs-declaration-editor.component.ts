@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { ChatService } from '@app/core/services/chat.service';
 import { CustomsDeclarationData, CustomsDeclarationItem, CustomsDeclarationProduction, CustomsDeclarationAuthority } from '@app/core/models/types';
 import {
@@ -25,7 +24,7 @@ interface FlatAuthorityRow { item: CustomsDeclarationItem; index: number; a: Cus
   selector: 'app-customs-declaration-editor',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.Default,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule],
   templateUrl: './customs-declaration-editor.component.html',
   styleUrl: './customs-declaration-editor.component.scss',
 })
@@ -56,14 +55,10 @@ export class CustomsDeclarationEditorComponent {
   readonly agencyOptions = ['อย.', 'กษ.', 'ปส.'];
 
   local: CustomsDeclarationData;
-  addProductionItemNumber: number | null = null;
-  addAuthorityItemNumber: number | null = null;
 
   constructor() {
     const existing = this.chat.formData().customsDeclaration;
     this.local = existing ? structuredClone(existing) : { items: [] };
-    this.addProductionItemNumber = this.local.items[0]?.itemNumber ?? null;
-    this.addAuthorityItemNumber = this.local.items[0]?.itemNumber ?? null;
   }
 
   // ── Header fields ────────────────────────────────────────────────────────────
@@ -117,13 +112,8 @@ export class CustomsDeclarationEditorComponent {
     item.productions = [...(item.productions ?? []), {}];
   }
 
-  addProductionForSelected(): void {
-    const item = this.local.items.find(i => i.itemNumber === this.addProductionItemNumber);
-    if (item) this.addProduction(item);
-  }
-
-  removeProduction(row: FlatProductionRow): void {
-    row.item.productions = (row.item.productions ?? []).filter((_, i) => i !== row.index);
+  removeProductionAt(item: CustomsDeclarationItem, index: number): void {
+    item.productions = (item.productions ?? []).filter((_, i) => i !== index);
   }
 
   // ── Authority / license data (from เลข U) ─────────────────────────────────────
@@ -145,13 +135,8 @@ export class CustomsDeclarationEditorComponent {
     item.authorities = [...(item.authorities ?? []), {}];
   }
 
-  addAuthorityForSelected(): void {
-    const item = this.local.items.find(i => i.itemNumber === this.addAuthorityItemNumber);
-    if (item) this.addAuthority(item);
-  }
-
-  removeAuthority(row: FlatAuthorityRow): void {
-    row.item.authorities = (row.item.authorities ?? []).filter((_, i) => i !== row.index);
+  removeAuthorityAt(item: CustomsDeclarationItem, index: number): void {
+    item.authorities = (item.authorities ?? []).filter((_, i) => i !== index);
   }
 
   itemLabel(item: CustomsDeclarationItem): string {

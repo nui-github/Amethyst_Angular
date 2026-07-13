@@ -203,9 +203,13 @@ ChatService      → src/app/core/services/chat.service.ts
     / ล็อต (COA)" (CustomsDeclarationItem.productions[]: Lot No./Mfg./Exp. Date/Qty. come from the
     COA OCR read, only Measurement + Meas. Unit are required user input) and "หน่วยงานที่ออกใบอนุญาต
     (เลข U)" (CustomsDeclarationItem.authorities[]: License Number from OCR + an Agency dropdown,
-    not yet required) — each with a "รายการที่" item-picker + add button, and a delete icon per row.
-    "บันทึก" opens a confirm dialog ("กรุณาตรวจสอบความถูกต้องของข้อมูลทั้งหมด...") before actually
-    saving — "ตรวจสอบอีกครั้ง" closes it with no change, confirm calls the real save
+    not yet required) — grouped per item (`.cde-item-group`, one card per GoodsShipment item with
+    both mini-tables + their own "+ เพิ่ม..." button inside, no shared item-picker dropdown; option
+    [value] bindings for a select tied to [(ngModel)] must use [ngValue] instead or Angular
+    stringifies the model, breaking `===` lookups against numeric itemNumber — bit us once already
+    with the old shared dropdown), and a delete icon per row. "บันทึก" opens a confirm dialog
+    ("กรุณาตรวจสอบความถูกต้องของข้อมูลทั้งหมด...") before actually saving — "ตรวจสอบอีกครั้ง" closes
+    it with no change, confirm calls the real save
 QueueService     → src/app/core/services/queue.service.ts
   - open(id) seals ship.messages as isReadOnly=true before setting openId
 OcrService       → src/app/core/services/ocr.service.ts

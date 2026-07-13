@@ -63,108 +63,102 @@
 
       <div class="cde-sec">
         <div class="cde-sec__head" style="border-left-color:#7C3AED">
-          <span class="cde-sec__title">ข้อมูลการผลิต / ล็อต (COA) ({{ flatProductions.length }} รายการ)</span>
+          <span class="cde-sec__title">ข้อมูลการผลิต (COA) และหน่วยงานที่ออกใบอนุญาต (เลข U) — แยกตามรายการสินค้า</span>
         </div>
-        <div class="cde-table-wrap">
-          <table class="cde-table">
-            <thead>
-              <tr>
-                <th>รายการที่</th>
-                <th>Lot Number</th>
-                <th>Mfg. Date</th>
-                <th>Exp. Date</th>
-                <th>Measurement <em>*</em></th>
-                <th>Meas. Unit <em>*</em></th>
-                <th>Qty.</th>
-                <th>Qty. Unit</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (row of flatProductions; track row.item.itemNumber + '_' + row.index) {
-                <tr>
-                  <td class="cde-td--num">{{ itemLabel(row.item) }}</td>
-                  <td><input class="cde-table__input" [value]="productionValue(row.p, 'lotNo')" (input)="onProductionInput(row.p, 'lotNo', $event)" /></td>
-                  <td><input class="cde-table__input" [value]="productionValue(row.p, 'mfgDate')" (input)="onProductionInput(row.p, 'mfgDate', $event)" /></td>
-                  <td><input class="cde-table__input" [value]="productionValue(row.p, 'expDate')" (input)="onProductionInput(row.p, 'expDate', $event)" /></td>
-                  <td [class.cde-td--missing]="isProductionMissing(row.p, 'measurement')">
-                    <input class="cde-table__input" [value]="productionValue(row.p, 'measurement')" (input)="onProductionInput(row.p, 'measurement', $event)" />
-                  </td>
-                  <td [class.cde-td--missing]="isProductionMissing(row.p, 'measurementUnit')">
-                    <input class="cde-table__input" [value]="productionValue(row.p, 'measurementUnit')" (input)="onProductionInput(row.p, 'measurementUnit', $event)" />
-                  </td>
-                  <td><input class="cde-table__input" [value]="productionValue(row.p, 'quantity')" (input)="onProductionInput(row.p, 'quantity', $event)" /></td>
-                  <td><input class="cde-table__input" [value]="productionValue(row.p, 'quantityUnit')" (input)="onProductionInput(row.p, 'quantityUnit', $event)" /></td>
-                  <td>
-                    <button type="button" class="cde-row-del" (click)="removeProduction(row)">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
-                    </button>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-        <div class="cde-subadd">
-          <select class="cde-subadd__select" [(ngModel)]="addProductionItemNumber">
-            @for (item of local.items; track item.itemNumber) {
-              <option [ngValue]="item.itemNumber">{{ itemLabel(item) }}</option>
-            }
-          </select>
-          <button type="button" class="cde-subadd__btn" (click)="addProductionForSelected()">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-            เพิ่มข้อมูลการผลิต
-          </button>
-        </div>
-      </div>
+        <div class="cde-item-groups">
+          @for (item of local.items; track item.itemNumber) {
+            <div class="cde-item-group">
+              <div class="cde-item-group__head">
+                <span class="cde-item-group__name">{{ itemLabel(item) }}</span>
+                @if (item.tariffCode) { <span class="cde-item-group__meta">พิกัด {{ item.tariffCode }}</span> }
+              </div>
 
-      <div class="cde-sec">
-        <div class="cde-sec__head" style="border-left-color:#B45309">
-          <span class="cde-sec__title">หน่วยงานที่ออกใบอนุญาต (เลข U) ({{ flatAuthorities.length }} รายการ)</span>
-        </div>
-        <div class="cde-table-wrap">
-          <table class="cde-table">
-            <thead>
-              <tr>
-                <th>รายการที่</th>
-                <th>เลขที่ใบอนุญาต (เลข U)</th>
-                <th>หน่วยงาน</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (row of flatAuthorities; track row.item.itemNumber + '_' + row.index) {
-                <tr>
-                  <td class="cde-td--num">{{ itemLabel(row.item) }}</td>
-                  <td><input class="cde-table__input" [value]="authorityValue(row.a, 'licenseNumber')" (input)="onAuthorityInput(row.a, 'licenseNumber', $event)" /></td>
-                  <td>
-                    <select class="cde-table__select" [value]="authorityValue(row.a, 'agency')" (change)="onAuthorityInput(row.a, 'agency', $event)">
-                      <option value="">(เลือกหน่วยงาน)</option>
-                      @for (a of agencyOptions; track a) {
-                        <option [value]="a">{{ a }}</option>
+              <div class="cde-item-group__sub">
+                <span class="cde-item-group__sub-title">ข้อมูลการผลิต / ล็อต (COA)</span>
+                <div class="cde-table-wrap">
+                  <table class="cde-mini-table">
+                    <thead>
+                      <tr>
+                        <th>Lot Number</th>
+                        <th>Mfg. Date</th>
+                        <th>Exp. Date</th>
+                        <th>Measurement <em>*</em></th>
+                        <th>Meas. Unit <em>*</em></th>
+                        <th>Qty.</th>
+                        <th>Qty. Unit</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (p of item.productions ?? []; track $index) {
+                        <tr>
+                          <td><input class="cde-table__input" [value]="productionValue(p, 'lotNo')" (input)="onProductionInput(p, 'lotNo', $event)" /></td>
+                          <td><input class="cde-table__input" [value]="productionValue(p, 'mfgDate')" (input)="onProductionInput(p, 'mfgDate', $event)" /></td>
+                          <td><input class="cde-table__input" [value]="productionValue(p, 'expDate')" (input)="onProductionInput(p, 'expDate', $event)" /></td>
+                          <td [class.cde-td--missing]="isProductionMissing(p, 'measurement')">
+                            <input class="cde-table__input" [value]="productionValue(p, 'measurement')" (input)="onProductionInput(p, 'measurement', $event)" />
+                          </td>
+                          <td [class.cde-td--missing]="isProductionMissing(p, 'measurementUnit')">
+                            <input class="cde-table__input" [value]="productionValue(p, 'measurementUnit')" (input)="onProductionInput(p, 'measurementUnit', $event)" />
+                          </td>
+                          <td><input class="cde-table__input" [value]="productionValue(p, 'quantity')" (input)="onProductionInput(p, 'quantity', $event)" /></td>
+                          <td><input class="cde-table__input" [value]="productionValue(p, 'quantityUnit')" (input)="onProductionInput(p, 'quantityUnit', $event)" /></td>
+                          <td>
+                            <button type="button" class="cde-row-del" (click)="removeProductionAt(item, $index)">
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
+                            </button>
+                          </td>
+                        </tr>
                       }
-                    </select>
-                  </td>
-                  <td>
-                    <button type="button" class="cde-row-del" (click)="removeAuthority(row)">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
-                    </button>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-        <div class="cde-subadd">
-          <select class="cde-subadd__select" [(ngModel)]="addAuthorityItemNumber">
-            @for (item of local.items; track item.itemNumber) {
-              <option [ngValue]="item.itemNumber">{{ itemLabel(item) }}</option>
-            }
-          </select>
-          <button type="button" class="cde-subadd__btn" (click)="addAuthorityForSelected()">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-            เพิ่มหน่วยงาน
-          </button>
+                    </tbody>
+                  </table>
+                </div>
+                <button type="button" class="cde-mini-add" (click)="addProduction(item)">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                  เพิ่มข้อมูลการผลิต
+                </button>
+              </div>
+
+              <div class="cde-item-group__sub">
+                <span class="cde-item-group__sub-title">หน่วยงานที่ออกใบอนุญาต (เลข U)</span>
+                <div class="cde-table-wrap">
+                  <table class="cde-mini-table">
+                    <thead>
+                      <tr>
+                        <th>เลขที่ใบอนุญาต (เลข U)</th>
+                        <th>หน่วยงาน</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (a of item.authorities ?? []; track $index) {
+                        <tr>
+                          <td><input class="cde-table__input" [value]="authorityValue(a, 'licenseNumber')" (input)="onAuthorityInput(a, 'licenseNumber', $event)" /></td>
+                          <td>
+                            <select class="cde-table__select" [value]="authorityValue(a, 'agency')" (change)="onAuthorityInput(a, 'agency', $event)">
+                              <option value="">(เลือกหน่วยงาน)</option>
+                              @for (ag of agencyOptions; track ag) {
+                                <option [value]="ag">{{ ag }}</option>
+                              }
+                            </select>
+                          </td>
+                          <td>
+                            <button type="button" class="cde-row-del" (click)="removeAuthorityAt(item, $index)">
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
+                            </button>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+                <button type="button" class="cde-mini-add" (click)="addAuthority(item)">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                  เพิ่มหน่วยงาน
+                </button>
+              </div>
+            </div>
+          }
         </div>
       </div>
     </div>
