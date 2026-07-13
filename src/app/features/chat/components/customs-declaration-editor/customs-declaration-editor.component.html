@@ -108,7 +108,7 @@
         <div class="cde-subadd">
           <select class="cde-subadd__select" [(ngModel)]="addProductionItemNumber">
             @for (item of local.items; track item.itemNumber) {
-              <option [value]="item.itemNumber">{{ itemLabel(item) }}</option>
+              <option [ngValue]="item.itemNumber">{{ itemLabel(item) }}</option>
             }
           </select>
           <button type="button" class="cde-subadd__btn" (click)="addProductionForSelected()">
@@ -158,7 +158,7 @@
         <div class="cde-subadd">
           <select class="cde-subadd__select" [(ngModel)]="addAuthorityItemNumber">
             @for (item of local.items; track item.itemNumber) {
-              <option [value]="item.itemNumber">{{ itemLabel(item) }}</option>
+              <option [ngValue]="item.itemNumber">{{ itemLabel(item) }}</option>
             }
           </select>
           <button type="button" class="cde-subadd__btn" (click)="addAuthorityForSelected()">
