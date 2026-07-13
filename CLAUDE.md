@@ -172,15 +172,19 @@ ChatMessage.type → @switch in ChatAreaComponent
                             When data.selectedItems present (every path — see selectAllAgencyItems() /
                             getInvoiceLineItems() below, formData.selectedItems is now set directly with
                             no separate item-selection UI), each item row has a "รายละเอียด" button opening
-                            a modal: if the item has a declarationItemNumber (types.ts InvoiceLineItem —
-                            FK into customsDeclaration.items, set by mapToInvoiceLineItems() for
-                            customs/SPN paths) it renders the full CustomsDeclarationItem via the shared
-                            <app-customs-item-detail> component (same one ocr-results uses); otherwise
-                            falls back to the basic Invoice/HS/origin/qty/lot/value grid. Either way,
-                            only Measurement + Meas. Unit are left editable below it (editableFields in
-                            form-preview.component.ts — the only ItemManualDetail fields no upstream
-                            document actually captures) the user must fill in and confirm per item;
-                            "ดำเนินการต่อ" stays disabled until every selected item is confirmed)
+                            a READ-ONLY modal (display-only, no editable fields or confirm step — every
+                            field including Measurement/Meas. Unit is already collected upstream by this
+                            point, either via the declaration-editor panel or baked into the upload's own
+                            mock data, so re-asking here would just be duplicate work): if the item has a
+                            declarationItemNumber (types.ts InvoiceLineItem — FK into
+                            customsDeclaration.items, set by mapToInvoiceLineItems() for customs/SPN paths)
+                            it renders the full CustomsDeclarationItem via the shared
+                            <app-customs-item-detail> component (same one ocr-results uses, [readOnly]=
+                            "saved"); otherwise falls back to the basic Invoice/HS/origin/qty/lot/value
+                            grid, plus a small Measurement/Meas. Unit display pulled straight from
+                            item.measurement/item.measUnit. The item-list section is the LAST thing in the
+                            panel (moved below the header sections) since it's purely informational now;
+                            "ดำเนินการต่อ" is enabled as soon as the card renders, no per-item gating)
   'missing-fields'     → MissingFieldsComponent (incomplete OCR → fill + optional re-upload)
   'agency-upload'      → AgencyUploadComponent  (per-agency doc slots; upload file OR manual entry per slot)
   'profile-select'     → ProfileSelectComponent (pick/confirm ShippingNet profile; mode: 'select'|'confirm')

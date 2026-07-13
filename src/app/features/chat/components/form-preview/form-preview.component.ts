@@ -1,8 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
-import { LicenseFormData, InvoiceLineItem, ItemManualDetail, ITEM_MANUAL_DETAIL_FIELDS, CustomsDeclarationData, CustomsDeclarationItem } from '@app/core/models/types';
+import { LicenseFormData, InvoiceLineItem, CustomsDeclarationData, CustomsDeclarationItem } from '@app/core/models/types';
 import { CUSTOMS_DECLARATION_HEADER_SECTIONS } from '@app/shared/utils/customs-declaration-sections';
 import { CustomsItemDetailComponent } from '../customs-item-detail/customs-item-detail.component';
 import { ChatService } from '@app/core/services/chat.service';
@@ -23,7 +22,7 @@ interface PreviewSection {
   selector: 'app-form-preview',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.Default,
-  imports: [CommonModule, FormsModule, NzDatePickerModule, CustomsItemDetailComponent],
+  imports: [CommonModule, FormsModule, CustomsItemDetailComponent],
   templateUrl: './form-preview.component.html',
   styleUrl: './form-preview.component.scss',
 })
@@ -32,37 +31,16 @@ export class FormPreviewComponent {
     this._data = val;
     // init local editable copy
     this.local = { ...val };
-    this.manualDetails = {};
-    this.confirmedItemIds = new Set();
-    for (const item of val.selectedItems ?? []) {
-      // Lot/Mfg/Exp/Qty are already known from OCR — only Measurement + Meas. Unit need the
-      // user to key in, since no document captures the declared measurement/unit for LPI.
-      // Paths that already collected them upstream (item-measurement, right after flags) pass
-      // item.measurement/measUnit through — pre-fill so the item isn't asked twice.
-      this.manualDetails[item.id] = {
-        lotNo: item.lotNo ?? '', mfgDate: item.mfgDate ?? '', expDate: item.expDate ?? '',
-        measurement: item.measurement ?? '', measUnit: item.measUnit ?? '',
-        qty: item.quantity ?? '', qtyUnit: item.unit ?? '',
-      };
-      // Items whose Measurement/Meas. Unit already arrived pre-filled (item-measurement step,
-      // right after flags) need no further action from the user here — auto-confirm so
-      // "ดำเนินการต่อ" is enabled immediately instead of asking them to re-confirm each row.
-      if (this.editableFields.every(f => (this.manualDetails[item.id][f.key] ?? '').trim().length > 0)) {
-        this.confirmedItemIds.add(item.id);
-      }
-    }
   }
   get data(): LicenseFormData { return this._data; }
   private _data!: LicenseFormData;
 
   local: LicenseFormData = {};
 
-  readonly manualFields = ITEM_MANUAL_DETAIL_FIELDS;
-  // Lot Number / Mfg. Date / Exp. Date / Qty. / Qty. Unit are auto-filled from OCR (see `data`
-  // setter above) — only Measurement + Meas. Unit are left for the user to key in by hand.
-  readonly editableFields = ITEM_MANUAL_DETAIL_FIELDS.filter(f => f.key === 'measurement' || f.key === 'measUnit');
-  manualDetails: Record<string, ItemManualDetail> = {};
-  confirmedItemIds = new Set<string>();
+  // Every field on selectedItems (including Measurement/Meas. Unit) is already collected upstream
+  // — either via the declaration-editor panel (customs-declaration-editor) or baked into the
+  // upload's own mock data — so this list is display-only here: "รายละเอียด" just shows what was
+  // already entered, no further confirmation gates "ดำเนินการต่อ".
   detailItemId: string | null = null;
 
   readonly chat = inject(ChatService);
@@ -201,24 +179,7 @@ export class FormPreviewComponent {
     return this.local.selectedItems?.find(i => i.id === this.detailItemId);
   }
 
-  isItemConfirmed(id: string): boolean { return this.confirmedItemIds.has(id); }
-
-  isManualDetailComplete(id: string): boolean {
-    const d = this.manualDetails[id];
-    if (!d) return false;
-    // Only the user-editable fields gate completion — Lot/Mfg/Exp/Qty are auto-filled from OCR
-    // and may legitimately stay blank when the source document simply didn't have them (e.g. no
-    // production/lot details on file for a given item).
-    return this.editableFields.every(f => (d[f.key] ?? '').trim().length > 0);
-  }
-
-  allItemDetailsConfirmed(): boolean {
-    const items = this.local.selectedItems ?? [];
-    return items.every(i => this.confirmedItemIds.has(i.id));
-  }
-
   openItemDetail(id: string): void {
-    if (this.saved) return;
     this.detailItemId = id;
   }
 
@@ -226,36 +187,8 @@ export class FormPreviewComponent {
     this.detailItemId = null;
   }
 
-  onManualFieldInput(id: string, key: keyof ItemManualDetail, event: Event): void {
-    const val = (event.target as HTMLInputElement).value;
-    this.manualDetails[id] = { ...this.manualDetails[id], [key]: val };
-  }
-
-  /** วว-ดด-ปปปป (พ.ศ.) → Date, for binding the manual-detail date pickers. */
-  manualDateValue(id: string, key: keyof ItemManualDetail): Date | null {
-    const val = this.manualDetails[id]?.[key];
-    if (!val) return null;
-    const [d, m, y] = val.split('-').map(Number);
-    if (!d || !m || !y) return null;
-    return new Date(y - 543, m - 1, d);
-  }
-
-  onManualDateChange(id: string, key: keyof ItemManualDetail, date: Date | null): void {
-    const val = date
-      ? `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear() + 543}`
-      : '';
-    this.manualDetails[id] = { ...this.manualDetails[id], [key]: val };
-  }
-
-  confirmItemDetail(id: string): void {
-    if (!this.isManualDetailComplete(id)) return;
-    this.confirmedItemIds = new Set(this.confirmedItemIds).add(id);
-    this.detailItemId = null;
-    this.cdr.detectChanges();
-  }
-
   proceed(): void {
-    if (this.saved || !this.allItemDetailsConfirmed()) return;
+    if (this.saved) return;
     this.saved = true;
     this.chat.formData.update(f => ({ ...f, ...this.local }));
     this.cdr.detectChanges();

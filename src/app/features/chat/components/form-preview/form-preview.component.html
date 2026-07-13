@@ -16,40 +16,6 @@
     </div>
   </div>
 
-  @if (local.selectedItems?.length) {
-    <div class="fp-section">
-      <div class="fp-section__head" style="border-left-color:#0463EF">
-        <span class="fp-section__title">รายการสินค้าที่ยื่นขอ ({{ local.selectedItems!.length }} รายการ)</span>
-      </div>
-      <div class="fp-items">
-        @for (item of local.selectedItems; track item.id) {
-          <div class="fp-item-row">
-            <span class="fp-item-row__name">{{ item.name }}</span>
-            <span class="fp-item-row__meta">{{ item.quantity }} {{ item.unit }} · Lot {{ item.lotNo }} · HS {{ item.hsCode }}</span>
-            <span class="fp-item-row__amount">฿{{ item.amount | number }}</span>
-            @if (isItemConfirmed(item.id)) {
-              <span class="fp-item-row__status fp-item-row__status--done">
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0D8F61" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                ครบถ้วน
-              </span>
-            } @else if (!saved) {
-              <span class="fp-item-row__status fp-item-row__status--warn">ต้องกรอกเพิ่ม</span>
-            }
-            @if (!saved) {
-              <button class="fp-detail-btn" (click)="openItemDetail(item.id)">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-                รายละเอียด
-              </button>
-            }
-          </div>
-        }
-      </div>
-      @if (!saved && local.selectedItems?.length && !allItemDetailsConfirmed()) {
-        <p class="fp-items__hint">กรุณากดปุ่ม “รายละเอียด” เพื่อกรอกข้อมูลเพิ่มเติมของสินค้าทุกรายการก่อนดำเนินการต่อ</p>
-      }
-    </div>
-  }
-
   @if (declaration) {
     <!-- Structured customs-declaration header (same shape as ocr-results) -->
     @for (section of declSections; track section.title) {
@@ -135,13 +101,34 @@
     }
   }
 
+  @if (local.selectedItems?.length) {
+    <div class="fp-section">
+      <div class="fp-section__head" style="border-left-color:#0463EF">
+        <span class="fp-section__title">รายการสินค้าที่ยื่นขอ ({{ local.selectedItems!.length }} รายการ)</span>
+      </div>
+      <div class="fp-items">
+        @for (item of local.selectedItems; track item.id) {
+          <div class="fp-item-row">
+            <span class="fp-item-row__name">{{ item.name }}</span>
+            <span class="fp-item-row__meta">{{ item.quantity }} {{ item.unit }} · Lot {{ item.lotNo }} · HS {{ item.hsCode }}</span>
+            <span class="fp-item-row__amount">฿{{ item.amount | number }}</span>
+            <button class="fp-detail-btn" (click)="openItemDetail(item.id)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+              รายละเอียด
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
   @if (!saved) {
     <div class="fp-save-bar">
       <span class="fp-save-hint">
       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
       กดที่ช่องเพื่อแก้ไขก่อนดำเนินการต่อ
     </span>
-      <button class="fp-save-btn" [disabled]="!allItemDetailsConfirmed()" (click)="proceed()">
+      <button class="fp-save-btn" (click)="proceed()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
         ดำเนินการต่อ
       </button>
@@ -195,49 +182,13 @@
           }
 
           <div class="fp-modal__section">
-            <span class="fp-modal__section-title">
-              {{ isItemConfirmed(item.id) ? 'Measurement / Meas. Unit' : 'ข้อมูลที่ต้องกรอกเพิ่มเติม' }}
-            </span>
-            @if (isItemConfirmed(item.id)) {
-              <!-- Already captured in the item-measurement step right after flags — display only -->
-              <div class="fp-modal__ro-grid">
-                @for (f of editableFields; track f.key) {
-                  <div class="fp-modal__ro"><span>{{ f.label }}</span><strong>{{ manualDetails[item.id][f.key] || '—' }}</strong></div>
-                }
-              </div>
-            } @else {
-              <div class="fp-modal__form-grid">
-                @for (f of editableFields; track f.key) {
-                  <label class="fp-modal__field">
-                    <span class="fp-modal__field-label">{{ f.label }} <em>*</em></span>
-                    @if (f.type === 'date') {
-                      <nz-date-picker class="fp-modal__input fp-modal__input--date"
-                        nzFormat="dd-MM-yyyy" nzPlaceHolder="วว-ดด-ปปปป"
-                        [ngModel]="manualDateValue(item.id, f.key)"
-                        (ngModelChange)="onManualDateChange(item.id, f.key, $event)" />
-                    } @else {
-                      <input class="fp-modal__input" [placeholder]="f.placeholder"
-                        [value]="manualDetails[item.id][f.key]"
-                        (input)="onManualFieldInput(item.id, f.key, $event)" />
-                    }
-                  </label>
-                }
-              </div>
-            }
+            <span class="fp-modal__section-title">Measurement / Meas. Unit</span>
+            <div class="fp-modal__ro-grid">
+              <div class="fp-modal__ro"><span>Measurement</span><strong>{{ item.measurement || '—' }}</strong></div>
+              <div class="fp-modal__ro"><span>Meas. Unit</span><strong>{{ item.measUnit || '—' }}</strong></div>
+            </div>
           </div>
         </div>
-
-        @if (!isItemConfirmed(item.id)) {
-          <div class="fp-modal__ft">
-            @if (!isManualDetailComplete(item.id)) {
-              <span class="fp-modal__ft-hint">กรอกข้อมูลที่มี <em>*</em> ให้ครบทุกช่อง</span>
-            }
-            <button class="fp-modal__confirm-btn" [disabled]="!isManualDetailComplete(item.id)" (click)="confirmItemDetail(item.id)">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-              ยืนยันข้อมูลสินค้า
-            </button>
-          </div>
-        }
       </div>
     </div>
   }
