@@ -220,7 +220,11 @@ ChatService      → src/app/core/services/chat.service.ts
     declarationEditorOpen())`, NOT nested inside the ocr-results message bubble — needs
     near-fullscreen width). openDeclarationEditor(msgId) / closeDeclarationEditor() /
     saveDeclarationEditor(updated) — save writes into both formData.customsDeclaration and the
-    originating message's own data (+ data.declarationComplete = true). Besides the header +
+    originating message's own data (+ data.declarationComplete = true). The main item table has
+    no "เลขที่ Invoice" column — every item in one session comes from a single chosen invoice
+    (see 'invoice-select' above), so repeating it per row was redundant; instead the section
+    header shows a badge with the distinct invoice number(s) found across `local.items`
+    (CustomsDeclarationEditorComponent.itemInvoiceNumbers, `.cde-sec__badge`). Besides the header +
     per-item core-field table, the panel also has two flattened per-item sub-tables — "ข้อมูลการผลิต
     / ล็อต (COA)" (CustomsDeclarationItem.productions[]: Lot No./Mfg./Exp. Date/Qty. come from the
     COA OCR read, only Measurement + Meas. Unit are required user input) and "หน่วยงานที่ออกใบอนุญาต

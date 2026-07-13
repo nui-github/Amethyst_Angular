@@ -48,7 +48,6 @@ export class CustomsDeclarationEditorComponent {
     { label: 'ประเทศที่ซื้อ', key: 'purchaseCountry', width: 100 },
     { label: 'มูลค่า (ตปท.)', key: 'invoiceAmountForeign', width: 85, unitKey: 'currencyCode', unitWidth: 55 },
     { label: 'มูลค่า (บาท)', key: 'invoiceAmountBaht', width: 90 },
-    { label: 'เลขที่ Invoice', key: 'invoiceNo', width: 110 },
     { label: 'ผู้ผลิต', key: 'manufacture', width: 220 },
   ];
 
@@ -85,6 +84,15 @@ export class CustomsDeclarationEditorComponent {
 
   isItemFieldMissing(item: CustomsDeclarationItem, key: string): boolean {
     return this.itemRequiredFields.includes(key) && !this.itemValue(item, key).trim();
+  }
+
+  // Invoice No. is dropped from the item table (it repeated on every row — the invoice-select
+  // step means every item here already comes from one invoice) and shown once in the section
+  // header instead. Still lists more than one if items happen to come from different invoices
+  // (e.g. the customs-declaration path, which isn't invoice-select-gated).
+  get itemInvoiceNumbers(): string {
+    const nums = Array.from(new Set(this.local.items.map(i => i.invoiceNo).filter((v): v is string => !!v)));
+    return nums.join(', ');
   }
 
   // ── Production / lot data (from COA) ──────────────────────────────────────────

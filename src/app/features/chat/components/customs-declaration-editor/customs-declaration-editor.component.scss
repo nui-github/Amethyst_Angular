@@ -79,6 +79,9 @@
 }
 
 .cde-sec__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   border-left: 3px solid;
   padding-left: 10px;
 }
@@ -87,6 +90,15 @@
   font-size: 13px;
   font-weight: 700;
   color: var(--bizx-navy);
+}
+
+.cde-sec__badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--bizx-blue);
+  background: rgba(4, 99, 239, 0.08);
+  padding: 2px 8px;
+  border-radius: 6px;
 }
 
 .cde-form-grid {

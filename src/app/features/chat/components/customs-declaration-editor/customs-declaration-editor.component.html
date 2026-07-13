@@ -31,6 +31,9 @@
       <div class="cde-sec">
         <div class="cde-sec__head" style="border-left-color:#0D8F61">
           <span class="cde-sec__title">รายการสินค้า ({{ local.items.length }} รายการ)</span>
+          @if (itemInvoiceNumbers) {
+            <span class="cde-sec__badge">Invoice {{ itemInvoiceNumbers }}</span>
+          }
         </div>
         <div class="cde-table-wrap">
           <table class="cde-table">
