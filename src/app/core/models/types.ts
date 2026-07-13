@@ -52,6 +52,15 @@ export interface HsCandidate {
   description: string;   // short description of what this HS heading covers
   dutyRate: number;       // import duty rate, %
   confidence: number;
+  // Optional agency this heading actually falls under — when set (AI candidates for the
+  // 'ไม่สามารถระบุ HS Code' group, or a manual lookupHsCode() hit), applying this candidate moves
+  // the item into that agency's group instead of just updating the HS Code display in place. Left
+  // undefined for ordinary same-agency re-classification candidates, which just refine the exact
+  // heading without changing which department the item is grouped under.
+  agency?: string;
+  agencyFull?: string;
+  requiresPermit?: boolean;
+  licenseType?: string;
 }
 
 // รายการวิเคราะห์รายสินค้า: product description → HS Code → Smart Tariff → กรมที่ต้องยื่น
@@ -61,7 +70,7 @@ export interface ProductHsAnalysis {
   hsCode: string;
   tariffCode: string;    // เลขพิกัดอัตราศุลกากรเต็ม (Smart Tariff)
   requiresPermit: boolean;
-  agency: string;        // 'อย.' | 'กษ.' | '—' (ไม่ต้องขอ)
+  agency: string;        // 'อย.' | 'กษ.' | 'ปส.' | '—' (ไม่ต้องขอ) | '?' (AI จัดกลุ่มไม่ได้ ต้องระบุเอง)
   agencyFull: string;
   licenseType?: string;
   confidence: number;

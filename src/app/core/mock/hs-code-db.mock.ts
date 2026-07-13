@@ -11,6 +11,15 @@ const HS_CODE_DB: Record<string, HsCandidate> = {
   '29411000': { hsCode: '2941.10.00', tariffCode: '2941.10.00.001', description: 'ยาปฏิชีวนะกลุ่มเพนิซิลลิน (วัตถุดิบ)', dutyRate: 0, confidence: 0 },
   '29419000': { hsCode: '2941.90.00', tariffCode: '2941.90.00.005', description: 'ยาปฏิชีวนะอื่นๆ (วัตถุดิบ)', dutyRate: 0, confidence: 0 },
   '39269099': { hsCode: '3926.90.99', tariffCode: '3926.90.99.014', description: 'ผลิตภัณฑ์พลาสติกอื่นๆ ที่มิได้ระบุไว้เฉพาะ', dutyRate: 10, confidence: 0 },
+  // These three carry an explicit `agency` — mainly used to resolve items in the "ไม่สามารถระบุ HS
+  // Code" group (item-hs-analysis.component.ts), so typing one of these in by hand also moves the
+  // item into the matching department's group, not just updates its HS Code display.
+  '90189095': { hsCode: '9018.90.90', tariffCode: '9018.90.90.095', description: 'เครื่องมือแพทย์สำหรับปิดแผล/วัสดุสิ้นเปลืองทางการแพทย์ควบคุม', dutyRate: 5, confidence: 0,
+    agency: 'อย.', agencyFull: 'สำนักงานคณะกรรมการอาหารและยา', requiresPermit: true, licenseType: 'เครื่องมือแพทย์' },
+  '30059090': { hsCode: '3005.90.90', tariffCode: '3005.90.90.020', description: 'ผ้าพันแผล/วัสดุปิดแผลทั่วไป (ไม่ควบคุม)', dutyRate: 10, confidence: 0,
+    agency: '—', agencyFull: '—', requiresPermit: false },
+  '90213909': { hsCode: '9021.39.00', tariffCode: '9021.39.00.009', description: 'วัสดุปิดแผลที่มีส่วนประกอบฝังตัว/ผ่านการฆ่าเชื้อพิเศษ', dutyRate: 0, confidence: 0,
+    agency: 'ปส.', agencyFull: 'สำนักงานปรมาณูเพื่อสันติภาพ', requiresPermit: true, licenseType: 'ผ่านการฆ่าเชื้อด้วยรังสีแกมมา' },
 };
 
 /** Normalize user input (e.g. "9018.90.90", "9018 90 90", "901890 90") to a digits-only key. */

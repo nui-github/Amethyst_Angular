@@ -104,23 +104,39 @@ ChatMessage.type → @switch in ChatAreaComponent
                             AI-analysis box always matches the invoice OCR box's item count/content, regardless
                             of which flow led there; per-product HS Code → Smart Tariff → agency, grouped by
                             resulting agency, INCLUDING a "ไม่ต้องขอใบอนุญาต" group (agency: '—') for items
-                            AI determines don't need any permit — each group card shows its item list
-                            directly + one "ยืนยันกลุ่มนี้ถูกต้อง" button that confirms every item in that
-                            group at once; every item shows its own `reason` (why AI chose that HS heading),
-                            `dutyRate` (import duty %), and AI confidence — real invoices from users carry no
-                            HS Code at all, so there is no invoice-vs-AI comparison, only AI-vs-user; each item
-                            has a "แก้ไข" button revealing up to 5 `candidates` (types.ts HsCandidate — HS
-                            Code/tariff/description/dutyRate/confidence) for the user to manually re-classify
-                            that single item, PLUS a manual-entry field ("หรือพิมพ์ HS Code เอง") — user
-                            types a code, "ค้นหา" looks it up via lookupHsCode() (mock/hs-code-db.mock.ts,
-                            a stand-in for the real tariff-schedule lookup), shows the matched
-                            code/description/duty if found (or "ไม่พบข้อมูล..." if not) with its own
-                            "ยืนยันใช้รหัสนี้" button; either path (candidate or manual) immediately updates
-                            the row and tags it "แก้ไขแล้ว" via ProductHsAnalysis.manuallyEdited; editing is
-                            only available before that item's group is confirmed. Clicking "ยืนยันกลุ่มนี้
-                            ถูกต้อง" opens a confirm dialog ("ได้ตรวจสอบ...ครบถ้วนแล้วใช่หรือไม่?") before
-                            actually locking the group — cancel closes it with no change, confirm calls
-                            confirmGroup(). All groups must be confirmed before "ดำเนินการต่อ")
+                            AI determines don't need any permit, AND a "ไม่สามารถระบุ HS Code ได้" group
+                            (agency: '?', sentinel like '—' — see product-hs-analysis.mock.ts p7) for items
+                            AI read the product description for but genuinely couldn't match a heading to
+                            confidently — rendered first (amber, CircleHelp icon, `.ih-group--unresolved`),
+                            with a hint instead of a confirm button (this group can never be "confirmed" —
+                            there's nothing valid in it to confirm) — each group card shows its item list
+                            directly + one "ยืนยันกลุ่มนี้ถูกต้อง" button (all groups except '?') that confirms
+                            every item in that group at once; every item shows its own `reason` (why AI chose
+                            that HS heading), `dutyRate` (import duty %), and AI confidence — real invoices
+                            from users carry no HS Code at all, so there is no invoice-vs-AI comparison, only
+                            AI-vs-user; each item has a "แก้ไข" button revealing up to 5 `candidates`
+                            (types.ts HsCandidate — HS Code/tariff/description/dutyRate/confidence) for the
+                            user to manually re-classify that single item, PLUS a manual-entry field ("หรือ
+                            พิมพ์ HS Code เอง") — user types a code, "ค้นหา" looks it up via lookupHsCode()
+                            (mock/hs-code-db.mock.ts, a stand-in for the real tariff-schedule lookup), shows
+                            the matched code/description/duty if found (or "ไม่พบข้อมูล..." if not) with its
+                            own "ยืนยันใช้รหัสนี้" button; either path (candidate or manual) immediately
+                            updates the row and tags it "แก้ไขแล้ว" via ProductHsAnalysis.manuallyEdited.
+                            When the chosen HsCandidate/lookup result also carries its own `agency` field
+                            (set on the '?' group's candidates/HS_CODE_DB entries, and optionally on any
+                            other candidate) AND it differs from the item's current agency, the item is
+                            MOVED into that agency's group instead of just updating its HS Code in place —
+                            ItemHsAnalysisComponent keeps a local mutable clone of every item
+                            (`this.items`) and fully re-derives `groups` (now a signal) from
+                            `item.agency` on every such move (rebuildGroups()); moving an item resets both
+                            the old and new group's confirmedGroups entry to false since their contents
+                            changed, forcing re-confirmation. Editing is only available before that item's
+                            group is confirmed. Clicking "ยืนยันกลุ่มนี้ถูกต้อง" opens a confirm dialog
+                            ("ได้ตรวจสอบ...ครบถ้วนแล้วใช่หรือไม่?") before actually locking the group —
+                            cancel closes it with no change, confirm calls confirmGroup(). All groups must
+                            be confirmed before "ดำเนินการต่อ" — for the '?' group specifically, "confirmed"
+                            means empty (every item has been resolved/moved out of it); once empty it's
+                            dropped from `groups` entirely and stops rendering)
   'item-measurement'   → ItemMeasurementComponent (legacy — like flag-card above, only reachable via the
                             unreachable chooseFullUpload() path (which never actually set selectedItems, so
                             in practice this box never showed there either) and historical queue-mock/

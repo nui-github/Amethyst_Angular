@@ -189,6 +189,20 @@
       border-bottom-color: rgba(13, 143, 97, 0.12);
     }
   }
+
+  &--unresolved {
+    border-color: #FDE4B0;
+  }
+}
+
+.ih-group__hint {
+  font-size: 11px;
+  line-height: 1.5;
+  color: #B45309;
+  background: rgba(180, 83, 9, 0.06);
+  margin: 0;
+  padding: 8px 14px;
+  border-bottom: 1px solid rgba(180, 83, 9, 0.12);
 }
 
 .ih-group__head {

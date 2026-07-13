@@ -57,8 +57,8 @@
   </div>
 
   <div class="ih-groups">
-    @for (group of groups; track group.key) {
-      <div class="ih-group" [class.ih-group--done]="isGroupConfirmed(group.key)">
+    @for (group of groups(); track group.key) {
+      <div class="ih-group" [class.ih-group--done]="isGroupConfirmed(group.key)" [class.ih-group--unresolved]="group.key === '?'">
 
         <div class="ih-group__head" [style.background]="groupStyle(group.key).bg" [style.color]="groupStyle(group.key).color">
           <span class="ih-group__icon" [style.color]="groupStyle(group.key).color">
@@ -66,17 +66,22 @@
               @case ('shield')    { <lucide-icon [img]="ShieldCheck" [size]="15" /> }
               @case ('sprout')    { <lucide-icon [img]="Sprout" [size]="15" /> }
               @case ('radiation') { <lucide-icon [img]="Radiation" [size]="15" /> }
+              @case ('help')      { <lucide-icon [img]="CircleHelp" [size]="15" /> }
               @default            { <lucide-icon [img]="PackageCheck" [size]="15" /> }
             }
           </span>
           <div class="ih-group__title">
-            <span class="ih-group__name">{{ group.key === '—' ? 'ไม่ต้องขอใบอนุญาต' : group.key }}</span>
-            @if (group.key !== '—') {
+            <span class="ih-group__name">{{ groupLabel(group.key) }}</span>
+            @if (group.key !== '—' && group.key !== '?') {
               <span class="ih-group__full">{{ group.full }}</span>
             }
           </div>
           <span class="ih-group__count">{{ group.items.length }} รายการ</span>
         </div>
+
+        @if (group.key === '?') {
+          <p class="ih-group__hint">AI อ่านคำอธิบายสินค้าแล้วแต่ไม่สามารถหาพิกัด HS Code ที่ตรงกันได้อย่างมั่นใจ — กรุณากด "แก้ไข" เพื่อเลือกหรือระบุ HS Code เอง รายการจะถูกย้ายไปกลุ่มที่ถูกต้องให้อัตโนมัติ</p>
+        }
 
         <div class="ih-group__items">
           @for (item of group.items; track item.id) {
@@ -95,8 +100,12 @@
               </div>
 
               <div class="ih-item__codes-row">
-                <span class="ih-item__codes">HS {{ displayHs(item).hsCode }} · พิกัด {{ displayHs(item).tariffCode }}</span>
-                <span class="ih-item__duty">ภาษี {{ displayHs(item).dutyRate }}%</span>
+                @if (displayHs(item).hsCode) {
+                  <span class="ih-item__codes">HS {{ displayHs(item).hsCode }} · พิกัด {{ displayHs(item).tariffCode }}</span>
+                  <span class="ih-item__duty">ภาษี {{ displayHs(item).dutyRate }}%</span>
+                } @else {
+                  <span class="ih-item__codes">ยังไม่ระบุ HS Code</span>
+                }
                 <span class="ih-item__conf">AI {{ displayHs(item).confidence }}%</span>
               </div>
 
@@ -155,22 +164,24 @@
           }
         </div>
 
-        <button class="ih-confirm-btn" [class.ih-confirm-btn--done]="isGroupConfirmed(group.key)"
-          [disabled]="proceeded() || isGroupConfirmed(group.key)" (click)="requestConfirmGroup(group.key)">
-          @if (isGroupConfirmed(group.key)) {
-            <lucide-icon [img]="Check" [size]="13" color="#0D8F61" />
-          } @else {
-            <lucide-icon [img]="Check" [size]="13" color="#fff" />
-          }
-          {{ isGroupConfirmed(group.key) ? 'ยืนยันแล้ว' : 'ยืนยันกลุ่มนี้ถูกต้อง' }}
-        </button>
+        @if (group.key !== '?') {
+          <button class="ih-confirm-btn" [class.ih-confirm-btn--done]="isGroupConfirmed(group.key)"
+            [disabled]="proceeded() || isGroupConfirmed(group.key)" (click)="requestConfirmGroup(group.key)">
+            @if (isGroupConfirmed(group.key)) {
+              <lucide-icon [img]="Check" [size]="13" color="#0D8F61" />
+            } @else {
+              <lucide-icon [img]="Check" [size]="13" color="#fff" />
+            }
+            {{ isGroupConfirmed(group.key) ? 'ยืนยันแล้ว' : 'ยืนยันกลุ่มนี้ถูกต้อง' }}
+          </button>
+        }
       </div>
     }
   </div>
 
   @if (!proceeded()) {
     <div class="ih-footer">
-      <span class="ih-footer__count">ยืนยันแล้ว {{ decidedCount() }} / {{ groups.length }} กลุ่ม</span>
+      <span class="ih-footer__count">ยืนยันแล้ว {{ decidedCount() }} / {{ decidableCount() }} กลุ่ม</span>
       <button class="ih-proceed-btn" [disabled]="!allDecided()" (click)="proceed()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
         ดำเนินการต่อ
@@ -187,7 +198,7 @@
 @if (confirmingGroup; as group) {
   <div class="ih-dialog__backdrop" (click)="cancelConfirmGroup()">
     <div class="ih-dialog" (click)="$event.stopPropagation()">
-      <p class="ih-dialog__title">ยืนยันกลุ่ม {{ group.key === '—' ? 'ไม่ต้องขอใบอนุญาต' : group.key }}</p>
+      <p class="ih-dialog__title">ยืนยันกลุ่ม {{ groupLabel(group.key) }}</p>
       <p class="ih-dialog__body">
         ได้ตรวจสอบพิกัด HS Code ของทุกรายการในกลุ่มนี้ ({{ group.items.length }} รายการ) ครบถ้วนแล้วใช่หรือไม่?
         หลังยืนยันจะไม่สามารถแก้ไขรายการในกลุ่มนี้ได้อีก

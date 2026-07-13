@@ -101,6 +101,21 @@ const PRODUCT_HS_ANALYSIS: ProductHsAnalysis[] = [
       { hsCode: '4819.50.00', tariffCode: '4819.50.00.001', description: 'บรรจุภัณฑ์กระดาษ/เยื่อกระดาษอื่นๆ', dutyRate: 10, confidence: 22 },
     ],
   },
+  {
+    id: 'p7', name: 'Advanced Wound Care Patch (AWC-9942X)',
+    hsCode: '', tariffCode: '', requiresPermit: false,
+    agency: '?', agencyFull: 'ยังไม่สามารถระบุได้',
+    confidence: 38, dutyRate: 0,
+    reason: 'AI ไม่สามารถระบุพิกัด HS Code ที่ตรงกับคำอธิบายสินค้าได้อย่างมั่นใจ (แผ่นแปะรักษาแผลที่มีทั้งคุณสมบัติทางการแพทย์และวัสดุสิ้นเปลืองทั่วไปปนกัน) กรุณาตรวจสอบเอกสารและระบุ HS Code ด้วยตนเอง',
+    candidates: [
+      { hsCode: '9018.90.90', tariffCode: '9018.90.90.095', description: 'เครื่องมือแพทย์สำหรับปิดแผล/วัสดุสิ้นเปลืองทางการแพทย์ควบคุม', dutyRate: 5, confidence: 52,
+        agency: 'อย.', agencyFull: 'สำนักงานคณะกรรมการอาหารและยา', requiresPermit: true, licenseType: 'เครื่องมือแพทย์' },
+      { hsCode: '3005.90.90', tariffCode: '3005.90.90.020', description: 'ผ้าพันแผล/วัสดุปิดแผลทั่วไป (ไม่ควบคุม)', dutyRate: 10, confidence: 45,
+        agency: '—', agencyFull: '—', requiresPermit: false },
+      { hsCode: '9021.39.00', tariffCode: '9021.39.00.009', description: 'วัสดุปิดแผลที่มีส่วนประกอบฝังตัว/ผ่านการฆ่าเชื้อพิเศษ', dutyRate: 0, confidence: 33,
+        agency: 'ปส.', agencyFull: 'สำนักงานปรมาณูเพื่อสันติภาพ', requiresPermit: true, licenseType: 'ผ่านการฆ่าเชื้อด้วยรังสีแกมมา' },
+    ],
+  },
 ];
 
 export function getProductHsAnalysis(): ProductHsAnalysis[] {
