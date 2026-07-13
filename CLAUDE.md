@@ -222,20 +222,27 @@ ChatService      → src/app/core/services/chat.service.ts
     saveDeclarationEditor(updated) — save writes into both formData.customsDeclaration and the
     originating message's own data (+ data.declarationComplete = true). The main item table has
     no "เลขที่ Invoice" column — every item in one session comes from a single chosen invoice
-    (see 'invoice-select' above), so repeating it per row was redundant; instead the section
-    header shows a badge with the distinct invoice number(s) found across `local.items`
-    (CustomsDeclarationEditorComponent.itemInvoiceNumbers, `.cde-sec__badge`). Besides the header +
-    per-item core-field table, the panel also has two flattened per-item sub-tables — "ข้อมูลการผลิต
+    (see 'invoice-select' above), so repeating it per row was redundant; instead it's shown once
+    as a badge in both the drawer's own header (`.cde-hd__badge`) and the item-table section
+    header (`.cde-sec__badge`) — both driven by CustomsDeclarationEditorComponent.
+    itemInvoiceNumbers (distinct invoice numbers across `local.items`, comma-joined — normally
+    just one). The main table also has a leading `#` order column (`.cde-td--order`, plain
+    `$index + 1`, not a data field) so the user can tell which row is which. Item labels
+    (itemLabel(), used by both the main table's implicit row order and the COA/เลข U group cards
+    below) default to nameEn over nameTh — some invoices only carry an English product name, so
+    falling back to TH first would leave more items unlabeled. Besides the header + per-item
+    core-field table, the panel also has two flattened per-item sub-tables — "ข้อมูลการผลิต
     / ล็อต (COA)" (CustomsDeclarationItem.productions[]: Lot No./Mfg./Exp. Date/Qty. come from the
     COA OCR read, only Measurement + Meas. Unit are required user input) and "หน่วยงานที่ออกใบอนุญาต
     (เลข U)" (CustomsDeclarationItem.authorities[]: License Number from OCR + an Agency dropdown,
-    not yet required) — grouped per item (`.cde-item-group`, one card per GoodsShipment item with
-    both mini-tables + their own "+ เพิ่ม..." button inside, no shared item-picker dropdown; option
-    [value] bindings for a select tied to [(ngModel)] must use [ngValue] instead or Angular
-    stringifies the model, breaking `===` lookups against numeric itemNumber — bit us once already
-    with the old shared dropdown), and a delete icon per row. "บันทึก" opens a confirm dialog
-    ("กรุณาตรวจสอบความถูกต้องของข้อมูลทั้งหมด...") before actually saving — "ตรวจสอบอีกครั้ง" closes
-    it with no change, confirm calls the real save
+    not yet required) — grouped per item (`.cde-item-group`, one card per GoodsShipment item,
+    each head showing a numbered order badge (`.cde-item-group__order`, itemOrder()) + itemLabel()
+    + tariffCode, then both mini-tables with their own "+ เพิ่ม..." button inside, no shared
+    item-picker dropdown; option [value] bindings for a select tied to [(ngModel)] must use
+    [ngValue] instead or Angular stringifies the model, breaking `===` lookups against numeric
+    itemNumber — bit us once already with the old shared dropdown), and a delete icon per row.
+    "บันทึก" opens a confirm dialog ("กรุณาตรวจสอบความถูกต้องของข้อมูลทั้งหมด...") before actually
+    saving — "ตรวจสอบอีกครั้ง" closes it with no change, confirm calls the real save
 QueueService     → src/app/core/services/queue.service.ts
   - open(id) seals ship.messages as isReadOnly=true before setting openId
 OcrService       → src/app/core/services/ocr.service.ts

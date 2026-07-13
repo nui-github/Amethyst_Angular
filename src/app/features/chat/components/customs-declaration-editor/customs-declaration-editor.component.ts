@@ -147,8 +147,14 @@ export class CustomsDeclarationEditorComponent {
     item.authorities = (item.authorities ?? []).filter((_, i) => i !== index);
   }
 
+  // EN name is the default label — some invoices only carry an English product name, never a
+  // Thai one, so falling back to TH first would leave those items unlabeled more often.
   itemLabel(item: CustomsDeclarationItem): string {
-    return item.nameTh || item.nameEn || `รายการที่ ${item.itemNumber}`;
+    return item.nameEn || item.nameTh || `รายการที่ ${item.itemNumber}`;
+  }
+
+  itemOrder(item: CustomsDeclarationItem): number {
+    return this.local.items.findIndex(i => i.itemNumber === item.itemNumber) + 1;
   }
 
   // ── Completion / save ────────────────────────────────────────────────────────

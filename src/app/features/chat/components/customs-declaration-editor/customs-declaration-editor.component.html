@@ -3,7 +3,12 @@
 
     <div class="cde-hd">
       <div>
-        <p class="cde-hd__title">กรอกข้อมูลเพิ่มเติม</p>
+        <p class="cde-hd__title">
+          กรอกข้อมูลเพิ่มเติม
+          @if (itemInvoiceNumbers) {
+            <span class="cde-hd__badge">Invoice {{ itemInvoiceNumbers }}</span>
+          }
+        </p>
         <p class="cde-hd__sub">ข้อมูลตามแบบฟอร์มที่ต้องยื่นต่อกรม — บางส่วนดึงมาจาก OCR ให้แล้ว ที่เหลือกรุณากรอกให้ครบ</p>
       </div>
       <button class="cde-close" (click)="close()">
@@ -39,14 +44,16 @@
           <table class="cde-table">
             <thead>
               <tr>
+                <th>#</th>
                 @for (col of itemCols; track col.key) {
                   <th>{{ col.label }} @if (col.required) { <em>*</em> }</th>
                 }
               </tr>
             </thead>
             <tbody>
-              @for (item of local.items; track item.itemNumber) {
+              @for (item of local.items; track item.itemNumber; let i = $index) {
                 <tr>
+                  <td class="cde-td--order">{{ i + 1 }}</td>
                   @for (col of itemCols; track col.key) {
                     <td [class.cde-td--missing]="isItemFieldMissing(item, col.key)">
                       <div class="cde-cell">
@@ -72,6 +79,7 @@
           @for (item of local.items; track item.itemNumber) {
             <div class="cde-item-group">
               <div class="cde-item-group__head">
+                <span class="cde-item-group__order">{{ itemOrder(item) }}</span>
                 <span class="cde-item-group__name">{{ itemLabel(item) }}</span>
                 @if (item.tariffCode) { <span class="cde-item-group__meta">พิกัด {{ item.tariffCode }}</span> }
               </div>
