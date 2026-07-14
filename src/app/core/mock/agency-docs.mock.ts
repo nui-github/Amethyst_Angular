@@ -78,6 +78,77 @@ export const AGENCY_REQUIRED_DOCS: Record<string, AgencyDoc[]> = {
       ],
     },
   ],
+  // Export-path agencies (see 'Export path' in CLAUDE.md)
+  'กรมควบคุมโรค': [
+    {
+      key: 'pathogen_permit', label: 'ใบอนุญาตนำเข้า-ส่งออกเชื้อโรคและพิษจากสัตว์', required: true,
+      hint: 'ออกโดยกรมควบคุมโรค ตาม พ.ร.บ.เชื้อโรคและพิษจากสัตว์ พ.ศ. 2558',
+      manualFields: [
+        { key: 'pathogenPermitNo',   label: 'เลขที่ใบอนุญาต', placeholder: 'เช่น กคร.-2568-000789' },
+        { key: 'pathogenPermitDate', label: 'วันที่อนุมัติ',    placeholder: 'dd/mm/yyyy' },
+      ],
+    },
+    {
+      key: 'sanitary_cert', label: 'หนังสือรับรองปลอดเชื้อ', required: true,
+      hint: 'Sanitary/Health Certificate รับรองความปลอดภัยของสารตัวอย่าง',
+      manualFields: [
+        { key: 'sanitaryCertNo',   label: 'เลขที่หนังสือรับรอง', placeholder: 'Certificate No.' },
+        { key: 'sanitaryCertDate', label: 'วันที่ออก',            placeholder: 'dd/mm/yyyy' },
+      ],
+    },
+    {
+      key: 'coa', label: 'Certificate of Analysis (COA)', required: false,
+      hint: 'ผลการวิเคราะห์คุณภาพชุดน้ำยา/สารตัวอย่าง (ถ้ามี)',
+      manualFields: [
+        { key: 'coaBatch',    label: 'Batch No.', placeholder: 'เช่น BIO-2568-014' },
+        { key: 'coaTestDate', label: 'วันที่ทดสอบ', placeholder: 'dd/mm/yyyy' },
+      ],
+    },
+  ],
+  'เชื้อเพลิง': [
+    {
+      key: 'fuel_business_permit', label: 'ใบอนุญาตประกอบกิจการควบคุมประเภทที่ 3', required: true,
+      hint: 'ออกโดยกรมธุรกิจพลังงาน ตาม พ.ร.บ.ควบคุมน้ำมันเชื้อเพลิง พ.ศ. 2542',
+      manualFields: [
+        { key: 'fuelPermitNo',   label: 'เลขที่ใบอนุญาต', placeholder: 'เช่น ธพ.-2568-000456' },
+        { key: 'fuelPermitDate', label: 'วันที่อนุมัติ',    placeholder: 'dd/mm/yyyy' },
+      ],
+    },
+    {
+      key: 'fuel_quality_cert', label: 'หนังสือรับรองคุณภาพน้ำมันเชื้อเพลิง', required: true,
+      hint: 'ระบุชนิด/คุณสมบัติของน้ำมันที่ส่งออก',
+      manualFields: [
+        { key: 'fuelQualityNo',   label: 'เลขที่หนังสือรับรอง', placeholder: 'Certificate No.' },
+        { key: 'fuelQualityDate', label: 'วันที่ออก',            placeholder: 'dd/mm/yyyy' },
+      ],
+    },
+  ],
+  'การยาง': [
+    {
+      key: 'rubber_trade_permit', label: 'ใบอนุญาตค้ายาง', required: true,
+      hint: 'ออกโดยการยางแห่งประเทศไทย ตาม พ.ร.บ.ควบคุมยาง พ.ศ. 2542',
+      manualFields: [
+        { key: 'rubberPermitNo',   label: 'เลขที่ใบอนุญาต', placeholder: 'เช่น กยท.-2568-000321' },
+        { key: 'rubberPermitDate', label: 'วันที่อนุมัติ',    placeholder: 'dd/mm/yyyy' },
+      ],
+    },
+    {
+      key: 'rubber_quality_cert', label: 'ใบรับรองคุณภาพยาง', required: true,
+      hint: 'ระบุชั้นคุณภาพยาง (เช่น RSS3) และผลตรวจสอบ',
+      manualFields: [
+        { key: 'rubberQualityNo',   label: 'เลขที่ใบรับรอง', placeholder: 'Certificate No.' },
+        { key: 'rubberQualityDate', label: 'วันที่ออก',       placeholder: 'dd/mm/yyyy' },
+      ],
+    },
+    {
+      key: 'origin', label: 'หนังสือรับรองแหล่งกำเนิดสินค้า', required: false,
+      hint: 'Certificate of Origin (C/O) — ตามที่ประเทศปลายทางกำหนด',
+      manualFields: [
+        { key: 'originNo',   label: 'เลขที่ C/O',      placeholder: 'Certificate No.' },
+        { key: 'originDate', label: 'วันที่ออกเอกสาร', placeholder: 'dd/mm/yyyy' },
+      ],
+    },
+  ],
   'multi': [
     {
       key: 'license_app', label: 'คำขออนุญาตนำเข้า', required: true,

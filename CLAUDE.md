@@ -462,10 +462,43 @@ additive things were needed, no forking:
   - AGENCY_DESC (chat.service.ts, used by the "เลือกกรม" choice-card) gained the 3 export agencies'
     full names too, so that step also needed zero new logic — it already builds its options list
     generically from whatever `ALL_AGENCIES` item-hs-analysis confirmation produced.
-  - NOT YET WIRED: export agency-docs upload + payment config (step 3 — agency-upload's document
-    slots are still import-shaped, only reachable via the invoice-first path's pendingAfterFlow=
-    'agency-docs' branch; the customs-first path used for step 2's live verification never reaches
-    it), submit/status copy (step 4).
+
+### Export path — Step 3: agency-docs upload, payment, submit/status
+Agency-upload was already fully generic (AgencyUploadComponent's `agency` @Input just calls
+getAgencyDocs(val), with a '—' fallback for any unknown code) and payment/fee display already
+generically calls getAgencyPayment(this.currentAgency) (populated for all 3 export agencies back
+in step 2) — so most of this step was just adding real mock data, not new logic:
+  - agency-docs.mock.ts gained 3 new AGENCY_REQUIRED_DOCS entries: 'กรมควบคุมโรค' (ใบอนุญาตนำเข้า-
+    ส่งออกเชื้อโรคและพิษจากสัตว์ + หนังสือรับรองปลอดเชื้อ, required; COA optional), 'เชื้อเพลิง'
+    (ใบอนุญาตประกอบกิจการควบคุมประเภทที่ 3 + หนังสือรับรองคุณภาพน้ำมันเชื้อเพลิง, both required),
+    'การยาง' (ใบอนุญาตค้ายาง + ใบรับรองคุณภาพยาง, both required; หนังสือรับรองแหล่งกำเนิดสินค้า
+    optional) — mirrors the doc research summarized earlier in this file's export-path planning.
+  - The generic "กรุณาอัปโหลดเอกสารประกอบที่${agency}ต้องการครับ" hint text used to end with a
+    hardcoded "เช่น ใบรับรอง GMP, COA" example that only made sense for import agencies — dropped
+    it since agency-upload's own card already lists the exact per-agency requirements right below.
+  - Two real bugs found and fixed while walking the invoice-first export path end to end:
+    1. continueAfterOCR()'s isAgencyDocsUpload branch (chat.service.ts) always set
+       formData.selectedItems from the import-only getInvoiceLineItems()/INVOICE_ITEMS_DECLARATION
+       mock regardless of direction — form-preview showed Amoxicillin/Clavulanic Acid items on an
+       export session. Now branches on direction(): export uses
+       mapExportItemsToInvoiceLineItems(getExportProductClassification()) (every export item, same
+       "whole invoice is the request" convention as import) with no extra customsDeclaration merge
+       needed since the export items' own records already came in via the export OCR passes.
+    2. finalizeSubmit() (chat.service.ts) hardcoded `type: 'IMP'` on every submitted Shipment —
+       Shipment.type: 'IMP'|'EXP' already existed and the queue page (permitDirectionLabel(),
+       .permit-type-tag--exp) already fully supported 'EXP', it just was never set. Now reads
+       `fd.direction === 'export' ? 'EXP' : 'IMP'` — verified live: submitted export shipment shows
+       the "ขาออก" tag in the queue.
+  - Verified live end-to-end on the invoice-first export path: item classification → เลือกกรม
+    (เชื้อเพลิง) → profile → agency-upload showing the fuel-specific doc slots → 2nd (gated) OCR
+    pass → declaration-editor save → form-preview (all 4 correct export items) → submit → status
+    card showing the correct ฿600 fuel fee and "ขอใบอนุญาตเพิ่ม" listing the remaining agencies
+    (การยาง, กรมควบคุมโรค) → queue page showing the shipment tagged "ขาออก". Import path re-walked
+    invoice-first end to end too, unaffected.
+  - NOT YET WIRED: export-specific submit/status copy polish (step 4) — the status-card/queue
+    copy is already direction-agnostic enough to read correctly as-is (verified above), so step 4
+    is now mostly about auditing wording across the less-common branches (edit/resubmit, "ขอใบ
+    อนุญาตเพิ่ม" repeat-agency flow, queue detail panel) rather than new plumbing.
 
 import-license-menu → 2 choices (chooseFullUpload()/full-upload card removed from menu, method still exists unused):
   ├─ chooseCustomsDocs()   → single-upload → OCR → item-hs-analysis (shared getProductHsAnalysis() dataset)

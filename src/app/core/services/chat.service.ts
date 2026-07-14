@@ -534,14 +534,23 @@ export class ChatService {
       this.isAgencyDocsUpload = false;
       this.checkMissingAfterFlags = true;   // invoice path: check missing fields after flags confirmed
       // No separate item-selection step — every line item on the uploaded invoice is the request.
-      // These items are a different shipment from the shared medical-device customsDeclaration
-      // (itemNumber 1-6), so their own CustomsDeclarationItem records (101-104) merge in alongside
-      // it rather than replacing it — form-preview's item modal can then show the full schema too.
-      this.formData.update(f => ({
-        ...f,
-        selectedItems: getInvoiceLineItems(this.formData().invoiceNo),
-        customsDeclaration: mergeCustomsDeclaration(f.customsDeclaration, { items: INVOICE_ITEMS_DECLARATION }),
-      }));
+      if (this.direction() === 'export') {
+        // Export items' own CustomsDeclarationItem records (itemNumber 1-4) already came in via
+        // the export OCR passes — no extra merge needed, unlike the import mock below.
+        this.formData.update(f => ({
+          ...f,
+          selectedItems: mapExportItemsToInvoiceLineItems(getExportProductClassification()),
+        }));
+      } else {
+        // These items are a different shipment from the shared medical-device customsDeclaration
+        // (itemNumber 1-6), so their own CustomsDeclarationItem records (101-104) merge in alongside
+        // it rather than replacing it — form-preview's item modal can then show the full schema too.
+        this.formData.update(f => ({
+          ...f,
+          selectedItems: getInvoiceLineItems(this.formData().invoiceNo),
+          customsDeclaration: mergeCustomsDeclaration(f.customsDeclaration, { items: INVOICE_ITEMS_DECLARATION }),
+        }));
+      }
       this.withTyping(() => this.afterFlagsConfirmed(), 600);
       return;
     }
@@ -638,7 +647,7 @@ export class ChatService {
     if (this.pendingAfterFlow === 'agency-docs') {
       // Invoice path: show agency-upload
       this.withTyping(() => {
-        this.bot('text', undefined, `กรุณาอัปโหลดเอกสารประกอบที่${agency}ต้องการครับ เช่น ใบรับรอง GMP, COA`);
+        this.bot('text', undefined, `กรุณาอัปโหลดเอกสารประกอบที่${agency}ต้องการครับ`);
         setTimeout(() => this.withTyping(() => {
           this.isAgencyDocsUpload = true;
           this.bot('agency-upload', { agency });
@@ -1023,7 +1032,7 @@ export class ChatService {
     const shipment: Shipment = {
       id: genId(), chatName, isNew: false,
       hthmRef: fd.ref?.startsWith('HTHM') ? fd.ref : undefined,
-      customsNo: refNo, type: 'IMP',
+      customsNo: refNo, type: fd.direction === 'export' ? 'EXP' : 'IMP',
       customer: fd.importer ?? '', contact: '', contactEmail: '',
       goods: fd.goodsDesc ?? fd.hsCode ?? '', hs: fd.hsCode ?? '',
       origin: fd.countryOrigin ?? '', importedAt: new Date().toLocaleString('th-TH'), createdAt: Date.now(),
