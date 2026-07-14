@@ -33,6 +33,26 @@
     transform: translateY(-1px);
   }
 
+  &--selected {
+    border-color: var(--bizx-blue);
+    background: rgba(4, 99, 239, 0.05);
+    cursor: default;
+    transform: none !important;
+    box-shadow: 0 2px 10px rgba(4, 99, 239, 0.12);
+
+    .doc-card__title { color: var(--bizx-blue); }
+    .doc-card__chev { color: var(--bizx-blue); }
+  }
+
+  &--faded {
+    opacity: 0.38;
+    cursor: default;
+    transform: none !important;
+    box-shadow: none !important;
+    border-color: #E8EAF2 !important;
+    background: #FAFAFA !important;
+  }
+
   &__icon {
     width: 44px;
     height: 44px;
