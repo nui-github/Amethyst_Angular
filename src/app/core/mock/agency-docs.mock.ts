@@ -10,6 +10,7 @@ export interface AgencyDoc {
   hint: string;
   required: boolean;
   manualFields: ManualField[];
+  multiple?: boolean;
 }
 
 export const AGENCY_REQUIRED_DOCS: Record<string, AgencyDoc[]> = {
@@ -79,26 +80,11 @@ export const AGENCY_REQUIRED_DOCS: Record<string, AgencyDoc[]> = {
     },
   ],
   // Export-path agencies (see 'Export path' in CLAUDE.md)
+  // กรมควบคุมโรค only needs COA — the pathogen-permit/sanitary-cert docs are collected elsewhere
   'กรมควบคุมโรค': [
     {
-      key: 'pathogen_permit', label: 'ใบอนุญาตนำเข้า-ส่งออกเชื้อโรคและพิษจากสัตว์', required: true,
-      hint: 'ออกโดยกรมควบคุมโรค ตาม พ.ร.บ.เชื้อโรคและพิษจากสัตว์ พ.ศ. 2558',
-      manualFields: [
-        { key: 'pathogenPermitNo',   label: 'เลขที่ใบอนุญาต', placeholder: 'เช่น กคร.-2568-000789' },
-        { key: 'pathogenPermitDate', label: 'วันที่อนุมัติ',    placeholder: 'dd/mm/yyyy' },
-      ],
-    },
-    {
-      key: 'sanitary_cert', label: 'หนังสือรับรองปลอดเชื้อ', required: true,
-      hint: 'Sanitary/Health Certificate รับรองความปลอดภัยของสารตัวอย่าง',
-      manualFields: [
-        { key: 'sanitaryCertNo',   label: 'เลขที่หนังสือรับรอง', placeholder: 'Certificate No.' },
-        { key: 'sanitaryCertDate', label: 'วันที่ออก',            placeholder: 'dd/mm/yyyy' },
-      ],
-    },
-    {
-      key: 'coa', label: 'Certificate of Analysis (COA)', required: false,
-      hint: 'ผลการวิเคราะห์คุณภาพชุดน้ำยา/สารตัวอย่าง (ถ้ามี)',
+      key: 'coa', label: 'Certificate of Analysis (COA)', required: true, multiple: true,
+      hint: 'ผลการวิเคราะห์คุณภาพชุดน้ำยา/สารตัวอย่าง — อัปโหลดได้มากกว่า 1 ไฟล์',
       manualFields: [
         { key: 'coaBatch',    label: 'Batch No.', placeholder: 'เช่น BIO-2568-014' },
         { key: 'coaTestDate', label: 'วันที่ทดสอบ', placeholder: 'dd/mm/yyyy' },

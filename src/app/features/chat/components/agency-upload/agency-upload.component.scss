@@ -92,6 +92,13 @@
   &:hover { background: rgba(4, 99, 239, 0.06); }
 }
 
+.au-file-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
 .au-file-row {
   display: flex;
   align-items: center;

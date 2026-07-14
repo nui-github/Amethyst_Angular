@@ -6,7 +6,7 @@ import { AgencyDoc, getAgencyDocs } from '@mock/agency-docs.mock';
 
 interface DocSlot {
   doc: AgencyDoc;
-  file: File | null;
+  files: File[];
   dragging: boolean;
 }
 
@@ -24,7 +24,7 @@ interface DocSlot {
 
       <div class="au-slots">
         @for (slot of slots; track slot.doc.key) {
-          <div class="au-slot" [class.au-slot--filled]="!!slot.file" [class.au-slot--drag]="slot.dragging">
+          <div class="au-slot" [class.au-slot--filled]="slot.files.length > 0" [class.au-slot--drag]="slot.dragging">
 
             <div class="au-slot__head">
               <span class="au-slot__label">{{ slot.doc.label }}</span>
@@ -33,8 +33,25 @@ interface DocSlot {
             </div>
             <p class="au-slot__hint">{{ slot.doc.hint }}</p>
 
-            <!-- Upload zone -->
-            @if (!slot.file) {
+            @if (slot.files.length > 0) {
+              <div class="au-file-list">
+                @for (f of slot.files; track f.name + f.size; let i = $index) {
+                  <div class="au-file-row">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0D8F61" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <span class="au-file-name">{{ f.name }}</span>
+                    <span class="au-file-size">{{ formatSize(f.size) }}</span>
+                    @if (!submitted()) {
+                      <button class="au-clear" (click)="removeFile(slot, i)">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Upload zone: shown until filled (single) or always (multiple, to add more) — hidden once submitted -->
+            @if (!submitted() && (slot.files.length === 0 || slot.doc.multiple)) {
               <label class="au-drop" [for]="'au_' + slot.doc.key"
                 [class.au-drop--drag]="slot.dragging"
                 (dragover)="onDragOver($event, slot)" (dragleave)="slot.dragging = false; cdr.detectChanges()"
@@ -44,19 +61,10 @@ interface DocSlot {
                   <polyline points="17 8 12 3 7 8"/>
                   <line x1="12" y1="3" x2="12" y2="15"/>
                 </svg>
-                <span>คลิกหรือลากไฟล์</span>
-                <input [id]="'au_' + slot.doc.key" type="file" accept=".pdf,.jpg,.jpeg,.png"
+                <span>{{ slot.files.length > 0 ? 'คลิกหรือลากไฟล์เพิ่ม' : 'คลิกหรือลากไฟล์' }}</span>
+                <input [id]="'au_' + slot.doc.key" type="file" accept=".pdf,.jpg,.jpeg,.png" [multiple]="!!slot.doc.multiple"
                   style="display:none" (change)="onFileChange($event, slot)" />
               </label>
-            } @else {
-              <div class="au-file-row">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0D8F61" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                <span class="au-file-name">{{ slot.file.name }}</span>
-                <span class="au-file-size">{{ formatSize(slot.file.size) }}</span>
-                <button class="au-clear" (click)="clearSlot(slot)">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
-                </button>
-              </div>
             }
 
           </div>
@@ -76,7 +84,7 @@ interface DocSlot {
 export class AgencyUploadComponent {
   @Input() set agency(val: string) {
     this._agency = val;
-    this.slots = getAgencyDocs(val).map(doc => ({ doc, file: null, dragging: false }));
+    this.slots = getAgencyDocs(val).map(doc => ({ doc, files: [], dragging: false }));
     this.cdr.detectChanges();
   }
   get agency(): string { return this._agency; }
@@ -86,11 +94,12 @@ export class AgencyUploadComponent {
   readonly cdr       = inject(ChangeDetectorRef);
   readonly submitted = signal(false);
 
-  slots: DocSlot[] = getAgencyDocs('อย.').map(doc => ({ doc, file: null, dragging: false }));
+  slots: DocSlot[] = getAgencyDocs('อย.').map(doc => ({ doc, files: [], dragging: false }));
 
   onFileChange(event: Event, slot: DocSlot): void {
-    const f = (event.target as HTMLInputElement).files?.[0] ?? null;
-    slot.file = f;
+    const picked = Array.from((event.target as HTMLInputElement).files ?? []);
+    if (!picked.length) return;
+    slot.files = slot.doc.multiple ? [...slot.files, ...picked] : [picked[0]];
     this.cdr.detectChanges();
   }
 
@@ -103,17 +112,19 @@ export class AgencyUploadComponent {
   onDrop(event: DragEvent, slot: DocSlot): void {
     event.preventDefault();
     slot.dragging = false;
-    const f = event.dataTransfer?.files?.[0] ?? null;
-    if (f) { slot.file = f; this.cdr.detectChanges(); }
+    const dropped = Array.from(event.dataTransfer?.files ?? []);
+    if (!dropped.length) return;
+    slot.files = slot.doc.multiple ? [...slot.files, ...dropped] : [dropped[0]];
+    this.cdr.detectChanges();
   }
 
-  clearSlot(slot: DocSlot): void {
-    slot.file = null;
+  removeFile(slot: DocSlot, index: number): void {
+    slot.files = slot.files.filter((_, i) => i !== index);
     this.cdr.detectChanges();
   }
 
   hasRequiredData(): boolean {
-    return this.slots.filter(s => s.doc.required).every(s => !!s.file);
+    return this.slots.filter(s => s.doc.required).every(s => s.files.length > 0);
   }
 
   formatSize(bytes: number): string {
@@ -126,7 +137,7 @@ export class AgencyUploadComponent {
     if (!this.hasRequiredData() || this.submitted()) return;
     this.submitted.set(true);
     this.cdr.detectChanges();
-    const files = this.slots.filter(s => !!s.file).map(s => s.file!);
+    const files = this.slots.flatMap(s => s.files);
     this.chat.startOCR(files);
   }
 }
