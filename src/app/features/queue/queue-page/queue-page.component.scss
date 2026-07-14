@@ -1484,7 +1484,6 @@
   flex-direction: column;
   gap: 6px;
   padding-top: 12px;
-  margin-bottom: 14px;
   border-top: 1px solid #D1FAE5;
 }
 
@@ -1493,6 +1492,20 @@
   font-weight: 600;
   color: #065F46;
   margin: 0 0 2px;
+}
+
+// Simplified palette for doc rows inside the green ผลการยื่น card — the shared .dv-doc-row/
+// .dv-doc-view (red PDF icon, gray outline button) is tuned for the white uploaded-documents
+// card and clashes here.
+.dv-doc-row--plain {
+  background: #fff;
+  border-color: rgba(13, 143, 97, 0.2);
+}
+
+.dv-doc-view--plain {
+  border-color: rgba(13, 143, 97, 0.3);
+  color: #0D8F61;
+  &:hover { border-color: #0D8F61; background: rgba(13, 143, 97, 0.06); }
 }
 
 .dv-result-actions {

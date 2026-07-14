@@ -453,38 +453,40 @@
                   }
                 </div>
 
-                <!-- Documents the department sent back (QR-payment pink-form flow only) -->
+                <!-- Documents the department sent back (QR-payment pink-form flow only) — pink
+                     form's actual deliverable IS these files, so พิมพ์/ดาวน์โหลดใบอนุญาต below
+                     don't apply and are skipped for it. -->
                 @if (openShipment()!.returnedDocuments?.length) {
                   <div class="dv-result-docs">
                     <p class="dv-result-docs__label">เอกสารที่ได้รับจากกรม ({{ openShipment()!.returnedDocuments!.length }} ไฟล์)</p>
                     @for (d of openShipment()!.returnedDocuments!; track d.id) {
-                      <div class="dv-doc-row">
+                      <div class="dv-doc-row dv-doc-row--plain">
                         <div class="dv-doc-icon">
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0D8F61" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
                         </div>
                         <span class="dv-doc-name">{{ d.name }}</span>
                         @if (d.uploadedAt) {
                           <span class="dv-doc-date">{{ d.uploadedAt }}</span>
                         }
-                        <button class="dv-doc-view" (click)="openDoc(d.url)">
+                        <button class="dv-doc-view dv-doc-view--plain" (click)="openDoc(d.url)">
                           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                           ดาวน์โหลด
                         </button>
                       </div>
                     }
                   </div>
+                } @else {
+                  <div class="dv-result-actions">
+                    <button class="dv-result-btn dv-result-btn--outline" (click)="printLicense(openShipment()!)">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                      พิมพ์ใบอนุญาต
+                    </button>
+                    <button class="dv-result-btn dv-result-btn--primary" (click)="downloadLicense(openShipment()!)">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                      ดาวน์โหลดใบอนุญาต
+                    </button>
+                  </div>
                 }
-
-                <div class="dv-result-actions">
-                  <button class="dv-result-btn dv-result-btn--outline" (click)="printLicense(openShipment()!)">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-                    พิมพ์ใบอนุญาต
-                  </button>
-                  <button class="dv-result-btn dv-result-btn--primary" (click)="downloadLicense(openShipment()!)">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    ดาวน์โหลดใบอนุญาต
-                  </button>
-                </div>
               </div>
             }
 
