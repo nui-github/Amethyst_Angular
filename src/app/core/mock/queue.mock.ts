@@ -13,10 +13,14 @@ const doc = (
 
 export const AGENCY_LABEL: Record<AgencyKey, string> = {
   dld: 'กรมปศุสัตว์', fda: 'อย.', dft: 'กรมการค้าต่างประเทศ',
-  doa: 'กษ.', diw: 'วอ.', none: 'ไม่ระบุ',
+  doa: 'กษ.', diw: 'วอ.',
+  ddc: 'กรมควบคุมโรค', doeb: 'กรมธุรกิจพลังงาน', raot: 'การยางแห่งประเทศไทย',
+  none: 'ไม่ระบุ',
 };
 export const AGENCY_SHORT: Record<AgencyKey, string> = {
-  dld: 'ปศ.', fda: 'อย.', dft: 'กค.', doa: 'กษ.', diw: 'วอ.', none: '—',
+  dld: 'ปศ.', fda: 'อย.', dft: 'กค.', doa: 'กษ.', diw: 'วอ.',
+  ddc: 'DDC', doeb: 'DOEB', raot: 'RAOT',
+  none: '—',
 };
 
 export const STATUS_META: Record<ShipmentStatus, { label: string; bg: string; text: string; dot: string }> = {
@@ -808,11 +812,11 @@ export const MOCK_QUEUE: Shipment[] = [
     customer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', contact: 'คุณพิมพ์ชนก ส่งดี',
     contactEmail: 'pimchanok@siamagriexport.co.th',
     origin: 'ไทย (TH)', importedAt: '10:05 น. วันนี้', createdAt: NOW - 4 * 3600_000, owner: 'ปวีณา ส.',
-    agency: 'fda', permitNeeded: true, formCode: 'Pink Form',
+    agency: 'ddc', permitNeeded: true, formCode: 'Pink Form',
     formName: 'คำขออนุญาตส่งออกเชื้อโรคและพิษจากสัตว์ (Pink Form) — กรมควบคุมโรค',
     conf: 84, stage: 7, statusKey: 'submitted',
     assess: { conf: 84, reason: 'บรรจุสารเชื้อโรคอ้างอิง (reference pathogen material) อยู่ภายใต้ พ.ร.บ.เชื้อโรคและพิษจากสัตว์ พ.ศ. 2558 ต้องขอใบอนุญาตจากกรมควบคุมโรคก่อนส่งออก' },
-    classify: { agency: 'fda', conf: 84, reason: '', alt: [] },
+    classify: { agency: 'ddc', conf: 84, reason: '', alt: [] },
     draft: { fields: [] },
     flags: [],
     audit: [
@@ -847,7 +851,7 @@ export const MOCK_QUEUE: Shipment[] = [
       t('10:20', 'bot', 'status-card', undefined, {
         refNo: 'RG-2568-82300', customsRef: 'EXPINV0009',
         submittedAt: new Date(Date.now() - 4 * 3600_000).toLocaleDateString('th-TH'), isPending: false,
-        agency: 'กรมควบคุมโรค',
+        agency: 'กรมควบคุมโรค', feeNote: 'ค่าธรรมเนียมกรม ฿1,000 (ชำระผ่าน QR แล้ว)',
       }),
       bot('10:32', 'กรมควบคุมโรคตรวจสอบและอนุมัติคำขอแล้วครับ ✅'),
       t('10:33', 'bot', 'payment-qr', undefined, {
@@ -866,10 +870,122 @@ export const MOCK_QUEUE: Shipment[] = [
       doc('d13a', 'Invoice EXPINV0009', 'invoice'),
       doc('d13b', 'DDC_PINKFORM_V2.0.pdf', 'coa'),
     ],
+    returnedDocuments: [
+      doc('d13r1', 'ใบรับรองฯ (DDCPINKFORM)', 'other', 'pdf', 'ddc', '14/7/2569 10:35'),
+      doc('d13r2', 'ใบรับรองฯ (DDCPINKFORM PDF)', 'other', 'pdf', 'ddc', '14/7/2569 10:35'),
+      doc('d13r3', 'ใบเสร็จรับเงิน (DDCERECEIPT PDF)', 'other', 'pdf', 'ddc', '14/7/2569 10:35'),
+    ],
     itemsSelected: true,
     items: [
       { id: 'i13', name: 'Pathogen Diagnostic Reagent Kit', hsCode: '3822.00.00', origin: 'ไทย (TH)', quantity: '500', unit: 'กล่อง', lotNo: 'BIO-2568-014', amount: 533600,
         detail: { lotNo: 'BIO-2568-014', mfgDate: '10-05-2568', expDate: '10-05-2570', measurement: '500', measUnit: 'กล่อง', qty: '25', qtyUnit: 'CTN' } },
+    ],
+  },
+
+  // ── 14. needs_you (EXP): Diphtheria Antitoxin – ขาออก pink form กรมควบคุมโรค (รอแนบเอกสาร) ──
+  {
+    id: 'EXP-68-014002', customsNo: 'HLTH000000014', hthmRef: 'HTHM000000014',
+    isNew: true, type: 'EXP',
+    goods: 'Diphtheria Antitoxin (เซรุ่มแก้พิษคอตีบ)', hs: '3002.12.00',
+    customer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', contact: 'คุณพิมพ์ชนก ส่งดี',
+    contactEmail: 'pimchanok@siamagriexport.co.th',
+    origin: 'ไทย (TH)', importedAt: '13:20 น. วันนี้', createdAt: NOW - 1 * 3600_000, owner: 'ปวีณา ส.',
+    agency: 'ddc', permitNeeded: true, formCode: 'Pink Form',
+    formName: 'คำขออนุญาตส่งออกเชื้อโรคและพิษจากสัตว์ (Pink Form) — กรมควบคุมโรค',
+    conf: 88, stage: 4, statusKey: 'needs_you',
+    assess: { conf: 88, reason: 'เซรุ่มแก้พิษ (antitoxin) จัดเป็นพิษจากสัตว์ อยู่ภายใต้ พ.ร.บ.เชื้อโรคและพิษจากสัตว์ พ.ศ. 2558 ต้องขอใบอนุญาตจากกรมควบคุมโรคก่อนส่งออก' },
+    classify: { agency: 'ddc', conf: 88, reason: '', alt: [] },
+    draft: { fields: [] },
+    flags: [],
+    audit: [
+      { time: '13:20', text: 'อัปโหลดใบ Invoice EXPINV0011 เข้าระบบแล้ว', by: 'ระบบ' },
+      { time: '13:23', text: 'OCR สำเร็จ', by: 'AI' },
+      { time: '13:25', text: 'วิเคราะห์ HS Code: 3002.12.00 → กรมควบคุมโรค (88%)', by: 'AI' },
+      { time: '13:26', text: 'รอแนบ Certificate of Analysis (COA)', by: 'AI' },
+    ],
+    messages: [
+      bot('13:20', 'อัปโหลดใบ Invoice EXPINV0011 เข้าระบบแล้วครับ — Diphtheria Antitoxin 200 กล่อง จากไทย ส่งออกไปเวียดนาม'),
+      t('13:23', 'bot', 'ocr-results', undefined, {
+        invoiceNo: 'EXPINV0011', invoiceDate: '14/07/2025', quantity: '200 กล่อง',
+        importer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', port: 'ท่าเรือแหลมฉบัง (LCH)',
+        hsCode: '3002.12.00', countryOrigin: 'ไทย (TH)', lotNo: 'BIO-2568-021', uNo: '',
+      }),
+      t('13:25', 'bot', 'hs-analysis', undefined, {
+        hsCode: '3002.12.00', goodsName: 'Diphtheria Antitoxin (เซรุ่มแก้พิษคอตีบ)',
+        description: 'เซรุ่มแก้พิษ (antitoxin) จัดเป็นพิษจากสัตว์ อยู่ภายใต้ พ.ร.บ.เชื้อโรคและพิษจากสัตว์ พ.ศ. 2558 ต้องขอใบอนุญาตจากกรมควบคุมโรคก่อนส่งออก',
+        requiresPermit: true, direction: 'export', agency: 'กรมควบคุมโรค', agencyFull: 'กรมควบคุมโรค (DDC)',
+        licenseType: 'Pink Form', confidence: 88,
+      }),
+      t('13:26', 'bot', 'agency-upload', undefined, {
+        agency: 'กรมควบคุมโรค', agencyLabel: 'กรมควบคุมโรค (DDC)',
+        slots: [
+          { id: 's1', label: 'Certificate of Analysis (COA)', required: true },
+        ],
+      }),
+    ],
+    documents: [
+      doc('d14a', 'Invoice EXPINV0011', 'invoice'),
+    ],
+    itemsSelected: true,
+    items: [
+      { id: 'i14', name: 'Diphtheria Antitoxin', hsCode: '3002.12.00', origin: 'ไทย (TH)', quantity: '200', unit: 'กล่อง', lotNo: 'BIO-2568-021', amount: 214000 },
+    ],
+  },
+
+  // ── 15. submitted (EXP): Botulinum Antitoxin – ขาออก pink form กรมควบคุมโรค (รออนุมัติ/ชำระ) ──
+  {
+    id: 'EXP-68-015003', customsNo: 'HLTH000000015', hthmRef: 'HTHM000000015',
+    isNew: false, type: 'EXP',
+    goods: 'Botulinum Antitoxin (เซรุ่มแก้พิษโบทูลิซึม)', hs: '3002.12.00',
+    customer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', contact: 'คุณพิมพ์ชนก ส่งดี',
+    contactEmail: 'pimchanok@siamagriexport.co.th',
+    origin: 'ไทย (TH)', importedAt: '08:40 น. เมื่อวาน', createdAt: NOW - 20 * 3600_000, owner: 'ปวีณา ส.',
+    agency: 'ddc', permitNeeded: true, formCode: 'Pink Form',
+    formName: 'คำขออนุญาตส่งออกเชื้อโรคและพิษจากสัตว์ (Pink Form) — กรมควบคุมโรค',
+    conf: 90, stage: 7, statusKey: 'submitted',
+    assess: { conf: 90, reason: 'เซรุ่มแก้พิษโบทูลิซึม จัดเป็นพิษจากสัตว์ อยู่ภายใต้ พ.ร.บ.เชื้อโรคและพิษจากสัตว์ พ.ศ. 2558 ต้องขอใบอนุญาตจากกรมควบคุมโรคก่อนส่งออก' },
+    classify: { agency: 'ddc', conf: 90, reason: '', alt: [] },
+    draft: { fields: [] },
+    flags: [],
+    audit: [
+      { time: '08:40', text: 'อัปโหลดใบ Invoice EXPINV0012 เข้าระบบแล้ว', by: 'ระบบ' },
+      { time: '08:43', text: 'OCR สำเร็จ', by: 'AI' },
+      { time: '08:45', text: 'วิเคราะห์ HS Code: 3002.12.00 → กรมควบคุมโรค (90%)', by: 'AI' },
+      { time: '08:50', text: 'แนบ Certificate of Analysis (COA) แล้ว', by: 'ปวีณา ส.' },
+      { time: '08:55', text: 'ยื่นกรมควบคุมโรค สำเร็จ (Pink Form)', by: 'ระบบ' },
+    ],
+    messages: [
+      bot('08:40', 'อัปโหลดใบ Invoice EXPINV0012 เข้าระบบแล้วครับ — Botulinum Antitoxin 80 กล่อง จากไทย ส่งออกไปเมียนมา'),
+      t('08:43', 'bot', 'ocr-results', undefined, {
+        invoiceNo: 'EXPINV0012', invoiceDate: '13/07/2025', quantity: '80 กล่อง',
+        importer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', port: 'ท่าเรือแหลมฉบัง (LCH)',
+        hsCode: '3002.12.00', countryOrigin: 'ไทย (TH)', lotNo: 'BIO-2568-019', uNo: '',
+      }),
+      t('08:45', 'bot', 'hs-analysis', undefined, {
+        hsCode: '3002.12.00', goodsName: 'Botulinum Antitoxin (เซรุ่มแก้พิษโบทูลิซึม)',
+        description: 'เซรุ่มแก้พิษโบทูลิซึม จัดเป็นพิษจากสัตว์ อยู่ภายใต้ พ.ร.บ.เชื้อโรคและพิษจากสัตว์ พ.ศ. 2558 ต้องขอใบอนุญาตจากกรมควบคุมโรคก่อนส่งออก',
+        requiresPermit: true, direction: 'export', agency: 'กรมควบคุมโรค', agencyFull: 'กรมควบคุมโรค (DDC)',
+        licenseType: 'Pink Form', confidence: 90,
+      }),
+      t('08:50', 'bot', 'agency-upload', undefined, {
+        agency: 'กรมควบคุมโรค', agencyLabel: 'กรมควบคุมโรค (DDC)',
+        slots: [
+          { id: 's1', label: 'Certificate of Analysis (COA)', required: true },
+        ],
+      }),
+      t('08:55', 'bot', 'status-card', undefined, {
+        refNo: 'RG-2568-73100', customsRef: 'EXPINV0012',
+        submittedAt: new Date(Date.now() - 20 * 3600_000).toLocaleDateString('th-TH'), isPending: false,
+        agency: 'กรมควบคุมโรค', feeNote: 'ค่าธรรมเนียมกรม ฿1,000 (รอกรมตรวจสอบและแจ้งชำระ)',
+      }),
+    ],
+    documents: [
+      doc('d15a', 'Invoice EXPINV0012', 'invoice'),
+      doc('d15b', 'DDC_PINKFORM_V1.0.pdf', 'coa'),
+    ],
+    itemsSelected: true,
+    items: [
+      { id: 'i15', name: 'Botulinum Antitoxin', hsCode: '3002.12.00', origin: 'ไทย (TH)', quantity: '80', unit: 'กล่อง', lotNo: 'BIO-2568-019', amount: 214400 },
     ],
   },
 ];

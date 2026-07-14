@@ -472,7 +472,9 @@ export interface SPNEntry {
 
 // ─── Queue / Shipment ────────────────────────────────────────────────────────
 
-export type AgencyKey = 'dld' | 'fda' | 'dft' | 'doa' | 'diw' | 'none';
+// dld/fda/dft/doa/diw are import-side agencies; ddc/doeb/raot are the export-side agencies added
+// for the ขาออก pink-form flow (see ChatService.QR_PAYMENT_AGENCIES) — กรมควบคุมโรค/เชื้อเพลิง/การยาง.
+export type AgencyKey = 'dld' | 'fda' | 'dft' | 'doa' | 'diw' | 'ddc' | 'doeb' | 'raot' | 'none';
 
 // Queue shipments only exist once a chat session has passed profile selection — which only
 // happens when a permit is actually required — so there is no "no_permit" queue status.
@@ -524,6 +526,10 @@ export interface Shipment {
   flags: ShipmentFlag[];
   audit: AuditEntry[];
   documents?: ShipmentDocument[];
+  // Files the department sent back after approval + payment (QR_PAYMENT_AGENCIES flow only —
+  // see ChatService.showAgencyReturnedDocs / agency-docs-returned.component.ts for the chat-side
+  // equivalent). Only present once that flow has actually completed.
+  returnedDocuments?: ShipmentDocument[];
   email?: { toName: string; to: string; subject: string; body: string; attName: string };
   items?: ShipmentItem[]; // per-product line items from the invoice/customs doc used for this LPI request
   itemsSelected?: boolean; // true once the shipment's flow has confirmed its item group (item-hs-analysis) —
