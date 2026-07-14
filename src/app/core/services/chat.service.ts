@@ -15,6 +15,7 @@ import { KNOWN_REFS, MOCK_FORM_DATA, MOCK_SPN_LIST } from '@mock/spn.mock';
 import { MOCK_SPN_PROFILES } from '@mock/spn-companies.mock';
 import { getInvoiceLineItems, INVOICE_ITEMS_DECLARATION } from '@mock/invoice-items.mock';
 import { getProductHsAnalysis, mapToInvoiceLineItems } from '@mock/product-hs-analysis.mock';
+import { getExportProductClassification, mapExportItemsToInvoiceLineItems } from '@mock/export-product-classification.mock';
 import { InvoiceOcrResult, toInvoiceSummaryOption } from '@mock/invoice-ocr.mock';
 import { environment } from '@env/environment';
 import { MOCK_SESSIONS } from '@mock/sessions.mock';
@@ -575,6 +576,10 @@ export class ChatService {
     'กษ.': 'กรมวิชาการเกษตร (กษ.)',
     'ปส.': 'สำนักงานปรมาณูเพื่อสันติภาพ (ปส.)',
     '—':   'ขอใบอนุญาตนำเข้าทั่วไป',
+    // Export-path agencies (see 'Export path' in CLAUDE.md)
+    'กรมควบคุมโรค': 'กรมควบคุมโรค (DDC)',
+    'เชื้อเพลิง':    'กรมธุรกิจพลังงาน (DOEB)',
+    'การยาง':       'การยางแห่งประเทศไทย (RAOT)',
   };
 
   private showAgencyChoice(recommendedAgency: string): void {
@@ -717,7 +722,8 @@ export class ChatService {
 
   // ── Per-product HS Code + Smart Tariff analysis (invoice path, right after OCR) ──
   private showItemHsAnalysis(): void {
-    this.bot('item-hs-analysis', { items: getProductHsAnalysis() } satisfies ItemHsAnalysisData);
+    const items = this.direction() === 'export' ? getExportProductClassification() : getProductHsAnalysis();
+    this.bot('item-hs-analysis', { items } satisfies ItemHsAnalysisData);
   }
 
   /** All items from the most recently confirmed item-hs-analysis card — kept so the
@@ -749,7 +755,10 @@ export class ChatService {
    *  re-selection step for the user. */
   private selectAllAgencyItems(): void {
     const agencyItems = this.confirmedProductItems.filter(i => i.requiresPermit && i.agency === this.currentAgency);
-    this.formData.update(f => ({ ...f, selectedItems: mapToInvoiceLineItems(agencyItems) }));
+    const selectedItems = this.direction() === 'export'
+      ? mapExportItemsToInvoiceLineItems(agencyItems)
+      : mapToInvoiceLineItems(agencyItems);
+    this.formData.update(f => ({ ...f, selectedItems }));
   }
 
   // ── Flag confirm flow ──────────────────────────────────────────────────────

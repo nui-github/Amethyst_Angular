@@ -15,6 +15,10 @@ export const AGENCY_PAYMENT: Record<string, AgencyPaymentConfig> = {
   'ปส.':      { requiresFee: true,  amount: 800,  note: 'ค่าตรวจสอบเครื่องกำเนิดรังสี' },
   'กรมประมง': { requiresFee: true,  amount: 200,  note: 'ต่อใบอนุญาตนำเข้า' },
   'กรมปศุสัตว์': { requiresFee: true, amount: 300, note: 'ต่อใบอนุญาต' },
+  // Export-path agencies (see 'Export path' in CLAUDE.md)
+  'กรมควบคุมโรค': { requiresFee: true,  amount: 1000, note: 'ค่าตรวจสอบเชื้อโรคและพิษจากสัตว์' },
+  'เชื้อเพลิง':    { requiresFee: true,  amount: 600,  note: 'ค่าธรรมเนียมใบอนุญาตควบคุมประเภทที่ 3' },
+  'การยาง':       { requiresFee: false, amount: 0,    note: 'ไม่มีค่าธรรมเนียม (ใบอนุญาตค้ายาง)' },
 };
 
 export function getAgencyPayment(agency: string): AgencyPaymentConfig {

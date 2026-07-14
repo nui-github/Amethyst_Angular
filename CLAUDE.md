@@ -310,6 +310,13 @@ src/
 │   │   │   │                            formData.selectedItems for the chosen agency (customs/SPN paths;
 │   │   │   │                            see selectAllAgencyItems() in chat.service.ts) — no separate
 │   │   │   │                            item-selection UI, the whole confirmed group IS the request
+│   │   │   ├── export-product-classification.mock.ts ← getExportProductClassification() — export-path
+│   │   │   │                            equivalent of product-hs-analysis.mock.ts; items e1-e4 mirror
+│   │   │   │                            export-invoice-ocr.mock.ts's 4 line items — grouped under
+│   │   │   │                            'การยาง'/'เชื้อเพลิง'/'กรมควบคุมโรค'/'—' instead of 'อย.'/'กษ.'/'ปส.';
+│   │   │   │                            also exports mapExportItemsToInvoiceLineItems() (selectAllAgencyItems()
+│   │   │   │                            in chat.service.ts calls this instead of mapToInvoiceLineItems() when
+│   │   │   │                            direction==='export' — see 'Export path' in Chat Flow below)
 │   │   │   ├── agency-docs.mock.ts    ← required docs per agency (อย./กษ./ปส.) + manualFields
 │   │   │   ├── invoice-items.mock.ts  ← invoice line items (getInvoiceLineItems) — invoice path's own
 │   │   │   │                            agency-upload step; set directly as formData.selectedItems, no
@@ -429,11 +436,36 @@ Welcome → showDocTypeChoice() → onDocTypeChoice('export'):
     ผู้นำเข้า" → "ข้อมูลบริษัทผู้ส่งออก") and arrivalDate/departureDate's `required` flag actually
     differ between directions — every other field key/label is shared, since DocumentControl/
     GoodsShipment is genuinely the same schema for ใบขนขาเข้า and ใบขนขาออก.
-  - NOT YET WIRED: item-hs-analysis-equivalent classification into กรมควบคุมโรค/เชื้อเพลิง/การยอ
-    (step 2), export agency-docs upload + payment config (step 3), submit/status copy (step 4) —
-    right now the export flow only goes as far as the (gated, for customs-first) ocr-results card;
-    "ดำเนินการต่อ" past that point still runs the import-shaped item-hs-analysis/agency logic
-    unchanged, which will show the wrong (import) agency list until step 2 lands.
+### Export path — Step 2: item classification into the 3 export agencies
+item-hs-analysis is the exact same ItemHsAnalysisComponent used by import — it's fully generic,
+grouping purely off whatever `item.agency` string is in the data it's given. Only two small
+additive things were needed, no forking:
+  - showItemHsAnalysis() (chat.service.ts) now picks getExportProductClassification()
+    (export-product-classification.mock.ts) instead of getProductHsAnalysis() when
+    `this.direction() === 'export'` — same ItemHsAnalysisData shape, items grouped under
+    'กรมควบคุมโรค' / 'เชื้อเพลิง' / 'การยาง' / '—' instead of 'อย.'/'กษ.'/'ปส.'/'—'. Item ids e1-e4
+    mirror the export-invoice-ocr.mock.ts line items 1:1 so the AI-analysis box matches the
+    invoice OCR box, same convention as import's p1-p6. e4 (rubber compound sheet, already
+    processed — not raw RSS3) is classified '—' to exercise the "ไม่ต้องขอ" group; e1's
+    candidates include a '?'-style cross-agency option (rubber → '—') and e4's candidates include
+    the reverse (→ 'การยาง'), so the same move-on-edit mechanism (see 'item-hs-analysis' above)
+    works for export items too — verified live (no new item-hs-analysis code needed for that part).
+  - GROUP_STYLE (item-hs-analysis.component.ts) and AGENCY_PAYMENT (payment.mock.ts) both gained
+    3 new entries for the export agency codes (icons: Biohazard/Fuel/Trees; fees: กรมควบคุมโรค
+    ฿1,000, เชื้อเพลิง ฿600, การยาง free) — both maps already had string-keyed fallbacks so nothing
+    would have crashed without this, it's purely cosmetic completeness.
+  - selectAllAgencyItems() (chat.service.ts) now calls mapExportItemsToInvoiceLineItems()
+    (export-product-classification.mock.ts, same role as mapToInvoiceLineItems() on the import
+    side) when direction==='export' — verified live: confirming the การยาง group and choosing it
+    as the agency correctly populates form-preview with only that 1 item (RSS3 rubber sheet,
+    ฿1,704,000, Lot RSS3-2568-090), header still reading "ข้อมูลบริษัทผู้ส่งออก".
+  - AGENCY_DESC (chat.service.ts, used by the "เลือกกรม" choice-card) gained the 3 export agencies'
+    full names too, so that step also needed zero new logic — it already builds its options list
+    generically from whatever `ALL_AGENCIES` item-hs-analysis confirmation produced.
+  - NOT YET WIRED: export agency-docs upload + payment config (step 3 — agency-upload's document
+    slots are still import-shaped, only reachable via the invoice-first path's pendingAfterFlow=
+    'agency-docs' branch; the customs-first path used for step 2's live verification never reaches
+    it), submit/status copy (step 4).
 
 import-license-menu → 2 choices (chooseFullUpload()/full-upload card removed from menu, method still exists unused):
   ├─ chooseCustomsDocs()   → single-upload → OCR → item-hs-analysis (shared getProductHsAnalysis() dataset)

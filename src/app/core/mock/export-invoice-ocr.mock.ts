@@ -21,7 +21,7 @@ export const EXPORT_INVOICE_CUSTOMS_ITEMS: CustomsDeclarationItem[] = [
     invoiceAmountForeign: '48000.00', currencyCode: 'USD', invoiceAmountBaht: '1704000.00',
     manufacture: 'สหกรณ์กองทุนสวนยางระยอง จำกัด, ระยอง',
     remark: 'ส่งออกเพื่อจำหน่ายในอุตสาหกรรมยางล้อ',
-    productions: [{ lotNo: 'RSS3-2568-090', mfgDate: '01-05-2568', quantity: '20000', quantityUnit: 'กก.' }],
+    productions: [{ lotNo: 'RSS3-2568-090', mfgDate: '01-05-2568', measurement: '20000', measurementUnit: 'กก.', quantity: '20000', quantityUnit: 'กก.' }],
   },
   {
     itemNumber: 2, invoiceNo: 'EXPINV0009', invoiceDate: '2025-05-12', invoiceItemNumber: 2, declarationLineNumber: 2,
@@ -32,7 +32,7 @@ export const EXPORT_INVOICE_CUSTOMS_ITEMS: CustomsDeclarationItem[] = [
     invoiceAmountForeign: '3200.00', currencyCode: 'USD', invoiceAmountBaht: '113900.00',
     manufacture: 'โรงกลั่นน้ำมันศรีราชา, ชลบุรี',
     certificateAnalysis: 'COA-FUEL-2568-021',
-    productions: [{ lotNo: 'FO-2568-021', mfgDate: '05-05-2568', quantity: '5000', quantityUnit: 'ลิตร' }],
+    productions: [{ lotNo: 'FO-2568-021', mfgDate: '05-05-2568', measurement: '5000', measurementUnit: 'ลิตร', quantity: '5000', quantityUnit: 'ลิตร' }],
   },
   {
     itemNumber: 3, invoiceNo: 'EXPINV0009', invoiceDate: '2025-05-12', invoiceItemNumber: 3, declarationLineNumber: 3,
@@ -43,7 +43,7 @@ export const EXPORT_INVOICE_CUSTOMS_ITEMS: CustomsDeclarationItem[] = [
     invoiceAmountForeign: '15000.00', currencyCode: 'USD', invoiceAmountBaht: '533600.00',
     manufacture: 'บริษัท ไบโอเทค ไดแอกโนสติกส์ จำกัด, ปทุมธานี',
     certificateAnalysis: 'COA-BIO-2568-014',
-    productions: [{ lotNo: 'BIO-2568-014', mfgDate: '10-05-2568', expDate: '10-05-2570', quantity: '500', quantityUnit: 'กล่อง' }],
+    productions: [{ lotNo: 'BIO-2568-014', mfgDate: '10-05-2568', expDate: '10-05-2570', measurement: '500', measurementUnit: 'กล่อง', quantity: '500', quantityUnit: 'กล่อง' }],
   },
   {
     itemNumber: 4, invoiceNo: 'EXPINV0009', invoiceDate: '2025-05-12', invoiceItemNumber: 4, declarationLineNumber: 4,
