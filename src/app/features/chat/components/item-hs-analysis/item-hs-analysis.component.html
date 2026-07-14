@@ -23,8 +23,8 @@
         </span>
       }
       <span class="ih-tag ih-tag--dir">
-        <lucide-icon [img]="ArrowDown" [size]="11" />
-        ขาเข้า
+        <lucide-icon [img]="isExport ? ArrowUp : ArrowDown" [size]="11" />
+        {{ isExport ? 'ขาออก' : 'ขาเข้า' }}
       </span>
       @if (agencySummary.length) {
         <span class="ih-tag ih-tag--multi">

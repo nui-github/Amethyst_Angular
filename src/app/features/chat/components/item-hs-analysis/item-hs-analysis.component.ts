@@ -1,10 +1,11 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Search, Check, ArrowDown, Percent, ShieldCheck, Sprout, PackageCheck, Radiation, Pencil, X, CircleHelp, Biohazard, Fuel, Trees } from 'lucide-angular';
+import { LucideAngularModule, Search, Check, ArrowDown, ArrowUp, Percent, ShieldCheck, Sprout, PackageCheck, Radiation, Pencil, X, CircleHelp, Biohazard, Fuel, Trees } from 'lucide-angular';
 import { HsCandidate, ItemHsAnalysisData, ProductHsAnalysis } from '@app/core/models/types';
 import { getAgencyPayment } from '@mock/payment.mock';
 import { lookupHsCode } from '@mock/hs-code-db.mock';
+import { ChatService } from '@app/core/services/chat.service';
 
 interface AgencySummaryRow {
   code: string;
@@ -45,9 +46,13 @@ export class ItemHsAnalysisComponent implements OnInit {
   @Input({ required: true }) data!: ItemHsAnalysisData;
   @Output() confirmed = new EventEmitter<ProductHsAnalysis[]>();
 
+  readonly chat = inject(ChatService);
+  get isExport(): boolean { return this.chat.direction() === 'export'; }
+
   readonly Search = Search;
   readonly Check = Check;
   readonly ArrowDown = ArrowDown;
+  readonly ArrowUp = ArrowUp;
   readonly Percent = Percent;
   readonly ShieldCheck = ShieldCheck;
   readonly Sprout = Sprout;
