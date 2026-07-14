@@ -285,6 +285,14 @@ src/
 │   │   │   ├── invoice-ocr.mock.ts    ← MOCK_INVOICE_OCR_RESULT (invoice-upload path only; mirrors a real
 │   │   │   │                            commercial invoice — multi-HS-code/origin line items, shown grouped
 │   │   │   │                            in the ocr-results card via OcrResultsData.lineItems)
+│   │   │   ├── export-ocr.mock.ts     ← MOCK_EXPORT_OCR_RESULT — export-path equivalent of ocr.mock.ts
+│   │   │   │                            (customs-first/ใบขนส่งออก path), items span the 3 export-control
+│   │   │   │                            agencies (see 'Export path' in Chat Flow below)
+│   │   │   ├── export-invoice-ocr.mock.ts ← MOCK_EXPORT_INVOICE_OCR_RESULT — export-path equivalent of
+│   │   │   │                            invoice-ocr.mock.ts (invoice-first path); export-ocr.mock.ts
+│   │   │   │                            re-exports this file's line items/customs items so both export
+│   │   │   │                            entry paths stay consistent, same pattern as ocr.mock.ts/
+│   │   │   │                            invoice-ocr.mock.ts on the import side
 │   │   │   ├── queue.mock.ts          ← shipments with realistic chatbot-flow messages
 │   │   │   ├── spn-companies.mock.ts
 │   │   │   ├── hs-analysis.mock.ts    ← analyzeHsCode() — only used by the unreachable chooseFullUpload() path
@@ -389,6 +397,43 @@ ChatService.send(text)
 
 Universal agency+profile order (all paths after item-hs-analysis): เลือกกรม (dept:) → เลือกโปรไฟล์ → continue
   pendingAfterFlow: 'agency-docs' (invoice) | 'form-preview' (customs) | 'proceed' (SPN)
+
+### Export path (เอกสารส่งออกสินค้า) — Step 1 of the export build-out
+Welcome → showDocTypeChoice() → onDocTypeChoice('export'):
+  - ChatService.direction: signal<'import'|'export'> set to 'export' (default 'import') — this is
+    the ONLY flag needed to make the shared components behave correctly; there is no separate
+    export component tree. No ShippingNet integration for export yet, so unlike the import branch
+    this skips straight to import-license-menu (same component, reused — see below) instead of
+    offering an SPN-vs-upload choice first.
+  - import-license-menu now takes `data.direction` (@Input) — same 2-choice card, just swaps
+    "ใบขนสินค้า" → "ใบขนส่งออก" on the customs-docs card; both buttons still call
+    chat.chooseCustomsDocs()/chooseInvoiceFirst() unchanged, which read chat.direction() themselves
+    to pick the right user-facing label and OCR mock — no new ChatService methods needed.
+  - single-upload gained a `direction` @Input (wired via chat-area's uploadDirection(msg) helper,
+    mirroring uploadMode(msg)) — only changes the mode:'customs' title ("อัปโหลดใบขนส่งออก" vs
+    "อัปโหลดใบขนสินค้า"); mode:'invoice' title ("อัปโหลดใบ Invoice") is shared as-is.
+  - ChatService.startOCR() passes `direction` through to OcrService.startOCR(files, variant,
+    direction) — when direction==='export', returns MOCK_EXPORT_OCR_RESULT (customs-first,
+    export-ocr.mock.ts) or MOCK_EXPORT_INVOICE_OCR_RESULT (invoice-first, export-invoice-ocr.mock.ts)
+    instead of the import mocks; both mirror the import mocks' shape exactly (OcrResult/
+    InvoiceOcrResult), with items spanning the 3 export-control agencies this build starts with —
+    กรมควบคุมโรค (diagnostic reagent kit), เชื้อเพลิง (industrial fuel oil), การยาง (RSS3 smoked
+    rubber sheet, rubber compound sheet) — so step 2 (item-hs-analysis-equivalent classification
+    into those 3 agencies) has realistic data to work with. Multi-invoice detection
+    (MULTI_INVOICE_TRIGGER) is import-only for now; export invoice-first never hits that branch.
+  - formData.direction is set on every OCR merge (startOCR, onInvoiceSelected) and read by
+    getCustomsDeclarationHeaderSections(direction) (shared/utils/customs-declaration-sections.ts) —
+    ocr-results, form-preview, and customs-declaration-editor all call this instead of the old
+    static CUSTOMS_DECLARATION_HEADER_SECTIONS export (kept only as an import-direction default for
+    any caller not yet made direction-aware). Only the company-info section title ("ข้อมูลบริษัท
+    ผู้นำเข้า" → "ข้อมูลบริษัทผู้ส่งออก") and arrivalDate/departureDate's `required` flag actually
+    differ between directions — every other field key/label is shared, since DocumentControl/
+    GoodsShipment is genuinely the same schema for ใบขนขาเข้า and ใบขนขาออก.
+  - NOT YET WIRED: item-hs-analysis-equivalent classification into กรมควบคุมโรค/เชื้อเพลิง/การยอ
+    (step 2), export agency-docs upload + payment config (step 3), submit/status copy (step 4) —
+    right now the export flow only goes as far as the (gated, for customs-first) ocr-results card;
+    "ดำเนินการต่อ" past that point still runs the import-shaped item-hs-analysis/agency logic
+    unchanged, which will show the wrong (import) agency list until step 2 lands.
 
 import-license-menu → 2 choices (chooseFullUpload()/full-upload card removed from menu, method still exists unused):
   ├─ chooseCustomsDocs()   → single-upload → OCR → item-hs-analysis (shared getProductHsAnalysis() dataset)

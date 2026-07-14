@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inpu
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule, CheckCircle } from 'lucide-angular';
 import { OcrResultsData, OcrLineItem, CustomsDeclarationData, CustomsDeclarationItem } from '@app/core/models/types';
-import { CUSTOMS_DECLARATION_HEADER_SECTIONS } from '@app/shared/utils/customs-declaration-sections';
+import { getCustomsDeclarationHeaderSections } from '@app/shared/utils/customs-declaration-sections';
 import { CustomsItemDetailComponent } from '../customs-item-detail/customs-item-detail.component';
 import { ChatService } from '@app/core/services/chat.service';
 
@@ -40,7 +40,7 @@ export class OcrResultsComponent {
   readonly cdr  = inject(ChangeDetectorRef);
   readonly el   = inject(ElementRef);
 
-  readonly declSections = CUSTOMS_DECLARATION_HEADER_SECTIONS;
+  get declSections() { return getCustomsDeclarationHeaderSections(this.local.direction ?? 'import'); }
 
   get isManual(): boolean { return !!(this._data as Partial<OcrResultsData>).isManual; }
   get declarationComplete(): boolean { return !!this.local.declarationComplete; }

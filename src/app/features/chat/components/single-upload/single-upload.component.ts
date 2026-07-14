@@ -13,6 +13,7 @@ import { ChatService } from '@app/core/services/chat.service';
 })
 export class SingleUploadComponent {
   @Input() mode: 'customs' | 'invoice' | 'agency-docs' = 'customs';
+  @Input() direction: 'import' | 'export' = 'import';
 
   readonly chat = inject(ChatService);
   readonly cdr  = inject(ChangeDetectorRef);

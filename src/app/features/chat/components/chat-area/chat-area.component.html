@@ -40,7 +40,7 @@
             <!-- Import license menu (3 doc-type cards) -->
             @case ('import-license-menu') {
               @if (!readOnly && !msg.isReadOnly) {
-                <app-import-license-menu />
+                <app-import-license-menu [data]="asAny(msg.data)" />
               } @else {
                 <span class="readonly-tag">เลือกประเภทเอกสารแล้ว</span>
               }
@@ -55,7 +55,7 @@
             @case ('spn-not-found') {
               @if (!readOnly && !msg.isReadOnly) {
                 <p class="welcome-sub" style="margin-bottom:10px">ไม่พบข้อมูลใบขนใน SPN — กรุณาเลือกประเภทเอกสารที่มีครับ</p>
-                <app-import-license-menu />
+                <app-import-license-menu [data]="asAny(msg.data)" />
               } @else {
                 <span class="readonly-tag">เลือกประเภทเอกสารแล้ว</span>
               }
@@ -119,7 +119,7 @@
             <!-- Single-slot upload (ใบขนสินค้า path) -->
             @case ('single-upload') {
               @if (!readOnly && !msg.isReadOnly) {
-                <app-single-upload [mode]="uploadMode(msg)" />
+                <app-single-upload [mode]="uploadMode(msg)" [direction]="uploadDirection(msg)" />
               } @else {
                 <span class="readonly-tag">✓ อัปโหลดเอกสารแล้ว</span>
               }

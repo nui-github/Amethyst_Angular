@@ -116,6 +116,11 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked {
     return 'customs';
   }
 
+  uploadDirection(msg: ChatMessage): 'import' | 'export' {
+    const d = msg.data as Record<string, unknown> | undefined;
+    return d?.['direction'] === 'export' ? 'export' : 'import';
+  }
+
   onChoice(msg: ChatMessage, value: string): void {
     const data = msg.data as ChoiceCardData;
     // Route choice to correct ChatService handler based on options present

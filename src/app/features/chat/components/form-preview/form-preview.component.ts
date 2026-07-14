@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inpu
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LicenseFormData, InvoiceLineItem, CustomsDeclarationData, CustomsDeclarationItem } from '@app/core/models/types';
-import { CUSTOMS_DECLARATION_HEADER_SECTIONS } from '@app/shared/utils/customs-declaration-sections';
+import { getCustomsDeclarationHeaderSections } from '@app/shared/utils/customs-declaration-sections';
 import { CustomsItemDetailComponent } from '../customs-item-detail/customs-item-detail.component';
 import { ChatService } from '@app/core/services/chat.service';
 
@@ -50,7 +50,7 @@ export class FormPreviewComponent {
   editingKey: string | null = null;
   saved = false;
 
-  readonly declSections = CUSTOMS_DECLARATION_HEADER_SECTIONS;
+  get declSections() { return getCustomsDeclarationHeaderSections(this.local.direction ?? 'import'); }
   get declaration(): CustomsDeclarationData | undefined { return this.local.customsDeclaration; }
 
   declValue(key: string): string {

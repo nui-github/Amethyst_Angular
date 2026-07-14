@@ -1,6 +1,9 @@
 import { Injectable, signal } from '@angular/core';
+import { Direction } from '@app/core/models/types';
 import { MOCK_OCR_RESULT, OcrResult } from '@mock/ocr.mock';
 import { MOCK_INVOICE_OCR_RESULT, MOCK_INVOICE_OCR_RESULTS, InvoiceOcrResult } from '@mock/invoice-ocr.mock';
+import { MOCK_EXPORT_OCR_RESULT, ExportOcrResult } from '@mock/export-ocr.mock';
+import { MOCK_EXPORT_INVOICE_OCR_RESULT, ExportInvoiceOcrResult } from '@mock/export-invoice-ocr.mock';
 
 const OCR_STAGES = ['อ่านเอกสาร', 'วิเคราะห์ข้อมูล', 'ตรวจสอบ HS Code', 'ร่างคำขอ'];
 
@@ -26,7 +29,11 @@ export class OcrService {
     this.isOCRing.set(false);
   }
 
-  async startOCR(_files?: unknown[], variant: 'default' | 'invoice' = 'default'): Promise<OcrResult | InvoiceOcrResult | MultiInvoiceDetection> {
+  async startOCR(
+    _files?: unknown[],
+    variant: 'default' | 'invoice' = 'default',
+    direction: Direction = 'import',
+  ): Promise<OcrResult | InvoiceOcrResult | MultiInvoiceDetection | ExportOcrResult | ExportInvoiceOcrResult> {
     this.reset();
     this.isOCRing.set(true);
 
@@ -37,6 +44,10 @@ export class OcrService {
     }
 
     this.isOCRing.set(false);
+
+    if (direction === 'export') {
+      return variant === 'invoice' ? MOCK_EXPORT_INVOICE_OCR_RESULT : MOCK_EXPORT_OCR_RESULT;
+    }
 
     if (variant === 'invoice') {
       const files = (_files ?? []) as { name?: string }[];

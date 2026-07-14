@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ChatService } from '@app/core/services/chat.service';
 import { CustomsDeclarationData, CustomsDeclarationItem, CustomsDeclarationProduction, CustomsDeclarationAuthority } from '@app/core/models/types';
 import {
-  CUSTOMS_DECLARATION_HEADER_SECTIONS,
+  getCustomsDeclarationHeaderSections,
   CUSTOMS_DECLARATION_ITEM_REQUIRED_FIELDS,
   CustomsDeclRow,
 } from '@app/shared/utils/customs-declaration-sections';
@@ -31,7 +31,7 @@ interface FlatAuthorityRow { item: CustomsDeclarationItem; index: number; a: Cus
 export class CustomsDeclarationEditorComponent {
   readonly chat = inject(ChatService);
 
-  readonly declSections = CUSTOMS_DECLARATION_HEADER_SECTIONS;
+  get declSections() { return getCustomsDeclarationHeaderSections(this.chat.formData().direction ?? 'import'); }
   readonly itemRequiredFields = CUSTOMS_DECLARATION_ITEM_REQUIRED_FIELDS;
 
   // Widths are sized to what each field actually holds — short numeric/code fields get just

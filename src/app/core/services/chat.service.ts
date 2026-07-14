@@ -5,7 +5,7 @@ import {
   StatusCardData, OcrResultsData, SpnResultData, Shipment,
   MissingField, MissingFieldsData, PaymentQrData, PaymentSlipData, HsAnalysisData,
   InvoiceLineItem, ItemHsAnalysisData, ProductHsAnalysis, ItemMeasurementData, CustomsDeclarationData,
-  InvoiceSelectData,
+  InvoiceSelectData, Direction,
 } from '@app/core/models/types';
 import { OcrService, MultiInvoiceDetection } from './ocr.service';
 import { QueueService } from './queue.service';
@@ -51,6 +51,11 @@ export class ChatService {
   // structured customsDeclaration. declarationEditorMsgId tracks which message to write back into.
   readonly declarationEditorOpen  = signal(false);
   readonly declarationEditorMsgId = signal<string | null>(null);
+
+  // Which side of the pipeline the current session is on — set once from showDocTypeChoice()'s
+  // answer, threaded into formData.direction and every message that needs direction-aware copy
+  // (single-upload title, ocr-results/form-preview/declaration-editor header sections).
+  readonly direction = signal<Direction>('import');
 
   readonly needsYouCount = computed(() => this.queue.needsYouCount());
 
@@ -265,13 +270,14 @@ export class ChatService {
       question: 'ท่านต้องการดำเนินการด้านใดครับ?',
       options: [
         { label: 'เอกสารนำเข้าสินค้า', value: 'import', description: 'ขอใบอนุญาต, RGoods, วิเคราะห์ HS Code' },
-        { label: 'เอกสารส่งออกสินค้า', value: 'export', description: 'ใบขนส่งออก, ภาษีส่งออก (เร็วๆ นี้)' },
+        { label: 'เอกสารส่งออกสินค้า', value: 'export', description: 'ใบขนส่งออก, ภาษีส่งออก' },
       ],
     } satisfies ChoiceCardData);
   }
 
   onDocTypeChoice(value: string): void {
     if (value === 'import') {
+      this.direction.set('import');
       this.user('เอกสารนำเข้าสินค้า');
       this.withTyping(() => {
         this.bot('choice-card', {
@@ -283,20 +289,22 @@ export class ChatService {
         } satisfies ChoiceCardData);
       }, 400);
     } else {
+      // Export path has no ShippingNet integration yet — skip straight to the upload-method menu.
+      this.direction.set('export');
       this.user('เอกสารส่งออกสินค้า');
-      this.withTyping(() => this.bot('text', undefined,
-        'ขออภัยครับ ระบบจัดการเอกสารส่งออกยังอยู่ระหว่างพัฒนา — จะเปิดให้ใช้งานเร็วๆ นี้ครับ'), 500);
+      this.markFlowStart();
+      this.withTyping(() => this.openImportLicenseMenu(), 400);
     }
   }
 
-  // ── Import license menu ────────────────────────────────────────────────────
+  // ── Import/export license menu ──────────────────────────────────────────────
   openImportLicenseMenu(): void {
-    this.withTyping(() => this.bot('import-license-menu'), 400);
+    this.withTyping(() => this.bot('import-license-menu', { direction: this.direction() }), 400);
   }
 
   // ── Document choice flows ──────────────────────────────────────────────────
 
-  /** Handle the SPN vs Upload choice */
+  /** Handle the SPN vs Upload choice (import path only) */
   onCustomsDocsChoice(value: string): void {
     if (value === 'spn') {
       this.user('ดึงข้อมูลจาก ShippingNet');
@@ -309,20 +317,22 @@ export class ChatService {
     }
   }
 
-  /** ใบขนสินค้า from menu → single-upload (XML) — no flag review needed */
+  /** ใบขนสินค้า/ใบขนส่งออก from menu — no flag review needed */
   chooseCustomsDocs(): void {
-    this.user('ใบขนสินค้า');
+    const dir = this.direction();
+    this.user(dir === 'export' ? 'ใบขนส่งออก' : 'ใบขนสินค้า');
     this.markFlowStart();
     this.isCustomsOnlyUpload = true;
-    this.withTyping(() => { this.step.set('invoice_upload'); this.bot('single-upload'); }, 400);
+    this.withTyping(() => { this.step.set('invoice_upload'); this.bot('single-upload', { direction: dir }); }, 400);
   }
 
   chooseInvoiceFirst(): void {
+    const dir = this.direction();
     this.user('ใบ Invoice');
     this.markFlowStart();
     this.isInvoicePath = true;
     this.submittedAgencies = [];
-    this.withTyping(() => { this.step.set('invoice_upload'); this.bot('single-upload', { mode: 'invoice' }); }, 400);
+    this.withTyping(() => { this.step.set('invoice_upload'); this.bot('single-upload', { mode: 'invoice', direction: dir }); }, 400);
   }
 
   chooseFullUpload(): void {
@@ -355,7 +365,8 @@ export class ChatService {
   async startOCR(_files?: unknown[]): Promise<void> {
     this.step.set('ocr');
     this.bot('ocr-progress');
-    const result = await this.ocr.startOCR(_files, this.isInvoicePath ? 'invoice' : 'default');
+    const dir = this.direction();
+    const result = await this.ocr.startOCR(_files, this.isInvoicePath ? 'invoice' : 'default', dir);
 
     if ('multiInvoice' in result) {
       this.showInvoiceSelect(result);
@@ -363,7 +374,7 @@ export class ChatService {
     }
 
     this.formData.update(f => ({
-      ...f, ...result,
+      ...f, ...result, direction: dir,
       customsDeclaration: mergeCustomsDeclaration(f.customsDeclaration, result.customsDeclaration),
     }));
     this.promoteActiveSession();
@@ -397,7 +408,7 @@ export class ChatService {
     });
 
     this.formData.update(f => ({
-      ...f, ...chosen,
+      ...f, ...chosen, direction: this.direction(),
       customsDeclaration: mergeCustomsDeclaration(f.customsDeclaration, chosen.customsDeclaration),
     }));
     this.promoteActiveSession();
@@ -415,6 +426,7 @@ export class ChatService {
       isManual: true,
       ...(fd.customsDeclaration ? { customsDeclaration: fd.customsDeclaration } : {}),
       declarationGateRequired: this.isCustomsOnlyUpload || this.isAgencyDocsUpload,
+      direction: this.direction(),
     } satisfies OcrResultsData);
     this.withTyping(() => this.continueAfterOCR(), 600);
   }
@@ -445,6 +457,7 @@ export class ChatService {
       // are meant to be the final/complete declaration — the invoice path's 1st pass (invoice doc
       // alone) can't carry full customs-manifest data yet, so it isn't gated.
       declarationGateRequired: this.isCustomsOnlyUpload || this.isAgencyDocsUpload,
+      direction: this.direction(),
     } satisfies OcrResultsData);
 
     // Skip missing fields check for re-edit paths (post-email, post-flag edit)

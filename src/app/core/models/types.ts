@@ -2,6 +2,11 @@
 
 export type MessageRole = 'bot' | 'user';
 
+// Which side of the customs pipeline this session is on — threads through ChatService.direction,
+// LicenseFormData.direction, and the shared declaration-header sections (customs-declaration-
+// sections.ts) so copy reads correctly ("ผู้นำเข้า" vs "ผู้ส่งออก") without forking components.
+export type Direction = 'import' | 'export';
+
 /**
  * Every bot message has a `type` that tells ChatAreaComponent which
  * sub-component to render. `data` carries the typed payload for that type.
@@ -174,6 +179,7 @@ export interface OcrResultsData {
   // this unset — a plain commercial invoice can't carry full customs-manifest data yet, so forcing
   // full completion there just blocks the user on fields no document has supplied yet.
   declarationGateRequired?: boolean;
+  direction?: Direction; // 'import' | 'export' — picks which header-section labels to show
 }
 
 // One "Source" entry (license backing a controlled item) on a GoodsShipment line
@@ -372,6 +378,7 @@ export interface LicenseFormData {
   importDate?: string;
   selectedItems?: InvoiceLineItem[]; // สินค้าที่ยื่นขอใบอนุญาต (ทั้งกลุ่มที่ AI จัดไว้ให้กรมนี้)
   customsDeclaration?: CustomsDeclarationData; // structured OCR output, merged across every upload step
+  direction?: Direction; // 'import' | 'export' — set once at flow start (ChatService.direction)
 }
 
 // รายการสินค้าใน Invoice — field ตามที่กรม (อย./กษ.) ใช้ประกอบคำขอนำเข้า
