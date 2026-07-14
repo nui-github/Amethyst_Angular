@@ -970,7 +970,7 @@ export class ChatService {
           this.isReEditOCR = true;
           this.markFlowStart();
           this.step.set('invoice_upload');
-          this.bot('single-upload');
+          this.bot('single-upload', { direction: this.direction() });
         }, 400);
       } else {
         this.withTyping(() => this.showFullUpload(true), 400);
@@ -1129,17 +1129,12 @@ export class ChatService {
 
   private showRemainingAgencySelector(): void {
     const remaining = this.ALL_AGENCIES.filter(a => !this.submittedAgencies.includes(a));
-    const AGENCY_DESC: Record<string, string> = {
-      'อย.': 'สำนักงานคณะกรรมการอาหารและยา',
-      'กษ.': 'กรมวิชาการเกษตร',
-      'ปส.': 'สำนักงานปรมาณูเพื่อสันติภาพ',
-    };
     this.bot('choice-card', {
       question: 'เลือกกรมที่ต้องการยื่นขอใบอนุญาต',
       options: remaining.map(a => ({
         label: a,
         value: `agency:${a}`,
-        description: AGENCY_DESC[a] ?? a,
+        description: this.AGENCY_DESC[a] ?? a,
       })),
     } satisfies ChoiceCardData);
   }

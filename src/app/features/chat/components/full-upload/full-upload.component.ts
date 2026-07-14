@@ -26,11 +26,14 @@ export class FullUploadComponent {
   readonly Upload = Upload;
   readonly X      = X;
 
+  // Re-upload fallback used for both directions (e.g. "แก้ไขเอกสารเพิ่มเติม" after form-preview on
+  // the invoice-first path) — labels swap "ใบขนสินค้า"/"ใบอนุญาตผู้นำเข้า" for the export side, same
+  // as single-upload's `direction` input.
   slots = signal<Slot[]>([
     { key: 'invoice',  label: 'ใบ Invoice',                     icon: ScrollText,  color: '#0463EF', file: null },
-    { key: 'customs',  label: 'ใบขนสินค้า',                     icon: FileText,    color: '#0D8F61', file: null },
+    { key: 'customs',  label: this.chat.direction() === 'export' ? 'ใบขนส่งออก' : 'ใบขนสินค้า', icon: FileText, color: '#0D8F61', file: null },
     { key: 'coa',      label: 'Certificate of Analysis (CoA)',   icon: Award,       color: '#7C3AED', file: null },
-    { key: 'ulicense', label: 'ใบอนุญาตผู้นำเข้า',              icon: ShieldCheck, color: '#B45309', file: null },
+    { key: 'ulicense', label: this.chat.direction() === 'export' ? 'ใบอนุญาตผู้ส่งออก' : 'ใบอนุญาตผู้นำเข้า', icon: ShieldCheck, color: '#B45309', file: null },
   ]);
 
   readonly hasAny = () => this.slots().some(s => s.file !== null);

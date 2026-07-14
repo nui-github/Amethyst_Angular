@@ -495,10 +495,28 @@ in step 2) — so most of this step was just adding real mock data, not new logi
     card showing the correct ฿600 fuel fee and "ขอใบอนุญาตเพิ่ม" listing the remaining agencies
     (การยาง, กรมควบคุมโรค) → queue page showing the shipment tagged "ขาออก". Import path re-walked
     invoice-first end to end too, unaffected.
-  - NOT YET WIRED: export-specific submit/status copy polish (step 4) — the status-card/queue
-    copy is already direction-agnostic enough to read correctly as-is (verified above), so step 4
-    is now mostly about auditing wording across the less-common branches (edit/resubmit, "ขอใบ
-    อนุญาตเพิ่ม" repeat-agency flow, queue detail panel) rather than new plumbing.
+
+### Export path — Step 4: wording audit across less-common branches
+Went through every branch not already exercised by steps 1-3's live walkthroughs — status-card/
+queue copy turned out to already be direction-agnostic (confirmed in step 3), so this step found
+and fixed 3 real remaining gaps, all in chat.service.ts:
+  - showRemainingAgencySelector() (the "ขอใบอนุญาตเพิ่ม" repeat-agency card) had its OWN local
+    `AGENCY_DESC` map hardcoded to only อย./กษ./ปส. — export agencies fell back to `?? a`, showing
+    the code as its own description twice (e.g. "เชื้อเพลิง — เชื้อเพลิง") instead of the full name.
+    Deleted the duplicate map and pointed it at the class-level `this.AGENCY_DESC` (already
+    populated with all agencies since step 2) — verified live: now shows "กรมธุรกิจพลังงาน (DOEB)"
+    / "กรมควบคุมโรค (DDC)" correctly.
+  - onPreviewChoice()'s "แก้ไขเอกสารเพิ่มเติม" branch for isCustomsOnlyUpload re-opened single-upload
+    without passing `direction` — re-editing a customs-first export declaration would silently
+    revert the card's title to "อัปโหลดใบขนสินค้า". Now passes `{ direction: this.direction() }`,
+    matching every other single-upload bot() call.
+  - full-upload.component.ts (the "แก้ไขเอกสารเพิ่มเติม" fallback for the invoice-first path) had
+    hardcoded "ใบขนสินค้า"/"ใบอนุญาตผู้นำเข้า" slot labels with no direction awareness at all — it
+    already injects ChatService, so its `slots` signal now reads `chat.direction()` directly
+    (field initializer order: `chat` is declared before `slots`, so it's available) to swap in
+    "ใบขนส่งออก"/"ใบอนุญาตผู้ส่งออก" for export, same pattern as single-upload.
+  - Also swept for other hardcoded "นำเข้า"/"ผู้นำเข้า" strings across queue-page and permit-status/
+    status-card templates — none found; those were already generic or already used shipment.type.
 
 import-license-menu → 2 choices (chooseFullUpload()/full-upload card removed from menu, method still exists unused):
   ├─ chooseCustomsDocs()   → single-upload → OCR → item-hs-analysis (shared getProductHsAnalysis() dataset)
