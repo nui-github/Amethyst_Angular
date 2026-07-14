@@ -17,7 +17,7 @@ export const AGENCY_REQUIRED_DOCS: Record<string, AgencyDoc[]> = {
   // LPI (Local Product Inspection) ของ อย. ใช้แค่ COA และเอกสารเลข U — ไม่ต้องใช้ GMP/คำขอนำเข้า/MSDS
   'อย.': [
     {
-      key: 'coa', label: 'Certificate of Analysis (COA)', required: true,
+      key: 'coa', label: 'Certificate of Analysis (COA)', required: true, multiple: true,
       hint: 'ผลการวิเคราะห์คุณภาพและความบริสุทธิ์ของสินค้า',
       manualFields: [
         { key: 'coaBatch',    label: 'Batch No.',        placeholder: 'เช่น LOT-2024-567' },
@@ -26,7 +26,7 @@ export const AGENCY_REQUIRED_DOCS: Record<string, AgencyDoc[]> = {
       ],
     },
     {
-      key: 'u_no', label: 'เอกสารเลข U', required: true,
+      key: 'u_no', label: 'เอกสารเลข U', required: true, multiple: true,
       hint: 'เลขทะเบียน U ที่ออกโดย อย. สำหรับยื่นขอ LPI',
       manualFields: [
         { key: 'uNo',       label: 'เลข U',        placeholder: 'เช่น U-2568-00123' },
