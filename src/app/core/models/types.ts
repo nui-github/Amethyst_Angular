@@ -365,6 +365,7 @@ export interface PaymentSlipData {
 export interface AgencyReturnDoc {
   key: string;
   label: string;
+  url: string;
 }
 
 export interface AgencyDocsReturnedData {
