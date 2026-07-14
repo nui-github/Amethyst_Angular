@@ -31,7 +31,7 @@ export class FullUploadComponent {
   // as single-upload's `direction` input.
   slots = signal<Slot[]>([
     { key: 'invoice',  label: 'ใบ Invoice',                     icon: ScrollText,  color: '#0463EF', file: null },
-    { key: 'customs',  label: this.chat.direction() === 'export' ? 'ใบขนส่งออก' : 'ใบขนสินค้า', icon: FileText, color: '#0D8F61', file: null },
+    { key: 'customs',  label: this.chat.direction() === 'export' ? 'ใบขนสินค้าขาออก' : 'ใบขนสินค้าขาเข้า', icon: FileText, color: '#0D8F61', file: null },
     { key: 'coa',      label: 'Certificate of Analysis (CoA)',   icon: Award,       color: '#7C3AED', file: null },
     { key: 'ulicense', label: this.chat.direction() === 'export' ? 'ใบอนุญาตผู้ส่งออก' : 'ใบอนุญาตผู้นำเข้า', icon: ShieldCheck, color: '#B45309', file: null },
   ]);

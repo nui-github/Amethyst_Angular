@@ -3,8 +3,8 @@
   <p class="su-title">
     @if (mode === 'invoice') { อัปโหลดใบ Invoice }
     @else if (mode === 'agency-docs') { อัปโหลดเอกสารประกอบเพิ่มเติม }
-    @else if (direction === 'export') { อัปโหลดใบขนส่งออก }
-    @else { อัปโหลดใบขนสินค้า }
+    @else if (direction === 'export') { อัปโหลดใบขนสินค้าขาออก }
+    @else { อัปโหลดใบขนสินค้าขาเข้า }
   </p>
   <p class="su-sub">
     @if (mode === 'invoice') { AI จะ OCR ดึงข้อมูลจากไฟล์ที่อัปโหลด รองรับ PDF, JPG, PNG }

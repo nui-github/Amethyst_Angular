@@ -318,10 +318,10 @@ export class ChatService {
     }
   }
 
-  /** ใบขนสินค้า/ใบขนส่งออก from menu — no flag review needed */
+  /** ใบขนสินค้าขาเข้า/ใบขนสินค้าขาออก from menu — no flag review needed */
   chooseCustomsDocs(): void {
     const dir = this.direction();
-    this.user(dir === 'export' ? 'ใบขนส่งออก' : 'ใบขนสินค้า');
+    this.user(dir === 'export' ? 'ใบขนสินค้าขาออก' : 'ใบขนสินค้าขาเข้า');
     this.markFlowStart();
     this.isCustomsOnlyUpload = true;
     this.withTyping(() => { this.step.set('invoice_upload'); this.bot('single-upload', { direction: dir }); }, 400);

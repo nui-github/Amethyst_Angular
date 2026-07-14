@@ -7,8 +7,8 @@ import { Direction } from '@app/core/models/types';
 /**
  * 2-card menu shown after the welcome card, when an SPN ref is not found, or (export path)
  * right after choosing "เอกสารส่งออกสินค้า" — same component either way, `data.direction` just
- * swaps the "ใบขนสินค้า"/"ใบขนส่งออก" card copy; both cards call the same ChatService methods,
- * which read `chat.direction()` themselves to behave correctly for either side.
+ * swaps the "ใบขนสินค้าขาเข้า"/"ใบขนสินค้าขาออก" card copy; both cards call the same ChatService
+ * methods, which read `chat.direction()` themselves to behave correctly for either side.
  */
 @Component({
   selector: 'app-import-license-menu',
@@ -23,7 +23,7 @@ import { Direction } from '@app/core/models/types';
         <lucide-icon [img]="icFile" [size]="18" />
       </span>
       <span class="doc-card__body">
-        <span class="doc-card__title">{{ isExport ? 'ใบขนส่งออก' : 'ใบขนสินค้า' }}</span>
+        <span class="doc-card__title">{{ isExport ? 'ใบขนสินค้าขาออก' : 'ใบขนสินค้าขาเข้า' }}</span>
         <span class="doc-card__sub">อัปโหลดใบขนฯ + เอกสารประกอบ — AI OCR ดึงข้อมูลทั้งหมด</span>
       </span>
       <lucide-icon [img]="icChevron" [size]="16" class="doc-card__chev" />
