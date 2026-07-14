@@ -799,4 +799,77 @@ export const MOCK_QUEUE: Shipment[] = [
       { id: 'i12_120', name: 'Titanium Dioxide (Nano Grade) — Lot 120', hsCode: '3206.11.00', origin: 'เยอรมนี', quantity: '242', unit: 'กก.', lotNo: 'TiO2-DE-0650', amount: 99900 },
     ],
   },
+
+  // ── 13. submitted (EXP): Pathogen Diagnostic Reagent Kit – ขาออก pink form กรมควบคุมโรค ──
+  {
+    id: 'EXP-68-013001', customsNo: 'HLTH000000013', hthmRef: 'HTHM000000013',
+    isNew: false, type: 'EXP',
+    goods: 'Pathogen Diagnostic Reagent Kit (ชุดน้ำยาตรวจวินิจฉัยเชื้อโรค)', hs: '3822.00.00',
+    customer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', contact: 'คุณพิมพ์ชนก ส่งดี',
+    contactEmail: 'pimchanok@siamagriexport.co.th',
+    origin: 'ไทย (TH)', importedAt: '10:05 น. วันนี้', createdAt: NOW - 4 * 3600_000, owner: 'ปวีณา ส.',
+    agency: 'fda', permitNeeded: true, formCode: 'Pink Form',
+    formName: 'คำขออนุญาตส่งออกเชื้อโรคและพิษจากสัตว์ (Pink Form) — กรมควบคุมโรค',
+    conf: 84, stage: 7, statusKey: 'submitted',
+    assess: { conf: 84, reason: 'บรรจุสารเชื้อโรคอ้างอิง (reference pathogen material) อยู่ภายใต้ พ.ร.บ.เชื้อโรคและพิษจากสัตว์ พ.ศ. 2558 ต้องขอใบอนุญาตจากกรมควบคุมโรคก่อนส่งออก' },
+    classify: { agency: 'fda', conf: 84, reason: '', alt: [] },
+    draft: { fields: [] },
+    flags: [],
+    audit: [
+      { time: '10:05', text: 'อัปโหลดใบ Invoice EXPINV0009 เข้าระบบแล้ว', by: 'ระบบ' },
+      { time: '10:08', text: 'OCR สำเร็จ', by: 'AI' },
+      { time: '10:10', text: 'วิเคราะห์ HS Code: 3822.00.00 → กรมควบคุมโรค (84%)', by: 'AI' },
+      { time: '10:14', text: 'แนบ Certificate of Analysis (COA) แล้ว', by: 'ปวีณา ส.' },
+      { time: '10:20', text: 'ยื่นกรมควบคุมโรค สำเร็จ (Pink Form)', by: 'ระบบ' },
+      { time: '10:32', text: 'กรมควบคุมโรคตรวจสอบและอนุมัติคำขอแล้ว', by: 'กรมควบคุมโรค' },
+      { time: '10:34', text: 'ชำระค่าธรรมเนียม ฿1,000 ผ่าน QR แล้ว', by: 'ปวีณา ส.' },
+      { time: '10:35', text: 'กรมควบคุมโรคส่งเอกสารกลับมาให้แล้ว (3 ไฟล์)', by: 'กรมควบคุมโรค' },
+    ],
+    messages: [
+      bot('10:05', 'อัปโหลดใบ Invoice EXPINV0009 เข้าระบบแล้วครับ — Pathogen Diagnostic Reagent Kit 500 กล่อง จากไทย ส่งออกไปญี่ปุ่น'),
+      t('10:08', 'bot', 'ocr-results', undefined, {
+        invoiceNo: 'EXPINV0009', invoiceDate: '12/05/2025', quantity: '500 กล่อง',
+        importer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', port: 'ท่าเรือแหลมฉบัง (LCH)',
+        hsCode: '3822.00.00', countryOrigin: 'ไทย (TH)', lotNo: 'BIO-2568-014', uNo: '',
+      }),
+      t('10:10', 'bot', 'hs-analysis', undefined, {
+        hsCode: '3822.00.00', goodsName: 'Pathogen Diagnostic Reagent Kit (ชุดน้ำยาตรวจวินิจฉัยเชื้อโรค)',
+        description: 'บรรจุสารเชื้อโรคอ้างอิง (reference pathogen material) อยู่ภายใต้ พ.ร.บ.เชื้อโรคและพิษจากสัตว์ พ.ศ. 2558 ต้องขอใบอนุญาตจากกรมควบคุมโรคก่อนส่งออก',
+        requiresPermit: true, direction: 'export', agency: 'กรมควบคุมโรค', agencyFull: 'กรมควบคุมโรค (DDC)',
+        licenseType: 'Pink Form', confidence: 84,
+      }),
+      t('10:14', 'bot', 'agency-upload', undefined, {
+        agency: 'กรมควบคุมโรค', agencyLabel: 'กรมควบคุมโรค (DDC)',
+        slots: [
+          { id: 's1', label: 'Certificate of Analysis (COA)', required: true },
+        ],
+      }),
+      t('10:20', 'bot', 'status-card', undefined, {
+        refNo: 'RG-2568-82300', customsRef: 'EXPINV0009',
+        submittedAt: new Date(Date.now() - 4 * 3600_000).toLocaleDateString('th-TH'), isPending: false,
+        agency: 'กรมควบคุมโรค',
+      }),
+      bot('10:32', 'กรมควบคุมโรคตรวจสอบและอนุมัติคำขอแล้วครับ ✅'),
+      t('10:33', 'bot', 'payment-qr', undefined, {
+        agency: 'กรมควบคุมโรค', amount: 1000, refNo: 'PAY-882300', expiresAt: '11:00',
+      }),
+      t('10:35', 'bot', 'agency-docs-returned', undefined, {
+        agency: 'กรมควบคุมโรค',
+        docs: [
+          { key: 'ddc_pink_form',     label: 'ใบรับรองฯ (DDCPINKFORM)',          url: SAMPLE_PDF },
+          { key: 'ddc_pink_form_pdf', label: 'ใบรับรองฯ (DDCPINKFORM PDF)',      url: SAMPLE_PDF },
+          { key: 'ddc_receipt',       label: 'ใบเสร็จรับเงิน (DDCERECEIPT PDF)', url: SAMPLE_PDF },
+        ],
+      }),
+    ],
+    documents: [
+      doc('d13a', 'Invoice EXPINV0009', 'invoice'),
+      doc('d13b', 'DDC_PINKFORM_V2.0.pdf', 'coa'),
+    ],
+    itemsSelected: true,
+    items: [
+      { id: 'i13', name: 'Pathogen Diagnostic Reagent Kit', hsCode: '3822.00.00', origin: 'ไทย (TH)', quantity: '500', unit: 'กล่อง', lotNo: 'BIO-2568-014', amount: 533600,
+        detail: { lotNo: 'BIO-2568-014', mfgDate: '10-05-2568', expDate: '10-05-2570', measurement: '500', measUnit: 'กล่อง', qty: '25', qtyUnit: 'CTN' } },
+    ],
+  },
 ];
