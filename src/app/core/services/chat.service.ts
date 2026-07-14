@@ -1036,6 +1036,11 @@ export class ChatService {
     this.bot('agency-docs-returned', {
       agency, docs: getAgencyReturnDocs(agency),
     } satisfies AgencyDocsReturnedData);
+    // Deferred from finalizeSubmit() for QR_PAYMENT_AGENCIES — only offer "ขอใบอนุญาตเพิ่ม" once
+    // this agency's approval → (payment) → returned-docs sequence has actually finished.
+    if (this.submittedAgencies.includes(agency)) {
+      this.withTyping(() => this.showNextAgencyIfAny(), 800);
+    }
   }
 
   onQrPaid(data: PaymentQrData): void {
@@ -1096,7 +1101,11 @@ export class ChatService {
         licenseType: fd.licenseType ?? 'RGoods',
         invoiceRef: fd.ref ?? fd.invoiceNo ?? '—',
       }]);
-      this.withTyping(() => this.showNextAgencyIfAny(), 800);
+      // QR_PAYMENT_AGENCIES must finish "ตรวจสอบสถานะ" → (payment if a fee applies) → returned
+      // docs first — showNextAgencyIfAny() runs from showAgencyReturnedDocs() instead for those.
+      if (!this.QR_PAYMENT_AGENCIES.includes(this.currentAgency)) {
+        this.withTyping(() => this.showNextAgencyIfAny(), 800);
+      }
     }
   }
 
