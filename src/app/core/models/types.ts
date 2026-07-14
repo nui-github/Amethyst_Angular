@@ -42,11 +42,15 @@ export type MessageType =
   | 'item-measurement' // after flags confirmed: table of every item being submitted (TH/EN name,
                         // tariff code, Lot No. from OCR) + Measurement/Meas. Unit the user must key in
                         // per row before proceeding — the only fields no upstream document captures
-  | 'invoice-select';   // invoice path only: shown when the uploaded file's OCR detects more than
+  | 'invoice-select'    // invoice path only: shown when the uploaded file's OCR detects more than
                         // one invoice inside it (see ocr.service.ts MULTI_INVOICE_TRIGGER) — user
                         // picks exactly one before the ocr-results card appears; the rest of the
                         // flow then proceeds using only that chosen invoice's data, same as a
                         // normal single-invoice upload
+  | 'agency-docs-returned'; // กรมควบคุมโรค/การยาง only (see ChatService.QR_PAYMENT_AGENCIES): shown
+                        // after the department approves the request (triggered by clicking
+                        // "ตรวจสอบสถานะ" on status-card) and, if a fee applies, after payment-qr
+                        // is paid — lists the documents the department sent back
 
 // One alternative HS Code suggestion offered when the user edits an item's classification —
 // invoices from real users typically carry no HS Code at all, so AI classifies purely from the
@@ -341,6 +345,8 @@ export interface StatusCardData {
   submittedAt: string;
   isPending?: boolean;      // kept for queue mock compatibility; always false in new flow
   feeNote?: string;         // e.g. "ค่าธรรมเนียมกรม ฿500 จะรวมในบิลรายเดือน"
+  agency?: string;          // which department this submission went to — drives "ตรวจสอบสถานะ"
+                             // behavior for QR-payment-flow agencies (see ChatService.checkStatus)
 }
 
 export interface PaymentQrData {
@@ -354,6 +360,16 @@ export interface PaymentSlipData {
   agency: string;
   amount: number;
   refNo: string;
+}
+
+export interface AgencyReturnDoc {
+  key: string;
+  label: string;
+}
+
+export interface AgencyDocsReturnedData {
+  agency: string;
+  docs: AgencyReturnDoc[];
 }
 
 // ─── Form / OCR ──────────────────────────────────────────────────────────────

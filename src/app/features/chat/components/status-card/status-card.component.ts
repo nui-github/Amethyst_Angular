@@ -72,7 +72,7 @@ import { ChatService } from '@app/core/services/chat.service';
       @if (!d.isPending) {
         <p class="status-card__sub">ต้องการดำเนินการอื่นเพิ่มเติมไหมครับ?</p>
         <div class="status-card__chips">
-          <button class="quick-chip" (click)="chat.send('ตรวจสอบสถานะใบอนุญาต')">
+          <button class="quick-chip" (click)="chat.checkStatus(d.agency)">
             <lucide-icon [img]="Search" [size]="12" /> ตรวจสอบสถานะ
           </button>
         </div>

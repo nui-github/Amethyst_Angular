@@ -246,6 +246,11 @@
                 (chosen)="onInvoiceSelected($event)" />
             }
 
+            <!-- กรมควบคุมโรค/การยาง only: documents the department sent back after approval (+ payment, if any) -->
+            @case ('agency-docs-returned') {
+              <app-agency-docs-returned [data]="$any(msg.data)" />
+            }
+
           }
         </div>
 

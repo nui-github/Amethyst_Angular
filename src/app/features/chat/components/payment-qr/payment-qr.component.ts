@@ -11,7 +11,7 @@ import { ChatService } from '@app/core/services/chat.service';
   template: `
     <div class="pqr-wrap">
       <p class="pqr-title">ชำระค่าธรรมเนียมใบอนุญาต</p>
-      <p class="pqr-sub">กรม{{ data.agency }} · ค่าธรรมเนียม <strong>{{ data.amount | number:'1.2-2' }} บาท</strong></p>
+      <p class="pqr-sub">{{ data.agency }} · ค่าธรรมเนียม <strong>{{ data.amount | number:'1.2-2' }} บาท</strong></p>
 
       <div class="pqr-qr-box">
         <!-- Simulated PromptPay QR -->
@@ -86,7 +86,7 @@ import { ChatService } from '@app/core/services/chat.service';
       <p class="pqr-expire">QR หมดอายุ: {{ data.expiresAt }}</p>
 
       <button class="pqr-btn" (click)="onPaid()">
-        ชำระเงินแล้ว — อัปโหลด Slip
+        ชำระเงินแล้ว
       </button>
     </div>
   `,

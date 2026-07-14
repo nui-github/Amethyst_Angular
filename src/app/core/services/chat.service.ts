@@ -5,12 +5,13 @@ import {
   StatusCardData, OcrResultsData, SpnResultData, Shipment,
   MissingField, MissingFieldsData, PaymentQrData, PaymentSlipData, HsAnalysisData,
   InvoiceLineItem, ItemHsAnalysisData, ProductHsAnalysis, ItemMeasurementData, CustomsDeclarationData,
-  InvoiceSelectData, Direction,
+  InvoiceSelectData, Direction, AgencyDocsReturnedData,
 } from '@app/core/models/types';
 import { OcrService, MultiInvoiceDetection } from './ocr.service';
 import { QueueService } from './queue.service';
 import { analyzeHsCode } from '@mock/hs-analysis.mock';
 import { getAgencyPayment } from '@mock/payment.mock';
+import { getAgencyReturnDocs } from '@mock/agency-return-docs.mock';
 import { KNOWN_REFS, MOCK_FORM_DATA, MOCK_SPN_LIST } from '@mock/spn.mock';
 import { MOCK_SPN_PROFILES } from '@mock/spn-companies.mock';
 import { getInvoiceLineItems, INVOICE_ITEMS_DECLARATION } from '@mock/invoice-items.mock';
@@ -1001,16 +1002,46 @@ export class ChatService {
     this.messages.update(list => list.map((m, i) => i === actual ? { ...m, isReadOnly: true } : m));
   }
 
+  // Agencies whose "ตรวจสอบสถานะ" chip simulates a real department approval → (QR payment if a
+  // fee applies) → returned-documents flow, instead of opening the generic permit-status list.
+  private readonly QR_PAYMENT_AGENCIES = ['กรมควบคุมโรค', 'การยาง'];
+
+  /** Called from status-card's "ตรวจสอบสถานะ" chip — agency-aware, unlike onCheckStatusChoice above */
+  checkStatus(agency?: string): void {
+    this.user('ตรวจสอบสถานะใบอนุญาต');
+    if (agency && this.QR_PAYMENT_AGENCIES.includes(agency)) {
+      this.withTyping(() => this.showAgencyApproval(agency), 700);
+    } else {
+      this.withTyping(() => this.bot('permit-status'), 500);
+    }
+  }
+
+  private showAgencyApproval(agency: string): void {
+    this.bot('text', undefined, `${agency}ตรวจสอบและอนุมัติคำขอแล้วครับ ✅`);
+    const payConfig = getAgencyPayment(agency);
+    if (payConfig.requiresFee) {
+      this.withTyping(() => {
+        this.bot('payment-qr', {
+          agency, amount: payConfig.amount,
+          refNo: `PAY-${Math.floor(Math.random() * 900000 + 100000)}`,
+          expiresAt: new Date(Date.now() + 15 * 60 * 1000).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
+        } satisfies PaymentQrData);
+      }, 600);
+    } else {
+      this.withTyping(() => this.showAgencyReturnedDocs(agency), 600);
+    }
+  }
+
+  private showAgencyReturnedDocs(agency: string): void {
+    this.bot('agency-docs-returned', {
+      agency, docs: getAgencyReturnDocs(agency),
+    } satisfies AgencyDocsReturnedData);
+  }
+
   onQrPaid(data: PaymentQrData): void {
     this.markLastReadOnly('payment-qr');
     this.user(`ชำระเงินแล้ว ${data.amount.toLocaleString('th-TH')} บาท`);
-    this.withTyping(() => {
-      this.bot('payment-slip', {
-        agency: data.agency,
-        amount: data.amount,
-        refNo: data.refNo,
-      } satisfies PaymentSlipData);
-    }, 600);
+    this.withTyping(() => this.showAgencyReturnedDocs(data.agency), 700);
   }
 
   onSlipUploaded(data: PaymentSlipData): void {
@@ -1053,7 +1084,7 @@ export class ChatService {
     this.bot('status-card', {
       refNo, customsRef: fd.ref ?? fd.invoiceNo ?? '—',
       submittedAt: new Date().toLocaleDateString('th-TH'),
-      feeNote,
+      feeNote, agency: this.currentAgency,
     } satisfies StatusCardData);
 
     if (this.currentAgency) {
