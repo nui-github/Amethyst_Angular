@@ -104,3 +104,85 @@ export const MOCK_EXPORT_INVOICE_OCR_RESULT = {
 };
 
 export type ExportInvoiceOcrResult = typeof MOCK_EXPORT_INVOICE_OCR_RESULT;
+
+// ─── Second invoice (multi-invoice-in-one-file scenario) ──────────────────────
+// Mirrors invoice-ocr.mock.ts's MOCK_INVOICE_OCR_RESULT_2 — export-side second invoice used
+// when ocr.service.ts's MULTI_INVOICE_TRIGGER matches on an export invoice upload.
+const EXPORT_INVOICE_LINE_ITEMS_2: OcrLineItem[] = [
+  { id: 'f1', name: 'Cassava Starch (แป้งมันสำปะหลัง)', hsCode: '1108.14.00', origin: 'นครราชสีมา (TH)', qty: '15000', unit: 'กก.' },
+  { id: 'f2', name: 'Frozen Shrimp (กุ้งแช่แข็ง)',       hsCode: '0306.17.00', origin: 'สุราษฎร์ธานี (TH)', qty: '8000',  unit: 'กก.' },
+];
+
+const EXPORT_INVOICE_CUSTOMS_ITEMS_2: CustomsDeclarationItem[] = [
+  {
+    itemNumber: 1, invoiceNo: 'EXPINV0010', invoiceDate: '2025-05-18', invoiceItemNumber: 1, declarationLineNumber: 1,
+    nameTh: 'แป้งมันสำปะหลัง', nameEn: 'Cassava Starch',
+    tariffCode: '1108140000', quantity: '15000', quantityUnit: 'กก.',
+    netWeight: '15000.000', netWeightUnit: 'KGM', packageAmount: '300', packageUnit: 'BAG',
+    originCountry: 'ไทย (TH)', purchaseCountry: 'ไต้หวัน (TW)',
+    invoiceAmountForeign: '9000.00', currencyCode: 'USD', invoiceAmountBaht: '320400.00',
+    manufacture: 'บริษัท โคราชสตาร์ช จำกัด, นครราชสีมา',
+    productions: [{ lotNo: 'CST-2568-033', mfgDate: '02-05-2568', measurement: '15000', measurementUnit: 'กก.', quantity: '15000', quantityUnit: 'กก.' }],
+  },
+  {
+    itemNumber: 2, invoiceNo: 'EXPINV0010', invoiceDate: '2025-05-18', invoiceItemNumber: 2, declarationLineNumber: 2,
+    nameTh: 'กุ้งแช่แข็ง', nameEn: 'Frozen Shrimp',
+    tariffCode: '0306170000', quantity: '8000', quantityUnit: 'กก.',
+    netWeight: '8000.000', netWeightUnit: 'KGM', packageAmount: '400', packageUnit: 'CTN',
+    originCountry: 'ไทย (TH)', purchaseCountry: 'ญี่ปุ่น (JP)',
+    invoiceAmountForeign: '48000.00', currencyCode: 'USD', invoiceAmountBaht: '1705600.00',
+    manufacture: 'บริษัท สุราษฎร์ซีฟู้ด จำกัด, สุราษฎร์ธานี',
+    certificateAnalysis: 'COA-SHRIMP-2568-011',
+    productions: [{ lotNo: 'SHR-2568-011', mfgDate: '10-05-2568', expDate: '10-05-2569', measurement: '8000', measurementUnit: 'กก.', quantity: '8000', quantityUnit: 'กก.' }],
+  },
+];
+
+const MOCK_EXPORT_INVOICE_CUSTOMS_DECLARATION_2: CustomsDeclarationData = {
+  referenceNumber:        '',
+  requestFactName:        'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด',
+  controlAgencyOfficeCode: '',
+  companyTaxNumber:       '',
+  companyBranch:          '',
+  companyName:            'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด (Siam Agri Export Co., Ltd.)',
+  attorneyIdCard:         '',
+  arrivalDate:            '',
+  departureDate:          '',
+  licenseType:            '',
+  consignmentCountry:     'TH',
+  destinationCountry:     '',
+  portDischargeCode:      '',
+  portLoadCode:           '',
+  controlDischargePort:   '',
+  controlReleasePort:     '',
+  informantIdCard:        '',
+  informantName:          '',
+  registrationId:         '',
+  items: EXPORT_INVOICE_CUSTOMS_ITEMS_2,
+};
+
+export const MOCK_EXPORT_INVOICE_OCR_RESULT_2 = {
+  invoiceNo:       'EXPINV0010',
+  invoiceDate:     '18/05/2025',
+  importDate:      '',
+  declarationDate: '',
+  quantity:        '23000',
+  qtyUnit:         'กก.',
+  lotNo:           'HOUSE-EXP-0092',
+  uNo:             '',
+  importer:        'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด',
+  declarant:       'NETBAY PUBLIC COMPANY LIMITED',
+  goodsDesc:       'แป้งมันสำปะหลัง / กุ้งแช่แข็ง (Cassava Starch / Frozen Shrimp)',
+  port:            'ท่าเรือแหลมฉบัง (LCH)',
+  hsCode:          '1108.14.00',
+  countryOrigin:   'ไทย (TH)',
+  licenseType:     '',
+  drugRegNo:       '',
+  lineItems:       EXPORT_INVOICE_LINE_ITEMS_2,
+  customsDeclaration: MOCK_EXPORT_INVOICE_CUSTOMS_DECLARATION_2,
+};
+
+// The set of invoices found inside one uploaded export-invoice file when MULTI_INVOICE_TRIGGER
+// matches — same pattern as MOCK_INVOICE_OCR_RESULTS in invoice-ocr.mock.ts.
+export const MOCK_EXPORT_INVOICE_OCR_RESULTS: ExportInvoiceOcrResult[] = [
+  MOCK_EXPORT_INVOICE_OCR_RESULT, MOCK_EXPORT_INVOICE_OCR_RESULT_2,
+];
