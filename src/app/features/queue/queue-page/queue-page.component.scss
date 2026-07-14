@@ -1479,6 +1479,22 @@
   color: #065F46;
 }
 
+.dv-result-docs {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 12px;
+  margin-bottom: 14px;
+  border-top: 1px solid #D1FAE5;
+}
+
+.dv-result-docs__label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #065F46;
+  margin: 0 0 2px;
+}
+
 .dv-result-actions {
   display: flex;
   gap: 8px;
