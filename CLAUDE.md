@@ -653,6 +653,17 @@ which ends the chat flow before ever reaching queue-save). So `permitNeeded` is 
 every shipment in `MOCK_QUEUE`.
 `email_outbox` / `await_customer` ถูกตัดออกจาก flow แล้ว (ไม่ใช้)
 
+Mechanism (ChatService): `onProfileSelected()` calls `saveEarlyQueueEntry(agency)` — pushes a thin
+`needs_you`/`isNew:true` Shipment (agency/formCode/documents already accurate via AGENCY_KEY_MAP/
+formForAgency()/buildDocumentsFromFormData(), but no items yet since selectedItems isn't populated
+this early) and remembers its id as `lastShipmentId`. `finalizeSubmit()` later builds the same full
+Shipment shape (this time with items/final formCode/stage/etc.) and, if `lastShipmentId` still
+points at a live record, `queue.update()`s it in place rather than adding a second one — one
+Shipment per agency round, growing more complete as the flow progresses, not created fresh at the
+very end. Each "ขอใบอนุญาตเพิ่ม" repeat for another agency goes through onProfileSelected again, so
+it gets its own separate early-saved record (matches submittedPermits' existing one-entry-per-agency
+convention).
+
 ### Queue → Chatbot session handoff
 ```
 QueuePage.selectRow(id)

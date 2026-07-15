@@ -677,6 +677,9 @@ export class ChatService {
       username:    profile.username,
       profile:     profile.code,
     });
+    // Every chat becomes a queue task the moment a profile is confirmed, not only once the user
+    // eventually clicks "ยืนยันส่งกรม" — finalizeSubmit() fills this same record in later.
+    this.saveEarlyQueueEntry(this.currentAgency);
     // Determine what to do based on pendingAfterFlow (set before agency choice)
     if (this.pendingAfterFlow === 'agency-docs') {
       // Invoice path: show agency-upload
@@ -1095,15 +1098,65 @@ export class ChatService {
     this.withTyping(() => this.finalizeSubmit(this.pendingSubmitRefNo), 800);
   }
 
+  /** Reconstructs the document list from formData — real uploaded files aren't retained as blobs
+   *  in this mock environment, so this is metadata-accurate (real invoice/customs ref) rather than
+   *  the actual file. Shared by saveEarlyQueueEntry() and finalizeSubmit(). */
+  private buildDocumentsFromFormData(fd: LicenseFormData): ShipmentDocument[] {
+    const documents: ShipmentDocument[] = [];
+    const uploadedAt = new Date().toLocaleDateString('th-TH');
+    if (fd.invoiceNo) {
+      documents.push({ id: genId(), name: `Invoice ${fd.invoiceNo}`, fileType: 'pdf', category: 'invoice', url: SAMPLE_DOC_URL, uploadedAt });
+    }
+    if (fd.ref?.startsWith('HTHM')) {
+      documents.push({ id: genId(), name: `ใบขนสินค้า ${fd.ref}`, fileType: 'pdf', category: 'customs', url: SAMPLE_DOC_URL, uploadedAt });
+    }
+    return documents;
+  }
+
+  private chatNameFor(fd: LicenseFormData): string {
+    return fd.ref?.startsWith('HTHM') ? fd.ref
+      : fd.invoiceNo ? fd.invoiceNo
+      : fd.importer ? `${fd.importer.replace('บริษัท ', '').replace(' จำกัด', '')} · ${fd.goodsDesc?.slice(0, 30) ?? ''}`
+      : `ขอใบ ${new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+  }
+
+  /** Saves a 'needs_you' placeholder into the queue the moment a profile is confirmed — every chat
+   *  now shows up there right away instead of only once "ยืนยันส่งกรม" is finally clicked.
+   *  finalizeSubmit() later updates this same record (via lastShipmentId) rather than creating a
+   *  second one. Items/documents aren't collected yet at this point in the flow, so this is
+   *  necessarily a thinner snapshot than the finalized record — filled in as the flow continues. */
+  private saveEarlyQueueEntry(agency: string): void {
+    const fd = this.formData();
+    const agencyKey: AgencyKey = this.AGENCY_KEY_MAP[agency] ?? 'none';
+    const form = this.formForAgency(agency);
+
+    const shipment: Shipment = {
+      id: genId(), chatName: this.chatNameFor(fd), isNew: true,
+      hthmRef: fd.ref?.startsWith('HTHM') ? fd.ref : undefined,
+      customsNo: fd.ref ?? fd.invoiceNo ?? 'รอเลขอ้างอิง', type: fd.direction === 'export' ? 'EXP' : 'IMP',
+      customer: fd.importer ?? '', contact: '', contactEmail: '',
+      goods: fd.goodsDesc ?? fd.hsCode ?? '', hs: fd.hsCode ?? '',
+      origin: fd.countryOrigin ?? '', importedAt: new Date().toLocaleString('th-TH'), createdAt: Date.now(),
+      owner: '', permitNeeded: true, agency: agencyKey,
+      formCode: form.code, formName: form.name,
+      conf: 88, stage: 4, statusKey: 'needs_you',
+      assess: { conf: 88, reason: 'กำลังดำเนินการ' },
+      classify: { agency: agencyKey, conf: 88, reason: '', alt: [] },
+      draft: { fields: [] }, flags: [],
+      audit: [{ time: getTime(), text: `เลือกโปรไฟล์และเริ่มดำเนินการกับ${agency}`, by: 'เจ้าหน้าที่' }],
+      documents: this.buildDocumentsFromFormData(fd), items: [], itemsSelected: false,
+      email: { toName: '', to: '', subject: '', body: '', attName: '' },
+      messages: this.messages().slice(this.flowStartIdx),
+    };
+
+    this.queue.add([shipment]);
+    this.lastShipmentId = shipment.id;
+  }
+
   private finalizeSubmit(refNo: string, feeNote?: string): void {
     this.promoteActiveSession();
     const flowMsgs = this.messages().slice(this.flowStartIdx);
     const fd = this.formData();
-
-    const chatName = fd.ref?.startsWith('HTHM') ? fd.ref
-      : fd.invoiceNo ? fd.invoiceNo
-      : fd.importer ? `${fd.importer.replace('บริษัท ', '').replace(' จำกัด', '')} · ${fd.goodsDesc?.slice(0, 30) ?? ''}`
-      : `ขอใบ ${new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' })}`;
 
     const agencyKey: AgencyKey = this.AGENCY_KEY_MAP[this.currentAgency] ?? 'none';
     const form = this.formForAgency(this.currentAgency);
@@ -1113,17 +1166,9 @@ export class ChatService {
       quantity: i.quantity, unit: i.unit, lotNo: i.lotNo, amount: i.amount,
     }));
 
-    const documents: ShipmentDocument[] = [];
-    const uploadedAt = new Date().toLocaleDateString('th-TH');
-    if (fd.invoiceNo) {
-      documents.push({ id: genId(), name: `Invoice ${fd.invoiceNo}`, fileType: 'pdf', category: 'invoice', url: SAMPLE_DOC_URL, uploadedAt });
-    }
-    if (fd.ref?.startsWith('HTHM')) {
-      documents.push({ id: genId(), name: `ใบขนสินค้า ${fd.ref}`, fileType: 'pdf', category: 'customs', url: SAMPLE_DOC_URL, uploadedAt });
-    }
-
+    const shipmentId = this.lastShipmentId ?? genId();
     const shipment: Shipment = {
-      id: genId(), chatName, isNew: false,
+      id: shipmentId, chatName: this.chatNameFor(fd), isNew: false,
       hthmRef: fd.ref?.startsWith('HTHM') ? fd.ref : undefined,
       customsNo: refNo, type: fd.direction === 'export' ? 'EXP' : 'IMP',
       customer: fd.importer ?? '', contact: '', contactEmail: '',
@@ -1136,13 +1181,21 @@ export class ChatService {
       classify: { agency: agencyKey, conf: 88, reason: '', alt: [] },
       draft: { fields: [] }, flags: [],
       audit: [{ time: getTime(), text: 'ยืนยันส่งกรมจากแชท', by: 'เจ้าหน้าที่' }],
-      documents, items, itemsSelected: items.length > 0,
+      documents: this.buildDocumentsFromFormData(fd), items, itemsSelected: items.length > 0,
       email: { toName: '', to: '', subject: '', body: '', attName: '' },
       messages: flowMsgs,
     };
 
-    this.queue.add([shipment]);
-    this.lastShipmentId = shipment.id;
+    // saveEarlyQueueEntry() (called from onProfileSelected) already pushed a 'needs_you' record for
+    // this agency's round — update it in place instead of adding a duplicate. Falls back to add()
+    // only if that somehow never ran (shouldn't happen — every flow goes through profile-select).
+    if (this.lastShipmentId && this.queue.get(this.lastShipmentId)) {
+      const { id: _drop, ...patch } = shipment;
+      this.queue.update(this.lastShipmentId, patch);
+    } else {
+      this.queue.add([shipment]);
+    }
+    this.lastShipmentId = shipmentId;
     this.step.set('done');
 
     this.bot('status-card', {
