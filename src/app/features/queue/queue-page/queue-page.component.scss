@@ -1451,6 +1451,24 @@
   &:hover { border-color: #0D8F61; background: rgba(13, 143, 97, 0.06); }
 }
 
+.dv-result-qr {
+  padding-top: 12px;
+  border-top: 1px solid #D1FAE5;
+}
+
+.dv-result-pending {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 14px 12px;
+  margin-top: 12px;
+  border-top: 1px solid #D1FAE5;
+  font-size: 12px;
+  font-weight: 600;
+  color: #B45309;
+}
+
 .dv-result-actions {
   display: flex;
   gap: 8px;

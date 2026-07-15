@@ -1,7 +1,6 @@
-import { ChangeDetectionStrategy, Component, Input, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PaymentQrData } from '@app/core/models/types';
-import { ChatService } from '@app/core/services/chat.service';
 
 @Component({
   selector: 'app-payment-qr',
@@ -126,9 +125,9 @@ import { ChatService } from '@app/core/services/chat.service';
 })
 export class PaymentQrComponent {
   @Input() data!: PaymentQrData;
-  readonly chat = inject(ChatService);
+  @Output() paid = new EventEmitter<PaymentQrData>();
 
   onPaid(): void {
-    this.chat.onQrPaid(this.data);
+    this.paid.emit(this.data);
   }
 }

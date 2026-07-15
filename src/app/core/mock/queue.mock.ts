@@ -953,6 +953,8 @@ export const MOCK_QUEUE: Shipment[] = [
       { time: '08:45', text: 'วิเคราะห์ HS Code: 3002.12.00 → กรมควบคุมโรค (90%)', by: 'AI' },
       { time: '08:50', text: 'แนบ Certificate of Analysis (COA) แล้ว', by: 'ปวีณา ส.' },
       { time: '08:55', text: 'ยื่นกรมควบคุมโรค สำเร็จ (Pink Form)', by: 'ระบบ' },
+      { time: '09:10', text: 'กรมควบคุมโรคตรวจสอบและอนุมัติคำขอแล้ว', by: 'กรมควบคุมโรค' },
+      { time: '09:12', text: 'กรมควบคุมโรคส่ง QR ชำระค่าธรรมเนียมกลับมาแล้ว รอชำระในหน้าคิวงาน', by: 'กรมควบคุมโรค' },
     ],
     messages: [
       bot('08:40', 'อัปโหลดใบ Invoice EXPINV0012 เข้าระบบแล้วครับ — Botulinum Antitoxin 80 กล่อง จากไทย ส่งออกไปเมียนมา'),
@@ -976,8 +978,10 @@ export const MOCK_QUEUE: Shipment[] = [
       t('08:55', 'bot', 'status-card', undefined, {
         refNo: 'RG-2568-73100', customsRef: 'EXPINV0012',
         submittedAt: new Date(Date.now() - 20 * 3600_000).toLocaleDateString('th-TH'), isPending: false,
-        agency: 'กรมควบคุมโรค', feeNote: 'ค่าธรรมเนียมกรม ฿1,000 (รอกรมตรวจสอบและแจ้งชำระ)',
+        agency: 'กรมควบคุมโรค', feeNote: 'ค่าธรรมเนียมกรม ฿1,000 (รอชำระผ่าน QR ในหน้าคิวงาน)',
       }),
+      bot('09:10', 'กรมควบคุมโรคตรวจสอบและอนุมัติคำขอแล้วครับ ✅'),
+      bot('09:11', 'กรมกำลังจัดเตรียม QR สำหรับชำระค่าธรรมเนียมครับ — กรุณาไปที่หน้าคิวงานเพื่อดู QR และดำเนินการชำระเงินต่อได้เลยครับ'),
     ],
     documents: [
       doc('d15a', 'Invoice EXPINV0012', 'invoice'),
@@ -987,5 +991,10 @@ export const MOCK_QUEUE: Shipment[] = [
     items: [
       { id: 'i15', name: 'Botulinum Antitoxin', hsCode: '3002.12.00', origin: 'ไทย (TH)', quantity: '80', unit: 'กล่อง', lotNo: 'BIO-2568-019', amount: 214400 },
     ],
+    paymentQr: {
+      agency: 'กรมควบคุมโรค', amount: 1000, refNo: 'PAY-773100',
+      expiresAt: new Date(Date.now() + 15 * 60 * 1000).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
+      status: 'unpaid',
+    },
   },
 ];

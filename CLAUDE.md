@@ -222,7 +222,12 @@ ChatMessage.type → @switch in ChatAreaComponent
   'missing-fields'     → MissingFieldsComponent (incomplete OCR → fill + optional re-upload)
   'agency-upload'      → AgencyUploadComponent  (per-agency doc slots; upload file OR manual entry per slot)
   'profile-select'     → ProfileSelectComponent (pick/confirm ShippingNet profile; mode: 'select'|'confirm')
-  'payment-qr'         → PaymentQrComponent     (QR PromptPay สำหรับกรมที่มีค่าธรรมเนียม)
+  'payment-qr'         → PaymentQrComponent     (QR PromptPay — legacy in chat now, only ever emitted
+                            by historical queue-mock/sessions-mock message replay (isReadOnly, so
+                            never interactive there); the live QR_PAYMENT_AGENCIES flow shows this
+                            same component on the queue detail page instead — see 'Payment flow'
+                            below. (paid) is a plain @Output() now, not a direct ChatService inject,
+                            specifically so both chat-area and queue-page can reuse the component)
   'payment-slip'       → PaymentSlipComponent   (อัปโหลด slip หลังชำระ; disabled after upload via msg.isReadOnly)
 ```
 
@@ -571,15 +576,48 @@ formData.selectedItems directly from getInvoiceLineItems() in continueAfterOCR()
 ```
 submit() → finalizeSubmit() → status-card (สีเขียว สำเร็จ) immediately
 
-ถ้ากรมมีค่าธรรมเนียม → status-card แสดง feeNote:
-  "ค่าธรรมเนียมกรม ฿{amount} จะรวมในบิลรายเดือน"
+Most agencies: fee (if any) is just informational —
+  status-card feeNote: "ค่าธรรมเนียมกรม ฿{amount} จะรวมในบิลรายเดือน"
+  No further payment step; ตรวจสอบสถานะ → generic 'permit-status' list.
 
-ไม่มี QR payment หรือ slip upload อีกต่อไป
-ค่าธรรมเนียมเก็บผ่านค่าใช้งานระบบรายเดือนแทน
+QR_PAYMENT_AGENCIES (chat.service.ts — currently กรมควบคุมโรค, การยาง; their Pink Form flow
+simulates a real department review) instead: status-card's "ตรวจสอบสถานะ" chip calls
+checkStatus(agency), which is agency-aware unlike the generic path:
+  checkStatus(agency) → showAgencyApproval(agency):
+    - bot text: "{agency}ตรวจสอบและอนุมัติคำขอแล้วครับ ✅"
+    - getAgencyPayment(agency).requiresFee:
+        true  (กรมควบคุมโรค) → bot text telling the user the QR will be waiting on the queue
+               page → setAgencyPaymentQr() writes Shipment.paymentQr = {agency, amount, refNo,
+               expiresAt, status:'unpaid'} directly onto the just-submitted shipment via
+               QueueService.update(lastShipmentId, ...) (lastShipmentId tracked from
+               finalizeSubmit()'s queue.add() call) → showNextAgencyIfAny() — the chat's part
+               in this agency's flow is over from here; QR payment happens entirely on the
+               queue detail page instead (below), not in chat.
+        false (การยาง) → showAgencyReturnedDocs(agency) same as before (bot 'agency-docs-returned'
+               card in chat) → showNextAgencyIfAny() once that resolves.
+  finalizeSubmit()'s own feeNote text also branches: QR_PAYMENT_AGENCIES get "...(รอชำระผ่าน QR
+  หลังกรมอนุมัติ)" instead of "...จะรวมในบิลรายเดือน", since that's not actually how their fee
+  gets collected.
+
+Queue-side QR payment (QueuePageComponent, "ผลการยื่น" card — only reachable once
+Shipment.paymentQr is set and status !== 'paid_confirmed', checked ahead of the existing
+returnedDocuments/print-download branches):
+  status 'unpaid'        → <app-payment-qr> (reused from chat/components/payment-qr — its (paid)
+                            output was changed from directly injecting ChatService to a plain
+                            EventEmitter so both chat and queue-page can wire their own handler)
+                            rendered inline with the QR/amount/expiry; "ชำระเงินแล้ว" → payQr(ship)
+  payQr(ship) marks paymentQr.status = 'paid_pending' immediately (+ audit entry), then after a
+  simulated delay (setTimeout, mirrors chat's withTyping() delay convention) marks
+  'paid_confirmed' and writes Shipment.returnedDocuments from getAgencyReturnDocs(agency) (+
+  another audit entry) — from that point the card falls through to the existing returned-docs
+  display, same as agency-docs-returned's chat equivalent.
+  status 'paid_pending'  → "รอกรมตรวจสอบสถานะการชำระเงิน..." (amber, no action)
 
 Agency fee config (payment.mock.ts):
   อย.  → ฟรี (LPI ไม่มีค่าธรรมเนียม)
   กษ.  → ฿500 (ค่าตรวจสอบสุขอนามัย)
+  กรมควบคุมโรค → ฿1,000 (ผ่าน QR ในคิวงาน, ดูด้านบน)
+  การยาง       → ฟรี
 ```
 
 ### ChatStep states

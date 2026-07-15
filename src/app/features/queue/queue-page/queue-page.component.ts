@@ -12,7 +12,9 @@ import { Router } from '@angular/router';
 import { QueueService, STATUS_META, AGENCY_SHORT, AGENCY_LABEL } from '@app/core/services/queue.service';
 import { ChatService } from '@app/core/services/chat.service';
 import { SidebarComponent } from '../../chat/components/sidebar/sidebar.component';
+import { PaymentQrComponent } from '../../chat/components/payment-qr/payment-qr.component';
 import { ChatMessage, Shipment, ShipmentStatus, ShipmentItem, ITEM_MANUAL_DETAIL_FIELDS } from '@app/core/models/types';
+import { getAgencyReturnDocs } from '@mock/agency-return-docs.mock';
 
 export { STATUS_META, AGENCY_SHORT };
 
@@ -24,7 +26,7 @@ const STAGE_LABELS = ['','ตรวจรับใบขน','วิเครา
   selector: 'app-queue-page',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, NzInputModule, NzButtonModule, NzTagModule, NzTableModule, NzToolTipModule, NzBadgeModule, LucideAngularModule, SidebarComponent],
+  imports: [CommonModule, FormsModule, NzInputModule, NzButtonModule, NzTagModule, NzTableModule, NzToolTipModule, NzBadgeModule, LucideAngularModule, SidebarComponent, PaymentQrComponent],
   templateUrl: './queue-page.component.html',
   styleUrl:    './queue-page.component.scss',
 })
@@ -258,5 +260,36 @@ export class QueuePageComponent {
     const a = document.createElement('a');
     a.href = url; a.download = filename; a.click();
     URL.revokeObjectURL(url);
+  }
+
+  /** "ชำระเงินแล้ว" on the queue-side QR payment card (ChatService.setAgencyPaymentQr wrote
+   *  paymentQr onto this shipment after department approval). Marks paid_pending immediately,
+   *  then simulates the department confirming payment + sending back its documents. */
+  payQr(ship: Shipment): void {
+    const qr = ship.paymentQr;
+    if (!qr || qr.status !== 'unpaid') return;
+    const payTime = this.nowTime();
+    this.q.update(ship.id, {
+      paymentQr: { ...qr, status: 'paid_pending' },
+      audit: [...ship.audit, { time: payTime, text: `ชำระค่าธรรมเนียม ฿${qr.amount.toLocaleString('th-TH')} ผ่าน QR แล้ว`, by: 'ผู้ใช้งาน' }],
+    });
+
+    setTimeout(() => {
+      const current = this.q.get(ship.id);
+      if (!current?.paymentQr) return;
+      const doneTime = this.nowTime();
+      this.q.update(ship.id, {
+        paymentQr: { ...current.paymentQr, status: 'paid_confirmed' },
+        returnedDocuments: getAgencyReturnDocs(current.paymentQr.agency).map((d, i) => ({
+          id: `pd_${ship.id}_${i}`, name: d.label, fileType: 'pdf', category: 'other',
+          url: d.url, uploadedAt: doneTime,
+        })),
+        audit: [...current.audit, { time: doneTime, text: `${current.paymentQr.agency}ตรวจสอบการชำระเงินสำเร็จ และส่งเอกสารกลับมาให้แล้ว`, by: current.paymentQr.agency }],
+      });
+    }, 2500);
+  }
+
+  private nowTime(): string {
+    return new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
   }
 }

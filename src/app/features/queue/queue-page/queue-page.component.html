@@ -426,6 +426,17 @@
                       </div>
                     }
                   </div>
+                } @else if (openShipment()!.paymentQr && openShipment()!.paymentQr!.status !== 'paid_confirmed') {
+                  @if (openShipment()!.paymentQr!.status === 'unpaid') {
+                    <div class="dv-result-qr">
+                      <app-payment-qr [data]="openShipment()!.paymentQr!" (paid)="payQr(openShipment()!)" />
+                    </div>
+                  } @else {
+                    <div class="dv-result-pending">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                      รอกรมตรวจสอบสถานะการชำระเงิน...
+                    </div>
+                  }
                 } @else {
                   <div class="dv-result-actions">
                     <button class="dv-result-btn dv-result-btn--outline" (click)="printLicense(openShipment()!)">

@@ -3,7 +3,7 @@ import {
   ChatMessage, ChatHistorySession, ChatStep, LicenseFormData, MessageType,
   FlagCardData, FlagItem, ChoiceCardData, EmailDraftData,
   StatusCardData, OcrResultsData, SpnResultData, Shipment,
-  MissingField, MissingFieldsData, PaymentQrData, PaymentSlipData, HsAnalysisData,
+  MissingField, MissingFieldsData, PaymentSlipData, HsAnalysisData,
   InvoiceLineItem, ItemHsAnalysisData, ProductHsAnalysis, ItemMeasurementData, CustomsDeclarationData,
   InvoiceSelectData, Direction, AgencyDocsReturnedData,
 } from '@app/core/models/types';
@@ -66,6 +66,10 @@ export class ChatService {
   private emailGen = 0;
   private currentAgency = '';
   private submittedAgencies: string[] = [];
+  // Shipment.id most recently pushed to the queue by finalizeSubmit() — checkStatus()'s approval
+  // flow patches this record directly (e.g. setAgencyPaymentQr()) since it happens later in the
+  // same session, after the shipment already exists in QueueService.
+  private lastShipmentId: string | null = null;
 
   // Public: tracks all agencies needed + which have been submitted
   readonly allPermitAgencies  = signal<string[]>([]);
@@ -988,7 +992,9 @@ export class ChatService {
 
     const payConfig = getAgencyPayment(this.currentAgency);
     const feeNote = payConfig.requiresFee
-      ? `ค่าธรรมเนียมกรม ฿${payConfig.amount.toLocaleString('th-TH')} จะรวมในบิลรายเดือน`
+      ? this.QR_PAYMENT_AGENCIES.includes(this.currentAgency)
+        ? `ค่าธรรมเนียมกรม ฿${payConfig.amount.toLocaleString('th-TH')} (รอชำระผ่าน QR หลังกรมอนุมัติ)`
+        : `ค่าธรรมเนียมกรม ฿${payConfig.amount.toLocaleString('th-TH')} จะรวมในบิลรายเดือน`
       : undefined;
 
     this.finalizeSubmit(refNo, feeNote);
@@ -1021,15 +1027,29 @@ export class ChatService {
     const payConfig = getAgencyPayment(agency);
     if (payConfig.requiresFee) {
       this.withTyping(() => {
-        this.bot('payment-qr', {
-          agency, amount: payConfig.amount,
-          refNo: `PAY-${Math.floor(Math.random() * 900000 + 100000)}`,
-          expiresAt: new Date(Date.now() + 15 * 60 * 1000).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
-        } satisfies PaymentQrData);
+        this.bot('text', undefined,
+          `กรมกำลังจัดเตรียม QR สำหรับชำระค่าธรรมเนียมครับ — กรุณาไปที่หน้าคิวงานเพื่อดู QR และดำเนินการชำระเงินต่อได้เลยครับ`);
+        this.setAgencyPaymentQr(agency, payConfig.amount);
+        this.withTyping(() => this.showNextAgencyIfAny(), 700);
       }, 600);
     } else {
       this.withTyping(() => this.showAgencyReturnedDocs(agency), 600);
     }
+  }
+
+  /** Writes the QR payment straight onto the shipment's queue record — the rest of that
+   *  agency's flow (view QR, pay, wait for confirmation, receive returned docs) happens on the
+   *  queue detail page from here, not in chat. See QueuePageComponent.payQr(). */
+  private setAgencyPaymentQr(agency: string, amount: number): void {
+    if (!this.lastShipmentId) return;
+    this.queue.update(this.lastShipmentId, {
+      paymentQr: {
+        agency, amount,
+        refNo: `PAY-${Math.floor(Math.random() * 900000 + 100000)}`,
+        expiresAt: new Date(Date.now() + 15 * 60 * 1000).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
+        status: 'unpaid',
+      },
+    });
   }
 
   private showAgencyReturnedDocs(agency: string): void {
@@ -1037,16 +1057,10 @@ export class ChatService {
       agency, docs: getAgencyReturnDocs(agency),
     } satisfies AgencyDocsReturnedData);
     // Deferred from finalizeSubmit() for QR_PAYMENT_AGENCIES — only offer "ขอใบอนุญาตเพิ่ม" once
-    // this agency's approval → (payment) → returned-docs sequence has actually finished.
+    // this agency's approval → returned-docs sequence has actually finished.
     if (this.submittedAgencies.includes(agency)) {
       this.withTyping(() => this.showNextAgencyIfAny(), 800);
     }
-  }
-
-  onQrPaid(data: PaymentQrData): void {
-    this.markLastReadOnly('payment-qr');
-    this.user(`ชำระเงินแล้ว ${data.amount.toLocaleString('th-TH')} บาท`);
-    this.withTyping(() => this.showAgencyReturnedDocs(data.agency), 700);
   }
 
   onSlipUploaded(data: PaymentSlipData): void {
@@ -1084,6 +1098,7 @@ export class ChatService {
     };
 
     this.queue.add([shipment]);
+    this.lastShipmentId = shipment.id;
     this.step.set('done');
 
     this.bot('status-card', {
@@ -1101,8 +1116,9 @@ export class ChatService {
         licenseType: fd.licenseType ?? 'RGoods',
         invoiceRef: fd.ref ?? fd.invoiceNo ?? '—',
       }]);
-      // QR_PAYMENT_AGENCIES must finish "ตรวจสอบสถานะ" → (payment if a fee applies) → returned
-      // docs first — showNextAgencyIfAny() runs from showAgencyReturnedDocs() instead for those.
+      // QR_PAYMENT_AGENCIES must finish "ตรวจสอบสถานะ" → approval → (QR payment in the queue page,
+      // if a fee applies, else returned docs right away) first — showNextAgencyIfAny() runs from
+      // showAgencyApproval()/showAgencyReturnedDocs() instead for those.
       if (!this.QR_PAYMENT_AGENCIES.includes(this.currentAgency)) {
         this.withTyping(() => this.showNextAgencyIfAny(), 800);
       }
