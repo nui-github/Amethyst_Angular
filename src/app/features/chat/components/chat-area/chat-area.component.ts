@@ -34,6 +34,7 @@ import { ItemHsAnalysisComponent } from '../item-hs-analysis/item-hs-analysis.co
 import { ItemMeasurementComponent } from '../item-measurement/item-measurement.component';
 import { InvoiceSelectComponent } from '../invoice-select/invoice-select.component';
 import { AgencyDocsReturnedComponent } from '../agency-docs-returned/agency-docs-returned.component';
+import { AgencyApprovalPendingComponent } from '../agency-approval-pending/agency-approval-pending.component';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 
 /**
@@ -59,7 +60,7 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
     ConnectPanelComponent, FullUploadComponent, SingleUploadComponent, EmailDraftComponent, FormPanelComponent,
     SpnConnectComponent, HsAnalysisComponent, FormPreviewComponent, MissingFieldsComponent, AgencyUploadComponent, ProfileSelectComponent, PermitStatusComponent,
     PaymentQrComponent, PaymentSlipComponent, ItemHsAnalysisComponent, ItemMeasurementComponent,
-    InvoiceSelectComponent, AgencyDocsReturnedComponent,
+    InvoiceSelectComponent, AgencyDocsReturnedComponent, AgencyApprovalPendingComponent,
   ],
   templateUrl: './chat-area.component.html',
   styleUrl: './chat-area.component.scss',

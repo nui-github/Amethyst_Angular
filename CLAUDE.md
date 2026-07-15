@@ -229,6 +229,13 @@ ChatMessage.type → @switch in ChatAreaComponent
                             below. (paid) is a plain @Output() now, not a direct ChatService inject,
                             specifically so both chat-area and queue-page can reuse the component)
   'payment-slip'       → PaymentSlipComponent   (อัปโหลด slip หลังชำระ; disabled after upload via msg.isReadOnly)
+  'agency-approval-pending' → AgencyApprovalPendingComponent (fee-charging QR_PAYMENT_AGENCIES only
+                            — currently just กรมควบคุมโรค, since การยาง has no fee; see 'Payment
+                            flow' below. Single card combining the "{agency}ตรวจสอบและอนุมัติคำขอ
+                            แล้วครับ" success line + a hint pointing the user to คิวงาน for the QR —
+                            previously 2 separate plain-text bot() bubbles, merged into one styled
+                            card. Purely informational, no interactive elements, so no isReadOnly
+                            gating needed)
 ```
 
 ### Services (inject, never constructor)
@@ -583,18 +590,17 @@ Most agencies: fee (if any) is just informational —
 QR_PAYMENT_AGENCIES (chat.service.ts — currently กรมควบคุมโรค, การยาง; their Pink Form flow
 simulates a real department review) instead: status-card's "ตรวจสอบสถานะ" chip calls
 checkStatus(agency), which is agency-aware unlike the generic path:
-  checkStatus(agency) → showAgencyApproval(agency):
-    - bot text: "{agency}ตรวจสอบและอนุมัติคำขอแล้วครับ ✅"
-    - getAgencyPayment(agency).requiresFee:
-        true  (กรมควบคุมโรค) → bot text telling the user the QR will be waiting on the queue
-               page → setAgencyPaymentQr() writes Shipment.paymentQr = {agency, amount, refNo,
-               expiresAt, status:'unpaid'} directly onto the just-submitted shipment via
-               QueueService.update(lastShipmentId, ...) (lastShipmentId tracked from
-               finalizeSubmit()'s queue.add() call) → showNextAgencyIfAny() — the chat's part
-               in this agency's flow is over from here; QR payment happens entirely on the
-               queue detail page instead (below), not in chat.
-        false (การยาง) → showAgencyReturnedDocs(agency) same as before (bot 'agency-docs-returned'
-               card in chat) → showNextAgencyIfAny() once that resolves.
+  checkStatus(agency) → showAgencyApproval(agency), branching on getAgencyPayment(agency).requiresFee:
+        true  (กรมควบคุมโรค) → bot 'agency-approval-pending' card (approved + "QR is on its way to
+               คิวงาน", single merged card — see message-type list above) → setAgencyPaymentQr()
+               writes Shipment.paymentQr = {agency, amount, refNo, expiresAt, status:'unpaid'}
+               directly onto the just-submitted shipment via QueueService.update(lastShipmentId,
+               ...) (lastShipmentId tracked from finalizeSubmit()'s queue.add() call) →
+               showNextAgencyIfAny() — the chat's part in this agency's flow is over from here;
+               QR payment happens entirely on the queue detail page instead (below), not in chat.
+        false (การยาง) → bot text "{agency}ตรวจสอบและอนุมัติคำขอแล้วครับ ✅" → showAgencyReturnedDocs
+               (agency) same as before (bot 'agency-docs-returned' card in chat) →
+               showNextAgencyIfAny() once that resolves.
   finalizeSubmit()'s own feeNote text also branches: QR_PAYMENT_AGENCIES get "...(รอชำระผ่าน QR
   หลังกรมอนุมัติ)" instead of "...จะรวมในบิลรายเดือน", since that's not actually how their fee
   gets collected.

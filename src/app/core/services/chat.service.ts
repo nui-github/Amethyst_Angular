@@ -5,7 +5,7 @@ import {
   StatusCardData, OcrResultsData, SpnResultData, Shipment,
   MissingField, MissingFieldsData, PaymentSlipData, HsAnalysisData,
   InvoiceLineItem, ItemHsAnalysisData, ProductHsAnalysis, ItemMeasurementData, CustomsDeclarationData,
-  InvoiceSelectData, Direction, AgencyDocsReturnedData,
+  InvoiceSelectData, Direction, AgencyDocsReturnedData, AgencyApprovalPendingData,
 } from '@app/core/models/types';
 import { OcrService, MultiInvoiceDetection } from './ocr.service';
 import { QueueService } from './queue.service';
@@ -1023,16 +1023,13 @@ export class ChatService {
   }
 
   private showAgencyApproval(agency: string): void {
-    this.bot('text', undefined, `${agency}ตรวจสอบและอนุมัติคำขอแล้วครับ ✅`);
     const payConfig = getAgencyPayment(agency);
     if (payConfig.requiresFee) {
-      this.withTyping(() => {
-        this.bot('text', undefined,
-          `กรมกำลังจัดเตรียม QR สำหรับชำระค่าธรรมเนียมครับ — กรุณาไปที่หน้าคิวงานเพื่อดู QR และดำเนินการชำระเงินต่อได้เลยครับ`);
-        this.setAgencyPaymentQr(agency, payConfig.amount);
-        this.withTyping(() => this.showNextAgencyIfAny(), 700);
-      }, 600);
+      this.bot('agency-approval-pending', { agency } satisfies AgencyApprovalPendingData);
+      this.setAgencyPaymentQr(agency, payConfig.amount);
+      this.withTyping(() => this.showNextAgencyIfAny(), 700);
     } else {
+      this.bot('text', undefined, `${agency}ตรวจสอบและอนุมัติคำขอแล้วครับ ✅`);
       this.withTyping(() => this.showAgencyReturnedDocs(agency), 600);
     }
   }

@@ -47,10 +47,14 @@ export type MessageType =
                         // picks exactly one before the ocr-results card appears; the rest of the
                         // flow then proceeds using only that chosen invoice's data, same as a
                         // normal single-invoice upload
-  | 'agency-docs-returned'; // กรมควบคุมโรค/การยาง only (see ChatService.QR_PAYMENT_AGENCIES): shown
+  | 'agency-docs-returned' // กรมควบคุมโรค/การยาง only (see ChatService.QR_PAYMENT_AGENCIES): shown
                         // after the department approves the request (triggered by clicking
                         // "ตรวจสอบสถานะ" on status-card) and, if a fee applies, after payment-qr
                         // is paid — lists the documents the department sent back
+  | 'agency-approval-pending'; // fee-charging QR_PAYMENT_AGENCIES only (currently กรมควบคุมโรค):
+                        // shown right after showAgencyApproval()'s approval instead of the old
+                        // 2 separate plain-text bot() bubbles — single card combining "approved"
+                        // + "QR is on its way to the queue page", see AgencyApprovalPendingComponent
 
 // One alternative HS Code suggestion offered when the user edits an item's classification —
 // invoices from real users typically carry no HS Code at all, so AI classifies purely from the
@@ -371,6 +375,10 @@ export interface AgencyReturnDoc {
 export interface AgencyDocsReturnedData {
   agency: string;
   docs: AgencyReturnDoc[];
+}
+
+export interface AgencyApprovalPendingData {
+  agency: string;
 }
 
 // ─── Form / OCR ──────────────────────────────────────────────────────────────

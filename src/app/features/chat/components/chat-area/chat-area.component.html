@@ -251,6 +251,11 @@
               <app-agency-docs-returned [data]="$any(msg.data)" />
             }
 
+            <!-- Fee-charging QR_PAYMENT_AGENCIES only: approved, QR payment now happens on the queue page -->
+            @case ('agency-approval-pending') {
+              <app-agency-approval-pending [data]="$any(msg.data)" />
+            }
+
           }
         </div>
 
