@@ -24,28 +24,22 @@
           </div>
         </div>
 
-        <!-- Toolbar: tabs + search -->
+        <!-- Toolbar: search + filters -->
         <div class="qt">
-          <div class="qt-tabs">
+          <div class="qt-search">
+            <lucide-icon [img]="icSearch" [size]="14" style="color:#BEC3D0;flex-shrink:0" />
+            <input [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" placeholder="ค้นหาจากเลขอ้างอิง, เลข inv, เลขใบขน, ชื่อสินค้า..." />
+          </div>
+          <select class="qt-filter qt-filter--status" [ngModel]="activeTab()" (ngModelChange)="activeTab.set($event)">
             @for (t of tabs; track t.value) {
-              <button class="qt-tab" [class.qt-tab--active]="activeTab() === t.value"
-                (click)="activeTab.set(t.value)">
-                {{ t.label }}
-                <span class="qt-badge" [class.qt-badge--active]="activeTab() === t.value">{{ tabCount(t.value) }}</span>
-              </button>
+              <option [value]="t.value">{{ t.label }} ({{ tabCount(t.value) }})</option>
             }
-          </div>
-          <div class="qt-right">
-            <select class="qt-filter" [ngModel]="permitFilter()" (ngModelChange)="permitFilter.set($event)">
-              <option value="all">ทุกประเภทใบอนุญาต</option>
-              <option value="IMP">ขาเข้า</option>
-              <option value="EXP">ขาออก</option>
-            </select>
-            <div class="qt-search">
-              <lucide-icon [img]="icSearch" [size]="14" style="color:#BEC3D0;flex-shrink:0" />
-              <input [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" placeholder="ค้นหา..." />
-            </div>
-          </div>
+          </select>
+          <select class="qt-filter" [ngModel]="permitFilter()" (ngModelChange)="permitFilter.set($event)">
+            <option value="all">ทุกประเภทใบอนุญาต</option>
+            <option value="IMP">ขาเข้า</option>
+            <option value="EXP">ขาออก</option>
+          </select>
         </div>
 
         <!-- Table -->
