@@ -75,13 +75,6 @@ export class DdcPinkFormEditorComponent implements OnInit {
     totalItemNumber: '',
     numberOfCopy: '',
     remark: '',
-    // Payment
-    bankCode: '',
-    bankBranchCode: '',
-    bankAccountNumber: '',
-    feeAmount: undefined,
-    postServiceAmount: undefined,
-    totalPaymentAmount: undefined,
     items: [],
   });
 
@@ -131,13 +124,7 @@ export class DdcPinkFormEditorComponent implements OnInit {
         totalItemNumber: '',
         numberOfCopy: '',
         remark: '',
-        bankCode: '',
-        bankBranchCode: '',
-        bankAccountNumber: '',
-        feeAmount: undefined,
-        postServiceAmount: undefined,
-        totalPaymentAmount: undefined,
-        items: decl.items || [],
+        items: (decl.items || []) as any,
       });
     }
   }
@@ -158,7 +145,7 @@ export class DdcPinkFormEditorComponent implements OnInit {
       informantIdCard: data.shipperManagerIdCard,
       portDischargeCode: data.portOfDischarge,
       departureDate: data.departureDate,
-      items: data.items,
+      items: data.items as any,
     };
 
     this.chat.saveDeclarationEditor(updated);
@@ -215,12 +202,28 @@ export interface DdcPinkFormData {
   totalItemNumber: string;
   numberOfCopy: string;
   remark: string;
-  // Payment
-  bankCode: string;
-  bankBranchCode: string;
-  bankAccountNumber: string;
-  feeAmount?: number;
-  postServiceAmount?: number;
-  totalPaymentAmount?: number;
-  items: any[];
+  items: DdcPinkFormItem[];
+}
+
+export interface DdcPinkFormItem {
+  itemNumber?: number;
+  invoiceItemNumber?: number;
+  productType?: string;
+  tariffCode?: string;
+  statisticalCode?: string;
+  nameTh?: string;
+  nameEn?: string;
+  quantity?: number;
+  quantityUnit?: string;
+  quantityUnitTextTh?: string;
+  packageUnit?: string;
+  packageUnitTextTh?: string;
+  productionDate?: string;
+  expirationDate?: string;
+  productionProvinceCode?: string;
+  productionProvinceName?: string;
+  productionSubProvinceCode?: string;
+  productionSubProvinceName?: string;
+  productionDistrictCode?: string;
+  productionDistrictName?: string;
 }

@@ -277,56 +277,98 @@
         <div class="cde-sec__head" style="border-left-color: rgb(59, 130, 246);">
           <span class="cde-sec__title">รายการสินค้า</span>
         </div>
-        <p style="color: var(--bizx-n600); font-size: 13px; margin: 0;">
-          รายการสินค้า {{ local().items.length || 0 }} รายการ (ดึงข้อมูลจาก OCR ของเอกสารสำเร็จ)
-        </p>
-      </div>
-
-      <!-- PAYMENT SECTION -->
-      <div class="cde-sec">
-        <div class="cde-sec__head" style="border-left-color: rgb(236, 72, 153);">
-          <span class="cde-sec__title">ข้อมูลชำระเงิน</span>
-        </div>
-        <div class="cde-form-grid">
-          <label class="cde-field">
-            <span class="cde-field__label">รหัสธนาคาร <em>*</em></span>
-            <input class="cde-field__input" [(ngModel)]="local().bankCode" />
-          </label>
-          <label class="cde-field">
-            <span class="cde-field__label">รหัสสาขาธนาคาร <em>*</em></span>
-            <input class="cde-field__input" [(ngModel)]="local().bankBranchCode" />
-          </label>
-          <label class="cde-field cde-field--full">
-            <span class="cde-field__label">เลขที่บัญชีธนาคาร <em>*</em></span>
-            <input class="cde-field__input" [(ngModel)]="local().bankAccountNumber" />
-          </label>
-          <label class="cde-field">
-            <span class="cde-field__label">ค่าธรรมเนียม (บาท) <em>*</em></span>
-            <input
-              class="cde-field__input"
-              type="number"
-              step="0.01"
-              [(ngModel)]="local().feeAmount"
-            />
-          </label>
-          <label class="cde-field">
-            <span class="cde-field__label">ค่าจัดส่งไปรษณีย์ (บาท)</span>
-            <input
-              class="cde-field__input"
-              type="number"
-              step="0.01"
-              [(ngModel)]="local().postServiceAmount"
-            />
-          </label>
-          <label class="cde-field">
-            <span class="cde-field__label">ยอดชำระรวม (บาท) <em>*</em></span>
-            <input
-              class="cde-field__input"
-              type="number"
-              step="0.01"
-              [(ngModel)]="local().totalPaymentAmount"
-            />
-          </label>
+        <div class="cde-items-list">
+          @for (item of local().items; let i = $index; track i) {
+            <div class="cde-item-card">
+              <div class="cde-item-card__head">
+                <h4 class="cde-item-card__title">รายการที่ {{ i + 1 }}</h4>
+              </div>
+              <div class="cde-form-grid">
+                <label class="cde-field">
+                  <span class="cde-field__label">ลำดับรายการใน Invoice</span>
+                  <input class="cde-field__input" [(ngModel)]="item.invoiceItemNumber" type="number" />
+                </label>
+                <label class="cde-field">
+                  <span class="cde-field__label">ประเภทอาหาร <em>*</em></span>
+                  <select class="cde-field__input" [(ngModel)]="item.productType">
+                    <option value="">เลือก</option>
+                    <option value="1">ผลไม้</option>
+                    <option value="2">ผัก</option>
+                    <option value="3">อาหาร</option>
+                    <option value="4">อื่นๆ</option>
+                  </select>
+                </label>
+                <label class="cde-field">
+                  <span class="cde-field__label">รหัสพิกัดศุลกากร</span>
+                  <input class="cde-field__input" [(ngModel)]="item.tariffCode" />
+                </label>
+                <label class="cde-field">
+                  <span class="cde-field__label">รหัสสถิติสินค้า</span>
+                  <input class="cde-field__input" [(ngModel)]="item.statisticalCode" />
+                </label>
+                <label class="cde-field cde-field--full">
+                  <span class="cde-field__label">ชื่ออาหาร (ไทย) <em>*</em></span>
+                  <input class="cde-field__input" [(ngModel)]="item.nameTh" placeholder="ชื่อสินค้าภาษาไทย" />
+                </label>
+                <label class="cde-field cde-field--full">
+                  <span class="cde-field__label">ชื่ออาหาร (อังกฤษ) <em>*</em></span>
+                  <input class="cde-field__input" [(ngModel)]="item.nameEn" placeholder="ชื่อสินค้าภาษาอังกฤษ" />
+                </label>
+                <label class="cde-field">
+                  <span class="cde-field__label">ปริมาณ <em>*</em></span>
+                  <input class="cde-field__input" [(ngModel)]="item.quantity" type="number" step="0.001" />
+                </label>
+                <label class="cde-field">
+                  <span class="cde-field__label">รหัสหน่วยปริมาณ <em>*</em></span>
+                  <input class="cde-field__input" [(ngModel)]="item.quantityUnit" />
+                </label>
+                <label class="cde-field">
+                  <span class="cde-field__label">ชื่อหน่วยปริมาณ (ไทย) <em>*</em></span>
+                  <input class="cde-field__input" [(ngModel)]="item.quantityUnitTextTh" />
+                </label>
+                <label class="cde-field">
+                  <span class="cde-field__label">รหัสหน่วยหีบห่อ <em>*</em></span>
+                  <input class="cde-field__input" [(ngModel)]="item.packageUnit" />
+                </label>
+                <label class="cde-field">
+                  <span class="cde-field__label">ชื่อหน่วยหีบห่อ (ไทย) <em>*</em></span>
+                  <input class="cde-field__input" [(ngModel)]="item.packageUnitTextTh" />
+                </label>
+                <label class="cde-field">
+                  <span class="cde-field__label">วันที่ผลิต <em>*</em></span>
+                  <input class="cde-field__input" [(ngModel)]="item.productionDate" type="date" />
+                </label>
+                <label class="cde-field">
+                  <span class="cde-field__label">วันหมดอายุ <em>*</em></span>
+                  <input class="cde-field__input" [(ngModel)]="item.expirationDate" type="date" />
+                </label>
+                <label class="cde-field">
+                  <span class="cde-field__label">รหัสจังหวัดผลิต <em>*</em></span>
+                  <input class="cde-field__input" [(ngModel)]="item.productionProvinceCode" />
+                </label>
+                <label class="cde-field">
+                  <span class="cde-field__label">ชื่อจังหวัดผลิต <em>*</em></span>
+                  <input class="cde-field__input" [(ngModel)]="item.productionProvinceName" />
+                </label>
+                <label class="cde-field">
+                  <span class="cde-field__label">รหัสอำเภอผลิต <em>*</em></span>
+                  <input class="cde-field__input" [(ngModel)]="item.productionSubProvinceCode" />
+                </label>
+                <label class="cde-field">
+                  <span class="cde-field__label">ชื่ออำเภอผลิต <em>*</em></span>
+                  <input class="cde-field__input" [(ngModel)]="item.productionSubProvinceName" />
+                </label>
+                <label class="cde-field">
+                  <span class="cde-field__label">รหัสตำบลผลิต <em>*</em></span>
+                  <input class="cde-field__input" [(ngModel)]="item.productionDistrictCode" />
+                </label>
+                <label class="cde-field">
+                  <span class="cde-field__label">ชื่อตำบลผลิต <em>*</em></span>
+                  <input class="cde-field__input" [(ngModel)]="item.productionDistrictName" />
+                </label>
+              </div>
+            </div>
+          }
         </div>
       </div>
     </div>
