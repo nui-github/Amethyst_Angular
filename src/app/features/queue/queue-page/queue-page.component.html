@@ -272,7 +272,6 @@
                       <span class="dv-audit-time">{{ a.time }}</span>
                       <div class="dv-audit-dot" [class.dv-audit-dot--ai]="a.by === 'AI'" [class.dv-audit-dot--sys]="a.by === 'ระบบ'"></div>
                       <span class="dv-audit-text">{{ a.text }}</span>
-                      <span class="dv-audit-by">{{ a.by }}</span>
                     </div>
                   }
                   @if (canProceed(openShipment()!)) {

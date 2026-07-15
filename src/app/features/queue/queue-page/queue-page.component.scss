@@ -975,15 +975,7 @@
   &--pending { background: #F59E0B; animation: pulseDot 1.8s ease-in-out infinite; }
 }
 
-.dv-audit-text { flex: 1; color: #374151; }
-.dv-audit-by {
-  font-size: 9px;
-  font-weight: 700;
-  padding: 1px 6px;
-  border-radius: 4px;
-  background: #F0F2F7;
-  color: #9CA3AF;
-}
+.dv-audit-text { color: #374151; }
 
 // Flag card
 .dv-flag {
