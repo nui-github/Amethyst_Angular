@@ -460,12 +460,12 @@
   padding: 7px 14px;
   border-radius: 8px;
   border: none;
-  background: var(--bizx-navy);
+  background: var(--bizx-blue);
   color: #fff;
   cursor: pointer;
-  transition: opacity 0.12s;
+  transition: background 0.12s;
 
-  &:hover { opacity: 0.88; }
+  &:hover { background: #034DBA; }
 }
 
 .ih-manual__result {
