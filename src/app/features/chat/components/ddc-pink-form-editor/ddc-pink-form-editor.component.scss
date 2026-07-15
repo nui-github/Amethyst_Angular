@@ -1,59 +1,68 @@
 .cde-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(1, 1, 54, 0.35);
+  z-index: 2000;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
+  justify-content: flex-end;
 }
 
 .cde-panel {
+  width: 94%;
+  max-width: 1400px;
+  height: 100%;
   background: #fff;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 900px;
-  max-height: 90vh;
+  box-shadow: -8px 0 32px rgba(1, 1, 54, 0.18);
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  animation: cde-slide-in 0.22s ease;
 
   &.ddc-panel {
     // Pink Form specific styling
   }
 }
 
+@keyframes cde-slide-in {
+  from { transform: translateX(24px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
 .cde-hd {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  padding: 20px 24px;
-  border-bottom: 1px solid #e5e7eb;
+  gap: 12px;
+  padding: 20px 28px;
+  border-bottom: 1px solid #EEF0F6;
+  flex-shrink: 0;
 
   &__content {
     flex: 1;
   }
 
   &__title {
-    font-size: 18px;
-    font-weight: 600;
+    font-size: 16px;
+    font-weight: 800;
     color: var(--bizx-navy);
     margin: 0;
   }
 
   &__close {
-    background: none;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     border: none;
-    cursor: pointer;
-    padding: 4px;
+    background: #F4F5F9;
+    color: var(--bizx-n500);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #6b7280;
-    transition: color 0.2s;
+    cursor: pointer;
+    transition: background 0.12s;
 
     &:hover {
-      color: var(--bizx-navy);
+      background: #E5E7EB;
     }
   }
 }
@@ -61,39 +70,40 @@
 .cde-body {
   flex: 1;
   overflow-y: auto;
-  padding: 24px;
+  padding: 20px 28px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .cde-sec {
-  margin-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 
   &__head {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding-left: 16px;
-    margin-bottom: 16px;
-    border-left: 4px solid;
-
-    &-color {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-    }
+    gap: 10px;
+    border-left: 3px solid;
+    padding-left: 10px;
   }
 
   &__title {
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 700;
     color: var(--bizx-navy);
     margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 }
 
 .cde-form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  gap: 12px;
+  padding-top: 8px;
 }
 
 .cde-field {
@@ -106,9 +116,11 @@
   }
 
   &__label {
-    font-size: 12px;
-    font-weight: 500;
+    font-size: 11px;
+    font-weight: 600;
     color: var(--bizx-navy);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
 
     em {
       color: #ef4444;
@@ -118,10 +130,10 @@
   }
 
   &__input {
-    padding: 8px 12px;
+    padding: 8px 10px;
     border: 1px solid #d1d5db;
     border-radius: 6px;
-    font-size: 13px;
+    font-size: 12px;
     font-family: inherit;
     transition: border-color 0.2s;
 
@@ -154,7 +166,7 @@
 }
 
 .cde-item-label {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--bizx-navy);
   margin-bottom: 12px;
@@ -165,23 +177,24 @@
 .cde-item-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  gap: 12px;
 }
 
 .cde-ft {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  padding: 16px 24px;
-  border-top: 1px solid #e5e7eb;
-  background: #f9fafb;
+  gap: 10px;
+  padding: 16px 28px;
+  border-top: 1px solid #EEF0F6;
+  background: #FAFBFD;
+  flex-shrink: 0;
 
   &__btn {
     padding: 8px 16px;
     border: none;
     border-radius: 6px;
-    font-size: 13px;
-    font-weight: 500;
+    font-size: 12px;
+    font-weight: 600;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -189,11 +202,11 @@
     transition: all 0.2s;
 
     &--cancel {
-      background: #e5e7eb;
+      background: #E5E7EB;
       color: var(--bizx-navy);
 
       &:hover {
-        background: #d1d5db;
+        background: #D1D5DB;
       }
     }
 
@@ -202,7 +215,7 @@
       color: white;
 
       &:hover {
-        background: #034dba;
+        background: #034DBA;
       }
     }
   }
@@ -211,38 +224,39 @@
 .cde-confirm-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(1, 1, 54, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2000;
+  z-index: 2001;
 }
 
 .cde-confirm-box {
   background: white;
   border-radius: 8px;
   padding: 24px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 32px rgba(1, 1, 54, 0.18);
   max-width: 400px;
   text-align: center;
 
   h3 {
-    font-size: 16px;
-    font-weight: 600;
+    font-size: 15px;
+    font-weight: 700;
     color: var(--bizx-navy);
     margin: 0 0 8px 0;
   }
 
   p {
-    font-size: 13px;
+    font-size: 12px;
     color: var(--bizx-n600);
     margin: 0 0 20px 0;
+    line-height: 1.5;
   }
 }
 
 .cde-confirm-actions {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   justify-content: center;
 }
 
@@ -250,17 +264,17 @@
   padding: 8px 16px;
   border: none;
   border-radius: 6px;
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 
   &.cancel {
-    background: #e5e7eb;
+    background: #E5E7EB;
     color: var(--bizx-navy);
 
     &:hover {
-      background: #d1d5db;
+      background: #D1D5DB;
     }
   }
 
@@ -269,22 +283,17 @@
     color: white;
 
     &:hover {
-      background: #034dba;
+      background: #034DBA;
     }
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
   .cde-form-grid {
     grid-template-columns: 1fr;
   }
 
   .cde-item-grid {
     grid-template-columns: 1fr;
-  }
-
-  .cde-panel {
-    width: 95%;
-    max-height: 95vh;
   }
 }
