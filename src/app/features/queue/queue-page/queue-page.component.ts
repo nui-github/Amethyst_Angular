@@ -140,8 +140,17 @@ export class QueuePageComponent {
   isDone(step: number, stage: number)   { return step < stage; }
   isActive(step: number, stage: number) { return step === stage; }
 
+  /** Agencies whose Pink Form flow charges a fee after ยื่นกรม (see chat.service.ts QR_PAYMENT_AGENCIES) —
+   *  their tracker gets an extra step for it. */
+  private readonly PAYMENT_STEP_AGENCIES: Shipment['agency'][] = ['ddc'];
+
   visibleSteps(): { label: string; idx: number }[] {
-    return STAGE_LABELS.slice(1).map((label, i) => ({ label, idx: i + 1 }));
+    const base = STAGE_LABELS.slice(1).map((label, i) => ({ label, idx: i + 1 }));
+    const ship = this.openShipment();
+    if (ship && this.PAYMENT_STEP_AGENCIES.includes(ship.agency)) {
+      base.push({ label: 'ชำระค่าธรรมเนียม', idx: base.length + 1 });
+    }
+    return base;
   }
 
   isDone2(stepIdx: number, stage: number) { return stepIdx < stage; }

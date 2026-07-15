@@ -691,7 +691,11 @@ Add to `mainItems` array in `sidebar.component.ts`
     · Submission result card (submitted only)
   - Footer: "ไปยืนยันในแชท" (needs_you) / "เสร็จสิ้นแล้ว" (submitted)
 - **Stage labels** (7 stages): ตรวจรับใบขน → วิเคราะห์ HS → จัดประเภท → แนบเอกสาร → กรอกข้อมูล → ยืนยันร่าง → ยื่นกรม
-- Mock data: 12 shipments in `queue.mock.ts` (enough for 2 pages at 10/page)
+  - Shipments whose `agency` is in `PAYMENT_STEP_AGENCIES` (queue-page.component.ts — currently `['ddc']`,
+    mirroring chat.service.ts's fee-charging Pink Form agencies) get an 8th step appended,
+    "ชำระค่าธรรมเนียม", after ยื่นกรม — `visibleSteps()` builds this dynamically per open shipment
+    rather than as a static array, since it only applies to some agencies
+- Mock data: 15 shipments in `queue.mock.ts` (enough for 2 pages at 10/page)
 
 ---
 
