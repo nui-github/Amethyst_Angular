@@ -776,6 +776,11 @@
     border-color: #FDE68A;
   }
 
+  &--alert {
+    background: #FEF3C7;
+    border-color: #F59E0B;
+  }
+
   &__hd {
     display: flex;
     align-items: center;
@@ -1467,6 +1472,13 @@
   font-size: 12px;
   font-weight: 600;
   color: #B45309;
+}
+
+.dv-payment-waiting-text {
+  font-size: 13px;
+  color: #92400E;
+  line-height: 1.5;
+  margin: 0;
 }
 
 .dv-result-actions {

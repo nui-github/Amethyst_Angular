@@ -159,6 +159,12 @@ export class QueuePageComponent {
     return ship.statusKey !== 'submitted';
   }
 
+  isPaymentAwaitingApproval(ship: Shipment): boolean {
+    return ship.statusKey === 'submitted'
+      && this.PAYMENT_STEP_AGENCIES.includes(ship.agency)
+      && !ship.paymentQr;
+  }
+
   toggleSidebar(): void { this.collapsed.update(v => !v); }
 
   setTabFilter(key: TabValue): void {

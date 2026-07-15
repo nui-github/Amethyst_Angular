@@ -870,11 +870,13 @@ export const MOCK_QUEUE: Shipment[] = [
       doc('d13a', 'Invoice EXPINV0009', 'invoice'),
       doc('d13b', 'DDC_PINKFORM_V2.0.pdf', 'coa'),
     ],
-    returnedDocuments: [
-      doc('d13r1', 'ใบรับรองฯ (DDCPINKFORM)', 'other', 'pdf', 'ddc', '14/7/2569 10:35'),
-      doc('d13r2', 'ใบรับรองฯ (DDCPINKFORM PDF)', 'other', 'pdf', 'ddc', '14/7/2569 10:35'),
-      doc('d13r3', 'ใบเสร็จรับเงิน (DDCERECEIPT PDF)', 'other', 'pdf', 'ddc', '14/7/2569 10:35'),
-    ],
+    paymentQr: {
+      agency: 'ddc',
+      amount: 1000,
+      refNo: 'PAY-882300',
+      expiresAt: '11:00',
+      status: 'unpaid' as const,
+    },
     itemsSelected: true,
     items: [
       { id: 'i13', name: 'Pathogen Diagnostic Reagent Kit', hsCode: '3822.00.00', origin: 'ไทย (TH)', quantity: '500', unit: 'กล่อง', lotNo: 'BIO-2568-014', amount: 533600,
@@ -996,5 +998,45 @@ export const MOCK_QUEUE: Shipment[] = [
       expiresAt: new Date(Date.now() + 15 * 60 * 1000).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
       status: 'unpaid',
     },
+  },
+
+  // ── 16. submitted (EXP): Rabies Immunoglobulin – ขาออก pink form กรมควบคุมโรค (รอการอนุมัติก่อนส่ง QR) ──
+  {
+    id: 'EXP-68-016004', customsNo: 'HLTH000000016', hthmRef: 'HTHM000000016',
+    isNew: false, type: 'EXP',
+    goods: 'Rabies Immunoglobulin (ภูมิคุ้มกันโรคพิษสุนัข)', hs: '3002.20.00',
+    customer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', contact: 'คุณพิมพ์ชนก ส่งดี',
+    contactEmail: 'pimchanok@siamagriexport.co.th',
+    origin: 'ไทย (TH)', importedAt: '07:30 น. 2 วันที่แล้ว', createdAt: NOW - 48 * 3600_000, owner: 'ปวีณา ส.',
+    agency: 'ddc', permitNeeded: true, formCode: 'Pink Form',
+    formName: 'คำขออนุญาตส่งออกเชื้อโรคและพิษจากสัตว์ (Pink Form) — กรมควบคุมโรค',
+    conf: 85, stage: 8, statusKey: 'submitted',
+    assess: { conf: 85, reason: 'ภูมิคุ้มกันโรคพิษสุนัข จัดเป็นพิษจากสัตว์ อยู่ภายใต้ พ.ร.บ.เชื้อโรคและพิษจากสัตว์ พ.ศ. 2558 ต้องขอใบอนุญาต' },
+    classify: { agency: 'ddc', conf: 85, reason: '', alt: [] },
+    draft: { fields: [] },
+    flags: [],
+    audit: [
+      { time: '07:30', text: 'อัปโหลดใบ Invoice EXPINV0014 เข้าระบบแล้ว', by: 'ระบบ' },
+      { time: '07:35', text: 'OCR สำเร็จ', by: 'AI' },
+      { time: '07:38', text: 'วิเคราะห์ HS Code: 3002.20.00 → กรมควบคุมโรค (85%)', by: 'AI' },
+      { time: '07:45', text: 'แนบ Certificate of Analysis (COA) แล้ว', by: 'ปวีณา ส.' },
+      { time: '07:55', text: 'ยื่นกรมควบคุมโรค สำเร็จ (Pink Form)', by: 'ระบบ' },
+    ],
+    messages: [
+      bot('07:30', 'อัปโหลดใบ Invoice EXPINV0014 เข้าระบบแล้วครับ — Rabies Immunoglobulin 150 กล่อง จากไทย ส่งออกไปสิงคโปร์'),
+      t('07:35', 'bot', 'status-card', undefined, {
+        refNo: 'RG-2568-76000', customsRef: 'EXPINV0014',
+        submittedAt: new Date(Date.now() - 48 * 3600_000).toLocaleDateString('th-TH'), isPending: false,
+        agency: 'กรมควบคุมโรค', feeNote: 'ค่าธรรมเนียมกรม ฿1,000 (รอการอนุมัติจากกรม)',
+      }),
+    ],
+    documents: [
+      doc('d16a', 'Invoice EXPINV0014', 'invoice'),
+      doc('d16b', 'DDC_PINKFORM_V1.5.pdf', 'coa'),
+    ],
+    itemsSelected: true,
+    items: [
+      { id: 'i16', name: 'Rabies Immunoglobulin', hsCode: '3002.20.00', origin: 'ไทย (TH)', quantity: '150', unit: 'กล่อง', lotNo: 'BIO-2568-025', amount: 445000 },
+    ],
   },
 ];
