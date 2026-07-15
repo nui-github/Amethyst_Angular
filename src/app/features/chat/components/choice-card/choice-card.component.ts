@@ -25,4 +25,8 @@ export class ChoiceCardComponent {
     this.selectedValue.set(value);
     this.chosen.emit(value);
   }
+
+  deptKey(value: string): string {
+    return value.replace(/^(dept|agency):/, '');
+  }
 }
