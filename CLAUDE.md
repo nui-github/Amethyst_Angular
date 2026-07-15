@@ -583,6 +583,21 @@ formData.selectedItems directly from getInvoiceLineItems() in continueAfterOCR()
 ```
 submit() → finalizeSubmit() → status-card (สีเขียว สำเร็จ) immediately
 
+finalizeSubmit() builds the queued Shipment from real chat state, not placeholders — this used to
+be hardcoded (agency: 'fda', formCode: 'ร.7' regardless of what was actually submitted, items: []
+always empty, no documents) so the queue list/detail view showed wrong data for any real
+chat-submitted request (0 รายการ, wrong form badge, wrong department). Now:
+  agency/classify.agency ← AGENCY_KEY_MAP[this.currentAgency] (chat.service.ts — currentAgency is a
+    display string like 'กรมควบคุมโรค'/'อย.'; AGENCY_KEY_MAP bridges it to the AgencyKey queue.mock.ts
+    keys off of. Added AgencyKey 'oap' for ปส. — no code existed for it before, same fix pattern as
+    the earlier ddc/doeb/raot additions for the export path)
+  formCode/formName ← formForAgency(agency): 'Pink Form' for QR_PAYMENT_AGENCIES, else 'RGoods',
+    with a formName built from the real agency + direction
+  items ← fd.selectedItems mapped to ShipmentItem[]; itemsSelected set iff non-empty
+  documents ← reconstructed from fd.invoiceNo/fd.ref (real placeholder PDF URL, same convention as
+    queue.mock.ts's SAMPLE_PDF — actual uploaded files aren't retained as blobs in this mock env)
+  stage ← 8 for ddc (see the 8th "ชำระค่าธรรมเนียม" step above), 7 otherwise
+
 Most agencies: fee (if any) is just informational —
   status-card feeNote: "ค่าธรรมเนียมกรม ฿{amount} จะรวมในบิลรายเดือน"
   No further payment step; ตรวจสอบสถานะ → generic 'permit-status' list.

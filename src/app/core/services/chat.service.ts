@@ -6,6 +6,7 @@ import {
   MissingField, MissingFieldsData, PaymentSlipData, HsAnalysisData,
   InvoiceLineItem, ItemHsAnalysisData, ProductHsAnalysis, ItemMeasurementData, CustomsDeclarationData,
   InvoiceSelectData, Direction, AgencyDocsReturnedData, AgencyApprovalPendingData,
+  ShipmentItem, ShipmentDocument, AgencyKey,
 } from '@app/core/models/types';
 import { OcrService, MultiInvoiceDetection } from './ocr.service';
 import { QueueService } from './queue.service';
@@ -25,6 +26,9 @@ import { mergeCustomsDeclaration } from '@app/shared/utils/helpers';
 let _idCounter = 0;
 const genId = () => `msg_${Date.now()}_${_idCounter++}`;
 const getTime = () => new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+// Placeholder for documents finalizeSubmit() reconstructs from formData — mirrors queue.mock.ts's
+// own SAMPLE_PDF convention (real uploaded files aren't retained as blobs in this mock environment).
+const SAMPLE_DOC_URL = 'https://www.w3.org/WAI/WCAG21/Techniques/pdf/PDF1.pdf';
 
 const WELCOME: ChatMessage = {
   id: 'welcome', role: 'bot', type: 'welcome', time: '09:00',
@@ -596,6 +600,31 @@ export class ChatService {
     'การยาง':       'การยางแห่งประเทศไทย (RAOT)',
   };
 
+  // Maps this.currentAgency's display string (as used throughout the chat flow — item-hs-analysis
+  // groups, AGENCY_DESC above, choice-card option values) onto the AgencyKey the queue side actually
+  // keys off of (AGENCY_LABEL/AGENCY_SHORT in queue.mock.ts) — finalizeSubmit() needs this since it
+  // used to just hardcode 'fda' regardless of which agency the user actually submitted to.
+  private readonly AGENCY_KEY_MAP: Record<string, AgencyKey> = {
+    'อย.': 'fda', 'กษ.': 'doa', 'ปส.': 'oap',
+    'กรมควบคุมโรค': 'ddc', 'เชื้อเพลิง': 'doeb', 'การยาง': 'raot',
+  };
+
+  // formCode/formName as actually shown for this agency's own flow (see queue.mock.ts static
+  // entries for the same pairing) — QR_PAYMENT_AGENCIES use Pink Form, everything else RGoods.
+  private formForAgency(agency: string): { code: string; name: string } {
+    const isExport = this.direction() === 'export';
+    if (this.QR_PAYMENT_AGENCIES.includes(agency)) {
+      return {
+        code: 'Pink Form',
+        name: `คำขออนุญาต${isExport ? 'ส่งออก' : 'นำเข้า'} (Pink Form) — ${agency}`,
+      };
+    }
+    return {
+      code: 'RGoods',
+      name: `คำขออนุญาต${isExport ? 'ส่งออก' : 'นำเข้า'}สินค้า (RGoods) — ${agency}`,
+    };
+  }
+
   private showAgencyChoice(recommendedAgency: string): void {
     const others = this.ALL_AGENCIES.filter(a => a !== recommendedAgency);
     const options: ChoiceCardData['options'] = [
@@ -1076,6 +1105,23 @@ export class ChatService {
       : fd.importer ? `${fd.importer.replace('บริษัท ', '').replace(' จำกัด', '')} · ${fd.goodsDesc?.slice(0, 30) ?? ''}`
       : `ขอใบ ${new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' })}`;
 
+    const agencyKey: AgencyKey = this.AGENCY_KEY_MAP[this.currentAgency] ?? 'none';
+    const form = this.formForAgency(this.currentAgency);
+
+    const items: ShipmentItem[] = (fd.selectedItems ?? []).map(i => ({
+      id: i.id, name: i.name, hsCode: i.hsCode, origin: i.origin,
+      quantity: i.quantity, unit: i.unit, lotNo: i.lotNo, amount: i.amount,
+    }));
+
+    const documents: ShipmentDocument[] = [];
+    const uploadedAt = new Date().toLocaleDateString('th-TH');
+    if (fd.invoiceNo) {
+      documents.push({ id: genId(), name: `Invoice ${fd.invoiceNo}`, fileType: 'pdf', category: 'invoice', url: SAMPLE_DOC_URL, uploadedAt });
+    }
+    if (fd.ref?.startsWith('HTHM')) {
+      documents.push({ id: genId(), name: `ใบขนสินค้า ${fd.ref}`, fileType: 'pdf', category: 'customs', url: SAMPLE_DOC_URL, uploadedAt });
+    }
+
     const shipment: Shipment = {
       id: genId(), chatName, isNew: false,
       hthmRef: fd.ref?.startsWith('HTHM') ? fd.ref : undefined,
@@ -1083,13 +1129,14 @@ export class ChatService {
       customer: fd.importer ?? '', contact: '', contactEmail: '',
       goods: fd.goodsDesc ?? fd.hsCode ?? '', hs: fd.hsCode ?? '',
       origin: fd.countryOrigin ?? '', importedAt: new Date().toLocaleString('th-TH'), createdAt: Date.now(),
-      owner: '', permitNeeded: true, agency: 'fda',
-      formCode: 'ร.7', formName: 'แบบคำขออนุญาตนำเข้า',
-      conf: 88, stage: 8, statusKey: 'submitted',
+      owner: '', permitNeeded: true, agency: agencyKey,
+      formCode: form.code, formName: form.name,
+      conf: 88, stage: agencyKey === 'ddc' ? 8 : 7, statusKey: 'submitted',
       assess: { conf: 88, reason: 'ยื่นแล้ว' },
-      classify: { agency: 'fda', conf: 88, reason: '', alt: [] },
+      classify: { agency: agencyKey, conf: 88, reason: '', alt: [] },
       draft: { fields: [] }, flags: [],
       audit: [{ time: getTime(), text: 'ยืนยันส่งกรมจากแชท', by: 'เจ้าหน้าที่' }],
+      documents, items, itemsSelected: items.length > 0,
       email: { toName: '', to: '', subject: '', body: '', attName: '' },
       messages: flowMsgs,
     };

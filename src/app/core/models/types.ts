@@ -482,7 +482,10 @@ export interface SPNEntry {
 
 // dld/fda/dft/doa/diw are import-side agencies; ddc/doeb/raot are the export-side agencies added
 // for the ขาออก pink-form flow (see ChatService.QR_PAYMENT_AGENCIES) — กรมควบคุมโรค/เชื้อเพลิง/การยาง.
-export type AgencyKey = 'dld' | 'fda' | 'dft' | 'doa' | 'diw' | 'ddc' | 'doeb' | 'raot' | 'none';
+// oap = สำนักงานปรมาณูเพื่อสันติภาพ (ปส., Office of Atoms for Peace) — the import-side item-hs-analysis
+// dataset (product-hs-analysis.mock.ts) classifies some items under 'ปส.' but no AgencyKey existed
+// for it until ChatService.finalizeSubmit() needed to map a real submitted agency onto a Shipment.
+export type AgencyKey = 'dld' | 'fda' | 'dft' | 'doa' | 'diw' | 'ddc' | 'doeb' | 'raot' | 'oap' | 'none';
 
 // Queue shipments only exist once a chat session has passed profile selection — which only
 // happens when a permit is actually required — so there is no "no_permit" queue status.
