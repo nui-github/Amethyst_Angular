@@ -678,8 +678,11 @@ export class ChatService {
       profile:     profile.code,
     });
     // Every chat becomes a queue task the moment a profile is confirmed, not only once the user
-    // eventually clicks "ยืนยันส่งกรม" — finalizeSubmit() fills this same record in later.
-    this.saveEarlyQueueEntry(this.currentAgency);
+    // eventually clicks "ยืนยันส่งกรม" — finalizeSubmit() fills this same record in later. Saved
+    // AFTER each branch posts its own next actionable card (not here, synchronously) so the
+    // snapshot's last message is something the user can actually continue from — "กลับไปคิวงาน" →
+    // "ดำเนินการต่อ" only leaves the LAST message interactive (loadQueueSession()), so a snapshot
+    // ending right after "เลือกโปรไฟล์แล้ว" with nothing further would strand the resumed session.
     // Determine what to do based on pendingAfterFlow (set before agency choice)
     if (this.pendingAfterFlow === 'agency-docs') {
       // Invoice path: show agency-upload
@@ -688,16 +691,23 @@ export class ChatService {
         setTimeout(() => this.withTyping(() => {
           this.isAgencyDocsUpload = true;
           this.bot('agency-upload', { agency });
+          this.saveEarlyQueueEntry(this.currentAgency);
         }, 400), 600);
       }, 500);
     } else if (this.pendingAfterFlow === 'form-preview') {
       // Customs path: every item AI grouped under this agency is the request — no re-selection
       this.selectAllAgencyItems();
-      this.withTyping(() => this.showPreview(), 500);
+      this.withTyping(() => {
+        this.showPreview();
+        this.saveEarlyQueueEntry(this.currentAgency);
+      }, 500);
     } else {
       // SPN path: every item AI grouped under this agency is the request — no re-selection
       this.selectAllAgencyItems();
-      this.withTyping(() => this.showProceedChoice(), 500);
+      this.withTyping(() => {
+        this.showProceedChoice();
+        this.saveEarlyQueueEntry(this.currentAgency);
+      }, 500);
     }
   }
 
