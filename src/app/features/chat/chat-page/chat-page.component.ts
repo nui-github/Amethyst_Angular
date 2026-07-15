@@ -9,6 +9,7 @@ import { QueueService } from '@app/core/services/queue.service';
 import { ChatAreaComponent } from '../components/chat-area/chat-area.component';
 import { SidebarComponent } from '../components/sidebar/sidebar.component';
 import { CustomsDeclarationEditorComponent } from '../components/customs-declaration-editor/customs-declaration-editor.component';
+import { DdcPinkFormEditorComponent } from '../components/ddc-pink-form-editor/ddc-pink-form-editor.component';
 
 @Component({
   selector: 'app-chat-page',
@@ -17,7 +18,7 @@ import { CustomsDeclarationEditorComponent } from '../components/customs-declara
   imports: [
     CommonModule, FormsModule, RouterModule,
     NzInputModule, LucideAngularModule,
-    ChatAreaComponent, SidebarComponent, CustomsDeclarationEditorComponent,
+    ChatAreaComponent, SidebarComponent, CustomsDeclarationEditorComponent, DdcPinkFormEditorComponent,
   ],
   templateUrl: './chat-page.component.html',
   styleUrl:    './chat-page.component.scss',
@@ -43,6 +44,11 @@ export class ChatPageComponent {
   /** True when only the initial welcome message exists (no user messages yet) */
   readonly isWelcome = computed(() =>
     this.chat.messages().length === 1 && this.chat.messages()[0].type === 'welcome'
+  );
+
+  /** Show DDC Pink Form when editor open (DDC is export-only) */
+  readonly showDdcForm = computed(() =>
+    this.chat.declarationEditorOpen() && this.chat.direction() === 'export'
   );
 
   goToQueue(): void { this.router.navigate(['/queue']); }

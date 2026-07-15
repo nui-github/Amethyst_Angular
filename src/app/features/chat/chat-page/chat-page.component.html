@@ -102,6 +102,10 @@
   </div>
 
   @if (chat.declarationEditorOpen()) {
-    <app-customs-declaration-editor />
+    @if (showDdcForm()) {
+      <app-ddc-pink-form-editor />
+    } @else {
+      <app-customs-declaration-editor />
+    }
   }
 </div>

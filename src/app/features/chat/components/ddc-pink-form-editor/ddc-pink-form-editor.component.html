@@ -1,0 +1,363 @@
+<div class="cde-backdrop">
+  <div class="cde-panel ddc-panel">
+    <!-- Header -->
+    <div class="cde-hd">
+      <div class="cde-hd__content">
+        <h2 class="cde-hd__title">ใบรับรองแหล่งผลิต แหล่งกำเนิดอาหารปลอดโรค (DDC Pink Form)</h2>
+      </div>
+      <button class="cde-hd__close" (click)="onClose()" type="button" aria-label="Close">
+        <lucide-icon [img]="icClose" [size]="20" />
+      </button>
+    </div>
+
+    <div class="cde-body">
+      <!-- CONTROL SECTION -->
+      <div class="cde-sec">
+        <div class="cde-sec__head" style="border-left-color: rgb(4, 99, 239);">
+          <span class="cde-sec__title">ส่วนควบคุม</span>
+        </div>
+        <div class="cde-form-grid">
+          <label class="cde-field">
+            <span class="cde-field__label">เลขที่อ้างอิง</span>
+            <input
+              class="cde-field__input"
+              [(ngModel)]="local().referenceNumber"
+              placeholder="XXXXnnnnnnnnn"
+            />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">เลขที่รับเอกสาร</span>
+            <input class="cde-field__input" [(ngModel)]="local().receiveNumber" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">เลขที่ใบรับรอง (DDC License)</span>
+            <input class="cde-field__input" [(ngModel)]="local().ddcLicenseNumber" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">วันที่ออกใบรับรอง</span>
+            <input
+              class="cde-field__input"
+              type="date"
+              [(ngModel)]="local().ddcLicenseIssueDate"
+            />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">วันที่มีผลบังคับใช้</span>
+            <input
+              class="cde-field__input"
+              type="date"
+              [(ngModel)]="local().ddcEffectiveDate"
+            />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">วันหมดอายุ</span>
+            <input
+              class="cde-field__input"
+              type="date"
+              [(ngModel)]="local().ddcExpireDate"
+            />
+          </label>
+          <label class="cde-field cde-field--full">
+            <span class="cde-field__label">ชื่อใบรับรอง</span>
+            <input class="cde-field__input" [(ngModel)]="local().ddcLicenseName" />
+          </label>
+        </div>
+      </div>
+
+      <!-- SHIPPER SECTION -->
+      <div class="cde-sec">
+        <div class="cde-sec__head" style="border-left-color: rgb(124, 58, 237);">
+          <span class="cde-sec__title">ข้อมูลบริษัทผู้ส่งออก</span>
+        </div>
+        <div class="cde-form-grid">
+          <label class="cde-field">
+            <span class="cde-field__label">เลขผู้เสียภาษี <em>*</em></span>
+            <input
+              class="cde-field__input"
+              [(ngModel)]="local().shipperTaxNumber"
+              placeholder="เลขประจำตัว"
+            />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">สาขาที่</span>
+            <input class="cde-field__input" [(ngModel)]="local().shipperBranch" />
+          </label>
+          <label class="cde-field cde-field--full">
+            <span class="cde-field__label">ชื่อบริษัท (อังกฤษ) <em>*</em></span>
+            <input class="cde-field__input" [(ngModel)]="local().shipperEnglishName" />
+          </label>
+          <label class="cde-field cde-field--full">
+            <span class="cde-field__label">ที่อยู่</span>
+            <input class="cde-field__input" [(ngModel)]="local().shipperStreet" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">ตำบล</span>
+            <input class="cde-field__input" [(ngModel)]="local().shipperDistrictName" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">อำเภอ</span>
+            <input class="cde-field__input" [(ngModel)]="local().shipperSubProvinceName" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">จังหวัด</span>
+            <input class="cde-field__input" [(ngModel)]="local().shipperProvinceName" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">รหัสไปรษณีย์</span>
+            <input class="cde-field__input" [(ngModel)]="local().shipperPostcode" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">รหัสประเทศ</span>
+            <input class="cde-field__input" [(ngModel)]="local().shipperCountryCode" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">ชื่อผู้จัดการ</span>
+            <input class="cde-field__input" [(ngModel)]="local().shipperManagerName" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">เลขบัตรประชาชน</span>
+            <input class="cde-field__input" [(ngModel)]="local().shipperManagerIdCard" />
+          </label>
+        </div>
+      </div>
+
+      <!-- CONSIGNEE SECTION -->
+      <div class="cde-sec">
+        <div class="cde-sec__head" style="border-left-color: rgb(13, 143, 97);">
+          <span class="cde-sec__title">ข้อมูลผู้รับสินค้า (Consignee)</span>
+        </div>
+        <div class="cde-form-grid">
+          <label class="cde-field cde-field--full">
+            <span class="cde-field__label">ชื่อผู้รับสินค้าในต่างประเทศ <em>*</em></span>
+            <input class="cde-field__input" [(ngModel)]="local().consigneeName" />
+          </label>
+          <label class="cde-field cde-field--full">
+            <span class="cde-field__label">ที่อยู่</span>
+            <input class="cde-field__input" [(ngModel)]="local().consigneeStreet" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">ตำบล</span>
+            <input class="cde-field__input" [(ngModel)]="local().consigneeDistrict" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">อำเภอ</span>
+            <input class="cde-field__input" [(ngModel)]="local().consigneeSubProvince" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">จังหวัด</span>
+            <input class="cde-field__input" [(ngModel)]="local().consigneeProvince" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">รหัสไปรษณีย์</span>
+            <input class="cde-field__input" [(ngModel)]="local().consigneePostcode" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">รหัสประเทศ <em>*</em></span>
+            <input class="cde-field__input" [(ngModel)]="local().consigneeCountryCode" />
+          </label>
+        </div>
+      </div>
+
+      <!-- EXPORT DETAILS SECTION -->
+      <div class="cde-sec">
+        <div class="cde-sec__head" style="border-left-color: rgb(249, 115, 22);">
+          <span class="cde-sec__title">ข้อมูลการส่งออก</span>
+        </div>
+        <div class="cde-form-grid">
+          <label class="cde-field">
+            <span class="cde-field__label">วันที่ส่งออก <em>*</em></span>
+            <input
+              class="cde-field__input"
+              type="date"
+              [(ngModel)]="local().departureDate"
+            />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">รหัสท่า</span>
+            <input class="cde-field__input" [(ngModel)]="local().portOfDischarge" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">เลขที่ Invoice <em>*</em></span>
+            <input class="cde-field__input" [(ngModel)]="local().invoiceNumber" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">วันที่ Invoice</span>
+            <input
+              class="cde-field__input"
+              type="date"
+              [(ngModel)]="local().invoiceDate"
+            />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">เลขที่ PO</span>
+            <input class="cde-field__input" [(ngModel)]="local().poNumber" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">วัตถุประสงค์ส่งออก</span>
+            <select class="cde-field__input" [(ngModel)]="local().objectiveOfExport">
+              <option value="">เลือก</option>
+              <option value="1">จำหน่าย</option>
+              <option value="2">แสดงสินค้า</option>
+              <option value="3">สินค้าตัวอย่าง</option>
+            </select>
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">ส่งออกโดยทาง <em>*</em></span>
+            <select class="cde-field__input" [(ngModel)]="local().modeOfTransport">
+              <option value="">เลือก</option>
+              <option value="1">ทางเรือ</option>
+              <option value="2">ทางรถไฟ</option>
+              <option value="3">ทางรถยนต์</option>
+              <option value="4">ทางเครื่องบิน</option>
+              <option value="5">ทางไปรษณีย์</option>
+            </select>
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">เครื่องหมายการค้า</span>
+            <input class="cde-field__input" [(ngModel)]="local().brandName" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">มูลค่ารวม</span>
+            <input
+              class="cde-field__input"
+              type="number"
+              step="0.01"
+              [(ngModel)]="local().totalForeignValue"
+            />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">สกุลเงิน</span>
+            <input class="cde-field__input" [(ngModel)]="local().currencyCode" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">ปริมาณรวม <em>*</em></span>
+            <input
+              class="cde-field__input"
+              type="number"
+              step="0.001"
+              [(ngModel)]="local().totalQuantity"
+            />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">หน่วยปริมาณ</span>
+            <input
+              class="cde-field__input"
+              [(ngModel)]="local().totalQuantityUnit"
+            />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">จำนวนรายการ <em>*</em></span>
+            <input
+              class="cde-field__input"
+              type="number"
+              [(ngModel)]="local().totalItemNumber"
+            />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">จำนวนสำเนา</span>
+            <input
+              class="cde-field__input"
+              type="number"
+              [(ngModel)]="local().numberOfCopy"
+            />
+          </label>
+          <label class="cde-field cde-field--full">
+            <span class="cde-field__label">หมายเหตุ</span>
+            <textarea
+              class="cde-field__input"
+              [(ngModel)]="local().remark"
+              rows="3"
+            ></textarea>
+          </label>
+        </div>
+      </div>
+
+      <!-- ITEMS SECTION -->
+      <div class="cde-sec">
+        <div class="cde-sec__head" style="border-left-color: rgb(59, 130, 246);">
+          <span class="cde-sec__title">รายการสินค้า</span>
+        </div>
+        <p style="color: var(--bizx-n600); font-size: 13px; margin: 0;">
+          รายการสินค้า {{ local().items.length || 0 }} รายการ (ดึงข้อมูลจาก OCR ของเอกสารสำเร็จ)
+        </p>
+      </div>
+
+      <!-- PAYMENT SECTION -->
+      <div class="cde-sec">
+        <div class="cde-sec__head" style="border-left-color: rgb(236, 72, 153);">
+          <span class="cde-sec__title">ข้อมูลชำระเงิน</span>
+        </div>
+        <div class="cde-form-grid">
+          <label class="cde-field">
+            <span class="cde-field__label">รหัสธนาคาร <em>*</em></span>
+            <input class="cde-field__input" [(ngModel)]="local().bankCode" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">รหัสสาขาธนาคาร <em>*</em></span>
+            <input class="cde-field__input" [(ngModel)]="local().bankBranchCode" />
+          </label>
+          <label class="cde-field cde-field--full">
+            <span class="cde-field__label">เลขที่บัญชีธนาคาร <em>*</em></span>
+            <input class="cde-field__input" [(ngModel)]="local().bankAccountNumber" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">ค่าธรรมเนียม (บาท) <em>*</em></span>
+            <input
+              class="cde-field__input"
+              type="number"
+              step="0.01"
+              [(ngModel)]="local().feeAmount"
+            />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">ค่าจัดส่งไปรษณีย์ (บาท)</span>
+            <input
+              class="cde-field__input"
+              type="number"
+              step="0.01"
+              [(ngModel)]="local().postServiceAmount"
+            />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">ยอดชำระรวม (บาท) <em>*</em></span>
+            <input
+              class="cde-field__input"
+              type="number"
+              step="0.01"
+              [(ngModel)]="local().totalPaymentAmount"
+            />
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="cde-ft">
+      <button class="cde-ft__btn cde-ft__btn--cancel" (click)="onClose()" type="button">
+        ปิด
+      </button>
+      <button class="cde-ft__btn cde-ft__btn--save" (click)="onSave()" type="button">
+        <lucide-icon [img]="icSave" [size]="16" />
+        บันทึก
+      </button>
+    </div>
+
+    <!-- Confirm Dialog -->
+    @if (showConfirmDialog()) {
+      <div class="cde-confirm-overlay" (click)="showConfirmDialog.set(false)">
+        <div class="cde-confirm-box" (click)="$event.stopPropagation()">
+          <h3>ยืนยันบันทึกข้อมูล</h3>
+          <p>กรุณาตรวจสอบความถูกต้องของข้อมูลทั้งหมด ก่อนบันทึก</p>
+          <div class="cde-confirm-actions">
+            <button class="cde-confirm-btn cancel" (click)="showConfirmDialog.set(false)">
+              ตรวจสอบอีกครั้ง
+            </button>
+            <button class="cde-confirm-btn submit" (click)="confirmSave()">
+              ยืนยันบันทึก
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>
