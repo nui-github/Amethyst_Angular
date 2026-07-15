@@ -17,7 +17,7 @@
             @for (s of statCards; track s.key) {
               <button class="kpi" [class.kpi--active]="activeTab() === s.key" (click)="setTabFilter(s.key)">
                 <div class="kpi__top-bar" [style.background]="s.dot"></div>
-                <div class="kpi__num" [style.color]="s.dot">{{ countByStatus(s.key) }}</div>
+                <div class="kpi__num" [style.color]="s.dot">{{ tabCount(s.key) }}</div>
                 <div class="kpi__label">{{ s.label }}</div>
               </button>
             }

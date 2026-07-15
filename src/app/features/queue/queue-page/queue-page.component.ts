@@ -57,8 +57,9 @@ export class QueuePageComponent {
   ];
 
   readonly statCards = [
-    { key: 'needs_you' as ShipmentStatus, label: 'รอดำเนินการ', dot: '#F59E0B', iconBg: '#FFFBEB' },
-    { key: 'submitted' as ShipmentStatus, label: 'ยื่นกรมแล้ว', dot: '#10B981', iconBg: '#ECFDF5' },
+    { key: 'all'       as TabValue, label: 'ทั้งหมด',      dot: '#6366F1', iconBg: '#EEF2FF' },
+    { key: 'needs_you' as TabValue, label: 'รอดำเนินการ', dot: '#F59E0B', iconBg: '#FFFBEB' },
+    { key: 'submitted' as TabValue, label: 'ยื่นกรมแล้ว',  dot: '#10B981', iconBg: '#ECFDF5' },
   ];
 
   readonly filteredQueue = computed(() => {
@@ -86,10 +87,6 @@ export class QueuePageComponent {
   tabCount(tab: TabValue): number {
     if (tab === 'all') return this.q.queue().length;
     return this.q.queue().filter(s => s.statusKey === tab).length;
-  }
-
-  countByStatus(key: ShipmentStatus): number {
-    return this.q.queue().filter(s => s.statusKey === key).length;
   }
 
   statusMeta(key: string) {
@@ -164,9 +161,9 @@ export class QueuePageComponent {
 
   toggleSidebar(): void { this.collapsed.update(v => !v); }
 
-  setTabFilter(key: ShipmentStatus): void {
-    const tv = key as unknown as TabValue;
-    this.activeTab.set(this.activeTab() === tv ? 'all' : tv);
+  setTabFilter(key: TabValue): void {
+    if (key === 'all') { this.activeTab.set('all'); return; }
+    this.activeTab.set(this.activeTab() === key ? 'all' : key);
   }
 
   selectRow(id: string): void {
