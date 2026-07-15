@@ -690,7 +690,7 @@ Add to `mainItems` array in `sidebar.component.ts`
     during the request, same field set as the chat's form-preview item modal) · Uploaded documents card
     · Submission result card (submitted only)
   - Footer: "ไปยืนยันในแชท" (needs_you) / "เสร็จสิ้นแล้ว" (submitted)
-- **Stage labels** (7 stages): ตรวจรับใบขน → วิเคราะห์ HS → จัดประเภท → แนบเอกสาร → ตรวจ flag → ยืนยันร่าง → ยื่นกรม
+- **Stage labels** (7 stages): ตรวจรับใบขน → วิเคราะห์ HS → จัดประเภท → แนบเอกสาร → กรอกข้อมูล → ยืนยันร่าง → ยื่นกรม
 - Mock data: 12 shipments in `queue.mock.ts` (enough for 2 pages at 10/page)
 
 ---

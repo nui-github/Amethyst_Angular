@@ -18,7 +18,7 @@ export { STATUS_META, AGENCY_SHORT };
 
 type TabValue = 'all' | 'needs_you' | 'submitted';
 
-const STAGE_LABELS = ['','ตรวจรับใบขน','วิเคราะห์ HS','จัดประเภท','แนบเอกสาร','ตรวจ flag','ยืนยันร่าง','ยื่นกรม'];
+const STAGE_LABELS = ['','ตรวจรับใบขน','วิเคราะห์ HS','จัดประเภท','แนบเอกสาร','กรอกข้อมูล','ยืนยันร่าง','ยื่นกรม'];
 
 @Component({
   selector: 'app-queue-page',
