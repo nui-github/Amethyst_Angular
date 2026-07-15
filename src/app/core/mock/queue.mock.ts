@@ -1039,4 +1039,52 @@ export const MOCK_QUEUE: Shipment[] = [
       { id: 'i16', name: 'Rabies Immunoglobulin', hsCode: '3002.20.00', origin: 'ไทย (TH)', quantity: '150', unit: 'กล่อง', lotNo: 'BIO-2568-025', amount: 445000 },
     ],
   },
+
+  // ── 17. submitted (EXP): Human Serum Albumin – ขาออก pink form กรมควบคุมโรค (ชำระแล้ว 3 ไฟล์) ──
+  {
+    id: 'EXP-68-017005', customsNo: 'HLTH000000017', hthmRef: 'HTHM000000017',
+    isNew: false, type: 'EXP',
+    goods: 'Human Serum Albumin (อัลบูมินเซรุ่มมนุษย์)', hs: '3002.11.00',
+    customer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', contact: 'คุณพิมพ์ชนก ส่งดี',
+    contactEmail: 'pimchanok@siamagriexport.co.th',
+    origin: 'ไทย (TH)', importedAt: '14:20 น. เมื่อวาน', createdAt: NOW - 24 * 3600_000, owner: 'ปวีณา ส.',
+    agency: 'ddc', permitNeeded: true, formCode: 'Pink Form',
+    formName: 'คำขออนุญาตส่งออกเชื้อโรคและพิษจากสัตว์ (Pink Form) — กรมควบคุมโรค',
+    conf: 92, stage: 8, statusKey: 'submitted',
+    assess: { conf: 92, reason: 'อัลบูมินเซรุ่มมนุษย์ (ผลิตจากเลือดมนุษย์) อยู่ภายใต้ พ.ร.บ.เชื้อโรคและพิษจากสัตว์ ต้องขอใบอนุญาต' },
+    classify: { agency: 'ddc', conf: 92, reason: '', alt: [] },
+    draft: { fields: [] },
+    flags: [],
+    audit: [
+      { time: '14:20', text: 'อัปโหลดใบ Invoice EXPINV0017 เข้าระบบแล้ว', by: 'ระบบ' },
+      { time: '14:25', text: 'OCR สำเร็จ', by: 'AI' },
+      { time: '14:28', text: 'วิเคราะห์ HS Code: 3002.11.00 → กรมควบคุมโรค (92%)', by: 'AI' },
+      { time: '14:35', text: 'แนบ Certificate of Analysis (COA) แล้ว', by: 'ปวีณา ส.' },
+      { time: '14:50', text: 'ยื่นกรมควบคุมโรค สำเร็จ (Pink Form)', by: 'ระบบ' },
+      { time: '15:10', text: 'กรมควบคุมโรคตรวจสอบและอนุมัติคำขอแล้ว', by: 'กรมควบคุมโรค' },
+      { time: '15:15', text: 'ชำระค่าธรรมเนียม ฿1,000 ผ่าน QR แล้ว', by: 'ปวีณา ส.' },
+      { time: '15:16', text: 'กรมควบคุมโรคส่งเอกสารกลับมาให้แล้ว (3 ไฟล์)', by: 'กรมควบคุมโรค' },
+    ],
+    messages: [
+      bot('14:20', 'อัปโหลดใบ Invoice EXPINV0017 เข้าระบบแล้วครับ — Human Serum Albumin 120 กล่อง จากไทย ส่งออกไปญี่ปุ่น'),
+      t('15:16', 'bot', 'status-card', undefined, {
+        refNo: 'RG-2568-77100', customsRef: 'EXPINV0017',
+        submittedAt: new Date(Date.now() - 24 * 3600_000).toLocaleDateString('th-TH'), isPending: false,
+        agency: 'กรมควบคุมโรค', feeNote: 'ค่าธรรมเนียมกรม ฿1,000 (ชำระแล้ว)',
+      }),
+    ],
+    documents: [
+      doc('d17a', 'Invoice EXPINV0017', 'invoice'),
+      doc('d17b', 'DDC_PINKFORM_V2.0.pdf', 'coa'),
+    ],
+    returnedDocuments: [
+      doc('d17r1', 'ใบรับรองฯ (DDCPINKFORM)', 'other', 'pdf', 'ddc', new Date(Date.now() - 24 * 3600_000 + 3600_000).toLocaleDateString('th-TH') + ' 15:16'),
+      doc('d17r2', 'ใบรับรองฯ (DDCPINKFORM PDF)', 'other', 'pdf', 'ddc', new Date(Date.now() - 24 * 3600_000 + 3600_000).toLocaleDateString('th-TH') + ' 15:16'),
+      doc('d17r3', 'ใบเสร็จรับเงิน (DDCERECEIPT PDF)', 'other', 'pdf', 'ddc', new Date(Date.now() - 24 * 3600_000 + 3600_000).toLocaleDateString('th-TH') + ' 15:16'),
+    ],
+    itemsSelected: true,
+    items: [
+      { id: 'i17', name: 'Human Serum Albumin', hsCode: '3002.11.00', origin: 'ไทย (TH)', quantity: '120', unit: 'กล่อง', lotNo: 'BIO-2568-032', amount: 384000 },
+    ],
+  },
 ];
