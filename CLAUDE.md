@@ -684,12 +684,15 @@ Add to `mainItems` array in `sidebar.component.ts`
 - **Background**: `#EDEEF4` page bg, `16px` outer padding
 - **Detail**: clicking any row opens inline detail panel (right side of same page)
   - Left column: AI assess card (HS Code pill + reason) · AI classify card · Audit trail
-  - Right column: Flag alerts · Draft license summary · Item list card (Shipment.items — per-product
+  - Right column: Draft license summary · Item list card (Shipment.items — per-product
     line item from the invoice/customs doc used for this LPI request; each row has a "รายละเอียด"
     button opening a read-only modal split into OCR-derived fields + ItemManualDetail fields captured
     during the request, same field set as the chat's form-preview item modal) · Uploaded documents card
     · Submission result card (submitted only)
-  - Footer: "ไปยืนยันในแชท" (needs_you) / "เสร็จสิ้นแล้ว" (submitted)
+    (the "Flag alerts" card was removed — there's no flag-confirmation step left in the live flow,
+    see 'flag-card'/'item-measurement' above; `Shipment.flags` data + `unresolvedFlags()`/
+    `resolvedFlags()` are unused now but left in types.ts/queue.mock.ts as historical data)
+  - Footer: "ดำเนินการต่อ" (needs_you) / "เสร็จสิ้นแล้ว" (submitted)
 - **Stage labels** (7 stages): ตรวจรับใบขน → วิเคราะห์ HS → จัดประเภท → แนบเอกสาร → กรอกข้อมูล → ยืนยันร่าง → ยื่นกรม
   - Shipments whose `agency` is in `PAYMENT_STEP_AGENCIES` (queue-page.component.ts — currently `['ddc']`,
     mirroring chat.service.ts's fee-charging Pink Form agencies) get an 8th step appended,

@@ -290,48 +290,6 @@
           <!-- RIGHT column -->
           <div class="dv-col-right">
 
-            <!-- Flag alerts -->
-            @if (openShipment()!.flags.length > 0) {
-              <div class="dv-card" [class.dv-card--warn]="unresolvedFlags(openShipment()!).length > 0">
-                <div class="dv-card__hd">
-                  @if (unresolvedFlags(openShipment()!).length > 0) {
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 00-3.48 0l-8 14A2 2 0 004 21h16a2 2 0 001.73-3"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                    <span style="color:#B45309">พบ {{ unresolvedFlags(openShipment()!).length }} จุดที่ยังรอยืนยัน</span>
-                  } @else {
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0D8F61" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
-                    <span style="color:#0D8F61">ยืนยันข้อมูลครบทุกจุดแล้ว</span>
-                  }
-                </div>
-                @for (f of openShipment()!.flags; track f.id) {
-                  <div class="dv-flag" [class.dv-flag--resolved]="f.resolved">
-                    <div class="dv-flag__hd">
-                      @if (f.resolved) {
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0D8F61" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-                      } @else {
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                      }
-                      <span class="dv-flag__title">{{ f.title }}</span>
-                    </div>
-                    <p class="dv-flag__detail">{{ f.detail }}</p>
-                    <div class="dv-flag__foot">
-                      <span class="dv-flag__conf" [style.color]="confColor(f.conf)">AI มั่นใจ {{ f.conf }}%</span>
-                      @if (f.resolved) {
-                        <span class="dv-flag__badge-ok">
-                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 12 2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
-                          ยืนยันแล้ว
-                        </span>
-                      } @else {
-                        <button class="dv-flag__btn dv-flag__btn--pending" (click)="proceedToChat(openShipment()!)">
-                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                          รอยืนยันในแชท →
-                        </button>
-                      }
-                    </div>
-                  </div>
-                }
-              </div>
-            }
-
             <!-- Draft license summary -->
             @if (openShipment()!.draft.fields.length > 0) {
               <div class="dv-card">
@@ -494,16 +452,10 @@
 
         <!-- Footer action bar -->
         <div class="dv-footer">
-          @if (unresolvedFlags(openShipment()!).length > 0) {
-            <p class="dv-footer__warn">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 00-3.48 0l-8 14A2 2 0 004 21h16a2 2 0 001.73-3"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-              ยังมี {{ unresolvedFlags(openShipment()!).length }} จุดรอยืนยันในแชท
-            </p>
-          }
           <div class="dv-footer__btns">
-@if (canProceed(openShipment()!)) {
+            @if (canProceed(openShipment()!)) {
               <button class="dv-btn dv-btn--primary" (click)="proceedToChat(openShipment()!)">
-                {{ unresolvedFlags(openShipment()!).length > 0 ? 'ไปยืนยันในแชท →' : 'ดำเนินการต่อ →' }}
+                ดำเนินการต่อ →
               </button>
             } @else {
               <button class="dv-btn" disabled>เสร็จสิ้นแล้ว</button>

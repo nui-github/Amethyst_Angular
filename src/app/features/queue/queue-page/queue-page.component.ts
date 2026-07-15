@@ -156,9 +156,6 @@ export class QueuePageComponent {
   isDone2(stepIdx: number, stage: number) { return stepIdx < stage; }
   isActive2(stepIdx: number, stage: number) { return stepIdx === stage; }
 
-  unresolvedFlags(ship: Shipment) { return ship.flags.filter(f => !f.resolved); }
-  resolvedFlags(ship: Shipment)   { return ship.flags.filter(f => f.resolved); }
-
   canProceed(ship: Shipment): boolean {
     return ship.statusKey !== 'submitted';
   }
