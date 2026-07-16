@@ -871,7 +871,7 @@ export const MOCK_QUEUE: Shipment[] = [
       doc('d13b', 'DDC_PINKFORM_V2.0.pdf', 'coa'),
     ],
     paymentQr: {
-      agency: 'ddc',
+      agency: 'กรมควบคุมโรค',
       amount: 1000,
       refNo: 'PAY-882300',
       expiresAt: '11:00',
