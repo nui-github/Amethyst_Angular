@@ -162,7 +162,8 @@ export class QueuePageComponent {
   isPaymentAwaitingApproval(ship: Shipment): boolean {
     return ship.statusKey === 'submitted'
       && this.PAYMENT_STEP_AGENCIES.includes(ship.agency)
-      && !ship.paymentQr;
+      && !ship.paymentQr
+      && !ship.returnedDocuments?.length;
   }
 
   toggleSidebar(): void { this.collapsed.update(v => !v); }
