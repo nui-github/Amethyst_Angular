@@ -130,7 +130,9 @@
   }
 
   &__input {
-    padding: 8px 10px;
+    height: 34px;
+    box-sizing: border-box;
+    padding: 0 10px;
     border: 1px solid #d1d5db;
     border-radius: 6px;
     font-size: 12px;
@@ -149,6 +151,11 @@
       color: #9ca3af;
       cursor: not-allowed;
     }
+  }
+
+  textarea.cde-field__input {
+    height: auto;
+    padding: 8px 10px;
   }
 }
 
