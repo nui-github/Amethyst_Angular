@@ -15,6 +15,7 @@ import { SidebarComponent } from '../../chat/components/sidebar/sidebar.componen
 import { PaymentQrComponent } from '../../chat/components/payment-qr/payment-qr.component';
 import { ChatMessage, Shipment, ShipmentStatus, ShipmentItem, ITEM_MANUAL_DETAIL_FIELDS } from '@app/core/models/types';
 import { getAgencyReturnDocs } from '@mock/agency-return-docs.mock';
+import { getAgencyPayment } from '@mock/payment.mock';
 
 export { STATUS_META, AGENCY_SHORT };
 
@@ -295,5 +296,25 @@ export class QueuePageComponent {
 
   private nowTime(): string {
     return new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  /** "ตรวจสอบสถานะอัปเดต" on the amber รอการตรวจสอบและอนุมัติ card — mocks the department
+   *  finishing its review (mirrors ChatService.showAgencyApproval's fee-agency branch, which
+   *  only runs from inside chat; this is the queue-page equivalent for when the user is already
+   *  on this page instead). Writes paymentQr straight onto the shipment so the card swaps to the
+   *  QR-payment view. */
+  approveDeptReview(ship: Shipment): void {
+    const agency = this.agencyFull(ship.agency);
+    const payConfig = getAgencyPayment(agency);
+    const approveTime = this.nowTime();
+    this.q.update(ship.id, {
+      paymentQr: {
+        agency, amount: payConfig.amount,
+        refNo: `PAY-${Math.floor(Math.random() * 900000 + 100000)}`,
+        expiresAt: new Date(Date.now() + 15 * 60 * 1000).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
+        status: 'unpaid',
+      },
+      audit: [...ship.audit, { time: approveTime, text: `${agency}ตรวจสอบและอนุมัติคำขอแล้ว ระบบส่ง QR ให้ท่านชำระค่าธรรมเนียมแล้ว`, by: agency }],
+    });
   }
 }
