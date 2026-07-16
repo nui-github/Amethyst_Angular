@@ -17,6 +17,14 @@
           <span class="cde-sec__title">ส่วนควบคุม</span>
         </div>
         <div class="cde-form-grid">
+          <label class="cde-field cde-field--full">
+            <span class="cde-field__label">เลขที่ใบรับรอง (DDC License)</span>
+            <input class="cde-field__input" [(ngModel)]="local().ddcLicenseNumber" />
+          </label>
+          <label class="cde-field cde-field--full">
+            <span class="cde-field__label">ชื่อใบรับรอง</span>
+            <input class="cde-field__input" [(ngModel)]="local().ddcLicenseName" />
+          </label>
           <label class="cde-field">
             <span class="cde-field__label">เลขที่อ้างอิง</span>
             <input
@@ -28,10 +36,6 @@
           <label class="cde-field">
             <span class="cde-field__label">เลขที่รับเอกสาร</span>
             <input class="cde-field__input" [(ngModel)]="local().receiveNumber" />
-          </label>
-          <label class="cde-field cde-field--full">
-            <span class="cde-field__label">เลขที่ใบรับรอง (DDC License)</span>
-            <input class="cde-field__input" [(ngModel)]="local().ddcLicenseNumber" />
           </label>
           <label class="cde-field">
             <span class="cde-field__label">วันที่ออกใบรับรอง</span>
@@ -57,10 +61,6 @@
               [(ngModel)]="local().ddcExpireDate"
             />
           </label>
-          <label class="cde-field cde-field--full">
-            <span class="cde-field__label">ชื่อใบรับรอง</span>
-            <input class="cde-field__input" [(ngModel)]="local().ddcLicenseName" />
-          </label>
         </div>
       </div>
 
@@ -70,6 +70,14 @@
           <span class="cde-sec__title">ข้อมูลบริษัทผู้ส่งออก</span>
         </div>
         <div class="cde-form-grid">
+          <label class="cde-field cde-field--full">
+            <span class="cde-field__label">ชื่อบริษัท (อังกฤษ) <em>*</em></span>
+            <input class="cde-field__input" [(ngModel)]="local().shipperEnglishName" />
+          </label>
+          <label class="cde-field cde-field--full">
+            <span class="cde-field__label">ที่อยู่</span>
+            <input class="cde-field__input" [(ngModel)]="local().shipperStreet" />
+          </label>
           <label class="cde-field">
             <span class="cde-field__label">เลขผู้เสียภาษี <em>*</em></span>
             <input
@@ -81,14 +89,6 @@
           <label class="cde-field">
             <span class="cde-field__label">สาขาที่</span>
             <input class="cde-field__input" [(ngModel)]="local().shipperBranch" />
-          </label>
-          <label class="cde-field cde-field--full">
-            <span class="cde-field__label">ชื่อบริษัท (อังกฤษ) <em>*</em></span>
-            <input class="cde-field__input" [(ngModel)]="local().shipperEnglishName" />
-          </label>
-          <label class="cde-field cde-field--full">
-            <span class="cde-field__label">ที่อยู่</span>
-            <input class="cde-field__input" [(ngModel)]="local().shipperStreet" />
           </label>
           <label class="cde-field">
             <span class="cde-field__label">ตำบล</span>
