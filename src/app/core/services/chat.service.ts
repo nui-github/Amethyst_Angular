@@ -1351,6 +1351,7 @@ export class ChatService {
 
   // ── New chat ───────────────────────────────────────────────────────────────
   newChat(): void {
+    this.syncQueueProgress();
     this.saveCurrentSession();
     this.activeSessionId.set(null);
     this.messages.set([WELCOME]);
@@ -1362,6 +1363,74 @@ export class ChatService {
     this.allPermitAgencies.set([]);
     this.submittedPermits.set([]);
     this.ocr.reset();
+  }
+
+  // Type→audit-label map for whatever the user progressed through in a resumed session that never
+  // reached "ยืนยันส่งกรม" — syncQueueProgress() below appends one entry per new step reached, so
+  // the queue detail's own Audit trail card reflects "the last step discussed", not the state the
+  // shipment was in when loadQueueSession() first opened it.
+  private readonly STEP_AUDIT_LABELS: Partial<Record<MessageType, string>> = {
+    'ocr-results': 'OCR อ่านข้อมูลสำเร็จ',
+    'hs-analysis': 'วิเคราะห์ HS Code แล้ว',
+    'item-hs-analysis': 'วิเคราะห์และจัดกลุ่มสินค้าตามกรมแล้ว',
+    'agency-upload': 'อัปโหลดเอกสารประกอบกรมแล้ว',
+    'missing-fields': 'กรอกข้อมูลที่ขาดหายแล้ว',
+    'form-preview': 'ตรวจสอบข้อมูลก่อนส่งกรมแล้ว',
+    'flag-card': 'ยืนยันจุดที่ต้องตรวจสอบแล้ว',
+    'item-measurement': 'กรอกข้อมูล Measurement แล้ว',
+  };
+
+  /** How far the steps-bar (queue-page's STAGE_LABELS) should advance given the message types seen
+   *  so far — mirrors the stage numbers already hand-authored per step in queue.mock.ts, so a
+   *  synced-back session lines up with those same checkpoints instead of drifting. */
+  private deriveStageFromMessages(msgs: ChatMessage[]): number {
+    const hasType = (t: MessageType) => msgs.some(m => m.type === t);
+    if (hasType('form-preview')) return 6;
+    if (hasType('agency-upload') && msgs.filter(m => m.type === 'ocr-results').length >= 2) return 5;
+    if (hasType('agency-upload')) return 4;
+    if (hasType('item-hs-analysis') || hasType('hs-analysis')) return 3;
+    if (hasType('ocr-results')) return 2;
+    return 1;
+  }
+
+  /** Persists whatever progress a RESUMED ("ดำเนินการต่อ") session made back onto its Shipment
+   *  record, even if the flow was left unfinished — otherwise the queue detail view (steps-bar,
+   *  audit trail) stays frozen at the point loadQueueSession() first opened it, and the next
+   *  "ดำเนินการต่อ" would restore state from a stale, incomplete message history. A flow that DID
+   *  reach "ยืนยันส่งกรม" is already fully handled by finalizeSubmit()'s own queue.update(), so this
+   *  is a no-op once submittedRefNo is set — re-running it would re-append the whole flow a second
+   *  time, since flowStartIdx isn't advanced mid-flow. */
+  private syncQueueProgress(): void {
+    const shipmentId = this.queueShipmentId();
+    if (!shipmentId || this.submittedRefNo()) return;
+    const ship = this.queue.get(shipmentId);
+    if (!ship) return;
+    const newMsgs = this.messages().slice(this.flowStartIdx);
+    if (newMsgs.length === 0) return;
+
+    const mergedMessages = [...(ship.messages ?? []), ...newMsgs];
+    const newAuditTexts = newMsgs
+      .map(m => this.STEP_AUDIT_LABELS[m.type])
+      .filter((text): text is string => !!text && !ship.audit.some(a => a.text === text));
+    const audit = [
+      ...ship.audit,
+      ...newAuditTexts.map(text => ({ time: getTime(), text, by: 'เจ้าหน้าที่' as const })),
+    ];
+
+    const fd = this.formData();
+    const items: ShipmentItem[] | undefined = fd.selectedItems?.length
+      ? fd.selectedItems.map(i => ({
+          id: i.id, name: i.name, hsCode: i.hsCode, origin: i.origin,
+          quantity: i.quantity, unit: i.unit, lotNo: i.lotNo, amount: i.amount,
+        }))
+      : undefined;
+
+    this.queue.update(shipmentId, {
+      messages: mergedMessages,
+      audit,
+      stage: Math.max(ship.stage, this.deriveStageFromMessages(mergedMessages)),
+      ...(items ? { items, itemsSelected: true } : {}),
+    });
   }
 
   /**
