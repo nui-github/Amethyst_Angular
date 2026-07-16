@@ -1443,7 +1443,7 @@ export class ChatService {
     this.queueShipmentId.set(null);
   }
 
-  loadQueueSession(ship: { id: string; messages?: import('@app/core/models/types').ChatMessage[]; statusKey: string; formCode?: string; hs?: string; goods?: string; }): void {
+  loadQueueSession(ship: { id: string; messages?: import('@app/core/models/types').ChatMessage[]; statusKey: string; formCode?: string; hs?: string; goods?: string; type?: 'IMP' | 'EXP'; }): void {
     const msgs = ship.messages ?? [];
     // For unresolved shipments, leave the last message live so the user can continue the flow
     const canResume = ship.statusKey === 'needs_you' && msgs.length > 0;
@@ -1451,6 +1451,15 @@ export class ChatService {
     this.messages.set(sealed.length ? sealed : [WELCOME]);
     this.flowStartIdx = sealed.length;
     this.queueShipmentId.set(ship.id);
+    // direction only ever gets set from the welcome-menu choice (onDocTypeChoice) — resuming a
+    // queue session skips that entirely, so without this an export session would silently
+    // continue against whatever direction was last active (or the 'import' default), pulling the
+    // wrong OCR mock for any later upload step in this resumed flow.
+    this.direction.set(ship.type === 'EXP' ? 'export' : 'import');
+    // saveEarlyQueueEntry()/finalizeSubmit() both key off lastShipmentId to update this shipment
+    // in place rather than creating a new one — without restoring it here, continuing a resumed
+    // session through to submit spawns a duplicate queue entry and leaves the original stranded.
+    this.lastShipmentId = ship.id;
     if (canResume) this.restoreStateFromMessages(msgs);
     // Restore step from statusKey so send() context is correct
     const stepMap: Record<string, import('@app/core/models/types').ChatStep> = {
@@ -1463,6 +1472,7 @@ export class ChatService {
   /** Rebuild the minimal service state needed for the last (unsealed) message's action to work correctly. */
   private restoreStateFromMessages(msgs: ChatMessage[]): void {
     let formData: LicenseFormData = {};
+    this.isAgencyDocsUpload = false;
     for (const m of msgs) {
       if (m.type === 'ocr-results' || m.type === 'form-preview') {
         formData = { ...formData, ...(m.data as LicenseFormData) };
@@ -1477,6 +1487,14 @@ export class ChatService {
         const agencies = Array.from(new Set(d.items.filter(i => i.requiresPermit).map(i => i.agency)));
         this.ALL_AGENCIES = agencies;
         if (agencies.length) this.currentAgency = agencies[0];
+      }
+      // agency-upload only exists on the invoice-first path (chooseInvoiceFirst() → ... →
+      // onProfileSelected() sets isAgencyDocsUpload right before posting this message — see there).
+      // Resuming straight into this card without restoring the flag left continueAfterOCR() falling
+      // through to the legacy full-upload/hs-analysis branch once the COA upload's OCR pass finished,
+      // showing an unrelated generic analysis instead of continuing the real invoice-path flow.
+      if (m.type === 'agency-upload') {
+        this.isAgencyDocsUpload = true;
       }
     }
     this.formData.set(formData);
