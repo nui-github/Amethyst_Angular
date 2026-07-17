@@ -1054,6 +1054,13 @@ export class ChatService {
   // fee applies) → returned-documents flow, instead of opening the generic permit-status list.
   private readonly QR_PAYMENT_AGENCIES = ['กรมควบคุมโรค', 'การยาง'];
 
+  /** StatusCardComponent uses this to hide its "ตรวจสอบสถานะ" chip for QR_PAYMENT_AGENCIES —
+   *  finalizeSubmit() now posts the approval step for them automatically, so the chip would just
+   *  be dead UI (see finalizeSubmit()'s QR_PAYMENT_AGENCIES branch). */
+  isAutoApprovalAgency(agency?: string): boolean {
+    return !!agency && this.QR_PAYMENT_AGENCIES.includes(agency);
+  }
+
   /** Called from status-card's "ตรวจสอบสถานะ" chip — agency-aware, unlike onCheckStatusChoice above */
   checkStatus(agency?: string): void {
     this.user('ตรวจสอบสถานะใบอนุญาต');
@@ -1229,10 +1236,15 @@ export class ChatService {
         licenseType: fd.licenseType ?? 'RGoods',
         invoiceRef: fd.ref ?? fd.invoiceNo ?? '—',
       }]);
-      // QR_PAYMENT_AGENCIES must finish "ตรวจสอบสถานะ" → approval → (QR payment in the queue page,
-      // if a fee applies, else returned docs right away) first — showNextAgencyIfAny() runs from
-      // showAgencyApproval()/showAgencyReturnedDocs() instead for those.
-      if (!this.QR_PAYMENT_AGENCIES.includes(this.currentAgency)) {
+      // QR_PAYMENT_AGENCIES must finish approval → (QR payment in the queue page, if a fee
+      // applies, else returned docs right away) first — showNextAgencyIfAny() runs from
+      // showAgencyApproval()/showAgencyReturnedDocs() instead for those. Posted automatically
+      // here rather than waiting on the status-card's "ตรวจสอบสถานะ" chip (not shown for these
+      // agencies — see StatusCardComponent/isAutoApprovalAgency()) since the department review
+      // is simulated anyway; no reason to make the user click through it.
+      if (this.QR_PAYMENT_AGENCIES.includes(this.currentAgency)) {
+        this.withTyping(() => this.showAgencyApproval(this.currentAgency), 900);
+      } else {
         this.withTyping(() => this.showNextAgencyIfAny(), 800);
       }
     }

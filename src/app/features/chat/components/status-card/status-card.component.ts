@@ -69,7 +69,7 @@ import { ChatService } from '@app/core/services/chat.service';
           }
         </div>
       </div>
-      @if (!d.isPending) {
+      @if (!d.isPending && !chat.isAutoApprovalAgency(d.agency)) {
         <div class="status-card__chips">
           <button class="quick-chip" (click)="chat.checkStatus(d.agency)">
             <lucide-icon [img]="Search" [size]="12" /> ตรวจสอบสถานะ
