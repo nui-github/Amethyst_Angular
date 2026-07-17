@@ -542,11 +542,17 @@ export interface Shipment {
   // see ChatService.showAgencyReturnedDocs / agency-docs-returned.component.ts for the chat-side
   // equivalent). Only present once that flow has actually completed.
   returnedDocuments?: ShipmentDocument[];
-  // QR-payment state for QR_PAYMENT_AGENCIES (chat.service.ts) once the department approves —
-  // set by ChatService.setAgencyPaymentQr(), cleared by no one (stays for history once paid).
-  // 'unpaid': QR ready to view/pay in the queue detail view. 'paid_pending': user paid, waiting
-  // on the department's confirmation. 'paid_confirmed' is never actually set — once confirmed the
-  // department's returnedDocuments show up instead and this field is just left as history.
+  // True once the department has finished its review (ChatService.showAgencyApproval /
+  // QueuePageComponent.approveDeptReview, QR_PAYMENT_AGENCIES only) — set before paymentQr,
+  // since the QR itself arrives from the department on its own unpredictable timeline. Lets the
+  // queue detail page tell "still under review" apart from "approved, waiting on the QR".
+  deptApproved?: boolean;
+  // QR-payment state for QR_PAYMENT_AGENCIES (chat.service.ts) once the department sends the QR —
+  // set by ChatService.markDeptApproved()'s caller / QueuePageComponent.mockQrArrival(), cleared
+  // by no one (stays for history once paid). 'unpaid': QR ready to view/pay in the queue detail
+  // view. 'paid_pending': user paid, waiting on the department's confirmation. 'paid_confirmed'
+  // is never actually set — once confirmed the department's returnedDocuments show up instead and
+  // this field is just left as history.
   paymentQr?: {
     agency: string;
     amount: number;

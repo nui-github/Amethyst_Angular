@@ -160,9 +160,25 @@ export class QueuePageComponent {
     return ship.statusKey !== 'submitted';
   }
 
-  isPaymentAwaitingApproval(ship: Shipment): boolean {
+  /** Still under the department's review — deptApproved hasn't been set yet. Normally only a
+   *  brief window (chat's own 3s simulated-review delay) since ChatService.showAgencyApproval()
+   *  sets deptApproved automatically; kept as its own check for whenever the user lands on this
+   *  page mid-review, or resumes a session that stopped there. */
+  isPendingApproval(ship: Shipment): boolean {
     return ship.statusKey === 'submitted'
       && this.PAYMENT_STEP_AGENCIES.includes(ship.agency)
+      && !ship.deptApproved
+      && !ship.paymentQr
+      && !ship.returnedDocuments?.length;
+  }
+
+  /** Approved, but the department hasn't sent its QR yet — deptApproved is set, paymentQr isn't.
+   *  This is the state most shipments actually sit in on this page, since chat's automatic
+   *  approval step runs well before the user usually navigates here. */
+  isAwaitingQr(ship: Shipment): boolean {
+    return ship.statusKey === 'submitted'
+      && this.PAYMENT_STEP_AGENCIES.includes(ship.agency)
+      && !!ship.deptApproved
       && !ship.paymentQr
       && !ship.returnedDocuments?.length;
   }
@@ -299,14 +315,24 @@ export class QueuePageComponent {
   }
 
   /** "ตรวจสอบสถานะอัปเดต" on the amber รอการตรวจสอบและอนุมัติ card — mocks the department
-   *  finishing its review (mirrors ChatService.showAgencyApproval's fee-agency branch, which
-   *  only runs from inside chat; this is the queue-page equivalent for when the user is already
-   *  on this page instead). Writes paymentQr straight onto the shipment so the card swaps to the
-   *  QR-payment view. */
+   *  finishing its review (mirrors ChatService.markDeptApproved(), which normally runs
+   *  automatically from chat well before the user reaches this page; this is the queue-page
+   *  equivalent for the rare case the user lands here first). Only flags deptApproved — the QR
+   *  is a separate, independently-timed event, see mockQrArrival() below. */
   approveDeptReview(ship: Shipment): void {
     const agency = this.agencyFull(ship.agency);
+    this.q.update(ship.id, {
+      deptApproved: true,
+      audit: [...ship.audit, { time: this.nowTime(), text: `${agency}ตรวจสอบและอนุมัติคำขอแล้ว`, by: agency }],
+    });
+  }
+
+  /** "ตรวจสอบสถานะอัปเดต" on the amber รออนุมัติ QR จากกรม card — mocks the department's QR
+   *  actually arriving (the approval itself already happened, see approveDeptReview() /
+   *  ChatService.markDeptApproved()). Writes paymentQr so the card swaps to the QR-payment view. */
+  mockQrArrival(ship: Shipment): void {
+    const agency = this.agencyFull(ship.agency);
     const payConfig = getAgencyPayment(agency);
-    const approveTime = this.nowTime();
     this.q.update(ship.id, {
       paymentQr: {
         agency, amount: payConfig.amount,
@@ -314,7 +340,7 @@ export class QueuePageComponent {
         expiresAt: new Date(Date.now() + 15 * 60 * 1000).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
         status: 'unpaid',
       },
-      audit: [...ship.audit, { time: approveTime, text: `${agency}ตรวจสอบและอนุมัติคำขอแล้ว ระบบส่ง QR ให้ท่านชำระค่าธรรมเนียมแล้ว`, by: agency }],
+      audit: [...ship.audit, { time: this.nowTime(), text: `${agency}ส่ง QR ให้ท่านชำระค่าธรรมเนียมแล้ว`, by: agency }],
     });
   }
 }

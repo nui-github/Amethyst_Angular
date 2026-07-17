@@ -376,8 +376,8 @@
               </div>
             }
 
-            <!-- Payment approval waiting — shown when shipment submitted to fee-charging agency but paymentQr not yet set -->
-            @if (isPaymentAwaitingApproval(openShipment()!)) {
+            <!-- Still under department review — deptApproved not set yet (brief window, see isPendingApproval()) -->
+            @if (isPendingApproval(openShipment()!)) {
               <div class="dv-card dv-card--alert">
                 <div class="dv-card__hd">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -390,8 +390,22 @@
               </div>
             }
 
-            <!-- Submission result card — hidden while awaiting dept approval (yellow card above covers that state) -->
-            @if (openSubmissionResult() && !isPaymentAwaitingApproval(openShipment()!)) {
+            <!-- Approved, but the department hasn't sent its QR yet — deptApproved is set, paymentQr isn't -->
+            @if (isAwaitingQr(openShipment()!)) {
+              <div class="dv-card dv-card--alert">
+                <div class="dv-card__hd">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  <span style="color:#B45309">รออนุมัติ QR จากกรม</span>
+                </div>
+                <p class="dv-payment-waiting-text">เอกสารของท่านได้รับการอนุมัติจาก{{ agencyFull(openShipment()!.agency) }}แล้วครับ อยู่ระหว่างรอกรมส่ง QR มาให้ชำระค่าธรรมเนียม</p>
+                <button class="dv-result-btn dv-result-btn--outline" (click)="mockQrArrival(openShipment()!)">
+                  ตรวจสอบสถานะอัปเดต
+                </button>
+              </div>
+            }
+
+            <!-- Submission result card — hidden while awaiting dept approval or the QR (yellow cards above cover those states) -->
+            @if (openSubmissionResult() && !isPendingApproval(openShipment()!) && !isAwaitingQr(openShipment()!)) {
               <div class="dv-card dv-card--submitted">
                 <div class="dv-card__hd">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0D8F61" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>

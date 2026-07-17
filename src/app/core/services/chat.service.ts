@@ -1086,11 +1086,14 @@ export class ChatService {
     if (payConfig.requiresFee) {
       // Posts a "กำลังตรวจสอบ..." card first, standing in for the wait on the department's own
       // API to respond, then flips the same message over to the approved state — rather than
-      // jumping straight to "อนุมัติแล้ว" with no sense that a real review happened.
+      // jumping straight to "อนุมัติแล้ว" with no sense that a real review happened. Approval and
+      // the QR itself are two separate, independently-timed events from the department's side —
+      // see markDeptApproved() — so paymentQr is deliberately NOT set here; the queue detail page
+      // shows a "waiting on the QR" card until the user mocks its arrival there.
       this.bot('agency-approval-pending', { agency, pending: true } satisfies AgencyApprovalPendingData);
       setTimeout(() => {
         this.updateLastMessageData('agency-approval-pending', { agency, pending: false });
-        this.setAgencyPaymentQr(agency, payConfig.amount);
+        this.markDeptApproved(agency);
         this.withTyping(() => this.showNextAgencyIfAny(), 700);
       }, 3000);
     } else {
@@ -1099,18 +1102,16 @@ export class ChatService {
     }
   }
 
-  /** Writes the QR payment straight onto the shipment's queue record — the rest of that
-   *  agency's flow (view QR, pay, wait for confirmation, receive returned docs) happens on the
-   *  queue detail page from here, not in chat. See QueuePageComponent.payQr(). */
-  private setAgencyPaymentQr(agency: string, amount: number): void {
+  /** Flags the shipment's queue record as department-approved — QueuePageComponent reads this to
+   *  swap its "รอการตรวจสอบและอนุมัติ" card for a "รอ QR จากกรม" one (paymentQr itself only gets
+   *  set once the user mocks the QR's arrival there, via QueuePageComponent.mockQrArrival()). */
+  private markDeptApproved(agency: string): void {
     if (!this.lastShipmentId) return;
+    const ship = this.queue.get(this.lastShipmentId);
+    if (!ship) return;
     this.queue.update(this.lastShipmentId, {
-      paymentQr: {
-        agency, amount,
-        refNo: `PAY-${Math.floor(Math.random() * 900000 + 100000)}`,
-        expiresAt: new Date(Date.now() + 15 * 60 * 1000).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
-        status: 'unpaid',
-      },
+      deptApproved: true,
+      audit: [...ship.audit, { time: getTime(), text: `${agency}ตรวจสอบและอนุมัติคำขอแล้ว`, by: agency }],
     });
   }
 
