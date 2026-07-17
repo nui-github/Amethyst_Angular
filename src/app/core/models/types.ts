@@ -379,6 +379,7 @@ export interface AgencyDocsReturnedData {
 
 export interface AgencyApprovalPendingData {
   agency: string;
+  pending?: boolean;   // true while simulating the department's review — see ChatService.showAgencyApproval
 }
 
 // ─── Form / OCR ──────────────────────────────────────────────────────────────

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, CheckCircle2, QrCode } from 'lucide-angular';
+import { LucideAngularModule, CheckCircle2, QrCode, Loader2 } from 'lucide-angular';
 import { AgencyApprovalPendingData } from '@app/core/models/types';
 
 @Component({
@@ -10,14 +10,21 @@ import { AgencyApprovalPendingData } from '@app/core/models/types';
   imports: [CommonModule, LucideAngularModule],
   template: `
     <div class="aap-wrap">
-      <p class="aap-title">
-        <lucide-icon [img]="CheckCircle2" [size]="16" color="#0D8F61" />
-        {{ data.agency }}ตรวจสอบและอนุมัติคำขอแล้วครับ
-      </p>
-      <div class="aap-hint">
-        <lucide-icon [img]="QrCode" [size]="14" color="#0463EF" style="flex-shrink:0;margin-top:1px" />
-        <span>กรมกำลังจัดเตรียม QR สำหรับชำระค่าธรรมเนียม — ไปที่หน้า<strong>คิวงาน</strong>เพื่อดู QR และดำเนินการชำระเงินต่อได้เลยครับ</span>
-      </div>
+      @if (data.pending) {
+        <p class="aap-title aap-title--pending">
+          <lucide-icon [img]="Loader2" [size]="16" color="#B45309" class="aap-spin" />
+          {{ data.agency }}กำลังตรวจสอบคำขอของท่าน...
+        </p>
+      } @else {
+        <p class="aap-title">
+          <lucide-icon [img]="CheckCircle2" [size]="16" color="#0D8F61" />
+          {{ data.agency }}ตรวจสอบและอนุมัติคำขอแล้วครับ
+        </p>
+        <div class="aap-hint">
+          <lucide-icon [img]="QrCode" [size]="14" color="#0463EF" style="flex-shrink:0;margin-top:1px" />
+          <span>กรมกำลังจัดเตรียม QR สำหรับชำระค่าธรรมเนียม — ไปที่หน้า<strong>คิวงาน</strong>เพื่อดู QR และดำเนินการชำระเงินต่อได้เลยครับ</span>
+        </div>
+      }
     </div>
   `,
   styles: [`
@@ -26,6 +33,9 @@ import { AgencyApprovalPendingData } from '@app/core/models/types';
       display: flex; align-items: center; gap: 6px;
       font-size: 13px; font-weight: 700; color: #0D8F61; margin: 0;
     }
+    .aap-title--pending { color: #B45309; }
+    .aap-spin { animation: aap-spin 1s linear infinite; }
+    @keyframes aap-spin { to { transform: rotate(360deg); } }
     .aap-hint {
       display: flex; align-items: flex-start; gap: 7px;
       background: rgba(4, 99, 239, 0.06);
@@ -44,4 +54,5 @@ export class AgencyApprovalPendingComponent {
   @Input({ required: true }) data!: AgencyApprovalPendingData;
   readonly CheckCircle2 = CheckCircle2;
   readonly QrCode = QrCode;
+  readonly Loader2 = Loader2;
 }

@@ -1050,6 +1050,16 @@ export class ChatService {
     this.messages.update(list => list.map((m, i) => i === actual ? { ...m, isReadOnly: true } : m));
   }
 
+  /** Swaps the `data` on the most recent message of `type` in place — used by showAgencyApproval()
+   *  to flip its pending card over to the approved state without posting a second message. */
+  private updateLastMessageData(type: MessageType, data: unknown): void {
+    const msgs = this.messages();
+    const idx = [...msgs].reverse().findIndex(m => m.type === type);
+    if (idx === -1) return;
+    const actual = msgs.length - 1 - idx;
+    this.messages.update(list => list.map((m, i) => i === actual ? { ...m, data } : m));
+  }
+
   // Agencies whose "ตรวจสอบสถานะ" chip simulates a real department approval → (QR payment if a
   // fee applies) → returned-documents flow, instead of opening the generic permit-status list.
   private readonly QR_PAYMENT_AGENCIES = ['กรมควบคุมโรค', 'การยาง'];
@@ -1074,9 +1084,15 @@ export class ChatService {
   private showAgencyApproval(agency: string): void {
     const payConfig = getAgencyPayment(agency);
     if (payConfig.requiresFee) {
-      this.bot('agency-approval-pending', { agency } satisfies AgencyApprovalPendingData);
-      this.setAgencyPaymentQr(agency, payConfig.amount);
-      this.withTyping(() => this.showNextAgencyIfAny(), 700);
+      // Posts a "กำลังตรวจสอบ..." card first, standing in for the wait on the department's own
+      // API to respond, then flips the same message over to the approved state — rather than
+      // jumping straight to "อนุมัติแล้ว" with no sense that a real review happened.
+      this.bot('agency-approval-pending', { agency, pending: true } satisfies AgencyApprovalPendingData);
+      setTimeout(() => {
+        this.updateLastMessageData('agency-approval-pending', { agency, pending: false });
+        this.setAgencyPaymentQr(agency, payConfig.amount);
+        this.withTyping(() => this.showNextAgencyIfAny(), 700);
+      }, 3000);
     } else {
       this.bot('text', undefined, `${agency}ตรวจสอบและอนุมัติคำขอแล้วครับ ✅`);
       this.withTyping(() => this.showAgencyReturnedDocs(agency), 600);
