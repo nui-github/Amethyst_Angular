@@ -73,7 +73,7 @@
 
 @if (item.sources?.length) {
   <div class="cid-section">
-    <span class="cid-section__title">แหล่งที่มา / ใบอนุญาตอ้างอิง</span>
+    <span class="cid-section__title">ข้อมูลแหล่งที่มา / วัสดุกัมมันตรังสี</span>
     @for (s of item.sources; track $index) {
       <div class="cid-ro-grid" [style.margin-bottom.px]="8">
         @for (f of sourceFields($index); track f.path) {

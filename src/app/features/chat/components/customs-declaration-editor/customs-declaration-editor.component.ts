@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ChatService } from '@app/core/services/chat.service';
-import { CustomsDeclarationData, CustomsDeclarationItem, CustomsDeclarationProduction, CustomsDeclarationAuthority } from '@app/core/models/types';
+import { CustomsDeclarationData, CustomsDeclarationItem, CustomsDeclarationProduction, CustomsDeclarationAuthority, CustomsDeclarationSource } from '@app/core/models/types';
 import {
   getCustomsDeclarationHeaderSections,
   CUSTOMS_DECLARATION_ITEM_REQUIRED_FIELDS,
@@ -145,6 +145,24 @@ export class CustomsDeclarationEditorComponent {
 
   removeAuthorityAt(item: CustomsDeclarationItem, index: number): void {
     item.authorities = (item.authorities ?? []).filter((_, i) => i !== index);
+  }
+
+  // ── Source / radioactive-material data (GoodsShipment.Source) — all fields optional, no
+  // required-field validation contributes from this group. ─────────────────────────────────────
+  sourceValue(s: CustomsDeclarationSource, key: keyof CustomsDeclarationSource): string {
+    return (s[key] ?? '').toString();
+  }
+
+  onSourceInput(s: CustomsDeclarationSource, key: keyof CustomsDeclarationSource, event: Event): void {
+    s[key] = (event.target as HTMLInputElement).value;
+  }
+
+  addSource(item: CustomsDeclarationItem): void {
+    item.sources = [...(item.sources ?? []), {}];
+  }
+
+  removeSourceAt(item: CustomsDeclarationItem, index: number): void {
+    item.sources = (item.sources ?? []).filter((_, i) => i !== index);
   }
 
   // EN name is the default label — some invoices only carry an English product name, never a

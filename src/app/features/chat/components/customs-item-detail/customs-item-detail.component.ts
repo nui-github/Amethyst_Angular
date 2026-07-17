@@ -98,6 +98,10 @@ export class CustomsItemDetailComponent {
     return [
       { label: 'เลขใบอนุญาต', path: `sources.${i}.licenseNumber` },
       { label: 'อ้างอิงแหล่งที่มา', path: `sources.${i}.sourceReference` },
+      { label: 'ชื่อวัสดุกัมมันตรังสี', path: `sources.${i}.radioactiveMaterial` },
+      { label: 'ปริมาณสาร', path: `sources.${i}.radioactiveQty` },
+      { label: 'หน่วย', path: `sources.${i}.radioactiveUnit` },
+      { label: 'จำนวน', path: `sources.${i}.amount` },
     ];
   }
 

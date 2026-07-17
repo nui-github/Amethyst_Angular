@@ -73,7 +73,7 @@
 
       <div class="cde-sec">
         <div class="cde-sec__head" style="border-left-color:#7C3AED">
-          <span class="cde-sec__title">ข้อมูลการผลิต (COA) และหน่วยงานที่ออกใบอนุญาต (เลข U) — แยกตามรายการสินค้า</span>
+          <span class="cde-sec__title">ข้อมูลการผลิต (COA), หน่วยงานที่ออกใบอนุญาต (เลข U) และแหล่งที่มา/วัสดุกัมมันตรังสี — แยกตามรายการสินค้า</span>
         </div>
         <div class="cde-item-groups">
           @for (item of local.items; track item.itemNumber) {
@@ -166,6 +166,46 @@
                 <button type="button" class="cde-mini-add" (click)="addAuthority(item)">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
                   เพิ่มหน่วยงาน
+                </button>
+              </div>
+
+              <div class="cde-item-group__sub">
+                <span class="cde-item-group__sub-title">ข้อมูลแหล่งที่มา / วัสดุกัมมันตรังสี</span>
+                <div class="cde-table-wrap">
+                  <table class="cde-mini-table">
+                    <thead>
+                      <tr>
+                        <th>เลขใบอนุญาต</th>
+                        <th>อ้างอิงแหล่งที่มา</th>
+                        <th>ชื่อวัสดุกัมมันตรังสี</th>
+                        <th>ปริมาณสาร</th>
+                        <th>หน่วย</th>
+                        <th>จำนวน</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (s of item.sources ?? []; track $index) {
+                        <tr>
+                          <td><input class="cde-table__input" [value]="sourceValue(s, 'licenseNumber')" (input)="onSourceInput(s, 'licenseNumber', $event)" /></td>
+                          <td><input class="cde-table__input" [value]="sourceValue(s, 'sourceReference')" (input)="onSourceInput(s, 'sourceReference', $event)" /></td>
+                          <td><input class="cde-table__input" [value]="sourceValue(s, 'radioactiveMaterial')" (input)="onSourceInput(s, 'radioactiveMaterial', $event)" /></td>
+                          <td><input class="cde-table__input" [value]="sourceValue(s, 'radioactiveQty')" (input)="onSourceInput(s, 'radioactiveQty', $event)" /></td>
+                          <td><input class="cde-table__input" [value]="sourceValue(s, 'radioactiveUnit')" (input)="onSourceInput(s, 'radioactiveUnit', $event)" /></td>
+                          <td><input class="cde-table__input" [value]="sourceValue(s, 'amount')" (input)="onSourceInput(s, 'amount', $event)" /></td>
+                          <td>
+                            <button type="button" class="cde-row-del" (click)="removeSourceAt(item, $index)">
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
+                            </button>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+                <button type="button" class="cde-mini-add" (click)="addSource(item)">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                  เพิ่มแหล่งที่มา
                 </button>
               </div>
             </div>
