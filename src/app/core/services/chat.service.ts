@@ -1165,11 +1165,23 @@ export class ChatService {
 
   private finalizeSubmit(refNo: string, feeNote?: string): void {
     this.promoteActiveSession();
-    const flowMsgs = this.messages().slice(this.flowStartIdx);
     const fd = this.formData();
 
     const agencyKey: AgencyKey = this.AGENCY_KEY_MAP[this.currentAgency] ?? 'none';
     const form = this.formForAgency(this.currentAgency);
+
+    // Posted BEFORE the flowMsgs snapshot below so the status-card message is actually included
+    // in the saved Shipment.messages — QueuePageComponent.openSubmissionResult() (queue-page.
+    // component.ts) finds its "ผลการยื่น" data by scanning ship.messages for a status-card
+    // message; posting it after the snapshot silently left every live-submitted shipment with no
+    // ผลการยื่น card at all on the queue page (only the static mock data had one baked in).
+    this.bot('status-card', {
+      refNo, customsRef: fd.ref ?? fd.invoiceNo ?? '—',
+      submittedAt: new Date().toLocaleDateString('th-TH'),
+      feeNote, agency: this.currentAgency,
+    } satisfies StatusCardData);
+
+    const flowMsgs = this.messages().slice(this.flowStartIdx);
 
     const items: ShipmentItem[] = (fd.selectedItems ?? []).map(i => ({
       id: i.id, name: i.name, hsCode: i.hsCode, origin: i.origin,
@@ -1207,12 +1219,6 @@ export class ChatService {
     }
     this.lastShipmentId = shipmentId;
     this.step.set('done');
-
-    this.bot('status-card', {
-      refNo, customsRef: fd.ref ?? fd.invoiceNo ?? '—',
-      submittedAt: new Date().toLocaleDateString('th-TH'),
-      feeNote, agency: this.currentAgency,
-    } satisfies StatusCardData);
 
     if (this.currentAgency) {
       this.submittedAgencies.push(this.currentAgency);
