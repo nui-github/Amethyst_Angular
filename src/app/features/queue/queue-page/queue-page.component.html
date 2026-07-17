@@ -390,17 +390,16 @@
               </div>
             }
 
-            <!-- Approved, but the department hasn't sent its QR yet — deptApproved is set, paymentQr isn't -->
+            <!-- Approved, but the department hasn't sent its QR yet — deptApproved is set, paymentQr isn't.
+                 No action button here: the QR's arrival is entirely on the department's own timeline,
+                 not something the user can prompt. -->
             @if (isAwaitingQr(openShipment()!)) {
               <div class="dv-card dv-card--alert">
                 <div class="dv-card__hd">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                   <span style="color:#B45309">รออนุมัติ QR จากกรม</span>
                 </div>
-                <p class="dv-payment-waiting-text">เอกสารของท่านได้รับการอนุมัติจาก{{ agencyFull(openShipment()!.agency) }}แล้วครับ อยู่ระหว่างรอกรมส่ง QR มาให้ชำระค่าธรรมเนียม</p>
-                <button class="dv-result-btn dv-result-btn--outline" (click)="mockQrArrival(openShipment()!)">
-                  ตรวจสอบสถานะอัปเดต
-                </button>
+                <p class="dv-payment-waiting-text">เอกสารของท่านได้รับการอนุมัติจาก{{ agencyFull(openShipment()!.agency) }}แล้วครับ ตอนนี้อยู่ระหว่างรอกรมส่ง QR มาให้ท่านชำระค่าธรรมเนียม</p>
               </div>
             }
 

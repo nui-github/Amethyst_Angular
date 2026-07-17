@@ -15,7 +15,6 @@ import { SidebarComponent } from '../../chat/components/sidebar/sidebar.componen
 import { PaymentQrComponent } from '../../chat/components/payment-qr/payment-qr.component';
 import { ChatMessage, Shipment, ShipmentStatus, ShipmentItem, ITEM_MANUAL_DETAIL_FIELDS } from '@app/core/models/types';
 import { getAgencyReturnDocs } from '@mock/agency-return-docs.mock';
-import { getAgencyPayment } from '@mock/payment.mock';
 
 export { STATUS_META, AGENCY_SHORT };
 
@@ -318,29 +317,14 @@ export class QueuePageComponent {
    *  finishing its review (mirrors ChatService.markDeptApproved(), which normally runs
    *  automatically from chat well before the user reaches this page; this is the queue-page
    *  equivalent for the rare case the user lands here first). Only flags deptApproved — the QR
-   *  is a separate, independently-timed event, see mockQrArrival() below. */
+   *  itself is a separate, independently-timed event with no user-triggerable mock (see the
+   *  รออนุมัติ QR จากกรม card in the template — no action button, since the user genuinely can't
+   *  prompt that along). */
   approveDeptReview(ship: Shipment): void {
     const agency = this.agencyFull(ship.agency);
     this.q.update(ship.id, {
       deptApproved: true,
       audit: [...ship.audit, { time: this.nowTime(), text: `${agency}ตรวจสอบและอนุมัติคำขอแล้ว`, by: agency }],
-    });
-  }
-
-  /** "ตรวจสอบสถานะอัปเดต" on the amber รออนุมัติ QR จากกรม card — mocks the department's QR
-   *  actually arriving (the approval itself already happened, see approveDeptReview() /
-   *  ChatService.markDeptApproved()). Writes paymentQr so the card swaps to the QR-payment view. */
-  mockQrArrival(ship: Shipment): void {
-    const agency = this.agencyFull(ship.agency);
-    const payConfig = getAgencyPayment(agency);
-    this.q.update(ship.id, {
-      paymentQr: {
-        agency, amount: payConfig.amount,
-        refNo: `PAY-${Math.floor(Math.random() * 900000 + 100000)}`,
-        expiresAt: new Date(Date.now() + 15 * 60 * 1000).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
-        status: 'unpaid',
-      },
-      audit: [...ship.audit, { time: this.nowTime(), text: `${agency}ส่ง QR ให้ท่านชำระค่าธรรมเนียมแล้ว`, by: agency }],
     });
   }
 }
