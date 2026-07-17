@@ -1000,7 +1000,7 @@ export const MOCK_QUEUE: Shipment[] = [
     },
   },
 
-  // ── 16. submitted (EXP): Rabies Immunoglobulin – ขาออก pink form กรมควบคุมโรค (รอการอนุมัติก่อนส่ง QR) ──
+  // ── 16. submitted (EXP): Rabies Immunoglobulin – ขาออก pink form กรมควบคุมโรค (อนุมัติแล้ว รอ QR จากกรม) ──
   {
     id: 'EXP-68-016004', customsNo: 'HLTH000000016', hthmRef: 'HTHM000000016',
     isNew: false, type: 'EXP',
@@ -1010,7 +1010,7 @@ export const MOCK_QUEUE: Shipment[] = [
     origin: 'ไทย (TH)', importedAt: '07:30 น. 2 วันที่แล้ว', createdAt: NOW - 48 * 3600_000, owner: 'ปวีณา ส.',
     agency: 'ddc', permitNeeded: true, formCode: 'Pink Form',
     formName: 'คำขออนุญาตส่งออกเชื้อโรคและพิษจากสัตว์ (Pink Form) — กรมควบคุมโรค',
-    conf: 85, stage: 8, statusKey: 'submitted',
+    conf: 85, stage: 8, statusKey: 'submitted', deptApproved: true,
     assess: { conf: 85, reason: 'ภูมิคุ้มกันโรคพิษสุนัข จัดเป็นพิษจากสัตว์ อยู่ภายใต้ พ.ร.บ.เชื้อโรคและพิษจากสัตว์ พ.ศ. 2558 ต้องขอใบอนุญาต' },
     classify: { agency: 'ddc', conf: 85, reason: '', alt: [] },
     draft: { fields: [] },
@@ -1021,13 +1021,14 @@ export const MOCK_QUEUE: Shipment[] = [
       { time: '07:38', text: 'วิเคราะห์ HS Code: 3002.20.00 → กรมควบคุมโรค (85%)', by: 'AI' },
       { time: '07:45', text: 'แนบ Certificate of Analysis (COA) แล้ว', by: 'ปวีณา ส.' },
       { time: '07:55', text: 'ยื่นกรมควบคุมโรค สำเร็จ (Pink Form)', by: 'ระบบ' },
+      { time: '08:10', text: 'กรมควบคุมโรคตรวจสอบและอนุมัติคำขอแล้ว', by: 'กรมควบคุมโรค' },
     ],
     messages: [
       bot('07:30', 'อัปโหลดใบ Invoice EXPINV0014 เข้าระบบแล้วครับ — Rabies Immunoglobulin 150 กล่อง จากไทย ส่งออกไปสิงคโปร์'),
       t('07:35', 'bot', 'status-card', undefined, {
         refNo: 'RG-2568-76000', customsRef: 'EXPINV0014',
         submittedAt: new Date(Date.now() - 48 * 3600_000).toLocaleDateString('th-TH'), isPending: false,
-        agency: 'กรมควบคุมโรค', feeNote: 'ค่าธรรมเนียมกรม ฿1,000 (รอการอนุมัติจากกรม)',
+        agency: 'กรมควบคุมโรค', feeNote: 'ค่าธรรมเนียมกรม ฿1,000 (รอกรมส่ง QR มาชำระ)',
       }),
     ],
     documents: [
