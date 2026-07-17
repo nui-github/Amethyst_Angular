@@ -80,14 +80,14 @@ export const AGENCY_REQUIRED_DOCS: Record<string, AgencyDoc[]> = {
     },
   ],
   // Export-path agencies (see 'Export path' in CLAUDE.md)
-  // กรมควบคุมโรค only needs COA — the pathogen-permit/sanitary-cert docs are collected elsewhere
+  // กรมควบคุมโรค only needs DOA — the pathogen-permit/sanitary-cert docs are collected elsewhere
   'กรมควบคุมโรค': [
     {
-      key: 'coa', label: 'Certificate of Analysis (COA)', required: true, multiple: true,
+      key: 'doa', label: 'Declaration of Analysis (DOA)', required: true, multiple: true,
       hint: 'ผลการวิเคราะห์คุณภาพชุดน้ำยา/สารตัวอย่าง — อัปโหลดได้มากกว่า 1 ไฟล์',
       manualFields: [
-        { key: 'coaBatch',    label: 'Batch No.', placeholder: 'เช่น BIO-2568-014' },
-        { key: 'coaTestDate', label: 'วันที่ทดสอบ', placeholder: 'dd/mm/yyyy' },
+        { key: 'doaBatch',    label: 'Batch No.', placeholder: 'เช่น BIO-2568-014' },
+        { key: 'doaTestDate', label: 'วันที่ทดสอบ', placeholder: 'dd/mm/yyyy' },
       ],
     },
   ],
