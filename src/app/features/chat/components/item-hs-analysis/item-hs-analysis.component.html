@@ -91,6 +91,9 @@
             <div class="ih-item" [class.ih-item--editing]="editingItemId() === item.id">
               <div class="ih-item__row">
                 <span class="ih-item__name">{{ item.name }}</span>
+                @if (item.isCompound) {
+                  <span class="ih-item__compound-badge">ยางผสม</span>
+                }
                 @if (isManuallyEdited(item)) {
                   <span class="ih-item__edited-badge">แก้ไขแล้ว</span>
                 }

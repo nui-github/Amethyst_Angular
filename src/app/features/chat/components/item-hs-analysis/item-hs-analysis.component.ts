@@ -168,6 +168,7 @@ export class ItemHsAnalysisComponent implements OnInit {
       item.agencyFull = candidate.agencyFull ?? candidate.agency;
       if (candidate.requiresPermit !== undefined) item.requiresPermit = candidate.requiresPermit;
       item.licenseType = candidate.licenseType;
+      item.isCompound = candidate.isCompound ?? false;
       this.rebuildGroups();
       // Composition of both the old and new group changed — require re-confirming either.
       this.confirmedGroups.update(s => ({ ...s, [oldKey]: false, [candidate.agency!]: false }));

@@ -1088,4 +1088,137 @@ export const MOCK_QUEUE: Shipment[] = [
       { id: 'i17', name: 'Human Serum Albumin', hsCode: '3002.11.00', origin: 'ไทย (TH)', quantity: '120', unit: 'กล่อง', lotNo: 'BIO-2568-032', amount: 384000 },
     ],
   },
+
+  // ── 18. needs_you (EXP): RSS3 Smoked Rubber Sheet – ขาออก การยาง (รอแนบเอกสาร) ──
+  {
+    id: 'EXP-68-018006', customsNo: 'HLTH000000018', hthmRef: 'HTHM000000018',
+    isNew: true, type: 'EXP',
+    goods: 'RSS3 Smoked Rubber Sheet (ยางแผ่นรมควันชั้น 3)', hs: '4001.21.00',
+    customer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', contact: 'คุณพิมพ์ชนก ส่งดี',
+    contactEmail: 'pimchanok@siamagriexport.co.th',
+    origin: 'ไทย (TH)', importedAt: '09:15 น. วันนี้', createdAt: NOW - 3 * 3600_000, owner: 'ปวีณา ส.',
+    agency: 'raot', permitNeeded: true, formCode: 'ใบอนุญาตค้ายาง',
+    formName: 'คำขอใบอนุญาตค้ายางขาออก — การยางแห่งประเทศไทย (RAOT)',
+    conf: 92, stage: 4, statusKey: 'needs_you',
+    assess: { conf: 92, reason: 'จัดเป็นยางแผ่นรมควันดิบ (RSS3) ซึ่งอยู่ภายใต้การควบคุมของ พ.ร.บ.ควบคุมยาง พ.ศ. 2542 ต้องมีใบอนุญาตค้ายางจากการยางแห่งประเทศไทยก่อนส่งออก' },
+    classify: { agency: 'raot', conf: 92, reason: '', alt: [] },
+    draft: { fields: [] },
+    flags: [],
+    audit: [
+      { time: '09:15', text: 'อัปโหลดใบขนสินค้าขาออก EXPINV0018 เข้าระบบแล้ว', by: 'ระบบ' },
+      { time: '09:18', text: 'OCR สำเร็จ', by: 'AI' },
+      { time: '09:20', text: 'วิเคราะห์ HS Code: 4001.21.00 → การยาง (92%)', by: 'AI' },
+      { time: '09:22', text: 'รอแนบใบอนุญาตค้ายางและใบรับรองคุณภาพยาง', by: 'AI' },
+    ],
+    messages: [
+      bot('09:15', 'อัปโหลดใบขนสินค้าขาออก EXPINV0018 เข้าระบบแล้วครับ — RSS3 Smoked Rubber Sheet 20,000 กก. จากไทย ส่งออกไปจีน'),
+      t('09:18', 'bot', 'ocr-results', undefined, {
+        invoiceNo: 'EXPINV0018', invoiceDate: '15/07/2025', quantity: '20000 กก.',
+        importer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', port: 'ท่าเรือแหลมฉบัง (LCH)',
+        hsCode: '4001.21.00', countryOrigin: 'ไทย (TH)', lotNo: 'RSS3-2568-090', uNo: '',
+      }),
+      t('09:20', 'bot', 'hs-analysis', undefined, {
+        hsCode: '4001.21.00', goodsName: 'RSS3 Smoked Rubber Sheet (ยางแผ่นรมควันชั้น 3)',
+        description: 'จัดเป็นยางแผ่นรมควันดิบ (RSS3) ซึ่งอยู่ภายใต้การควบคุมของ พ.ร.บ.ควบคุมยาง พ.ศ. 2542 ต้องมีใบอนุญาตค้ายางจากการยางแห่งประเทศไทยก่อนส่งออก',
+        requiresPermit: true, direction: 'export', agency: 'การยาง', agencyFull: 'การยางแห่งประเทศไทย (RAOT)',
+        licenseType: 'ใบอนุญาตค้ายาง', confidence: 92,
+      }),
+      t('09:22', 'bot', 'agency-upload', undefined, {
+        agency: 'การยาง', agencyLabel: 'การยางแห่งประเทศไทย (RAOT)',
+        slots: [
+          { id: 's1', label: 'ใบอนุญาตค้ายาง', required: true },
+          { id: 's2', label: 'ใบรับรองคุณภาพยาง', required: true },
+        ],
+      }),
+    ],
+    documents: [
+      doc('d18a', 'ใบขนสินค้าขาออก EXPINV0018', 'customs'),
+    ],
+    itemsSelected: true,
+    items: [
+      { id: 'i18', name: 'RSS3 Smoked Rubber Sheet', hsCode: '4001.21.00', origin: 'ไทย (TH)', quantity: '20000', unit: 'กก.', lotNo: 'RSS3-2568-090', amount: 1704000 },
+    ],
+  },
+
+  // ── 19. submitted (EXP): RSS3 + Rubber Compound Sheet – ขาออก การยาง (ยื่นแล้ว, ชำระค่าธรรมเนียมใบรับรองยางผสมแล้ว) ──
+  {
+    id: 'EXP-68-019007', customsNo: 'HLTH000000019', hthmRef: 'HTHM000000019',
+    isNew: false, type: 'EXP',
+    goods: 'RSS3 Smoked Rubber Sheet + Rubber Compound Sheet (ยางแผ่นรมควัน + ยางแผ่นผสม)', hs: '4001.21.00',
+    customer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', contact: 'คุณพิมพ์ชนก ส่งดี',
+    contactEmail: 'pimchanok@siamagriexport.co.th',
+    origin: 'ไทย (TH)', importedAt: '10:40 น. เมื่อวาน', createdAt: NOW - 26 * 3600_000, owner: 'ปวีณา ส.',
+    agency: 'raot', permitNeeded: true, formCode: 'ใบอนุญาตค้ายาง',
+    formName: 'คำขอใบอนุญาตค้ายางขาออก — การยางแห่งประเทศไทย (RAOT)',
+    conf: 89, stage: 7, statusKey: 'submitted',
+    assess: { conf: 89, reason: 'ยางแผ่นรมควันดิบ (RSS3) ต้องมีใบอนุญาตค้ายาง ส่วนยางแผ่นผสม (Compounded Rubber) ไม่เข้าข่ายใบอนุญาตค้ายาง แต่ต้องขอใบรับรองปริมาณเนื้อยางแห้งและชำระค่าธรรมเนียมก่อนส่งออก' },
+    classify: { agency: 'raot', conf: 89, reason: '', alt: [] },
+    draft: { fields: [] },
+    flags: [],
+    audit: [
+      { time: '10:40', text: 'อัปโหลดใบขนสินค้าขาออก EXPINV0019 เข้าระบบแล้ว', by: 'ระบบ' },
+      { time: '10:43', text: 'OCR สำเร็จ', by: 'AI' },
+      { time: '10:46', text: 'วิเคราะห์ HS Code: 2 รายการ → การยาง (89%)', by: 'AI' },
+      { time: '10:50', text: 'ชำระค่าธรรมเนียมใบรับรองปริมาณเนื้อยางแห้ง ฿150 ผ่านบัญชีธนาคารกสิกรไทยแล้ว', by: 'ปวีณา ส.' },
+      { time: '10:55', text: 'แนบใบอนุญาตค้ายางและใบรับรองคุณภาพยางแล้ว', by: 'ปวีณา ส.' },
+      { time: '11:05', text: 'ยื่นการยางแห่งประเทศไทย สำเร็จ (ใบอนุญาตค้ายาง)', by: 'ระบบ' },
+      { time: '11:20', text: 'การยางแห่งประเทศไทยตรวจสอบและอนุมัติคำขอแล้ว ส่งใบอนุญาตกลับมาให้แล้ว', by: 'การยางแห่งประเทศไทย' },
+    ],
+    messages: [
+      bot('10:40', 'อัปโหลดใบขนสินค้าขาออก EXPINV0019 เข้าระบบแล้วครับ — RSS3 Smoked Rubber Sheet 20,000 กก. และ Rubber Compound Sheet 3,000 กก. จากไทย ส่งออกไปจีน'),
+      t('10:43', 'bot', 'ocr-results', undefined, {
+        invoiceNo: 'EXPINV0019', invoiceDate: '16/07/2025', quantity: '23000 กก.',
+        importer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', port: 'ท่าเรือแหลมฉบัง (LCH)',
+        hsCode: '4001.21.00', countryOrigin: 'ไทย (TH)', lotNo: 'RSS3-2568-091', uNo: '',
+      }),
+      t('10:50', 'bot', 'rubber-cert-payment', undefined, {
+        agency: 'การยาง', itemNames: ['Rubber Compound Sheet (ยางแผ่นผสม)'], amount: 150,
+        refNo: 'RC-2568-773100',
+        accounts: [
+          { id: 'kbank-1', bankName: 'ธนาคารกสิกรไทย', accountNoMasked: 'xxx-x-x4821-5', accountName: 'บจก. เน็ตเบย์', isDefault: true },
+          { id: 'scb-1', bankName: 'ธนาคารไทยพาณิชย์', accountNoMasked: 'xxx-x-x0932-1', accountName: 'บจก. เน็ตเบย์' },
+        ],
+        paid: true, paidAccountId: 'kbank-1',
+      }),
+      t('10:55', 'bot', 'agency-upload', undefined, {
+        agency: 'การยาง', agencyLabel: 'การยางแห่งประเทศไทย (RAOT)',
+        slots: [
+          { id: 's1', label: 'ใบอนุญาตค้ายาง', required: true },
+          { id: 's2', label: 'ใบรับรองคุณภาพยาง', required: true },
+        ],
+      }),
+      t('11:05', 'bot', 'status-card', undefined, {
+        refNo: 'RG-2568-89100', customsRef: 'EXPINV0019',
+        submittedAt: new Date(Date.now() - 26 * 3600_000).toLocaleDateString('th-TH'), isPending: false,
+        agency: 'การยาง', feeNote: 'ไม่มีค่าธรรมเนียม (ใบอนุญาตค้ายาง)',
+      }),
+      bot('11:20', 'การยางแห่งประเทศไทยตรวจสอบและอนุมัติคำขอแล้วครับ ✅'),
+      t('11:21', 'bot', 'agency-docs-returned', undefined, {
+        agency: 'การยาง',
+        docs: [
+          { key: 'raot_permit_pdf', label: 'ใบอนุญาตค้ายาง (RAOTPERMIT PDF)', url: SAMPLE_PDF },
+        ],
+      }),
+    ],
+    documents: [
+      doc('d19a', 'ใบขนสินค้าขาออก EXPINV0019', 'customs'),
+      doc('d19b', 'RAOT_PERMIT_APPLICATION.pdf', 'other'),
+    ],
+    rubberCertPayment: {
+      itemNames: ['Rubber Compound Sheet (ยางแผ่นผสม)'],
+      amount: 150,
+      refNo: 'RC-2568-773100',
+      paidAccountLabel: 'ธนาคารกสิกรไทย xxx-x-x4821-5',
+      certUrl: SAMPLE_PDF,
+      paidAt: new Date(Date.now() - 26 * 3600_000).toLocaleDateString('th-TH'),
+    },
+    returnedDocuments: [
+      doc('d19r1', 'ใบอนุญาตค้ายาง (RAOTPERMIT PDF)', 'other', 'pdf', 'raot', new Date(Date.now() - 26 * 3600_000 + 3600_000).toLocaleDateString('th-TH') + ' 11:21'),
+    ],
+    itemsSelected: true,
+    items: [
+      { id: 'i19a', name: 'RSS3 Smoked Rubber Sheet', hsCode: '4001.21.00', origin: 'ไทย (TH)', quantity: '20000', unit: 'กก.', lotNo: 'RSS3-2568-091', amount: 1704000 },
+      { id: 'i19b', name: 'Rubber Compound Sheet', hsCode: '4005.10.00', origin: 'ไทย (TH)', quantity: '3000', unit: 'กก.', lotNo: 'SGL-2568-045', amount: 159800 },
+    ],
+  },
 ];

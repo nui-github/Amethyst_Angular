@@ -46,9 +46,10 @@ export class ChatPageComponent {
     this.chat.messages().length === 1 && this.chat.messages()[0].type === 'welcome'
   );
 
-  /** Show DDC Pink Form when editor open (DDC is export-only) */
+  /** Show DDC Pink Form only for กรมควบคุมโรค (DDC) — the other two export agencies
+   *  (การยาง, เชื้อเพลิง) and every import flow use the generic CustomsDeclarationEditorComponent. */
   readonly showDdcForm = computed(() =>
-    this.chat.declarationEditorOpen() && this.chat.direction() === 'export'
+    this.chat.declarationEditorOpen() && this.chat.currentAgencyName === 'กรมควบคุมโรค'
   );
 
   goToQueue(): void { this.router.navigate(['/queue']); }

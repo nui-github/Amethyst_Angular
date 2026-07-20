@@ -7,8 +7,9 @@ import { ProductHsAnalysis, InvoiceLineItem } from '@app/core/models/types';
 // AI-analysis box's item count/content matches the invoice OCR box, same as the import side.
 // The 3 export-control agencies this build starts with: กรมควบคุมโรค (pathogen/biological
 // diagnostic reagents), เชื้อเพลิง = กรมธุรกิจพลังงาน (fuel), การยาง = การยางแห่งประเทศไทย
-// (rubber) — see CLAUDE.md 'Export path'. e4 (rubber compound sheet) is classified as a
-// general processed-rubber good (not raw RSS3), demonstrating the "ไม่ต้องขอใบอนุญาต" group.
+// (rubber) — see CLAUDE.md 'Export path'. e4 (rubber compound sheet) is compounded/processed
+// rubber (isCompound: true) — same 'การยาง' group as raw RSS3 (e1), but needs a natural-rubber-
+// content certificate + fee (RubberCertPaymentComponent) instead of ใบอนุญาตค้ายาง.
 const EXPORT_PRODUCT_CLASSIFICATION: ProductHsAnalysis[] = [
   {
     id: 'e1', name: 'RSS3 Smoked Rubber Sheet (ยางแผ่นรมควันชั้น 3)',
@@ -20,7 +21,7 @@ const EXPORT_PRODUCT_CLASSIFICATION: ProductHsAnalysis[] = [
       { hsCode: '4001.21.00', tariffCode: '4001.21.00.001', description: 'ยางแผ่นรมควัน (Smoked Sheets) ชั้น 1-5', dutyRate: 0, confidence: 92 },
       { hsCode: '4001.22.00', tariffCode: '4001.22.00.001', description: 'ยางแท่ง (Technically Specified Natural Rubber, TSNR)', dutyRate: 0, confidence: 70 },
       { hsCode: '4001.29.00', tariffCode: '4001.29.00.001', description: 'ยางธรรมชาติชนิดอื่นๆ ที่มิได้ระบุไว้เฉพาะ', dutyRate: 0, confidence: 58 },
-      { hsCode: '4005.10.00', tariffCode: '4005.10.00.001', description: 'ยางแผ่นผสม (Compounded Rubber)', dutyRate: 0, confidence: 40, agency: '—', agencyFull: '—', requiresPermit: false },
+      { hsCode: '4005.10.00', tariffCode: '4005.10.00.001', description: 'ยางแผ่นผสม (Compounded Rubber)', dutyRate: 0, confidence: 40, agency: 'การยาง', agencyFull: 'การยางแห่งประเทศไทย', requiresPermit: true, isCompound: true, licenseType: 'ใบรับรองปริมาณเนื้อยางแห้ง (สำหรับยางผสม)' },
       { hsCode: '4001.30.00', tariffCode: '4001.30.00.001', description: 'ยางบาลาตา/กัตตาเปอร์ชา/กัวยูล/ชิเคิล และยางธรรมชาติที่คล้ายกัน', dutyRate: 0, confidence: 25 },
     ],
   },
@@ -52,13 +53,14 @@ const EXPORT_PRODUCT_CLASSIFICATION: ProductHsAnalysis[] = [
   },
   {
     id: 'e4', name: 'Rubber Compound Sheet (ยางแผ่นผสม)',
-    hsCode: '4005.10.00', tariffCode: '4005.10.00.001', requiresPermit: false,
-    agency: '—', agencyFull: '—',
+    hsCode: '4005.10.00', tariffCode: '4005.10.00.001', requiresPermit: true,
+    agency: 'การยาง', agencyFull: 'การยางแห่งประเทศไทย (RAOT)', licenseType: 'ใบรับรองปริมาณเนื้อยางแห้ง (สำหรับยางผสม)',
+    isCompound: true,
     confidence: 81, dutyRate: 0,
-    reason: 'จัดเป็นยางแผ่นที่ผ่านการผสมสารเคมี (Compounded Rubber) แล้ว ไม่ใช่ยางดิบตามความหมายของ พ.ร.บ.ควบคุมยาง จึงไม่เข้าข่ายต้องขอใบอนุญาตค้ายางจากการยางแห่งประเทศไทย',
+    reason: 'จัดเป็นยางแผ่นที่ผ่านการผสมสารเคมี (Compounded Rubber) แล้ว ไม่ใช่ยางดิบตามความหมายของ พ.ร.บ.ควบคุมยาง จึงไม่เข้าข่ายต้องขอใบอนุญาตค้ายาง แต่ยังต้องขอใบรับรองปริมาณเนื้อยางแห้งและชำระค่าธรรมเนียมกับการยางแห่งประเทศไทยก่อนส่งออก',
     candidates: [
-      { hsCode: '4005.10.00', tariffCode: '4005.10.00.001', description: 'ยางผสมสารเคมี ยังไม่ได้ทำเป็นแผ่น/แท่ง/รูปทรงอื่น (Compounded Rubber)', dutyRate: 0, confidence: 81 },
-      { hsCode: '4001.21.00', tariffCode: '4001.21.00.002', description: 'ยางแผ่นรมควันดิบ (ควบคุมโดยการยางแห่งประเทศไทย)', dutyRate: 0, confidence: 47, agency: 'การยาง', agencyFull: 'การยางแห่งประเทศไทย', requiresPermit: true, licenseType: 'ใบอนุญาตค้ายาง (พ.ร.บ.ควบคุมยาง)' },
+      { hsCode: '4005.10.00', tariffCode: '4005.10.00.001', description: 'ยางผสมสารเคมี ยังไม่ได้ทำเป็นแผ่น/แท่ง/รูปทรงอื่น (Compounded Rubber)', dutyRate: 0, confidence: 81, isCompound: true },
+      { hsCode: '4001.21.00', tariffCode: '4001.21.00.002', description: 'ยางแผ่นรมควันดิบ (ควบคุมโดยการยางแห่งประเทศไทย)', dutyRate: 0, confidence: 47, agency: 'การยาง', agencyFull: 'การยางแห่งประเทศไทย', requiresPermit: true, licenseType: 'ใบอนุญาตค้ายาง (พ.ร.บ.ควบคุมยาง)', isCompound: false },
       { hsCode: '4006.90.00', tariffCode: '4006.90.00.001', description: 'ผลิตภัณฑ์ยางกึ่งสำเร็จรูปชนิดอื่นๆ', dutyRate: 0, confidence: 33 },
     ],
   },

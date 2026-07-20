@@ -213,6 +213,15 @@
               }
             }
 
+            <!-- การยาง (RAOT) ยางผสม: certificate fee, paid via linked bank account debit -->
+            @case ('rubber-cert-payment') {
+              @if (!readOnly && !msg.isReadOnly) {
+                <app-rubber-cert-payment [data]="$any(msg.data)" />
+              } @else {
+                <span class="readonly-tag">✓ ชำระค่าธรรมเนียมใบรับรองแล้ว</span>
+              }
+            }
+
             <!-- Agency-specific document upload slots -->
             @case ('agency-upload') {
               @if (!readOnly && !msg.isReadOnly) {

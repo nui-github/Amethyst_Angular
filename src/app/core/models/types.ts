@@ -51,10 +51,15 @@ export type MessageType =
                         // after the department approves the request (triggered by clicking
                         // "ตรวจสอบสถานะ" on status-card) and, if a fee applies, after payment-qr
                         // is paid — lists the documents the department sent back
-  | 'agency-approval-pending'; // fee-charging QR_PAYMENT_AGENCIES only (currently กรมควบคุมโรค):
+  | 'agency-approval-pending' // fee-charging QR_PAYMENT_AGENCIES only (currently กรมควบคุมโรค):
                         // shown right after showAgencyApproval()'s approval instead of the old
                         // 2 separate plain-text bot() bubbles — single card combining "approved"
                         // + "QR is on its way to the queue page", see AgencyApprovalPendingComponent
+  | 'rubber-cert-payment'; // การยาง (RAOT) export path only: gated between เลือกโปรไฟล์ and the
+                        // agency's next step (agency-upload/form-preview/proceed) whenever the
+                        // confirmed การยาง group contains a compound-rubber item (isCompound) —
+                        // ใบรับรองปริมาณเนื้อยางแห้ง has its own fee, paid via linked bank account
+                        // debit (not QR, not monthly billing) — see RubberCertPaymentComponent
 
 // One alternative HS Code suggestion offered when the user edits an item's classification —
 // invoices from real users typically carry no HS Code at all, so AI classifies purely from the
@@ -74,6 +79,8 @@ export interface HsCandidate {
   agencyFull?: string;
   requiresPermit?: boolean;
   licenseType?: string;
+  isCompound?: boolean; // การยาง only: applying this candidate reclassifies the item as
+                         // compound/raw rubber — see ProductHsAnalysis.isCompound
 }
 
 // รายการวิเคราะห์รายสินค้า: product description → HS Code → Smart Tariff → กรมที่ต้องยื่น
@@ -91,6 +98,9 @@ export interface ProductHsAnalysis {
   dutyRate: number;       // อัตราภาษีนำเข้า, %
   candidates?: HsCandidate[]; // ตัวเลือกพิกัด HS Code อื่นๆ (สูงสุด 5 รายการ) สำหรับให้ user แก้ไขเลือกเอง
   manuallyEdited?: boolean;   // true เมื่อ user เลือกพิกัดอื่นแทนที่ AI แนะนำ
+  isCompound?: boolean;       // การยาง only: compounded/processed rubber (ยางผสม) — needs
+                              // ใบรับรองปริมาณเนื้อยางแห้ง + fee instead of ใบอนุญาตค้ายาง,
+                              // gated via RubberCertPaymentComponent before the agency's next step
 }
 
 export interface ItemHsAnalysisData {
@@ -366,6 +376,26 @@ export interface PaymentSlipData {
   refNo: string;
 }
 
+// การยาง only: linked bank account for the ใบรับรองปริมาณเนื้อยางแห้ง fee — system already has
+// the user's accounts on file (RAOT e-SFR direct-debit convention), UI just lets them pick which.
+export interface BankAccount {
+  id: string;
+  bankName: string;
+  accountNoMasked: string;  // e.g. "xxx-x-x1234-5"
+  accountName: string;
+  isDefault?: boolean;
+}
+
+export interface RubberCertPaymentData {
+  agency: string;           // 'การยาง'
+  itemNames: string[];      // compound-rubber items needing the certificate
+  amount: number;           // THB
+  refNo: string;
+  accounts: BankAccount[];
+  paid?: boolean;
+  paidAccountId?: string;
+}
+
 export interface AgencyReturnDoc {
   key: string;
   label: string;
@@ -559,6 +589,17 @@ export interface Shipment {
     refNo: string;
     expiresAt: string;
     status: 'unpaid' | 'paid_pending' | 'paid_confirmed';
+  };
+  // การยาง only: set once RubberCertPaymentComponent's fee is paid (ChatService.onRubberCertPaid) —
+  // the ใบรับรองปริมาณเนื้อยางแห้ง is a separate document from returnedDocuments (the department's
+  // final permit), obtained earlier in the flow via bank account debit rather than QR.
+  rubberCertPayment?: {
+    itemNames: string[];
+    amount: number;
+    refNo: string;
+    paidAccountLabel: string; // e.g. "ธนาคารกสิกรไทย xxx-x-x4821-5"
+    certUrl: string;
+    paidAt: string;
   };
   email?: { toName: string; to: string; subject: string; body: string; attName: string };
   items?: ShipmentItem[]; // per-product line items from the invoice/customs doc used for this LPI request

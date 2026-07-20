@@ -6,7 +6,7 @@ import {
   MissingField, MissingFieldsData, PaymentSlipData, HsAnalysisData,
   InvoiceLineItem, ItemHsAnalysisData, ProductHsAnalysis, ItemMeasurementData, CustomsDeclarationData,
   InvoiceSelectData, Direction, AgencyDocsReturnedData, AgencyApprovalPendingData,
-  ShipmentItem, ShipmentDocument, AgencyKey,
+  ShipmentItem, ShipmentDocument, AgencyKey, RubberCertPaymentData,
 } from '@app/core/models/types';
 import { OcrService, MultiInvoiceDetection } from './ocr.service';
 import { QueueService } from './queue.service';
@@ -18,6 +18,7 @@ import { MOCK_SPN_PROFILES } from '@mock/spn-companies.mock';
 import { getInvoiceLineItems, INVOICE_ITEMS_DECLARATION } from '@mock/invoice-items.mock';
 import { getProductHsAnalysis, mapToInvoiceLineItems } from '@mock/product-hs-analysis.mock';
 import { getExportProductClassification, mapExportItemsToInvoiceLineItems } from '@mock/export-product-classification.mock';
+import { RUBBER_COMPOUND_CERT_FEE, MOCK_LINKED_BANK_ACCOUNTS } from '@mock/rubber-cert.mock';
 import { InvoiceOcrResult, toInvoiceSummaryOption } from '@mock/invoice-ocr.mock';
 import { environment } from '@env/environment';
 import { MOCK_SESSIONS } from '@mock/sessions.mock';
@@ -69,6 +70,12 @@ export class ChatService {
   private flagGen = 0;
   private emailGen = 0;
   private currentAgency = '';
+  /** Read-only view of currentAgency for components outside ChatService (e.g. ChatPageComponent
+   *  deciding which declaration-editor variant to show — DDC Pink Form is DDC-specific, not
+   *  export-direction-specific). */
+  get currentAgencyName(): string {
+    return this.currentAgency;
+  }
   private submittedAgencies: string[] = [];
   // Shipment.id most recently pushed to the queue by finalizeSubmit() — checkStatus()'s approval
   // flow patches this record directly (e.g. setAgencyPaymentQr()) since it happens later in the
@@ -361,6 +368,12 @@ export class ChatService {
   private pendingAfterMissingFields: 'ocr' | 'proceed-choice' = 'ocr';
   // What to do after agency+profile selection
   private pendingAfterFlow: 'agency-docs' | 'form-preview' | 'proceed' = 'proceed';
+  // การยาง (RAOT) compound-rubber cert fee gate — see onProfileSelected()/showRubberCertPayment()
+  private rubberCertPaid = false;
+  private pendingRubberCertAgency = '';
+  // Set by onRubberCertPaid(), consumed (and cleared) by the very next saveEarlyQueueEntry() —
+  // there's exactly one such call per agency round, right after the gate resolves.
+  private rubberCertPaymentInfo?: Shipment['rubberCertPayment'];
 
   private showFullUpload(reEdit = false): void {
     this.isReEditOCR = reEdit;
@@ -610,13 +623,21 @@ export class ChatService {
   };
 
   // formCode/formName as actually shown for this agency's own flow (see queue.mock.ts static
-  // entries for the same pairing) — QR_PAYMENT_AGENCIES use Pink Form, everything else RGoods.
+  // entries for the same pairing) — "Pink Form" is DDC's own real form name specifically, not a
+  // generic label for every QR_PAYMENT_AGENCIES member, so การยาง needs its own case (real RAOT
+  // document is ใบอนุญาตค้ายาง under พ.ร.บ.ควบคุมยาง — see product-hs-analysis licenseType).
   private formForAgency(agency: string): { code: string; name: string } {
     const isExport = this.direction() === 'export';
-    if (this.QR_PAYMENT_AGENCIES.includes(agency)) {
+    if (agency === 'กรมควบคุมโรค') {
       return {
         code: 'Pink Form',
         name: `คำขออนุญาต${isExport ? 'ส่งออก' : 'นำเข้า'} (Pink Form) — ${agency}`,
+      };
+    }
+    if (agency === 'การยาง') {
+      return {
+        code: 'ใบอนุญาตค้ายาง',
+        name: `คำขอใบอนุญาตค้ายาง${isExport ? 'ขาออก' : ''} — การยางแห่งประเทศไทย (RAOT)`,
       };
     }
     return {
@@ -683,7 +704,26 @@ export class ChatService {
     // snapshot's last message is something the user can actually continue from — "กลับไปคิวงาน" →
     // "ดำเนินการต่อ" only leaves the LAST message interactive (loadQueueSession()), so a snapshot
     // ending right after "เลือกโปรไฟล์แล้ว" with nothing further would strand the resumed session.
-    // Determine what to do based on pendingAfterFlow (set before agency choice)
+
+    // การยาง (RAOT) gate: compound-rubber items (isCompound) need a ใบรับรองปริมาณเนื้อยางแห้ง +
+    // fee, paid via linked bank account debit, BEFORE any of the branches below run — cheaper to
+    // check once here than duplicate the check in every branch.
+    const compoundItems = agency
+      ? this.confirmedProductItems.filter(i => i.agency === agency && i.isCompound)
+      : [];
+    if (compoundItems.length > 0 && !this.rubberCertPaid) {
+      this.pendingRubberCertAgency = agency!;
+      this.showRubberCertPayment(agency!, compoundItems);
+      return;
+    }
+    this.continueAgencyFlow(agency!);
+  }
+
+  /** The "what happens after profile confirmed" branch — extracted from onProfileSelected()
+   *  so it can also run after the การยาง compound-rubber cert fee is paid (onRubberCertPaid()),
+   *  without re-running the profile/spnSession setup above. Determine what to do based on
+   *  pendingAfterFlow (set before agency choice). */
+  private continueAgencyFlow(agency: string): void {
     if (this.pendingAfterFlow === 'agency-docs') {
       // Invoice path: show agency-upload
       this.withTyping(() => {
@@ -709,6 +749,38 @@ export class ChatService {
         this.saveEarlyQueueEntry(this.currentAgency);
       }, 500);
     }
+  }
+
+  /** Posts the rubber-cert-payment card — gated between เลือกโปรไฟล์ and the agency's next step
+   *  whenever the confirmed การยาง group contains a compound-rubber item. */
+  private showRubberCertPayment(agency: string, items: ProductHsAnalysis[]): void {
+    this.withTyping(() => {
+      this.bot('rubber-cert-payment', {
+        agency,
+        itemNames: items.map(i => i.name),
+        amount: RUBBER_COMPOUND_CERT_FEE,
+        refNo: `RC-2568-${Math.floor(100000 + Math.random() * 900000)}`,
+        accounts: MOCK_LINKED_BANK_ACCOUNTS,
+      } satisfies RubberCertPaymentData);
+    }, 500);
+  }
+
+  /** Called from RubberCertPaymentComponent once the user confirms payment. */
+  onRubberCertPaid(data: RubberCertPaymentData, accountId: string): void {
+    this.updateLastMessageData('rubber-cert-payment', { ...data, paid: true, paidAccountId: accountId });
+    this.markLastReadOnly('rubber-cert-payment');
+    this.user('ชำระค่าธรรมเนียมใบรับรองยางผสมแล้ว');
+    this.rubberCertPaid = true;
+    const account = MOCK_LINKED_BANK_ACCOUNTS.find(a => a.id === accountId);
+    this.rubberCertPaymentInfo = {
+      itemNames: data.itemNames,
+      amount: data.amount,
+      refNo: data.refNo,
+      paidAccountLabel: account ? `${account.bankName} ${account.accountNoMasked}` : '',
+      certUrl: SAMPLE_DOC_URL,
+      paidAt: new Date().toLocaleDateString('th-TH'),
+    };
+    this.continueAgencyFlow(this.pendingRubberCertAgency);
   }
 
   /** Called from MissingFieldsComponent when user submits */
@@ -1116,9 +1188,20 @@ export class ChatService {
   }
 
   private showAgencyReturnedDocs(agency: string): void {
-    this.bot('agency-docs-returned', {
-      agency, docs: getAgencyReturnDocs(agency),
-    } satisfies AgencyDocsReturnedData);
+    const docs = getAgencyReturnDocs(agency);
+    this.bot('agency-docs-returned', { agency, docs } satisfies AgencyDocsReturnedData);
+    // Also persist onto the queue record — mirrors QueuePageComponent.payQr()'s equivalent write
+    // for the QR-fee branch, so the final permit (e.g. ใบอนุญาตค้ายาง) shows up in the queue
+    // detail's "ผลการยื่น" card too, not just as a transient chat card.
+    if (this.lastShipmentId) {
+      const doneTime = getTime();
+      this.queue.update(this.lastShipmentId, {
+        returnedDocuments: docs.map((d, i) => ({
+          id: `pd_${this.lastShipmentId}_${i}`, name: d.label, fileType: 'pdf', category: 'other',
+          url: d.url, uploadedAt: doneTime,
+        })),
+      });
+    }
     // Deferred from finalizeSubmit() for QR_PAYMENT_AGENCIES — only offer "ขอใบอนุญาตเพิ่ม" once
     // this agency's approval → returned-docs sequence has actually finished.
     if (this.submittedAgencies.includes(agency)) {
@@ -1181,7 +1264,9 @@ export class ChatService {
       documents: this.buildDocumentsFromFormData(fd), items: [], itemsSelected: false,
       email: { toName: '', to: '', subject: '', body: '', attName: '' },
       messages: this.messages().slice(this.flowStartIdx),
+      rubberCertPayment: this.rubberCertPaymentInfo,
     };
+    this.rubberCertPaymentInfo = undefined;
 
     this.queue.add([shipment]);
     this.lastShipmentId = shipment.id;
@@ -1397,6 +1482,9 @@ export class ChatService {
     this.queueShipmentId.set(null);
     this.allPermitAgencies.set([]);
     this.submittedPermits.set([]);
+    this.rubberCertPaid = false;
+    this.pendingRubberCertAgency = '';
+    this.rubberCertPaymentInfo = undefined;
     this.ocr.reset();
   }
 
@@ -1599,6 +1687,11 @@ export class ChatService {
       // showing an unrelated generic analysis instead of continuing the real invoice-path flow.
       if (m.type === 'agency-upload') {
         this.isAgencyDocsUpload = true;
+      }
+      if (m.type === 'rubber-cert-payment') {
+        const d = m.data as RubberCertPaymentData;
+        this.pendingRubberCertAgency = d.agency;
+        this.rubberCertPaid = !!d.paid;
       }
     }
     this.formData.set(formData);
