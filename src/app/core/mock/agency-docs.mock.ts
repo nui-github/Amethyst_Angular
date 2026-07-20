@@ -80,7 +80,9 @@ export const AGENCY_REQUIRED_DOCS: Record<string, AgencyDoc[]> = {
     },
   ],
   // Export-path agencies (see 'Export path' in CLAUDE.md)
-  // กรมควบคุมโรค only needs DOA — the pathogen-permit/sanitary-cert docs are collected elsewhere
+  // กรมควบคุมโรค — DOA + ฉลากภาชนะบรรจุ (พ.ร.บ.เชื้อโรคและพิษจากสัตว์ พ.ศ. 2558 กำหนดให้ต้องยื่น
+  // เอกสารกำกับ ฉลาก และภาชนะบรรจุประกอบการขออนุญาต); the pathogen-permit/sanitary-cert docs
+  // themselves are collected elsewhere
   'กรมควบคุมโรค': [
     {
       key: 'doa', label: 'Declaration of Analysis (DOA)', required: true, multiple: true,
@@ -89,6 +91,11 @@ export const AGENCY_REQUIRED_DOCS: Record<string, AgencyDoc[]> = {
         { key: 'doaBatch',    label: 'Batch No.', placeholder: 'เช่น BIO-2568-014' },
         { key: 'doaTestDate', label: 'วันที่ทดสอบ', placeholder: 'dd/mm/yyyy' },
       ],
+    },
+    {
+      key: 'label', label: 'ฉลากภาชนะบรรจุ (Container Label)', required: true, multiple: true,
+      hint: 'ฉลากที่ติดบนภาชนะบรรจุ/หีบห่อสินค้าจริง — อัปโหลดได้มากกว่า 1 ไฟล์',
+      manualFields: [],
     },
   ],
   'เชื้อเพลิง': [
