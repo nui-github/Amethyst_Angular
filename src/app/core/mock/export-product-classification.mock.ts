@@ -21,7 +21,7 @@ const EXPORT_PRODUCT_CLASSIFICATION: ProductHsAnalysis[] = [
       { hsCode: '4001.21.00', tariffCode: '4001.21.00.001', description: 'ยางแผ่นรมควัน (Smoked Sheets) ชั้น 1-5', dutyRate: 0, confidence: 92 },
       { hsCode: '4001.22.00', tariffCode: '4001.22.00.001', description: 'ยางแท่ง (Technically Specified Natural Rubber, TSNR)', dutyRate: 0, confidence: 70 },
       { hsCode: '4001.29.00', tariffCode: '4001.29.00.001', description: 'ยางธรรมชาติชนิดอื่นๆ ที่มิได้ระบุไว้เฉพาะ', dutyRate: 0, confidence: 58 },
-      { hsCode: '4005.10.00', tariffCode: '4005.10.00.001', description: 'ยางแผ่นผสม (Compounded Rubber)', dutyRate: 0, confidence: 40, agency: 'การยาง', agencyFull: 'การยางแห่งประเทศไทย', requiresPermit: true, isCompound: true, licenseType: 'ใบรับรองปริมาณเนื้อยางแห้ง (สำหรับยางผสม)' },
+      { hsCode: '4005.10.00', tariffCode: '4005.10.00.001', description: 'ยางแผ่นผสม (Compounded Rubber)', dutyRate: 0, confidence: 40, agency: 'การยาง', agencyFull: 'การยางแห่งประเทศไทย', requiresPermit: true, isCompound: true, licenseType: 'หนังสือรับรองคุณภาพยาง (e-QC, สำหรับยางผสม)' },
       { hsCode: '4001.30.00', tariffCode: '4001.30.00.001', description: 'ยางบาลาตา/กัตตาเปอร์ชา/กัวยูล/ชิเคิล และยางธรรมชาติที่คล้ายกัน', dutyRate: 0, confidence: 25 },
     ],
   },
@@ -54,10 +54,10 @@ const EXPORT_PRODUCT_CLASSIFICATION: ProductHsAnalysis[] = [
   {
     id: 'e4', name: 'Rubber Compound Sheet (ยางแผ่นผสม)',
     hsCode: '4005.10.00', tariffCode: '4005.10.00.001', requiresPermit: true,
-    agency: 'การยาง', agencyFull: 'การยางแห่งประเทศไทย (RAOT)', licenseType: 'ใบรับรองปริมาณเนื้อยางแห้ง (สำหรับยางผสม)',
+    agency: 'การยาง', agencyFull: 'การยางแห่งประเทศไทย (RAOT)', licenseType: 'หนังสือรับรองคุณภาพยาง (e-QC, สำหรับยางผสม)',
     isCompound: true,
     confidence: 81, dutyRate: 0,
-    reason: 'จัดเป็นยางแผ่นที่ผ่านการผสมสารเคมี (Compounded Rubber) แล้ว ไม่ใช่ยางดิบตามความหมายของ พ.ร.บ.ควบคุมยาง จึงไม่เข้าข่ายต้องขอใบอนุญาตค้ายาง แต่ยังต้องขอใบรับรองปริมาณเนื้อยางแห้งและชำระค่าธรรมเนียมกับการยางแห่งประเทศไทยก่อนส่งออก',
+    reason: 'จัดเป็นยางแผ่นที่ผ่านการผสมสารเคมี (Compounded Rubber) แล้ว ไม่ใช่ยางดิบตามความหมายของ พ.ร.บ.ควบคุมยาง จึงไม่เข้าข่ายต้องขอใบอนุญาตค้ายาง แต่ยังต้องขอหนังสือรับรองคุณภาพยาง (e-QC) และชำระค่าธรรมเนียมกับการยางแห่งประเทศไทยก่อนส่งออก',
     candidates: [
       { hsCode: '4005.10.00', tariffCode: '4005.10.00.001', description: 'ยางผสมสารเคมี ยังไม่ได้ทำเป็นแผ่น/แท่ง/รูปทรงอื่น (Compounded Rubber)', dutyRate: 0, confidence: 81, isCompound: true },
       { hsCode: '4001.21.00', tariffCode: '4001.21.00.002', description: 'ยางแผ่นรมควันดิบ (ควบคุมโดยการยางแห่งประเทศไทย)', dutyRate: 0, confidence: 47, agency: 'การยาง', agencyFull: 'การยางแห่งประเทศไทย', requiresPermit: true, licenseType: 'ใบอนุญาตค้ายาง (พ.ร.บ.ควบคุมยาง)', isCompound: false },

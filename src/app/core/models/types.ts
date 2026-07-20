@@ -55,11 +55,13 @@ export type MessageType =
                         // shown right after showAgencyApproval()'s approval instead of the old
                         // 2 separate plain-text bot() bubbles — single card combining "approved"
                         // + "QR is on its way to the queue page", see AgencyApprovalPendingComponent
-  | 'rubber-cert-payment'; // การยาง (RAOT) export path only: gated between เลือกโปรไฟล์ and the
-                        // agency's next step (agency-upload/form-preview/proceed) whenever the
-                        // confirmed การยาง group contains a compound-rubber item (isCompound) —
-                        // ใบรับรองปริมาณเนื้อยางแห้ง has its own fee, paid via linked bank account
-                        // debit (not QR, not monthly billing) — see RubberCertPaymentComponent
+  | 'rubber-cert-payment'; // การยาง (RAOT) export path only: shown when the user picks the
+                        // "ขอหนังสือรับรองคุณภาพยาง (e-QC)" option on the rubber-flow choice-card
+                        // (a plain 'choice-card' — see onRubberFlowChoice()) that's gated between
+                        // เลือกโปรไฟล์ and the agency's next step whenever the confirmed การยาง
+                        // group contains a compound-rubber item (isCompound) — the e-QC cert has
+                        // its own fee, paid via linked bank account debit (not QR, not monthly
+                        // billing) — see RubberCertPaymentComponent
 
 // One alternative HS Code suggestion offered when the user edits an item's classification —
 // invoices from real users typically carry no HS Code at all, so AI classifies purely from the
@@ -98,9 +100,10 @@ export interface ProductHsAnalysis {
   dutyRate: number;       // อัตราภาษีนำเข้า, %
   candidates?: HsCandidate[]; // ตัวเลือกพิกัด HS Code อื่นๆ (สูงสุด 5 รายการ) สำหรับให้ user แก้ไขเลือกเอง
   manuallyEdited?: boolean;   // true เมื่อ user เลือกพิกัดอื่นแทนที่ AI แนะนำ
-  isCompound?: boolean;       // การยาง only: compounded/processed rubber (ยางผสม) — needs
-                              // ใบรับรองปริมาณเนื้อยางแห้ง + fee instead of ใบอนุญาตค้ายาง,
-                              // gated via RubberCertPaymentComponent before the agency's next step
+  isCompound?: boolean;       // การยาง only: compounded/processed rubber (ยางผสม) — instead of
+                              // ใบอนุญาตค้ายาง, gates a choice-card (see onRubberFlowChoice()) between
+                              // requesting a หนังสือรับรองคุณภาพยาง (e-QC) + fee, or going straight
+                              // to customs clearance (only legal once the e-QC number already exists)
 }
 
 export interface ItemHsAnalysisData {
@@ -376,7 +379,7 @@ export interface PaymentSlipData {
   refNo: string;
 }
 
-// การยาง only: linked bank account for the ใบรับรองปริมาณเนื้อยางแห้ง fee — system already has
+// การยาง only: linked bank account for the หนังสือรับรองคุณภาพยาง (e-QC) fee — system already has
 // the user's accounts on file (RAOT e-SFR direct-debit convention), UI just lets them pick which.
 export interface BankAccount {
   id: string;
@@ -591,7 +594,7 @@ export interface Shipment {
     status: 'unpaid' | 'paid_pending' | 'paid_confirmed';
   };
   // การยาง only: set once RubberCertPaymentComponent's fee is paid (ChatService.onRubberCertPaid) —
-  // the ใบรับรองปริมาณเนื้อยางแห้ง is a separate document from returnedDocuments (the department's
+  // the หนังสือรับรองคุณภาพยาง (e-QC) is a separate document from returnedDocuments (the department's
   // final permit), obtained earlier in the flow via bank account debit rather than QR.
   rubberCertPayment?: {
     itemNames: string[];

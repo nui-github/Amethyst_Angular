@@ -371,6 +371,9 @@ export class ChatService {
   // การยาง (RAOT) compound-rubber cert fee gate — see onProfileSelected()/showRubberCertPayment()
   private rubberCertPaid = false;
   private pendingRubberCertAgency = '';
+  // Compound items pending a choice between requesting the e-QC cert now vs. going straight to
+  // customs clearance (only legal once the e-QC number already exists — see onRubberFlowChoice()).
+  private pendingRubberFlowItems: ProductHsAnalysis[] = [];
   // Set by onRubberCertPaid(), consumed (and cleared) by the very next saveEarlyQueueEntry() —
   // there's exactly one such call per agency round, right after the gate resolves.
   private rubberCertPaymentInfo?: Shipment['rubberCertPayment'];
@@ -705,15 +708,16 @@ export class ChatService {
     // "ดำเนินการต่อ" only leaves the LAST message interactive (loadQueueSession()), so a snapshot
     // ending right after "เลือกโปรไฟล์แล้ว" with nothing further would strand the resumed session.
 
-    // การยาง (RAOT) gate: compound-rubber items (isCompound) need a ใบรับรองปริมาณเนื้อยางแห้ง +
-    // fee, paid via linked bank account debit, BEFORE any of the branches below run — cheaper to
-    // check once here than duplicate the check in every branch.
+    // การยาง (RAOT) gate: compound-rubber items (isCompound) must resolve a choice — request the
+    // หนังสือรับรองคุณภาพยาง (e-QC) + fee now (bank account debit), or go straight to customs
+    // clearance (only legal if the e-QC number already exists) — BEFORE any of the branches below
+    // run. Cheaper to check once here than duplicate the check in every branch.
     const compoundItems = agency
       ? this.confirmedProductItems.filter(i => i.agency === agency && i.isCompound)
       : [];
     if (compoundItems.length > 0 && !this.rubberCertPaid) {
       this.pendingRubberCertAgency = agency!;
-      this.showRubberCertPayment(agency!, compoundItems);
+      this.showRubberFlowChoice(agency!, compoundItems);
       return;
     }
     this.continueAgencyFlow(agency!);
@@ -749,6 +753,49 @@ export class ChatService {
         this.saveEarlyQueueEntry(this.currentAgency);
       }, 500);
     }
+  }
+
+  /** Posts a 2-way choice — gated between เลือกโปรไฟล์ and the agency's next step whenever the
+   *  confirmed การยาง group contains a compound-rubber item: request the e-QC quality cert now,
+   *  or go straight to customs clearance + export fee (only legal if the e-QC number already
+   *  exists, i.e. this session already paid for it earlier this round). */
+  private showRubberFlowChoice(agency: string, items: ProductHsAnalysis[]): void {
+    this.pendingRubberFlowItems = items;
+    this.withTyping(() => {
+      this.bot('choice-card', {
+        question: 'ระบบตรวจพบสินค้าที่เป็นยางผสมในใบ Invoice ท่านต้องการดำเนินการขั้นตอนใดต่อ?',
+        options: [
+          {
+            label: 'ขอหนังสือรับรองคุณภาพยาง (e-QC)',
+            value: 'rubber-eqc',
+            description: `สำหรับรายการยางผสม (${items.length} รายการ) — ต้องขอและชำระค่าธรรมเนียมก่อนส่งออก`,
+          },
+          {
+            label: 'ขอใบอนุญาตผ่านด่านศุลกากร และชำระค่าธรรมเนียมส่งยางออกนอกราชอาณาจักร (e-SFR)',
+            value: 'rubber-customs-fee',
+            description: 'หมายเหตุ: รายการยางผสมต้องมีเลขหนังสือรับรองคุณภาพยาง (e-QC) แล้วจึงจะขอขั้นตอนนี้ได้',
+          },
+        ],
+      } satisfies ChoiceCardData);
+    }, 500);
+  }
+
+  /** Called from ChatAreaComponent when the user picks an option on the rubber-flow choice-card. */
+  onRubberFlowChoice(value: string): void {
+    if (value === 'rubber-eqc') {
+      this.user('ขอหนังสือรับรองคุณภาพยาง (e-QC)');
+      this.showRubberCertPayment(this.pendingRubberCertAgency, this.pendingRubberFlowItems);
+      return;
+    }
+    this.user('ขอใบอนุญาตผ่านด่านศุลกากร และชำระค่าธรรมเนียมส่งยางออกนอกราชอาณาจักร');
+    if (!this.rubberCertPaid) {
+      this.withTyping(() => {
+        this.bot('text', undefined, 'รายการยางผสมยังไม่มีเลขหนังสือรับรองคุณภาพยาง (e-QC) กรุณาขอหนังสือรับรองให้เรียบร้อยก่อน จึงจะขอใบอนุญาตผ่านด่านศุลกากรได้ครับ');
+        this.showRubberFlowChoice(this.pendingRubberCertAgency, this.pendingRubberFlowItems);
+      }, 500);
+      return;
+    }
+    this.continueAgencyFlow(this.pendingRubberCertAgency);
   }
 
   /** Posts the rubber-cert-payment card — gated between เลือกโปรไฟล์ and the agency's next step
@@ -1497,6 +1544,7 @@ export class ChatService {
     this.submittedPermits.set([]);
     this.rubberCertPaid = false;
     this.pendingRubberCertAgency = '';
+    this.pendingRubberFlowItems = [];
     this.rubberCertPaymentInfo = undefined;
     this.ocr.reset();
   }

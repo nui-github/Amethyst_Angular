@@ -139,8 +139,10 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked {
     const hasNoMore      = data.options.some(o => o.value === 'no-more-agency');
     const hasAgencyKey   = data.options.some(o => o.value.startsWith('agency:'));
     const hasCheckStatus = data.options.some(o => o.value === 'check-status');
+    const hasRubberFlow  = data.options.some(o => o.value === 'rubber-eqc');
 
     if (hasImport)       return this.chat.onDocTypeChoice(value);
+    if (hasRubberFlow)   return this.chat.onRubberFlowChoice(value);
     if (hasSpn)          return this.chat.onCustomsDocsChoice(value);
     if (hasMulti)        return this.chat.onAgencyChoice(value);
     if (hasNoMore)       return this.chat.onNextAgencyChoice(value);

@@ -10,8 +10,8 @@ import { ChatService } from '@app/core/services/chat.service';
   imports: [CommonModule],
   template: `
     <div class="rcp-wrap">
-      <p class="rcp-title">ใบรับรองปริมาณเนื้อยางแห้ง (ยางผสม)</p>
-      <p class="rcp-sub">{{ data.agency }} · ต้องขอใบรับรองและชำระค่าธรรมเนียมก่อนส่งออกรายการดังนี้</p>
+      <p class="rcp-title">หนังสือรับรองคุณภาพยาง (e-QC) — ยางผสม</p>
+      <p class="rcp-sub">{{ data.agency }} · ต้องขอหนังสือรับรองและชำระค่าธรรมเนียมก่อนส่งออกรายการดังนี้</p>
 
       <ul class="rcp-items">
         @for (name of data.itemNames; track name) {

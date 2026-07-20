@@ -1,6 +1,6 @@
 import { BankAccount } from '@app/core/models/types';
 
-// ใบรับรองปริมาณเนื้อยางแห้ง (compound rubber, HS 4005.10.00) — real RAOT fee is
+// หนังสือรับรองคุณภาพยาง (e-QC, compound rubber HS 4005.10.00) — real RAOT fee is
 // ฿0.002/kg via the e-SFR system; flat mock amount here since the real calc is too small
 // (a few baht) to demo meaningfully.
 export const RUBBER_COMPOUND_CERT_FEE = 150;
