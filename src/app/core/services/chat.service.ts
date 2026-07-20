@@ -858,6 +858,19 @@ export class ChatService {
    *  customs/SPN item-selection step can filter down to whichever agency was chosen. */
   private confirmedProductItems: ProductHsAnalysis[] = [];
 
+  /** CustomsDeclarationItem.itemNumber set for whichever items the confirmed item-hs-analysis
+   *  grouped under `agency` — lets an agency-specific editor (e.g. DdcPinkFormEditorComponent)
+   *  narrow decl.items down to just its own certificate's item(s) instead of every item on the
+   *  shared invoice (continueAfterOCR()'s isAgencyDocsUpload branch deliberately sets
+   *  formData.selectedItems to the WHOLE invoice regardless of agency — "every line item on the
+   *  uploaded invoice is the request" — so that alone can't be used to filter). Empty when nothing's
+   *  been confirmed yet (e.g. the customs-first path's gate, which runs before item-hs-analysis) —
+   *  callers should fall back to showing every item in that case. */
+  declarationItemNumbersForAgency(agency: string): Set<number> {
+    const items = mapExportItemsToInvoiceLineItems(this.confirmedProductItems.filter(i => i.agency === agency));
+    return new Set(items.map(i => i.declarationItemNumber).filter((n): n is number => n !== undefined));
+  }
+
   onItemHsAnalysisConfirmed(msgId: string, items: ProductHsAnalysis[]): void {
     this.messages.update(ms => ms.map(m =>
       m.id === msgId && m.type === 'item-hs-analysis'

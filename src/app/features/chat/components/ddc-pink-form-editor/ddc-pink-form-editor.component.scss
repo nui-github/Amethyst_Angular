@@ -229,6 +229,15 @@
       &:hover {
         background: #034DBA;
       }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+
+        &:hover {
+          background: var(--bizx-blue);
+        }
+      }
     }
   }
 }

@@ -336,11 +336,11 @@
                 </label>
                 <label class="cde-field">
                   <span class="cde-field__label">วันที่ผลิต <em>*</em></span>
-                  <input class="cde-field__input" [(ngModel)]="item.productionDate" type="date" />
+                  <input class="cde-field__input" [(ngModel)]="item.productionDate" placeholder="dd-mm-yyyy" />
                 </label>
                 <label class="cde-field">
                   <span class="cde-field__label">วันหมดอายุ <em>*</em></span>
-                  <input class="cde-field__input" [(ngModel)]="item.expirationDate" type="date" />
+                  <input class="cde-field__input" [(ngModel)]="item.expirationDate" placeholder="dd-mm-yyyy" />
                 </label>
                 <label class="cde-field">
                   <span class="cde-field__label">รหัสจังหวัดผลิต <em>*</em></span>
@@ -378,7 +378,7 @@
       <button class="cde-ft__btn cde-ft__btn--cancel" (click)="onClose()" type="button">
         ปิด
       </button>
-      <button class="cde-ft__btn cde-ft__btn--save" (click)="onSave()" type="button">
+      <button class="cde-ft__btn cde-ft__btn--save" (click)="onSave()" type="button" [disabled]="!canSave()">
         <lucide-icon [img]="icSave" [size]="16" />
         บันทึก
       </button>
