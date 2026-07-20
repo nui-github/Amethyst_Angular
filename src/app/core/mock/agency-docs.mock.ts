@@ -85,8 +85,8 @@ export const AGENCY_REQUIRED_DOCS: Record<string, AgencyDoc[]> = {
   // themselves are collected elsewhere
   'กรมควบคุมโรค': [
     {
-      key: 'doa', label: 'Declaration of Analysis (DOA)', required: true, multiple: true,
-      hint: 'ผลการวิเคราะห์คุณภาพชุดน้ำยา/สารตัวอย่าง — อัปโหลดได้มากกว่า 1 ไฟล์',
+      key: 'doa', label: 'Declaration of Analysis (DOA)', required: true, multiple: false,
+      hint: 'ผลการวิเคราะห์คุณภาพชุดน้ำยา/สารตัวอย่าง — อัปโหลดได้ไฟล์เดียว',
       manualFields: [
         { key: 'doaBatch',    label: 'Batch No.', placeholder: 'เช่น BIO-2568-014' },
         { key: 'doaTestDate', label: 'วันที่ทดสอบ', placeholder: 'dd/mm/yyyy' },
