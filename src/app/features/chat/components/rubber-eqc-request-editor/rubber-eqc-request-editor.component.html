@@ -215,17 +215,22 @@
             <span class="cde-field__label">Payment Method</span>
             <input class="cde-field__input" value="1 - e-Payment" readonly />
           </label>
-          <label class="cde-field">
-            <span class="cde-field__label">Bank Code <em>*</em></span>
-            <input class="cde-field__input" [(ngModel)]="local().bankCode" />
+          <label class="cde-field cde-field--full">
+            <span class="cde-field__label">บัญชีที่ตัดชำระ <em>*</em></span>
+            <select class="cde-field__input" [(ngModel)]="local().paymentAccountId">
+              <option value="">--Please Select--</option>
+              @for (acc of accounts; track acc.id) {
+                <option [value]="acc.id">{{ acc.bankName }} {{ acc.accountNoMasked }}{{ acc.isDefault ? ' (บัญชีหลัก)' : '' }}</option>
+              }
+            </select>
           </label>
           <label class="cde-field">
-            <span class="cde-field__label">Bank Branch Code <em>*</em></span>
-            <input class="cde-field__input" [(ngModel)]="local().bankBranchCode" />
+            <span class="cde-field__label">Payment Amount</span>
+            <input class="cde-field__input" [value]="(local().paymentAmount | number:'1.2-2') + ' บาท'" readonly />
           </label>
           <label class="cde-field">
-            <span class="cde-field__label">Bank Account Number <em>*</em></span>
-            <input class="cde-field__input" [(ngModel)]="local().bankAccountNumber" />
+            <span class="cde-field__label">Credit Amount</span>
+            <input class="cde-field__input" type="number" step="0.01" [(ngModel)]="local().creditAmount" />
           </label>
         </div>
       </div>

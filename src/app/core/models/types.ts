@@ -445,9 +445,13 @@ export interface RubberEqcRequestData {
   sampleReturn: 'return' | 'no-return'; // Return *
   isUrgent: boolean;               // Is Urgent *
   paymentMethod: string;           // Payment Method * — กยท. ยอมรับเฉพาะ "1 e-Payment" จึงล็อกค่าไว้
-  bankCode: string;                // Bank Code *
-  bankBranchCode: string;          // Bank Branch Code *
-  bankAccountNumber: string;       // Bank Account Number *
+  // e-Payment debits one of the user's already-linked bank accounts (BankAccount,
+  // rubber-cert.mock.ts) — picking one already carries its own bank/branch/account number, so
+  // there's no separate Bank Code/Branch Code/Account Number entry (that's what those 3 fields
+  // in the raw data dictionary collapse into once "linked account" selection exists).
+  paymentAccountId: string;        // *
+  paymentAmount: number;           // Payment Amount — system-computed (RUBBER_COMPOUND_CERT_FEE), not user-entered
+  creditAmount: number;            // Credit Amount (optional)
   managerIdCard: string;           // Manager ID Card (conditional)
   managerName: string;             // Manager Name (conditional on Manager ID Card)
   items: RubberEqcRequestItem[];

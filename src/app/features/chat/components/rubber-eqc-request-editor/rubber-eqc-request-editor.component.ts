@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import { ChatService } from '@app/core/services/chat.service';
 import { RubberEqcRequestData, RubberEqcRequestItem } from '@app/core/models/types';
+import { RUBBER_COMPOUND_CERT_FEE, MOCK_LINKED_BANK_ACCOUNTS } from '@mock/rubber-cert.mock';
 import { X, Save } from 'lucide-angular';
 
 @Component({
@@ -52,15 +53,17 @@ export class RubberEqcRequestEditorComponent implements OnInit {
     // RAOT (กยท.) only accepts value "1 - e-Payment" for Payment Method — matches the linked
     // bank-account debit already collected on the next card (RubberCertPaymentComponent).
     paymentMethod: '1',
-    bankCode: '',
-    bankBranchCode: '',
-    bankAccountNumber: '',
+    paymentAccountId: '',
+    paymentAmount: 0,
+    creditAmount: 0,
     managerIdCard: '',
     managerName: '',
     items: [],
   });
 
   showConfirmDialog = signal(false);
+
+  readonly accounts = MOCK_LINKED_BANK_ACCOUNTS;
 
   // Required (*) fields mirror the "M" entries in the กยท. column of RAOT's own Rubber
   // Certificate Request Message (V1.10) data dictionary — Save stays disabled until every one
@@ -73,7 +76,7 @@ export class RubberEqcRequestEditorComponent implements OnInit {
     'companyTaxNumber', 'companyBranch', 'companyThaiName', 'companyEnglishName',
     'street', 'district', 'subProvince', 'province', 'postcode', 'labCode',
     'reasonType', 'documentType', 'documentLanguage', 'contactName', 'contactPhone',
-    'bankCode', 'bankBranchCode', 'bankAccountNumber',
+    'paymentAccountId',
   ];
   private readonly REQUIRED_ITEM_KEYS: (keyof RubberEqcRequestItem)[] = [
     'inspectionType', 'rubberSpecies',
@@ -92,7 +95,11 @@ export class RubberEqcRequestEditorComponent implements OnInit {
     // running number), never typed by the user.
     const profileCode = (this.chat.spnSession()?.profile ?? 'NETB').padEnd(4, 'X').slice(0, 4).toUpperCase();
     const referenceNumber = `${profileCode}${String(Date.now()).slice(-9).padStart(9, '0')}`;
-    this.local.update(d => ({ ...d, referenceNumber }));
+    // Payment Amount is system-computed (same flat fee RubberCertPaymentComponent charges later
+    // for this request), not user-entered; the default linked account is pre-selected the same
+    // way RubberCertPaymentComponent pre-selects it.
+    const paymentAccountId = this.accounts.find(a => a.isDefault)?.id ?? this.accounts[0]?.id ?? '';
+    this.local.update(d => ({ ...d, referenceNumber, paymentAmount: RUBBER_COMPOUND_CERT_FEE, paymentAccountId }));
 
     const items: RubberEqcRequestItem[] = this.chat.pendingRubberItems.map((item, i) => ({
       itemNo: String(i + 1).padStart(4, '0'),
