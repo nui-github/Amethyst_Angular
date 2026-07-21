@@ -223,7 +223,14 @@
               }
             }
 
-            <!-- การยาง (RAOT) ยางผสม: certificate fee, paid via linked bank account debit -->
+            <!-- การยาง (RAOT) ยางผสม: e-QC submission status — pure display, never interactive,
+                 so it renders regardless of readOnly (auto-flips rubber-accept → license-accept) -->
+            @case ('rubber-eqc-status') {
+              <app-rubber-eqc-status [data]="$any(msg.data)" />
+            }
+
+            <!-- การยาง (RAOT) ยางผสม: certificate fee, paid via linked bank account debit — LEGACY,
+                 only shown by historical queue-mock/sessions-mock message replay now, see types.ts -->
             @case ('rubber-cert-payment') {
               @if (!readOnly && !msg.isReadOnly) {
                 <app-rubber-cert-payment [data]="$any(msg.data)" />

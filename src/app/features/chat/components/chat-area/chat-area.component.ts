@@ -37,6 +37,7 @@ import { AgencyDocsReturnedComponent } from '../agency-docs-returned/agency-docs
 import { AgencyApprovalPendingComponent } from '../agency-approval-pending/agency-approval-pending.component';
 import { RubberCertPaymentComponent } from '../rubber-cert-payment/rubber-cert-payment.component';
 import { RubberEqcGateComponent } from '../rubber-eqc-gate/rubber-eqc-gate.component';
+import { RubberEqcStatusComponent } from '../rubber-eqc-status/rubber-eqc-status.component';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 
 /**
@@ -63,7 +64,7 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
     SpnConnectComponent, HsAnalysisComponent, FormPreviewComponent, MissingFieldsComponent, AgencyUploadComponent, ProfileSelectComponent, PermitStatusComponent,
     PaymentQrComponent, PaymentSlipComponent, ItemHsAnalysisComponent, ItemMeasurementComponent,
     InvoiceSelectComponent, AgencyDocsReturnedComponent, AgencyApprovalPendingComponent,
-    RubberCertPaymentComponent, RubberEqcGateComponent,
+    RubberCertPaymentComponent, RubberEqcGateComponent, RubberEqcStatusComponent,
   ],
   templateUrl: './chat-area.component.html',
   styleUrl: './chat-area.component.scss',

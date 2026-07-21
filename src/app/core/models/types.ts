@@ -55,19 +55,29 @@ export type MessageType =
                         // shown right after showAgencyApproval()'s approval instead of the old
                         // 2 separate plain-text bot() bubbles — single card combining "approved"
                         // + "QR is on its way to the queue page", see AgencyApprovalPendingComponent
-  | 'rubber-cert-payment' // การยาง (RAOT) export path only: shown once the e-QC request form
-                        // (rubber-eqc-gate below) has been saved and the user clicks
-                        // "ดำเนินการต่อ" on that card — the e-QC cert has its own fee, paid via
-                        // linked bank account debit (not QR, not monthly billing) — see
-                        // RubberCertPaymentComponent
-  | 'rubber-eqc-gate'; // การยาง (RAOT) export path only: posted right after the user picks
+  | 'rubber-cert-payment' // การยาง (RAOT) export path — LEGACY, only used by historical
+                        // queue-mock/sessions-mock message replay now. The live flow used to show
+                        // this (pick a linked bank account, click "ชำระเงิน") right after the
+                        // e-QC request form's "ดำเนินการต่อ", but once the request-form drawer
+                        // itself gained its own "บัญชีที่ตัดชำระ" field (see
+                        // RubberEqcRequestEditorComponent), re-asking here was pure duplicate
+                        // work — replaced by 'rubber-eqc-status' below, see RubberCertPaymentComponent
+  | 'rubber-eqc-gate' // การยาง (RAOT) export path only: posted right after the user picks
                         // "ขอหนังสือรับรองคุณภาพยาง (e-QC)" on the rubber-flow choice-card (a
                         // plain 'choice-card' — see onRubberFlowChoice()). Shows only a
                         // "กรอกข้อมูล" button until the RubberEqcRequestEditorComponent drawer
                         // is saved (data.completed) — same gate pattern as ocr-results'
                         // declarationGateRequired ("กรอกข้อมูลเพิ่มเติม" → "ดำเนินการต่อ"), except
                         // "กรอกข้อมูล" stays clickable even after completion so the user can
-                        // reopen and edit again before actually proceeding to rubber-cert-payment
+                        // reopen and edit again before actually proceeding to 'rubber-eqc-status'
+  | 'rubber-eqc-status'; // การยาง (RAOT) export path only: posted when "ดำเนินการต่อ" is clicked
+                        // on the rubber-eqc-gate card (see showRubberEqcStatus()) — a pure display
+                        // card, never interactive. Starts as status 'rubber-accept' (request
+                        // accepted by RAOT, awaiting auto-debit from the account chosen in the
+                        // request-form drawer); after a 3s mock delay (same convention as
+                        // showAgencyApproval()'s pending→approved flip) swaps in place to
+                        // 'license-accept' with a mock Certificate No. + full license detail —
+                        // see RubberEqcStatusComponent
 
 // One alternative HS Code suggestion offered when the user edits an item's classification —
 // invoices from real users typically carry no HS Code at all, so AI classifies purely from the
@@ -496,6 +506,23 @@ export interface RubberEqcGateData {
   agency: string;      // 'การยาง'
   itemNames: string[]; // compound-rubber items the request form covers
   completed: boolean;  // true once RubberEqcRequestEditorComponent has been saved at least once
+}
+
+export interface RubberEqcStatusData {
+  agency: string;                  // 'การยาง'
+  status: 'rubber-accept' | 'license-accept';
+  amount: number;                  // fee amount, auto-debited from paidAccountLabel's account
+  paidAccountLabel: string;        // e.g. "ธนาคารกสิกรไทย xxx-x-x4821-5" — from the request form's own account picker
+  certificateNo?: string;          // set once status is 'license-accept'
+  issueDate?: string;
+  expireDate?: string;
+  issuerOrgId?: string;
+  issuerNameTh?: string;
+  issuerNameEn?: string;
+  issuerAddressTh?: string;
+  issuerAddressEn?: string;
+  labCode?: string;                // from the saved request form, shown on the lab-detail tab
+  remark?: string;
 }
 
 export interface AgencyReturnDoc {

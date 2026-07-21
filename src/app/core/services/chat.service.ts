@@ -7,7 +7,7 @@ import {
   InvoiceLineItem, ItemHsAnalysisData, ProductHsAnalysis, ItemMeasurementData, CustomsDeclarationData,
   InvoiceSelectData, Direction, AgencyDocsReturnedData, AgencyApprovalPendingData,
   ShipmentItem, ShipmentDocument, AgencyKey, RubberCertPaymentData,
-  RubberEqcRequestData, RubberEqcGateData,
+  RubberEqcRequestData, RubberEqcGateData, RubberEqcStatusData,
 } from '@app/core/models/types';
 import { OcrService, MultiInvoiceDetection } from './ocr.service';
 import { QueueService } from './queue.service';
@@ -868,10 +868,61 @@ export class ChatService {
   }
 
   /** Called from RubberEqcGateComponent's "ดำเนินการต่อ" button, only reachable once the request
-   *  form has been saved at least once. Moves on to the e-QC fee payment card. */
+   *  form has been saved at least once. Moves on to the e-QC submission-status card. */
   onRubberEqcGateProceed(): void {
     this.user('ดำเนินการต่อ');
-    this.withTyping(() => this.showRubberCertPayment(this.pendingRubberCertAgency, this.pendingRubberFlowItems), 400);
+    this.withTyping(() => this.showRubberEqcStatus(this.pendingRubberCertAgency), 400);
+  }
+
+  /** Posts the rubber-eqc-status card — starts as 'rubber-accept' (request accepted by RAOT,
+   *  awaiting auto-debit from the account already chosen in the request-form drawer), then after
+   *  a mock 3s processing delay flips in place to 'license-accept' with a Certificate No. and
+   *  full license detail, same pending→approved convention as showAgencyApproval(). */
+  private showRubberEqcStatus(agency: string): void {
+    const req = this.rubberEqcRequestData;
+    const account = MOCK_LINKED_BANK_ACCOUNTS.find(a => a.id === req?.paymentAccountId);
+    const amount = req?.paymentAmount ?? RUBBER_COMPOUND_CERT_FEE;
+    const paidAccountLabel = account ? `${account.bankName} ${account.accountNoMasked}` : '';
+
+    this.bot('rubber-eqc-status', {
+      agency,
+      status: 'rubber-accept',
+      amount,
+      paidAccountLabel,
+    } satisfies RubberEqcStatusData);
+
+    setTimeout(() => {
+      const certificateNo = `RAOT-EQC-2568-${Math.floor(100000 + Math.random() * 900000)}`;
+      const issueDate = new Date().toISOString().slice(0, 10);
+      const expireDate = new Date(Date.now() + 45 * 24 * 3600_000).toISOString().slice(0, 10);
+      this.updateLastMessageData('rubber-eqc-status', {
+        agency,
+        status: 'license-accept',
+        amount,
+        paidAccountLabel,
+        certificateNo,
+        issueDate,
+        expireDate,
+        issuerOrgId: 'RAOT-0001',
+        issuerNameTh: 'การยางแห่งประเทศไทย',
+        issuerNameEn: 'Rubber Authority of Thailand',
+        issuerAddressTh: '67/25 ถนนบางขุนนนท์ บางขุนนนท์ เขตบางกอกน้อย กรุงเทพมหานคร',
+        issuerAddressEn: '67/25 Bangkhunnon, Bangkoknoi, Bangkok 10700',
+        labCode: req?.labCode,
+        remark: '',
+      } satisfies RubberEqcStatusData);
+
+      this.rubberCertPaid = true;
+      this.rubberCertPaymentInfo = {
+        itemNames: this.pendingRubberFlowItems.map(i => i.name),
+        amount,
+        refNo: certificateNo,
+        paidAccountLabel,
+        certUrl: SAMPLE_DOC_URL,
+        paidAt: new Date().toLocaleDateString('th-TH'),
+      };
+      this.continueAgencyFlow(agency);
+    }, 3000);
   }
 
   /** Posts the rubber-cert-payment card — gated between เลือกโปรไฟล์ and the agency's next step
@@ -1839,6 +1890,11 @@ export class ChatService {
         const d = m.data as RubberCertPaymentData;
         this.pendingRubberCertAgency = d.agency;
         this.rubberCertPaid = !!d.paid;
+      }
+      if (m.type === 'rubber-eqc-status') {
+        const d = m.data as RubberEqcStatusData;
+        this.pendingRubberCertAgency = d.agency;
+        this.rubberCertPaid = d.status === 'license-accept';
       }
     }
     this.formData.set(formData);
