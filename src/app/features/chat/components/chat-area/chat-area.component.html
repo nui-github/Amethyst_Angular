@@ -213,6 +213,16 @@
               }
             }
 
+            <!-- การยาง (RAOT) ยางผสม: e-QC request form gate — "กรอกข้อมูล" opens the drawer,
+                 "ดำเนินการต่อ" only appears once saved -->
+            @case ('rubber-eqc-gate') {
+              @if (!readOnly && !msg.isReadOnly) {
+                <app-rubber-eqc-gate [data]="$any(msg.data)" [msgId]="msg.id" />
+              } @else {
+                <span class="readonly-tag">✓ กรอกแบบคำขอใบรับรองคุณภาพยางแล้ว</span>
+              }
+            }
+
             <!-- การยาง (RAOT) ยางผสม: certificate fee, paid via linked bank account debit -->
             @case ('rubber-cert-payment') {
               @if (!readOnly && !msg.isReadOnly) {

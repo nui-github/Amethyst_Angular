@@ -55,13 +55,19 @@ export type MessageType =
                         // shown right after showAgencyApproval()'s approval instead of the old
                         // 2 separate plain-text bot() bubbles — single card combining "approved"
                         // + "QR is on its way to the queue page", see AgencyApprovalPendingComponent
-  | 'rubber-cert-payment'; // การยาง (RAOT) export path only: shown when the user picks the
-                        // "ขอหนังสือรับรองคุณภาพยาง (e-QC)" option on the rubber-flow choice-card
-                        // (a plain 'choice-card' — see onRubberFlowChoice()) that's gated between
-                        // เลือกโปรไฟล์ and the agency's next step whenever the confirmed การยาง
-                        // group contains a compound-rubber item (isCompound) — the e-QC cert has
-                        // its own fee, paid via linked bank account debit (not QR, not monthly
-                        // billing) — see RubberCertPaymentComponent
+  | 'rubber-cert-payment' // การยาง (RAOT) export path only: shown once the e-QC request form
+                        // (rubber-eqc-gate below) has been saved and the user clicks
+                        // "ดำเนินการต่อ" on that card — the e-QC cert has its own fee, paid via
+                        // linked bank account debit (not QR, not monthly billing) — see
+                        // RubberCertPaymentComponent
+  | 'rubber-eqc-gate'; // การยาง (RAOT) export path only: posted right after the user picks
+                        // "ขอหนังสือรับรองคุณภาพยาง (e-QC)" on the rubber-flow choice-card (a
+                        // plain 'choice-card' — see onRubberFlowChoice()). Shows only a
+                        // "กรอกข้อมูล" button until the RubberEqcRequestEditorComponent drawer
+                        // is saved (data.completed) — same gate pattern as ocr-results'
+                        // declarationGateRequired ("กรอกข้อมูลเพิ่มเติม" → "ดำเนินการต่อ"), except
+                        // "กรอกข้อมูล" stays clickable even after completion so the user can
+                        // reopen and edit again before actually proceeding to rubber-cert-payment
 
 // One alternative HS Code suggestion offered when the user edits an item's classification —
 // invoices from real users typically carry no HS Code at all, so AI classifies purely from the
@@ -397,6 +403,82 @@ export interface RubberCertPaymentData {
   accounts: BankAccount[];
   paid?: boolean;
   paidAccountId?: string;
+}
+
+// RAOT "Rubber Certificate Request Message (e-QC)" — the request form that must be filled and
+// saved BEFORE the e-QC fee (RubberCertPaymentData above) is paid; opened from
+// RubberEqcRequestEditorComponent when the user picks the e-QC option on the rubber-flow
+// choice-card. Field set/required (*) markers mirror the real RAOT e-QC request form.
+export interface RubberEqcRequestData {
+  jobNumber: string;
+  documentType: string;        // ชนิดเอกสาร *
+  testReason: string;          // เหตุผลของการตรวจคุณภาพยางฯ *
+  companyCode: string;         // *
+  brokerCode: string;          // *
+  managerCode: string;         // *
+  managerId: string;
+  producerName: string;        // ผู้ผลิตยาง
+  invoiceNo: string;
+  testGroup: string;
+  labCode: string;             // *
+  totalSamples?: number;       // จำนวนตัวอย่างที่ส่งวิเคราะห์รวม
+  documentLanguage: string;    // ภาษาของเอกสารที่ขอ *
+  deliveryMethod: string;      // วิธีการจัดส่งเอกสาร
+  contactName: string;         // ชื่อผู้ประสานงานของผู้ขอใบรับรอง
+  contactPhone: string;
+  rubberLicenseNo: string;
+  cancelReferenceNo: string;
+  applicantCompanyName: string;
+  exporterCompanyName: string;
+  managerName: string;
+  brokerCompanyName: string;
+  invoiceDate: string;
+  isUrgent: boolean;           // ระยะเวลาการขอผล: เร่งด่วน / ไม่เร่งด่วน
+  labNameTh: string;           // ชื่อห้องทดสอบ(ไทย)
+  sampleReturn: 'return' | 'no-return';
+  paymentMethod: string;       // *
+  items: RubberEqcRequestItem[];
+}
+
+export interface RubberEqcRequestItem {
+  itemNo: string;               // read-only, auto "0001", "0002", ...
+  invoiceItemNo: string;
+  destCountryCode: string;      // รหัสประเทศปลายทาง
+  descriptionEn: string;
+  descriptionTh: string;
+  contractNo: string;           // เลขที่สัญญา
+  rubberType: string;           // ประเภทยางพารา
+  rubberSpecies: string;        // ชนิดของยางพารา *
+  sampleNo: string;             // หมายเลขตัวอย่างยาง
+  inspectionType: string;       // ประเภทการขอตรวจ *
+  sampleType: string;           // ประเภทตัวอย่าง
+  weight?: number;
+  quantity?: number;
+  packageAmount?: number;
+  exportWeight?: number;
+  productionFormula?: number;   // สูตรการผลิต ปริมาณยางธรรมชาติ (%)
+  estWeightPerLot?: number;     // น้ำหนักโดยประมาณ/ล๊อต
+  firstGradeNo?: number;        // หมายเลขอันดับแรกของยาง
+  packagePerLot?: number;       // จำนวนลังต่อล๊อต
+  lastGradeNo?: number;         // หมายเลขอันดับสุดท้ายของยาง
+  piecePerPackage?: number;     // จำนวนแท่งต่อลัง
+  rubberQuantity?: number;      // จำนวนยาง
+  productionDate: string;       // วันที่ผลิต
+  uncertaintyTopic: string;     // หัวข้อที่จะทำ Uncertainty
+  remark: string;
+  attributes: RubberEqcAttribute[];
+}
+
+export interface RubberEqcAttribute {
+  testItem: string;        // การทดสอบคุณสมบัติ
+  testMethod: string;      // วิธีทดสอบ
+  uncertaintyTest: string; // ทดสอบความไม่แน่นอนของการวัด
+}
+
+export interface RubberEqcGateData {
+  agency: string;      // 'การยาง'
+  itemNames: string[]; // compound-rubber items the request form covers
+  completed: boolean;  // true once RubberEqcRequestEditorComponent has been saved at least once
 }
 
 export interface AgencyReturnDoc {

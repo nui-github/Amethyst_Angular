@@ -7,6 +7,7 @@ import {
   InvoiceLineItem, ItemHsAnalysisData, ProductHsAnalysis, ItemMeasurementData, CustomsDeclarationData,
   InvoiceSelectData, Direction, AgencyDocsReturnedData, AgencyApprovalPendingData,
   ShipmentItem, ShipmentDocument, AgencyKey, RubberCertPaymentData,
+  RubberEqcRequestData, RubberEqcGateData,
 } from '@app/core/models/types';
 import { OcrService, MultiInvoiceDetection } from './ocr.service';
 import { QueueService } from './queue.service';
@@ -59,6 +60,15 @@ export class ChatService {
   readonly declarationEditorOpen  = signal(false);
   readonly declarationEditorMsgId = signal<string | null>(null);
 
+  // Full-screen RAOT "Rubber Certificate Request Message (e-QC)" panel — opened from a
+  // rubber-eqc-gate card's "กรอกข้อมูล" button (see openRubberEqcEditor()); must be saved (all
+  // required fields filled) before that card's "ดำเนินการต่อ" button appears and the e-QC fee
+  // payment card (rubber-cert-payment) can be shown. rubberEqcEditorMsgId tracks which
+  // rubber-eqc-gate message to write completed:true back into, same pattern as
+  // declarationEditorMsgId above.
+  readonly rubberEqcEditorOpen  = signal(false);
+  readonly rubberEqcEditorMsgId = signal<string | null>(null);
+
   // Which side of the pipeline the current session is on — set once from showDocTypeChoice()'s
   // answer, threaded into formData.direction and every message that needs direction-aware copy
   // (single-upload title, ocr-results/form-preview/declaration-editor header sections).
@@ -75,6 +85,20 @@ export class ChatService {
    *  export-direction-specific). */
   get currentAgencyName(): string {
     return this.currentAgency;
+  }
+
+  /** Read-only view of the compound-rubber items pending the e-QC request/payment gate — used by
+   *  RubberEqcRequestEditorComponent to build one item card per item, same access pattern as
+   *  currentAgencyName above. */
+  get pendingRubberItems(): ProductHsAnalysis[] {
+    return this.pendingRubberFlowItems;
+  }
+
+  /** Read-only view of the e-QC request form's last-saved values, if any — lets
+   *  RubberEqcRequestEditorComponent restore what the user already filled in when reopened via
+   *  "กรอกข้อมูล" instead of resetting to blank. */
+  get rubberEqcRequest(): RubberEqcRequestData | undefined {
+    return this.rubberEqcRequestData;
   }
   private submittedAgencies: string[] = [];
   // Shipment.id most recently pushed to the queue by finalizeSubmit() — checkStatus()'s approval
@@ -377,6 +401,10 @@ export class ChatService {
   // Set by onRubberCertPaid(), consumed (and cleared) by the very next saveEarlyQueueEntry() —
   // there's exactly one such call per agency round, right after the gate resolves.
   private rubberCertPaymentInfo?: Shipment['rubberCertPayment'];
+  // Filled e-QC request form, persisted across re-opens of the drawer (see saveRubberEqcRequest()/
+  // pendingRubberItems below) so re-clicking "กรอกข้อมูล" after the first save shows what was
+  // already entered instead of resetting blank.
+  private rubberEqcRequestData?: RubberEqcRequestData;
 
   private showFullUpload(reEdit = false): void {
     this.isReEditOCR = reEdit;
@@ -784,7 +812,7 @@ export class ChatService {
   onRubberFlowChoice(value: string): void {
     if (value === 'rubber-eqc') {
       this.user('ขอหนังสือรับรองคุณภาพยาง (e-QC)');
-      this.showRubberCertPayment(this.pendingRubberCertAgency, this.pendingRubberFlowItems);
+      this.showRubberEqcGate(this.pendingRubberCertAgency, this.pendingRubberFlowItems);
       return;
     }
     this.user('ขอใบอนุญาตผ่านด่านศุลกากร และชำระค่าธรรมเนียมส่งยางออกนอกราชอาณาจักร');
@@ -796,6 +824,54 @@ export class ChatService {
       return;
     }
     this.continueAgencyFlow(this.pendingRubberCertAgency);
+  }
+
+  /** Posts the rubber-eqc-gate card — only a "กรอกข้อมูล" button shows until the request-form
+   *  drawer is saved (data.completed), forcing the user to fill it before "ดำเนินการต่อ" appears. */
+  private showRubberEqcGate(agency: string, items: ProductHsAnalysis[]): void {
+    this.withTyping(() => {
+      this.bot('rubber-eqc-gate', {
+        agency,
+        itemNames: items.map(i => i.name),
+        completed: false,
+      } satisfies RubberEqcGateData);
+    }, 500);
+  }
+
+  /** Called from RubberEqcGateComponent's "กรอกข้อมูล" button. */
+  openRubberEqcEditor(msgId: string): void {
+    this.rubberEqcEditorMsgId.set(msgId);
+    this.rubberEqcEditorOpen.set(true);
+  }
+
+  /** Called from RubberEqcRequestEditorComponent's close button — no partial save, matches
+   *  CustomsDeclarationEditorComponent/DdcPinkFormEditorComponent's onClose() convention. */
+  closeRubberEqcEditor(): void {
+    this.rubberEqcEditorOpen.set(false);
+  }
+
+  /** Called from RubberEqcRequestEditorComponent once every required field is filled and the
+   *  user confirms save — every required field was already validated there. Persists the filled
+   *  data (so reopening "กรอกข้อมูล" later shows it instead of resetting blank), closes the panel,
+   *  and marks the originating rubber-eqc-gate message complete so "ดำเนินการต่อ" appears. */
+  saveRubberEqcRequest(data: RubberEqcRequestData): void {
+    this.rubberEqcRequestData = data;
+    this.rubberEqcEditorOpen.set(false);
+    const msgId = this.rubberEqcEditorMsgId();
+    if (msgId) {
+      this.messages.update(ms => ms.map(m =>
+        m.id === msgId && m.type === 'rubber-eqc-gate'
+          ? { ...m, data: { ...(m.data as RubberEqcGateData), completed: true } }
+          : m
+      ));
+    }
+  }
+
+  /** Called from RubberEqcGateComponent's "ดำเนินการต่อ" button, only reachable once the request
+   *  form has been saved at least once. Moves on to the e-QC fee payment card. */
+  onRubberEqcGateProceed(): void {
+    this.user('ดำเนินการต่อ');
+    this.withTyping(() => this.showRubberCertPayment(this.pendingRubberCertAgency, this.pendingRubberFlowItems), 400);
   }
 
   /** Posts the rubber-cert-payment card — gated between เลือกโปรไฟล์ and the agency's next step
@@ -1546,6 +1622,9 @@ export class ChatService {
     this.pendingRubberCertAgency = '';
     this.pendingRubberFlowItems = [];
     this.rubberCertPaymentInfo = undefined;
+    this.rubberEqcEditorOpen.set(false);
+    this.rubberEqcEditorMsgId.set(null);
+    this.rubberEqcRequestData = undefined;
     this.ocr.reset();
   }
 
@@ -1748,6 +1827,13 @@ export class ChatService {
       // showing an unrelated generic analysis instead of continuing the real invoice-path flow.
       if (m.type === 'agency-upload') {
         this.isAgencyDocsUpload = true;
+      }
+      if (m.type === 'rubber-eqc-gate') {
+        const d = m.data as RubberEqcGateData;
+        this.pendingRubberCertAgency = d.agency;
+        // Only `.name` is read by RubberEqcRequestEditorComponent when building fresh item cards
+        // (see its ngOnInit) — a lightweight reconstruction is enough to resume "กรอกข้อมูล" here.
+        this.pendingRubberFlowItems = d.itemNames.map(name => ({ name } as ProductHsAnalysis));
       }
       if (m.type === 'rubber-cert-payment') {
         const d = m.data as RubberCertPaymentData;

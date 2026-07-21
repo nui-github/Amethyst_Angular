@@ -10,6 +10,7 @@ import { ChatAreaComponent } from '../components/chat-area/chat-area.component';
 import { SidebarComponent } from '../components/sidebar/sidebar.component';
 import { CustomsDeclarationEditorComponent } from '../components/customs-declaration-editor/customs-declaration-editor.component';
 import { DdcPinkFormEditorComponent } from '../components/ddc-pink-form-editor/ddc-pink-form-editor.component';
+import { RubberEqcRequestEditorComponent } from '../components/rubber-eqc-request-editor/rubber-eqc-request-editor.component';
 
 @Component({
   selector: 'app-chat-page',
@@ -19,6 +20,7 @@ import { DdcPinkFormEditorComponent } from '../components/ddc-pink-form-editor/d
     CommonModule, FormsModule, RouterModule,
     NzInputModule, LucideAngularModule,
     ChatAreaComponent, SidebarComponent, CustomsDeclarationEditorComponent, DdcPinkFormEditorComponent,
+    RubberEqcRequestEditorComponent,
   ],
   templateUrl: './chat-page.component.html',
   styleUrl:    './chat-page.component.scss',
