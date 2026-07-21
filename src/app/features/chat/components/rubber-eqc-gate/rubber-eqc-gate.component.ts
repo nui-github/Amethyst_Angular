@@ -120,7 +120,7 @@ import { ChatService } from '@app/core/services/chat.service';
       lucide-icon { color: var(--bizx-blue); }
     }
     .reg-actions {
-      display: flex; gap: 8px;
+      display: flex; gap: 8px; justify-content: flex-end;
     }
     .reg-btn {
       display: flex; align-items: center; justify-content: center; gap: 6px;
