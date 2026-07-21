@@ -409,34 +409,47 @@ export interface RubberCertPaymentData {
 // saved BEFORE the e-QC fee (RubberCertPaymentData above) is paid; opened from
 // RubberEqcRequestEditorComponent when the user picks the e-QC option on the rubber-flow
 // choice-card. Field set/required (*) markers mirror the real RAOT e-QC request form.
+// Control section fields/required-ness mirror the real RAOT (กยท.) data dictionary — "Rubber
+// Certificate Request Message V1.10" — using its กยท. column as ground truth (this flow only
+// ever submits to การยาง/RAOT, never to กวก., so กวก.-only fields like Test Group/Total Product
+// Amount are dropped, and Reason Type/Document Type/Language use the doc's own enum values, not
+// invented ones). Fields the doc marks "C" (conditional, e.g. Broker/Manufacturer Tax Number)
+// are kept as optional inputs rather than hard-required, since their condition depends on other
+// field values this mock doesn't otherwise model.
 export interface RubberEqcRequestData {
-  jobNumber: string;
-  documentType: string;        // ชนิดเอกสาร *
-  testReason: string;          // เหตุผลของการตรวจคุณภาพยางฯ *
-  companyCode: string;         // *
-  brokerCode: string;          // *
-  managerCode: string;         // *
-  managerId: string;
-  producerName: string;        // ผู้ผลิตยาง
-  invoiceNo: string;
-  testGroup: string;
-  labCode: string;             // *
-  totalSamples?: number;       // จำนวนตัวอย่างที่ส่งวิเคราะห์รวม
-  documentLanguage: string;    // ภาษาของเอกสารที่ขอ *
-  deliveryMethod: string;      // วิธีการจัดส่งเอกสาร
-  contactName: string;         // ชื่อผู้ประสานงานของผู้ขอใบรับรอง
-  contactPhone: string;
-  rubberLicenseNo: string;
-  cancelReferenceNo: string;
-  applicantCompanyName: string;
-  exporterCompanyName: string;
-  managerName: string;
-  brokerCompanyName: string;
-  invoiceDate: string;
-  isUrgent: boolean;           // ระยะเวลาการขอผล: เร่งด่วน / ไม่เร่งด่วน
-  labNameTh: string;           // ชื่อห้องทดสอบ(ไทย)
-  sampleReturn: 'return' | 'no-return';
-  paymentMethod: string;       // *
+  referenceNumber: string;         // Reference Number * — auto-generated, not user-entered
+  companyTaxNumber: string;        // Company Tax Number *
+  companyBranch: string;           // Company Branch *
+  companyThaiName: string;         // Company Thai Name *
+  companyEnglishName: string;      // Company English Name *
+  street: string;                  // Street and Number *
+  district: string;                // District *
+  subProvince: string;             // Sub province *
+  province: string;                // Province *
+  postcode: string;                // Postcode *
+  companyStrLicenseNo: string;     // Company Str License No (conditional)
+  brokerTaxNumber: string;         // Broker Tax Number (conditional)
+  brokerBranch: string;            // Broker Branch (conditional)
+  manufacturerTaxNumber: string;   // Manufacturer Tax Number (conditional)
+  manufacturerBranch: string;      // Manufacturer Branch (conditional)
+  manufacturerStrLicenseNo: string; // Manufacturer Str License No (conditional)
+  labCode: string;                 // Lab Code *
+  certificateEnglishAddress: string; // Certificate English Address (conditional)
+  reasonType: string;              // Reason Type * — 0 ส่งออก / 1 ทั่วไป / 2 นำเข้า
+  documentType: string;            // Document Type * — 1 หนังสือรับรอง / 2 ใบรายงานผล / 3 ทั้งสอง
+  documentLanguage: string;        // Language * — 1 ไทย / 2 อังกฤษ / 3 ไทย+อังกฤษ
+  deliveryMethod: string;          // Delivery — กยท. ยอมรับเฉพาะ "3 อิเล็กทรอนิกส์" จึงล็อกค่าไว้
+  contactName: string;             // Contact Name *
+  contactPhone: string;            // Contact Telephone Number *
+  email: string;                   // e-mail (optional)
+  sampleReturn: 'return' | 'no-return'; // Return *
+  isUrgent: boolean;               // Is Urgent *
+  paymentMethod: string;           // Payment Method * — กยท. ยอมรับเฉพาะ "1 e-Payment" จึงล็อกค่าไว้
+  bankCode: string;                // Bank Code *
+  bankBranchCode: string;          // Bank Branch Code *
+  bankAccountNumber: string;       // Bank Account Number *
+  managerIdCard: string;           // Manager ID Card (conditional)
+  managerName: string;             // Manager Name (conditional on Manager ID Card)
   items: RubberEqcRequestItem[];
 }
 

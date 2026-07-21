@@ -18,128 +18,166 @@
         </div>
         <div class="cde-form-grid">
           <label class="cde-field">
-            <span class="cde-field__label">Job Number</span>
-            <input class="cde-field__input" [(ngModel)]="local().jobNumber" />
+            <span class="cde-field__label">Reference Number</span>
+            <input class="cde-field__input" [(ngModel)]="local().referenceNumber" readonly />
           </label>
           <label class="cde-field">
-            <span class="cde-field__label">Rubber License No</span>
-            <input class="cde-field__input" [(ngModel)]="local().rubberLicenseNo" />
+            <span class="cde-field__label">Reason Type — เหตุผลของการตรวจคุณภาพยางฯ <em>*</em></span>
+            <select class="cde-field__input" [(ngModel)]="local().reasonType">
+              <option value="">--Please Select--</option>
+              <option value="0">0 - เพื่อส่งออก (Export)</option>
+              <option value="1">1 - เพื่อทั่วไป (General)</option>
+              <option value="2">2 - เพื่อนำเข้า (Import — ต้องแนบเอกสาร MSDS)</option>
+            </select>
           </label>
           <label class="cde-field">
-            <span class="cde-field__label">ชนิดเอกสาร <em>*</em></span>
+            <span class="cde-field__label">Document Type — ชนิดเอกสาร <em>*</em></span>
             <select class="cde-field__input" [(ngModel)]="local().documentType">
               <option value="">--Please Select--</option>
-              <option value="new">ขอใหม่ (New Request)</option>
-              <option value="amend">ขอแก้ไข (Amendment)</option>
-              <option value="cancel">ขอยกเลิก (Cancellation)</option>
+              <option value="1">1 - หนังสือรับรองคุณภาพยาง</option>
+              <option value="2">2 - ใบรายงานผลการทดสอบ</option>
+              <option value="3">3 - หนังสือรับรองคุณภาพยางและใบรายงานผลการทดสอบ</option>
             </select>
           </label>
           <label class="cde-field">
-            <span class="cde-field__label">Cancel Reference No</span>
-            <input class="cde-field__input" [(ngModel)]="local().cancelReferenceNo" />
-          </label>
-          <label class="cde-field cde-field--full">
-            <span class="cde-field__label">เหตุผลของการตรวจคุณภาพยางฯ <em>*</em></span>
-            <select class="cde-field__input" [(ngModel)]="local().testReason">
+            <span class="cde-field__label">Language — ภาษาของเอกสารที่ขอ <em>*</em></span>
+            <select class="cde-field__input" [(ngModel)]="local().documentLanguage">
               <option value="">--Please Select--</option>
-              <option value="pre-export">ตรวจสอบก่อนส่งออก (Pre-export Inspection)</option>
-              <option value="customer-request">ตรวจสอบตามคำร้องขอลูกค้า (Customer Request)</option>
-              <option value="annual">ตรวจสอบประจำปี (Annual Verification)</option>
+              <option value="1">1 - ภาษาไทย</option>
+              <option value="2">2 - ภาษาอังกฤษ (+฿200)</option>
+              <option value="3">3 - ภาษาไทยและภาษาอังกฤษ (+฿200)</option>
             </select>
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">Delivery — วิธีการจัดส่งเอกสาร</span>
+            <input class="cde-field__input" value="3 - อิเล็กทรอนิกส์ (Electronic)" readonly />
           </label>
         </div>
       </div>
 
-      <!-- COMPANY / CONTACT SECTION -->
+      <!-- COMPANY SECTION -->
       <div class="cde-sec">
         <div class="cde-sec__head" style="border-left-color: rgb(124, 58, 237);">
-          <span class="cde-sec__title">ข้อมูลบริษัทและผู้ติดต่อ</span>
+          <span class="cde-sec__title">ข้อมูลบริษัทผู้ส่งออก</span>
         </div>
         <div class="cde-form-grid">
           <label class="cde-field">
-            <span class="cde-field__label">Company Code <em>*</em></span>
-            <input class="cde-field__input" [(ngModel)]="local().companyCode" />
-          </label>
-          <label class="cde-field cde-field--full">
-            <span class="cde-field__label">Company Name (ผู้ขอใบรับรอง)</span>
-            <input class="cde-field__input" [(ngModel)]="local().applicantCompanyName" />
+            <span class="cde-field__label">Company Tax Number <em>*</em></span>
+            <input class="cde-field__input" [(ngModel)]="local().companyTaxNumber" />
           </label>
           <label class="cde-field">
-            <span class="cde-field__label">Broker Code <em>*</em></span>
-            <input class="cde-field__input" [(ngModel)]="local().brokerCode" />
-          </label>
-          <label class="cde-field cde-field--full">
-            <span class="cde-field__label">Company Name (นายหน้า)</span>
-            <input class="cde-field__input" [(ngModel)]="local().brokerCompanyName" />
+            <span class="cde-field__label">Company Branch <em>*</em></span>
+            <input class="cde-field__input" [(ngModel)]="local().companyBranch" />
           </label>
           <label class="cde-field">
-            <span class="cde-field__label">Manager Code <em>*</em></span>
-            <input class="cde-field__input" [(ngModel)]="local().managerCode" />
+            <span class="cde-field__label">Company Str License No</span>
+            <input class="cde-field__input" [(ngModel)]="local().companyStrLicenseNo" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">Certificate English Address</span>
+            <input class="cde-field__input" [(ngModel)]="local().certificateEnglishAddress" />
+          </label>
+          <label class="cde-field cde-field--full">
+            <span class="cde-field__label">Company Thai Name <em>*</em></span>
+            <input class="cde-field__input" [(ngModel)]="local().companyThaiName" placeholder="เช่น บริษัท สยาม จำกัด" />
+          </label>
+          <label class="cde-field cde-field--full">
+            <span class="cde-field__label">Company English Name <em>*</em></span>
+            <input class="cde-field__input" [(ngModel)]="local().companyEnglishName" placeholder="e.g. Siam Co., Ltd." />
+          </label>
+          <label class="cde-field cde-field--full">
+            <span class="cde-field__label">Street and Number <em>*</em></span>
+            <input class="cde-field__input" [(ngModel)]="local().street" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">District <em>*</em></span>
+            <input class="cde-field__input" [(ngModel)]="local().district" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">Sub Province <em>*</em></span>
+            <input class="cde-field__input" [(ngModel)]="local().subProvince" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">Province <em>*</em></span>
+            <input class="cde-field__input" [(ngModel)]="local().province" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">Postcode <em>*</em></span>
+            <input class="cde-field__input" [(ngModel)]="local().postcode" />
+          </label>
+        </div>
+      </div>
+
+      <!-- BROKER / MANUFACTURER SECTION -->
+      <div class="cde-sec">
+        <div class="cde-sec__head" style="border-left-color: rgb(217, 119, 6);">
+          <span class="cde-sec__title">ข้อมูล Broker และผู้ผลิตยาง (ถ้ามี)</span>
+        </div>
+        <div class="cde-form-grid">
+          <label class="cde-field">
+            <span class="cde-field__label">Broker Tax Number</span>
+            <input class="cde-field__input" [(ngModel)]="local().brokerTaxNumber" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">Broker Branch</span>
+            <input class="cde-field__input" [(ngModel)]="local().brokerBranch" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">Manufacturer Tax Number</span>
+            <input class="cde-field__input" [(ngModel)]="local().manufacturerTaxNumber" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">Manufacturer Branch</span>
+            <input class="cde-field__input" [(ngModel)]="local().manufacturerBranch" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">Manufacturer Str License No</span>
+            <input class="cde-field__input" [(ngModel)]="local().manufacturerStrLicenseNo" />
+          </label>
+        </div>
+      </div>
+
+      <!-- MANAGER / CONTACT SECTION -->
+      <div class="cde-sec">
+        <div class="cde-sec__head" style="border-left-color: rgb(13, 143, 97);">
+          <span class="cde-sec__title">ผู้จัดการ/ผู้รับมอบอำนาจ และผู้ติดต่อ</span>
+        </div>
+        <div class="cde-form-grid">
+          <label class="cde-field">
+            <span class="cde-field__label">Manager ID Card</span>
+            <input class="cde-field__input" [(ngModel)]="local().managerIdCard" />
           </label>
           <label class="cde-field">
             <span class="cde-field__label">Manager Name</span>
             <input class="cde-field__input" [(ngModel)]="local().managerName" />
           </label>
           <label class="cde-field">
-            <span class="cde-field__label">Manager ID</span>
-            <input class="cde-field__input" [(ngModel)]="local().managerId" />
-          </label>
-          <label class="cde-field cde-field--full">
-            <span class="cde-field__label">Company Name (ผู้ส่งออก)</span>
-            <input class="cde-field__input" [(ngModel)]="local().exporterCompanyName" />
-          </label>
-          <label class="cde-field">
-            <span class="cde-field__label">ผู้ผลิตยาง</span>
-            <input class="cde-field__input" [(ngModel)]="local().producerName" />
-          </label>
-          <label class="cde-field">
-            <span class="cde-field__label">ชื่อผู้ประสานงานของผู้ขอใบรับรอง</span>
+            <span class="cde-field__label">Contact Name <em>*</em></span>
             <input class="cde-field__input" [(ngModel)]="local().contactName" />
           </label>
           <label class="cde-field">
-            <span class="cde-field__label">เบอร์โทรศัพท์ของผู้ติดต่อ</span>
+            <span class="cde-field__label">Contact Telephone Number <em>*</em></span>
             <input class="cde-field__input" [(ngModel)]="local().contactPhone" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">e-mail</span>
+            <input class="cde-field__input" type="email" [(ngModel)]="local().email" />
           </label>
         </div>
       </div>
 
-      <!-- INVOICE / LAB SECTION -->
+      <!-- LAB / CONDITIONS SECTION -->
       <div class="cde-sec">
-        <div class="cde-sec__head" style="border-left-color: rgb(13, 143, 97);">
-          <span class="cde-sec__title">ข้อมูล Invoice และห้องทดสอบ</span>
+        <div class="cde-sec__head" style="border-left-color: rgb(220, 38, 38);">
+          <span class="cde-sec__title">ห้องปฏิบัติการและเงื่อนไข</span>
         </div>
         <div class="cde-form-grid">
-          <label class="cde-field">
-            <span class="cde-field__label">Invoice No</span>
-            <input class="cde-field__input" [(ngModel)]="local().invoiceNo" />
-          </label>
-          <label class="cde-field">
-            <span class="cde-field__label">Invoice Date</span>
-            <input class="cde-field__input" [(ngModel)]="local().invoiceDate" placeholder="dd-mm-yyyy" />
-          </label>
-          <label class="cde-field">
-            <span class="cde-field__label">Test Group</span>
-            <select class="cde-field__input" [(ngModel)]="local().testGroup">
-              <option value="">--Please Select--</option>
-              <option value="sheet">กลุ่มยางแผ่น (Sheet Rubber)</option>
-              <option value="compound">กลุ่มยางผสม (Compound Rubber)</option>
-              <option value="block">กลุ่มยางแท่ง (Block Rubber)</option>
-            </select>
-          </label>
           <label class="cde-field">
             <span class="cde-field__label">Lab Code <em>*</em></span>
             <input class="cde-field__input" [(ngModel)]="local().labCode" />
           </label>
           <label class="cde-field">
-            <span class="cde-field__label">ชื่อห้องทดสอบ(ไทย)</span>
-            <input class="cde-field__input" [(ngModel)]="local().labNameTh" />
-          </label>
-          <label class="cde-field">
-            <span class="cde-field__label">จำนวนตัวอย่างที่ส่งวิเคราะห์รวม</span>
-            <input class="cde-field__input" type="number" [(ngModel)]="local().totalSamples" />
-          </label>
-          <label class="cde-field">
-            <span class="cde-field__label">ระยะเวลาการขอผล</span>
+            <span class="cde-field__label">Is Urgent — ต้องการขอผลเร่งด่วน (+100%)</span>
             <div class="cde-radio-row">
               <label class="cde-radio">
                 <input type="radio" name="isUrgent" [value]="true" [(ngModel)]="local().isUrgent" />
@@ -152,7 +190,7 @@
             </div>
           </label>
           <label class="cde-field">
-            <span class="cde-field__label">เงื่อนไขการรับตัวอย่างคืน</span>
+            <span class="cde-field__label">Return — เงื่อนไขการรับตัวอย่างคืน</span>
             <div class="cde-radio-row">
               <label class="cde-radio">
                 <input type="radio" name="sampleReturn" value="return" [(ngModel)]="local().sampleReturn" />
@@ -167,38 +205,27 @@
         </div>
       </div>
 
-      <!-- DOCUMENT / PAYMENT SECTION -->
+      <!-- PAYMENT SECTION -->
       <div class="cde-sec">
         <div class="cde-sec__head" style="border-left-color: rgb(249, 115, 22);">
-          <span class="cde-sec__title">การจัดส่งเอกสารและค่าธรรมเนียม</span>
+          <span class="cde-sec__title">การชำระเงิน</span>
         </div>
         <div class="cde-form-grid">
           <label class="cde-field">
-            <span class="cde-field__label">ภาษาของเอกสารที่ขอ <em>*</em></span>
-            <select class="cde-field__input" [(ngModel)]="local().documentLanguage">
-              <option value="">--Please Select--</option>
-              <option value="th">ไทย (Thai)</option>
-              <option value="en">อังกฤษ (English)</option>
-              <option value="bi">ไทย/อังกฤษ (Bilingual)</option>
-            </select>
+            <span class="cde-field__label">Payment Method</span>
+            <input class="cde-field__input" value="1 - e-Payment" readonly />
           </label>
           <label class="cde-field">
-            <span class="cde-field__label">วิธีการจัดส่งเอกสาร</span>
-            <select class="cde-field__input" [(ngModel)]="local().deliveryMethod">
-              <option value="">--Please Select--</option>
-              <option value="pickup">รับด้วยตนเอง (Pick-up)</option>
-              <option value="post">ไปรษณีย์ (Postal Mail)</option>
-              <option value="email">อีเมล (Email/PDF)</option>
-            </select>
+            <span class="cde-field__label">Bank Code <em>*</em></span>
+            <input class="cde-field__input" [(ngModel)]="local().bankCode" />
           </label>
-          <label class="cde-field cde-field--full">
-            <span class="cde-field__label">Payment method <em>*</em></span>
-            <select class="cde-field__input" [(ngModel)]="local().paymentMethod">
-              <option value="">--Please Select--</option>
-              <option value="debit">หักบัญชีธนาคาร (Bank Direct Debit)</option>
-              <option value="transfer">โอนเงิน (Bank Transfer)</option>
-              <option value="monthly">เรียกเก็บรายเดือน (Monthly Billing)</option>
-            </select>
+          <label class="cde-field">
+            <span class="cde-field__label">Bank Branch Code <em>*</em></span>
+            <input class="cde-field__input" [(ngModel)]="local().bankBranchCode" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">Bank Account Number <em>*</em></span>
+            <input class="cde-field__input" [(ngModel)]="local().bankAccountNumber" />
           </label>
         </div>
       </div>

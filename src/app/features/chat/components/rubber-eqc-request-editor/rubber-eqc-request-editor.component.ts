@@ -21,43 +21,59 @@ export class RubberEqcRequestEditorComponent implements OnInit {
   readonly icSave = Save;
 
   local = signal<RubberEqcRequestData>({
-    jobNumber: '',
-    documentType: '',
-    testReason: '',
-    companyCode: '',
-    brokerCode: '',
-    managerCode: '',
-    managerId: '',
-    producerName: '',
-    invoiceNo: '',
-    testGroup: '',
+    referenceNumber: '',
+    companyTaxNumber: '',
+    companyBranch: '',
+    companyThaiName: '',
+    companyEnglishName: '',
+    street: '',
+    district: '',
+    subProvince: '',
+    province: '',
+    postcode: '',
+    companyStrLicenseNo: '',
+    brokerTaxNumber: '',
+    brokerBranch: '',
+    manufacturerTaxNumber: '',
+    manufacturerBranch: '',
+    manufacturerStrLicenseNo: '',
     labCode: '',
-    totalSamples: 0,
+    certificateEnglishAddress: '',
+    reasonType: '',
+    documentType: '',
     documentLanguage: '',
-    deliveryMethod: '',
+    // RAOT (กยท.) only accepts value "3 - อิเล็กทรอนิกส์" for Delivery — no real choice to offer.
+    deliveryMethod: '3',
     contactName: '',
     contactPhone: '',
-    rubberLicenseNo: '',
-    cancelReferenceNo: '',
-    applicantCompanyName: '',
-    exporterCompanyName: '',
-    managerName: '',
-    brokerCompanyName: '',
-    invoiceDate: '',
-    isUrgent: false,
-    labNameTh: '',
+    email: '',
     sampleReturn: 'no-return',
-    paymentMethod: '',
+    isUrgent: false,
+    // RAOT (กยท.) only accepts value "1 - e-Payment" for Payment Method — matches the linked
+    // bank-account debit already collected on the next card (RubberCertPaymentComponent).
+    paymentMethod: '1',
+    bankCode: '',
+    bankBranchCode: '',
+    bankAccountNumber: '',
+    managerIdCard: '',
+    managerName: '',
     items: [],
   });
 
   showConfirmDialog = signal(false);
 
-  // Required (*) fields — matches the red-boxed fields on RAOT's own e-QC request form. Save
-  // stays disabled until every one of these is filled, same gating pattern as DdcPinkFormEditor.
+  // Required (*) fields mirror the "M" entries in the กยท. column of RAOT's own Rubber
+  // Certificate Request Message (V1.10) data dictionary — Save stays disabled until every one
+  // of these is filled, same gating pattern as DdcPinkFormEditor. Fields the dictionary marks
+  // "C" (conditional) are left out of this list and rendered as plain optional inputs instead,
+  // since their condition depends on other field values this mock doesn't otherwise model.
+  // deliveryMethod/paymentMethod/sampleReturn/isUrgent are also "M" in the dictionary but always
+  // have a value here (fixed or default-selected), so gating on them would be a no-op.
   private readonly REQUIRED_HEADER_KEYS: (keyof RubberEqcRequestData)[] = [
-    'documentType', 'testReason', 'companyCode', 'brokerCode', 'managerCode', 'labCode',
-    'documentLanguage', 'paymentMethod',
+    'companyTaxNumber', 'companyBranch', 'companyThaiName', 'companyEnglishName',
+    'street', 'district', 'subProvince', 'province', 'postcode', 'labCode',
+    'reasonType', 'documentType', 'documentLanguage', 'contactName', 'contactPhone',
+    'bankCode', 'bankBranchCode', 'bankAccountNumber',
   ];
   private readonly REQUIRED_ITEM_KEYS: (keyof RubberEqcRequestItem)[] = [
     'inspectionType', 'rubberSpecies',
@@ -71,6 +87,12 @@ export class RubberEqcRequestEditorComponent implements OnInit {
       this.local.set(existing);
       return;
     }
+
+    // Reference Number is system-issued (format XXXXnnnnnnnnn — XXXX = profile name, nnnnnnnnn =
+    // running number), never typed by the user.
+    const profileCode = (this.chat.spnSession()?.profile ?? 'NETB').padEnd(4, 'X').slice(0, 4).toUpperCase();
+    const referenceNumber = `${profileCode}${String(Date.now()).slice(-9).padStart(9, '0')}`;
+    this.local.update(d => ({ ...d, referenceNumber }));
 
     const items: RubberEqcRequestItem[] = this.chat.pendingRubberItems.map((item, i) => ({
       itemNo: String(i + 1).padStart(4, '0'),
