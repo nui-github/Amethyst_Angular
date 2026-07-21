@@ -523,6 +523,7 @@ export interface RubberEqcStatusData {
   issuerAddressEn?: string;
   labCode?: string;                // from the saved request form, shown on the lab-detail tab
   remark?: string;
+  certUrl?: string;                // downloadable หนังสือรับรองคุณภาพยาง (e-QC) file, set once status is 'license-accept'
 }
 
 export interface AgencyReturnDoc {

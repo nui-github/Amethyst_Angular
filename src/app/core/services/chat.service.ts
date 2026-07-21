@@ -910,6 +910,7 @@ export class ChatService {
         issuerAddressEn: '67/25 Bangkhunnon, Bangkoknoi, Bangkok 10700',
         labCode: req?.labCode,
         remark: '',
+        certUrl: SAMPLE_DOC_URL,
       } satisfies RubberEqcStatusData);
 
       this.rubberCertPaid = true;

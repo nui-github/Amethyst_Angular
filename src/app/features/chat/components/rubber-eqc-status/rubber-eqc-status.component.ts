@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, Loader2, BadgeCheck, Clock, CheckCircle2 } from 'lucide-angular';
+import { LucideAngularModule, Loader2, BadgeCheck, Clock, CheckCircle2, Download } from 'lucide-angular';
 import { RubberEqcStatusData } from '@app/core/models/types';
 
 type Tab = 'license' | 'lab' | 'remark';
@@ -38,8 +38,7 @@ type Tab = 'license' | 'lab' | 'remark';
         <div class="res-hint res-hint--done">
           <lucide-icon [img]="CheckCircle2" [size]="14" />
           <span>
-            ตัดชำระค่าบริการ ฿{{ data.amount | number:'1.2-2' }} ผ่านบัญชี {{ data.paidAccountLabel }}
-            เรียบร้อยแล้ว — Certificate No. {{ data.certificateNo }}
+            ตัดชำระค่าบริการ ฿{{ data.amount | number:'1.2-2' }} ผ่านบัญชี {{ data.paidAccountLabel }} เรียบร้อยแล้ว
           </span>
         </div>
 
@@ -57,23 +56,41 @@ type Tab = 'license' | 'lab' | 'remark';
 
         <div class="res-panel">
           @if (activeTab() === 'license') {
-            <div class="res-rows">
-              <div class="res-row"><span>เลขประจำตัวหน่วยงานผู้ออกใบอนุญาต</span><strong>{{ data.issuerOrgId || '-' }}</strong></div>
-              <div class="res-row"><span>ชื่อหน่วยงานออกใบอนุญาต (ไทย)</span><strong>{{ data.issuerNameTh }}</strong></div>
-              <div class="res-row"><span>ชื่อหน่วยงานออกใบอนุญาต (อังกฤษ)</span><strong>{{ data.issuerNameEn }}</strong></div>
-              <div class="res-row"><span>ที่อยู่</span><strong>{{ data.issuerAddressTh }}</strong></div>
-              <div class="res-row"><span>ที่อยู่ (ภาษาอังกฤษ)</span><strong>{{ data.issuerAddressEn }}</strong></div>
-              <div class="res-row"><span>Certificate No.</span><strong>{{ data.certificateNo }}</strong></div>
-              <div class="res-row"><span>Issue Date</span><strong>{{ data.issueDate }}</strong></div>
-              <div class="res-row"><span>Expire Date</span><strong>{{ data.expireDate }}</strong></div>
+            <div class="info-card res-card">
+              <div class="info-card__head">ใบรับรองคุณภาพยาง (e-QC)</div>
+              <div class="info-card__body">
+                <div class="info-card__row"><span>Certificate No.</span><span>{{ data.certificateNo }}</span></div>
+                <div class="info-card__row"><span>Issue Date</span><span>{{ data.issueDate }}</span></div>
+                <div class="info-card__row"><span>Expire Date</span><span>{{ data.expireDate }}</span></div>
+              </div>
+            </div>
+            <div class="info-card res-card">
+              <div class="info-card__head">หน่วยงานผู้ออกใบอนุญาต</div>
+              <div class="info-card__body">
+                <div class="info-card__row"><span>เลขประจำตัวหน่วยงาน</span><span>{{ data.issuerOrgId || '-' }}</span></div>
+                <div class="info-card__row"><span>ชื่อหน่วยงาน (ไทย)</span><span>{{ data.issuerNameTh }}</span></div>
+                <div class="info-card__row"><span>ชื่อหน่วยงาน (อังกฤษ)</span><span>{{ data.issuerNameEn }}</span></div>
+                <div class="info-card__row res-row--wrap"><span>ที่อยู่</span><span>{{ data.issuerAddressTh }}</span></div>
+                <div class="info-card__row res-row--wrap"><span>ที่อยู่ (ภาษาอังกฤษ)</span><span>{{ data.issuerAddressEn }}</span></div>
+              </div>
             </div>
           } @else if (activeTab() === 'lab') {
-            <div class="res-rows">
-              <div class="res-row"><span>รหัสห้องปฏิบัติการ (Lab Code)</span><strong>{{ data.labCode || '-' }}</strong></div>
+            <div class="info-card res-card">
+              <div class="info-card__head">ห้องปฏิบัติการทดสอบ</div>
+              <div class="info-card__body">
+                <div class="info-card__row"><span>รหัสห้องปฏิบัติการ (Lab Code)</span><span>{{ data.labCode || '-' }}</span></div>
+              </div>
             </div>
           } @else {
             <p class="res-remark">{{ data.remark || '-' }}</p>
           }
+        </div>
+
+        <div class="res-ft">
+          <button class="res-dl" (click)="download()" type="button">
+            <lucide-icon [img]="Download" [size]="13" />
+            ดาวน์โหลดหนังสือรับรองคุณภาพยาง (e-QC)
+          </button>
         </div>
       }
     </div>
@@ -145,19 +162,30 @@ type Tab = 'license' | 'lab' | 'remark';
     }
     .res-panel {
       padding-top: 2px;
+      display: flex; flex-direction: column; gap: 10px;
     }
-    .res-rows {
-      display: flex; flex-direction: column; gap: 7px;
+    .res-card {
+      margin-top: 0;
     }
-    .res-row {
-      display: flex; justify-content: space-between; gap: 16px;
-      font-size: 12.5px; padding: 5px 0; border-bottom: 1px dashed #EEF0F6;
+    .res-row--wrap {
+      flex-direction: column; align-items: flex-start; gap: 3px;
 
-      span { color: #6B7280; flex-shrink: 0; }
-      strong { color: var(--bizx-navy); font-weight: 600; text-align: right; }
+      span:last-child { text-align: left; font-weight: 500; color: var(--bizx-navy); }
     }
     .res-remark {
       font-size: 12.5px; color: var(--bizx-navy); margin: 0;
+    }
+    .res-ft {
+      display: flex; justify-content: flex-end;
+    }
+    .res-dl {
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 16px; border-radius: 8px;
+      border: 1.5px solid var(--bizx-blue); background: #fff;
+      font-size: 12px; font-weight: 700; color: var(--bizx-blue); font-family: inherit;
+      cursor: pointer; transition: background 0.15s;
+
+      &:hover { background: rgba(4, 99, 239, 0.06); }
     }
   `],
 })
@@ -170,6 +198,11 @@ export class RubberEqcStatusComponent {
   readonly BadgeCheck = BadgeCheck;
   readonly Clock = Clock;
   readonly CheckCircle2 = CheckCircle2;
+  readonly Download = Download;
+
+  download(): void {
+    if (this.data.certUrl) window.open(this.data.certUrl, '_blank', 'noopener');
+  }
 
   get isDone(): boolean {
     return this.data.status === 'license-accept';
