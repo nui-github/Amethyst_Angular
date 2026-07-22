@@ -340,6 +340,7 @@ export interface FlagCardData {
 
 export interface ChoiceCardData {
   question: string;
+  subtitle?: string;
   options: { label: string; value: string; description?: string }[];
 }
 

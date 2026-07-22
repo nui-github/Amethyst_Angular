@@ -7,6 +7,9 @@
       <p class="choice-card__question" [class.choice-card__question--status]="isSimple">{{ data.question }}</p>
     </div>
   }
+  @if (data.subtitle) {
+    <p class="choice-card__subtitle">{{ data.subtitle }}</p>
+  }
 
   <!-- Rich cards when options have descriptions -->
   @if (!isSimple) {

@@ -835,7 +835,8 @@ export class ChatService {
     this.pendingRubberFlowItems = items;
     this.withTyping(() => {
       this.bot('choice-card', {
-        question: 'ระบบตรวจพบสินค้าที่เป็นยางผสมในใบ Invoice ท่านต้องการดำเนินการขั้นตอนใดต่อ?',
+        question: 'ท่านต้องการดำเนินการขั้นตอนใดต่อ?',
+        subtitle: 'ท่านสามารถขอหนังสือรับรองคุณภาพยาง (e-QC) ก่อนได้ เพื่อนำเลขหนังสือรับรองไปใช้ต่อในการขอใบอนุญาตและชำระค่าธรรมเนียม (e-SFR)',
         options: [
           {
             label: 'ขอหนังสือรับรองคุณภาพยาง (e-QC)',
