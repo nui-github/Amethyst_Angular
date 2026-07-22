@@ -226,7 +226,7 @@
           </label>
           <label class="cde-field">
             <span class="cde-field__label">Payment Amount</span>
-            <input class="cde-field__input" [value]="(local().paymentAmount | number:'1.2-2') + ' บาท'" readonly />
+            <input class="cde-field__input" [value]="(computedPaymentAmount() | number:'1.2-2') + ' บาท'" readonly />
           </label>
           <label class="cde-field">
             <span class="cde-field__label">Credit Amount</span>

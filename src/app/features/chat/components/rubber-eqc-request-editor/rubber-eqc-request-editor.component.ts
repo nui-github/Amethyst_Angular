@@ -156,6 +156,30 @@ export class RubberEqcRequestEditorComponent implements OnInit {
     return headerOk && itemsOk;
   }
 
+  // อัตราค่าบริการทดสอบยางธรรมชาติ (ยางผสมสารเคมี/ยางผสม) ต่อ 1 ชุดตัวอย่าง — คิดตามน้ำหนักส่งออก
+  // ([normal, urgent] บาท ต่อ bracket บนสุดของน้ำหนัก กก.)
+  private static readonly EXPORT_WEIGHT_RATE_TABLE: [number, number, number][] = [
+    [20_160, 400, 800],
+    [100_800, 800, 1_600],
+    [201_600, 1_200, 2_400],
+    [Infinity, 1_500, 3_000],
+  ];
+
+  private rateForExportWeight(weightKg: number, urgent: boolean): number {
+    const bracket = RubberEqcRequestEditorComponent.EXPORT_WEIGHT_RATE_TABLE
+      .find(([maxKg]) => weightKg <= maxKg) ?? RubberEqcRequestEditorComponent.EXPORT_WEIGHT_RATE_TABLE.at(-1)!;
+    const [, normalRate, urgentRate] = bracket;
+    return urgent ? urgentRate : normalRate;
+  }
+
+  /** Plain method (not computed()) — same reasoning as canSave(): items are mutated in place via
+   *  [(ngModel)], so this needs to re-run every CD tick to reflect Export Weight/Is Urgent edits
+   *  live, same pattern used throughout this component. One test sample (rate) per item. */
+  computedPaymentAmount(): number {
+    const d = this.local();
+    return d.items.reduce((sum, item) => sum + this.rateForExportWeight(item.exportWeight ?? 0, d.isUrgent), 0);
+  }
+
   onSave(): void {
     if (!this.canSave()) return;
     this.showConfirmDialog.set(true);
@@ -163,6 +187,7 @@ export class RubberEqcRequestEditorComponent implements OnInit {
 
   confirmSave(): void {
     this.showConfirmDialog.set(false);
+    this.local.update(d => ({ ...d, paymentAmount: this.computedPaymentAmount() }));
     this.chat.saveRubberEqcRequest(this.local());
   }
 
