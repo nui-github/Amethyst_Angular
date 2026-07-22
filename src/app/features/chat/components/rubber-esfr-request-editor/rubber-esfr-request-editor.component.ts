@@ -37,8 +37,17 @@ export class RubberEsfrRequestEditorComponent implements OnInit {
     inventoryContactPerson: '',
     companyTaxNumber: '',
     companyBranch: '',
+    companyThaiName: '',
+    companyEnglishName: '',
+    companyStreet: '',
+    companyDistrict: '',
+    companySubProvince: '',
+    companyProvince: '',
+    companyPostcode: '',
     brokerTaxNumber: '',
+    brokerBranch: '',
     managerIdCard: '',
+    managerName: '',
     modeOfTransport: '',
     loadPort: '',
     destinationCountryCode: '',
@@ -47,12 +56,25 @@ export class RubberEsfrRequestEditorComponent implements OnInit {
     tradeTerms: '',
     freightFee: 0,
     insuranceAmount: 0,
+    purchaseOrderNumber: '',
+    consigneeName: '',
+    consigneeStreet: '',
+    consigneeDistrict: '',
+    consigneeSubProvince: '',
+    consigneeProvince: '',
+    consigneePostcode: '',
+    purchaseCountryCode: '',
     netWeight: 0,
     fobValueForeign: 0,
     currencyCode: '',
     contractPricePerKg: 0,
     paymentAccountId: '',
     paymentAmount: 0,
+    chargesRate: 0,
+    creditAmount: 0,
+    totalAmountRaot: 0,
+    announcementNumber: '',
+    announcementDate: '',
     items: [],
   });
 
@@ -107,12 +129,18 @@ export class RubberEsfrRequestEditorComponent implements OnInit {
       rubberCode: '',
       weight: 0,
       weightUnitCode: 'KGM',
+      quantity: 0,
+      quantityUnitCode: '',
       drc: 0,
       contractDate: '',
+      reductionRate: 0,
+      reductionWeight: 0,
       priceValueFreight: 0,
       priceValueBaht: 0,
       netPriceValueFreight: 0,
       netPriceValueBaht: 0,
+      chargingWeight: 0,
+      remark: '',
       certificates: [
         {
           certificateNumber: eqcCertNo,
@@ -154,6 +182,12 @@ export class RubberEsfrRequestEditorComponent implements OnInit {
     return d.items.reduce((sum, item) => sum + rateForExportWeight(item.weight ?? 0, false), 0);
   }
 
+  /** Total Amount RAOT — the dictionary defines this as Payment Amount + Credit Amount exactly, so
+   *  it's derived rather than a separate user-entered field. */
+  computedTotalAmountRaot(): number {
+    return this.computedPaymentAmount() + (this.local().creditAmount || 0);
+  }
+
   onSave(): void {
     if (!this.canSave()) return;
     this.showConfirmDialog.set(true);
@@ -161,7 +195,7 @@ export class RubberEsfrRequestEditorComponent implements OnInit {
 
   confirmSave(): void {
     this.showConfirmDialog.set(false);
-    this.local.update(d => ({ ...d, paymentAmount: this.computedPaymentAmount() }));
+    this.local.update(d => ({ ...d, paymentAmount: this.computedPaymentAmount(), totalAmountRaot: this.computedTotalAmountRaot() }));
     this.chat.saveEsfrRequest(this.local());
   }
 

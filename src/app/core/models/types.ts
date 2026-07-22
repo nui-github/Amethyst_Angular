@@ -552,10 +552,13 @@ export interface RubberEsfrGateData {
 }
 
 // ใบขออนุญาตผ่านด่านศุลกากรและใบชำระเงินค่าธรรมเนียมก่อนส่งออกยางไปนอกราชอาณาจักร (e-SFR /
-// Rubber License Request Message V1.0, กวก. data dictionary) — field set + required-ness follow
-// the "กวก." column there. Payment section (Payment Method/บัญชีที่ตัดชำระ/Payment Amount) is
-// deliberately NOT modeled off this dictionary's own (all "ไม่ใช้") payment fields — it stays the
-// linked-bank-account picker already built for e-QC, left untouched by design.
+// Rubber License Request Message V1.0, กวก. data dictionary — the "Cat (อิง กวก. > Cat หลัก)"
+// version, which resolves every field the earlier "กวก." column alone left blank/"ไม่ใช้" to its
+// real O/M/C category instead) — field set + required-ness follow that column. Payment section
+// (Payment Method/บัญชีที่ตัดชำระ/Payment Amount) is deliberately NOT modeled off this dictionary's
+// own payment/Cess fields (46-55, mostly O/C here) — it stays the linked-bank-account picker
+// already built for e-QC, left untouched by design; those dictionary fields are skipped entirely
+// rather than added as unused duplicates.
 export interface RubberEsfrRequestData {
   referenceNumber: string;        // auto-issued, same convention as RubberEqcRequestData.referenceNumber
   senderRegistrationId: string;   // Sender Registration ID * — auto-issued, same as e-QC's
@@ -572,8 +575,17 @@ export interface RubberEsfrRequestData {
   inventoryContactPerson: string; // Inventory Contact Person *
   companyTaxNumber: string;       // Company Tax Number *
   companyBranch: string;          // Company Branch *
+  companyThaiName: string;        // Company Thai Name (optional)
+  companyEnglishName: string;     // Company English Name (optional)
+  companyStreet: string;          // (Company) Street and Number (optional)
+  companyDistrict: string;        // (Company) District (optional)
+  companySubProvince: string;     // (Company) Sub province (optional)
+  companyProvince: string;        // (Company) Province (optional)
+  companyPostcode: string;        // (Company) Postcode (optional)
   brokerTaxNumber: string;        // Broker Tax Number (conditional)
+  brokerBranch: string;           // Broker Branch (optional)
   managerIdCard: string;          // Manager ID Card (conditional on Broker Tax Number)
+  managerName: string;            // Manager Name (optional)
   modeOfTransport: string;        // Mode of Transport * — กวก. ยอมรับช่องทาง 1-4 เท่านั้น
   loadPort: string;               // Load Port * — รหัสสถานที่ส่งออก
   destinationCountryCode: string; // Destination Country Code *
@@ -582,13 +594,27 @@ export interface RubberEsfrRequestData {
   tradeTerms: string;             // Trade Terms * — เงื่อนไขการซื้อขายตาม INCOTERMS
   freightFee: number;             // Freight fee * — ค่าระวาง
   insuranceAmount: number;        // Insurance Amount Foreign * — ค่าประกันภัย
+  purchaseOrderNumber: string;    // Purchase Order Number (optional)
+  consigneeName: string;          // Consignee Name (optional)
+  consigneeStreet: string;        // Consignee Street and Number (optional)
+  consigneeDistrict: string;      // Consignee District (optional)
+  consigneeSubProvince: string;   // Consignee Sub province (optional)
+  consigneeProvince: string;      // Consignee Province (optional)
+  consigneePostcode: string;      // Consignee Postcode (optional)
+  purchaseCountryCode: string;    // Purchase Country Code (optional)
   netWeight: number;              // Net Weight * — หน่วยเป็น KGM เท่านั้น
   fobValueForeign: number;        // FOB Value Foreign * — ราคาต่อกิโลกรัม เงินต่างประเทศ (US)
   currencyCode: string;           // Currency Code * — USD หรือ THB
   contractPricePerKg: number;     // Contract price/kg *
-  paymentAccountId: string;       // บัญชีที่ตัดชำระ * — same linked-account picker as e-QC (payment
-                                   // section left untouched, see interface comment above)
+  paymentAccountId: string;       // บัญชีที่ตัดชำระ * — same linked-account picker as e-QC; Bank
+                                   // Code/Branch Code/Bank Account Number (49-51) aren't modeled
+                                   // separately since picking an account already carries all three
   paymentAmount: number;          // Cess fee, system-computed from items' Weight (rateForExportWeight)
+  chargesRate: number;            // Charges Rate (optional) — อัตราเรียกเก็บต่อกิโลกรัม (เงิน Cess)
+  creditAmount: number;           // Credit Amount (optional)
+  totalAmountRaot: number;        // Total Amount RAOT — system-computed, Payment Amount + Credit Amount
+  announcementNumber: string;     // Announcement Number (optional)
+  announcementDate: string;       // Announcement Date (optional)
   items: RubberEsfrRequestItem[];
 }
 
@@ -601,12 +627,18 @@ export interface RubberEsfrRequestItem {
   rubberCode: string;             // Rubber Code * — Class Rubber
   weight?: number;                // Weight * — น้ำหนักที่อนุญาต
   weightUnitCode: string;         // Weight Unit Code * — KGM/TNE/GRM
+  quantity?: number;               // Quantity (optional)
+  quantityUnitCode: string;        // Quantity Unit Code (optional)
   drc?: number;                   // DRC * — ร้อยละเนื้อยางแห้ง
   contractDate: string;           // Contract Date *
+  reductionRate?: number;          // Reduction Rate (optional) — ค่า % ลดน้ำหนักสุทธิ
+  reductionWeight?: number;        // Reduction Weight (optional)
   priceValueFreight?: number;     // Price Value Freight * — ราคาต่อกก. เงินต่างประเทศ
   priceValueBaht?: number;        // Price Value Baht *
   netPriceValueFreight?: number;  // Net Price Value Freight * — FOB เงิน US
   netPriceValueBaht?: number;     // Net Price Value Baht * — FOB เงินบาท
+  chargingWeight?: number;         // Charging Weight (optional) — น้ำหนักสุทธิเรียกเก็บ
+  remark: string;                 // Remark (optional)
   certificates: RubberEsfrCertificate[]; // Quality Certificate — required when the tariff code is
                                    // compound/mixed rubber, which is every item on this flow
 }

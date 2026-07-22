@@ -106,12 +106,89 @@
             <input class="cde-field__input" [(ngModel)]="local().companyBranch" />
           </label>
           <label class="cde-field">
+            <span class="cde-field__label">Company Thai Name</span>
+            <input class="cde-field__input" [(ngModel)]="local().companyThaiName" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">Company English Name</span>
+            <input class="cde-field__input" [(ngModel)]="local().companyEnglishName" />
+          </label>
+          <label class="cde-field cde-field--half">
+            <span class="cde-field__label">Company Street and Number</span>
+            <input class="cde-field__input" [(ngModel)]="local().companyStreet" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">Company District</span>
+            <input class="cde-field__input" [(ngModel)]="local().companyDistrict" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">Company Sub Province</span>
+            <input class="cde-field__input" [(ngModel)]="local().companySubProvince" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">Company Province</span>
+            <input class="cde-field__input" [(ngModel)]="local().companyProvince" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">Company Postcode</span>
+            <input class="cde-field__input" [(ngModel)]="local().companyPostcode" />
+          </label>
+          <label class="cde-field">
             <span class="cde-field__label">Broker Tax Number</span>
             <input class="cde-field__input" [(ngModel)]="local().brokerTaxNumber" />
           </label>
           <label class="cde-field">
+            <span class="cde-field__label">Broker Branch</span>
+            <input class="cde-field__input" [(ngModel)]="local().brokerBranch" />
+          </label>
+          <label class="cde-field cde-field--half">
             <span class="cde-field__label">Manager ID Card</span>
             <input class="cde-field__input" [(ngModel)]="local().managerIdCard" />
+          </label>
+          <label class="cde-field cde-field--half">
+            <span class="cde-field__label">Manager Name</span>
+            <input class="cde-field__input" [(ngModel)]="local().managerName" />
+          </label>
+        </div>
+      </div>
+
+      <!-- CONSIGNEE / PURCHASE ORDER SECTION -->
+      <div class="cde-sec">
+        <div class="cde-sec__head" style="border-left-color: rgb(13, 143, 97);">
+          <span class="cde-sec__title">ข้อมูลผู้ซื้อ / ใบสั่งซื้อ</span>
+        </div>
+        <div class="cde-form-grid">
+          <label class="cde-field">
+            <span class="cde-field__label">Purchase Order Number</span>
+            <input class="cde-field__input" [(ngModel)]="local().purchaseOrderNumber" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">Consignee Name</span>
+            <input class="cde-field__input" [(ngModel)]="local().consigneeName" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">Purchase Country Code</span>
+            <input class="cde-field__input" [(ngModel)]="local().purchaseCountryCode" maxlength="2" placeholder="เช่น CN" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">Consignee Postcode</span>
+            <input class="cde-field__input" [(ngModel)]="local().consigneePostcode" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">Consignee Street and Number</span>
+            <input class="cde-field__input" [(ngModel)]="local().consigneeStreet" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">Consignee District</span>
+            <input class="cde-field__input" [(ngModel)]="local().consigneeDistrict" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">Consignee Sub Province</span>
+            <input class="cde-field__input" [(ngModel)]="local().consigneeSubProvince" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">Consignee Province</span>
+            <input class="cde-field__input" [(ngModel)]="local().consigneeProvince" />
           </label>
         </div>
       </div>
@@ -220,12 +297,28 @@
                   </select>
                 </label>
                 <label class="cde-field">
+                  <span class="cde-field__label">Quantity</span>
+                  <input class="cde-field__input" type="number" step="0.001" [(ngModel)]="item.quantity" />
+                </label>
+                <label class="cde-field">
+                  <span class="cde-field__label">Quantity Unit Code</span>
+                  <input class="cde-field__input" [(ngModel)]="item.quantityUnitCode" />
+                </label>
+                <label class="cde-field">
                   <span class="cde-field__label">DRC (%) <em>*</em></span>
                   <input class="cde-field__input" type="number" step="0.01" [(ngModel)]="item.drc" />
                 </label>
                 <label class="cde-field">
                   <span class="cde-field__label">Contract Date <em>*</em></span>
                   <input class="cde-field__input" type="date" [(ngModel)]="item.contractDate" />
+                </label>
+                <label class="cde-field">
+                  <span class="cde-field__label">Reduction Rate (%)</span>
+                  <input class="cde-field__input" type="number" step="0.01" [(ngModel)]="item.reductionRate" />
+                </label>
+                <label class="cde-field">
+                  <span class="cde-field__label">Reduction Weight</span>
+                  <input class="cde-field__input" type="number" step="0.001" [(ngModel)]="item.reductionWeight" />
                 </label>
                 <label class="cde-field">
                   <span class="cde-field__label">Price Value Freight <em>*</em></span>
@@ -242,6 +335,14 @@
                 <label class="cde-field">
                   <span class="cde-field__label">Net Price Value Baht <em>*</em></span>
                   <input class="cde-field__input" type="number" step="0.00001" [(ngModel)]="item.netPriceValueBaht" />
+                </label>
+                <label class="cde-field cde-field--full">
+                  <span class="cde-field__label">Charging Weight</span>
+                  <input class="cde-field__input" type="number" step="0.001" [(ngModel)]="item.chargingWeight" />
+                </label>
+                <label class="cde-field cde-field--full">
+                  <span class="cde-field__label">Remark</span>
+                  <textarea class="cde-field__input" [(ngModel)]="item.remark" rows="2"></textarea>
                 </label>
               </div>
 
@@ -305,6 +406,26 @@
           <label class="cde-field">
             <span class="cde-field__label">Payment Amount (ค่าธรรมเนียม Cess)</span>
             <input class="cde-field__input" [value]="(computedPaymentAmount() | number:'1.2-2') + ' บาท'" readonly />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">Credit Amount</span>
+            <input class="cde-field__input" type="number" step="0.01" [(ngModel)]="local().creditAmount" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">Charges Rate (บาท/กก.)</span>
+            <input class="cde-field__input" type="number" step="0.01" [(ngModel)]="local().chargesRate" />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">Total Amount RAOT</span>
+            <input class="cde-field__input" [value]="(computedTotalAmountRaot() | number:'1.2-2') + ' บาท'" readonly />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">Announcement Number</span>
+            <input class="cde-field__input" [(ngModel)]="local().announcementNumber" />
+          </label>
+          <label class="cde-field cde-field--full">
+            <span class="cde-field__label">Announcement Date</span>
+            <input class="cde-field__input" type="date" [(ngModel)]="local().announcementDate" />
           </label>
         </div>
       </div>
