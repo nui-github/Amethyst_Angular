@@ -234,24 +234,25 @@
             }
 
             <!-- การยาง (RAOT) ยางผสม: e-SFR request form gate — posted after e-QC LICENSE ACCEPT if
-                 the user picks "ทำ e-SFR ต่อ"; same "กรอกข้อมูล" → "ดำเนินการต่อ" gate as rubber-eqc-gate -->
+                 the user picks "ทำ e-SFR ต่อ"; same "กรอกข้อมูล" → "ดำเนินการต่อ" gate as rubber-eqc-gate.
+                 Always rendered (not swapped for a plain readonly-tag) so scrolling back up still
+                 shows the full card — [interactive] just hides/disables its own footer actions. -->
             @case ('rubber-esfr-gate') {
-              @if (!readOnly && !msg.isReadOnly) {
-                <app-rubber-esfr-gate [data]="$any(msg.data)" [msgId]="msg.id" />
-              } @else {
-                <span class="readonly-tag">✓ กรอกแบบคำขอ e-SFR แล้ว</span>
-              }
+              <app-rubber-esfr-gate
+                [data]="$any(msg.data)"
+                [msgId]="msg.id"
+                [interactive]="!readOnly && !msg.isReadOnly" />
             }
 
             <!-- การยาง (RAOT) ยางผสม: e-SFR read-only summary before actual submission — posted
                  when rubber-esfr-gate's "ดำเนินการต่อ" is clicked; "แก้ไขข้อมูล" reopens the editor,
-                 "ส่งคำขอใบอนุญาต" seals this card and moves on to rubber-esfr-status -->
+                 "ส่งคำขอใบอนุญาต" seals this card and moves on to rubber-esfr-status. Always
+                 rendered, same reasoning as rubber-esfr-gate above. -->
             @case ('rubber-esfr-preview') {
-              @if (!readOnly && !msg.isReadOnly) {
-                <app-rubber-esfr-preview [data]="$any(msg.data)" [msgId]="msg.id" />
-              } @else {
-                <span class="readonly-tag">✓ ส่งคำขอใบอนุญาต e-SFR แล้ว</span>
-              }
+              <app-rubber-esfr-preview
+                [data]="$any(msg.data)"
+                [msgId]="msg.id"
+                [interactive]="!readOnly && !msg.isReadOnly" />
             }
 
             <!-- การยาง (RAOT) ยางผสม: e-SFR submission status — 'rubber-accept' mocks the processing

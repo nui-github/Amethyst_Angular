@@ -44,7 +44,7 @@ import { ChatService } from '@app/core/services/chat.service';
         }
       </div>
 
-      @if (!submitted()) {
+      @if (!isDone) {
         <div class="epv-ft">
           <button class="epv-btn epv-btn--outline" (click)="onEdit()" type="button">
             <lucide-icon [img]="PencilLine" [size]="14" />
@@ -148,6 +148,7 @@ import { ChatService } from '@app/core/services/chat.service';
 export class RubberEsfrPreviewComponent {
   @Input() msgId = '';
   @Input({ required: true }) data!: RubberEsfrPreviewData;
+  @Input() interactive = true;
 
   readonly chat = inject(ChatService);
   readonly submitted = signal(false);
@@ -157,6 +158,13 @@ export class RubberEsfrPreviewComponent {
   readonly PencilLine = PencilLine;
   readonly Send = Send;
   readonly CheckCircle2 = CheckCircle2;
+
+  // Same reasoning as RubberEsfrGateComponent.isDone — `submitted` covers the instant in-session
+  // click, `!interactive` covers this card re-rendering already-sealed (history scroll-back, queue
+  // resume, reload) where `submitted` starts false but the footer must stay non-actionable.
+  get isDone(): boolean {
+    return this.submitted() || !this.interactive;
+  }
 
   get req() {
     return this.data.request;

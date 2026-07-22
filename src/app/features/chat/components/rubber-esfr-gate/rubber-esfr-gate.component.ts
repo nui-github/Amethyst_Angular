@@ -32,7 +32,7 @@ import { ChatService } from '@app/core/services/chat.service';
         }
       </ul>
 
-      @if (!proceeded()) {
+      @if (!isDone) {
         <div class="reg-hint" [class.reg-hint--done]="data.completed">
           <lucide-icon [img]="data.completed ? CheckCircle2 : AlertCircle" [size]="14" />
           <span>
@@ -146,6 +146,7 @@ import { ChatService } from '@app/core/services/chat.service';
 export class RubberEsfrGateComponent {
   @Input() msgId = '';
   @Input({ required: true }) data!: RubberEsfrGateData;
+  @Input() interactive = true;
 
   readonly chat = inject(ChatService);
   readonly proceeded = signal(false);
@@ -156,6 +157,14 @@ export class RubberEsfrGateComponent {
   readonly ArrowRight = ArrowRight;
   readonly CheckCircle2 = CheckCircle2;
   readonly AlertCircle = AlertCircle;
+
+  // Local `proceeded` gives instant feedback the moment this session clicks "ดำเนินการต่อ" (before
+  // the async chat message update ripples back down); `!interactive` covers the card being
+  // re-rendered already-sealed — history scroll-back, queue resume, or a fresh reload — where
+  // `proceeded` starts false but the card must still show as done, not offer live actions again.
+  get isDone(): boolean {
+    return this.proceeded() || !this.interactive;
+  }
 
   openEditor(): void {
     this.chat.openEsfrEditor(this.msgId);
