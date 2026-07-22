@@ -53,13 +53,13 @@ export class QueuePageComponent {
   readonly tabs = [
     { label: 'ทั้งหมด',          value: 'all'       as TabValue },
     { label: 'รอดำเนินการ',      value: 'needs_you' as TabValue },
-    { label: 'ยื่นแล้ว',         value: 'submitted' as TabValue },
+    { label: 'อนุมัติแล้ว',       value: 'submitted' as TabValue },
   ];
 
   readonly statCards = [
     { key: 'all'       as TabValue, label: 'ทั้งหมด',      dot: '#6366F1', iconBg: '#EEF2FF' },
     { key: 'needs_you' as TabValue, label: 'รอดำเนินการ', dot: '#F59E0B', iconBg: '#FFFBEB' },
-    { key: 'submitted' as TabValue, label: 'ยื่นกรมแล้ว',  dot: '#10B981', iconBg: '#ECFDF5' },
+    { key: 'submitted' as TabValue, label: 'อนุมัติแล้ว',  dot: '#10B981', iconBg: '#ECFDF5' },
   ];
 
   readonly filteredQueue = computed(() => {
