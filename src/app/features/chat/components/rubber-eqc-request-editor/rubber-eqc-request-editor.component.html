@@ -22,6 +22,10 @@
             <input class="cde-field__input" [(ngModel)]="local().referenceNumber" readonly />
           </label>
           <label class="cde-field">
+            <span class="cde-field__label">Sender Registration ID — รหัสผู้ส่งข้อมูล</span>
+            <input class="cde-field__input" [(ngModel)]="local().senderRegistrationId" readonly />
+          </label>
+          <label class="cde-field">
             <span class="cde-field__label">Reason Type — เหตุผลของการตรวจคุณภาพยางฯ <em>*</em></span>
             <select class="cde-field__input" [(ngModel)]="local().reasonType">
               <option value="">--Please Select--</option>
@@ -114,10 +118,6 @@
           <span class="cde-sec__title">ข้อมูล Broker และผู้ผลิตยาง (ถ้ามี)</span>
         </div>
         <div class="cde-form-grid">
-          <label class="cde-field">
-            <span class="cde-field__label">Broker Tax Number</span>
-            <input class="cde-field__input" [(ngModel)]="local().brokerTaxNumber" />
-          </label>
           <label class="cde-field">
             <span class="cde-field__label">Broker Branch</span>
             <input class="cde-field__input" [(ngModel)]="local().brokerBranch" />
@@ -248,6 +248,14 @@
               </div>
               <div class="cde-form-grid">
                 <label class="cde-field">
+                  <span class="cde-field__label">Invoice Number</span>
+                  <input class="cde-field__input" [(ngModel)]="item.invoiceNumber" />
+                </label>
+                <label class="cde-field">
+                  <span class="cde-field__label">Invoice Date</span>
+                  <input class="cde-field__input" type="date" [(ngModel)]="item.invoiceDate" />
+                </label>
+                <label class="cde-field">
                   <span class="cde-field__label">Invoice Item No.</span>
                   <input class="cde-field__input" [(ngModel)]="item.invoiceItemNo" />
                 </label>
@@ -258,16 +266,6 @@
                 <label class="cde-field">
                   <span class="cde-field__label">เลขที่สัญญา</span>
                   <input class="cde-field__input" [(ngModel)]="item.contractNo" />
-                </label>
-                <label class="cde-field">
-                  <span class="cde-field__label">ประเภทยางพารา</span>
-                  <select class="cde-field__input" [(ngModel)]="item.rubberType">
-                    <option value="">--Please Select--</option>
-                    <option value="smoked-sheet">ยางแผ่นรมควัน (Smoked Sheet)</option>
-                    <option value="block">ยางแท่ง (Block Rubber / TSNR)</option>
-                    <option value="compound">ยางผสม (Compounded Rubber)</option>
-                    <option value="latex">น้ำยางข้น (Latex Concentrate)</option>
-                  </select>
                 </label>
                 <label class="cde-field cde-field--full">
                   <span class="cde-field__label">EN Description</span>
@@ -282,10 +280,6 @@
                   <input class="cde-field__input" [(ngModel)]="item.rubberSpecies" />
                 </label>
                 <label class="cde-field">
-                  <span class="cde-field__label">หมายเลขตัวอย่างยาง</span>
-                  <input class="cde-field__input" [(ngModel)]="item.sampleNo" />
-                </label>
-                <label class="cde-field">
                   <span class="cde-field__label">ประเภทการขอตรวจ <em>*</em></span>
                   <select class="cde-field__input" [(ngModel)]="item.inspectionType">
                     <option value="">--Please Select--</option>
@@ -293,23 +287,6 @@
                     <option value="contract">ตรวจตามสัญญาซื้อขาย (Contract Inspection)</option>
                     <option value="re-inspection">ตรวจซ้ำ (Re-inspection)</option>
                   </select>
-                </label>
-                <label class="cde-field">
-                  <span class="cde-field__label">ประเภทตัวอย่าง</span>
-                  <select class="cde-field__input" [(ngModel)]="item.sampleType">
-                    <option value="">--Please Select--</option>
-                    <option value="warehouse">ตัวอย่างจากคลังสินค้า (Warehouse Sample)</option>
-                    <option value="silo">ตัวอย่างจากไซโล (Silo Sample)</option>
-                    <option value="line">ตัวอย่างจากไลน์ผลิต (Production Line Sample)</option>
-                  </select>
-                </label>
-                <label class="cde-field">
-                  <span class="cde-field__label">Weight</span>
-                  <input class="cde-field__input" type="number" step="0.001" [(ngModel)]="item.weight" />
-                </label>
-                <label class="cde-field">
-                  <span class="cde-field__label">Quantity</span>
-                  <input class="cde-field__input" type="number" step="0.001" [(ngModel)]="item.quantity" />
                 </label>
                 <label class="cde-field">
                   <span class="cde-field__label">Package Amount</span>
@@ -320,40 +297,16 @@
                   <input class="cde-field__input" type="number" step="0.001" [(ngModel)]="item.exportWeight" />
                 </label>
                 <label class="cde-field">
+                  <span class="cde-field__label">Export Weight Unit Code</span>
+                  <input class="cde-field__input" [(ngModel)]="item.exportWeightUnit" placeholder="เช่น KGM" />
+                </label>
+                <label class="cde-field">
                   <span class="cde-field__label">สูตรการผลิต ปริมาณยางธรรมชาติ (%)</span>
                   <input class="cde-field__input" type="number" step="0.01" [(ngModel)]="item.productionFormula" />
                 </label>
                 <label class="cde-field">
-                  <span class="cde-field__label">น้ำหนักโดยประมาณ/ล๊อต</span>
-                  <input class="cde-field__input" type="number" step="0.001" [(ngModel)]="item.estWeightPerLot" />
-                </label>
-                <label class="cde-field">
-                  <span class="cde-field__label">หมายเลขอันดับแรกของยาง</span>
-                  <input class="cde-field__input" type="number" step="0.01" [(ngModel)]="item.firstGradeNo" />
-                </label>
-                <label class="cde-field">
-                  <span class="cde-field__label">จำนวนลังต่อล๊อต</span>
-                  <input class="cde-field__input" type="number" [(ngModel)]="item.packagePerLot" />
-                </label>
-                <label class="cde-field">
-                  <span class="cde-field__label">หมายเลขอันดับสุดท้ายของยาง</span>
-                  <input class="cde-field__input" type="number" step="0.01" [(ngModel)]="item.lastGradeNo" />
-                </label>
-                <label class="cde-field">
-                  <span class="cde-field__label">จำนวนแท่งต่อลัง</span>
-                  <input class="cde-field__input" type="number" [(ngModel)]="item.piecePerPackage" />
-                </label>
-                <label class="cde-field">
                   <span class="cde-field__label">จำนวนยาง</span>
                   <input class="cde-field__input" type="number" [(ngModel)]="item.rubberQuantity" />
-                </label>
-                <label class="cde-field">
-                  <span class="cde-field__label">วันที่ผลิต</span>
-                  <input class="cde-field__input" [(ngModel)]="item.productionDate" placeholder="dd-mm-yyyy" />
-                </label>
-                <label class="cde-field cde-field--full">
-                  <span class="cde-field__label">หัวข้อที่จะทำ Uncertainty</span>
-                  <input class="cde-field__input" [(ngModel)]="item.uncertaintyTopic" />
                 </label>
                 <label class="cde-field cde-field--full">
                   <span class="cde-field__label">Remark</span>

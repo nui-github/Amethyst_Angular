@@ -23,6 +23,7 @@ export class RubberEqcRequestEditorComponent implements OnInit {
 
   local = signal<RubberEqcRequestData>({
     referenceNumber: '',
+    senderRegistrationId: '',
     companyTaxNumber: '',
     companyBranch: '',
     companyThaiName: '',
@@ -33,7 +34,6 @@ export class RubberEqcRequestEditorComponent implements OnInit {
     province: '',
     postcode: '',
     companyStrLicenseNo: '',
-    brokerTaxNumber: '',
     brokerBranch: '',
     manufacturerTaxNumber: '',
     manufacturerBranch: '',
@@ -66,12 +66,14 @@ export class RubberEqcRequestEditorComponent implements OnInit {
   readonly accounts = MOCK_LINKED_BANK_ACCOUNTS;
 
   // Required (*) fields mirror the "M" entries in the กยท. column of RAOT's own Rubber
-  // Certificate Request Message (V1.10) data dictionary — Save stays disabled until every one
+  // Certificate Request Message data dictionary — Save stays disabled until every one
   // of these is filled, same gating pattern as DdcPinkFormEditor. Fields the dictionary marks
   // "C" (conditional) are left out of this list and rendered as plain optional inputs instead,
   // since their condition depends on other field values this mock doesn't otherwise model.
   // deliveryMethod/paymentMethod/sampleReturn/isUrgent are also "M" in the dictionary but always
-  // have a value here (fixed or default-selected), so gating on them would be a no-op.
+  // have a value here (fixed or default-selected), so gating on them would be a no-op —
+  // referenceNumber/senderRegistrationId are "M" too but system-issued the same way, never
+  // user-entered, so they're excluded here for the same reason.
   private readonly REQUIRED_HEADER_KEYS: (keyof RubberEqcRequestData)[] = [
     'companyTaxNumber', 'companyBranch', 'companyThaiName', 'companyEnglishName',
     'street', 'district', 'subProvince', 'province', 'postcode', 'labCode',
@@ -92,40 +94,34 @@ export class RubberEqcRequestEditorComponent implements OnInit {
     }
 
     // Reference Number is system-issued (format XXXXnnnnnnnnn — XXXX = profile name, nnnnnnnnn =
-    // running number), never typed by the user.
+    // running number), never typed by the user. Sender Registration ID (รหัสผู้ส่งข้อมูล) is the
+    // same kind of system-issued value — reuse the same profile code, distinct running number so
+    // it doesn't just echo Reference Number.
     const profileCode = (this.chat.spnSession()?.profile ?? 'NETB').padEnd(4, 'X').slice(0, 4).toUpperCase();
     const referenceNumber = `${profileCode}${String(Date.now()).slice(-9).padStart(9, '0')}`;
+    const senderRegistrationId = `${profileCode}-SND-${String(Date.now()).slice(-6)}`;
     // Payment Amount is system-computed (same flat fee RubberCertPaymentComponent charges later
     // for this request), not user-entered; the default linked account is pre-selected the same
     // way RubberCertPaymentComponent pre-selects it.
     const paymentAccountId = this.accounts.find(a => a.isDefault)?.id ?? this.accounts[0]?.id ?? '';
-    this.local.update(d => ({ ...d, referenceNumber, paymentAmount: RUBBER_COMPOUND_CERT_FEE, paymentAccountId }));
+    this.local.update(d => ({ ...d, referenceNumber, senderRegistrationId, paymentAmount: RUBBER_COMPOUND_CERT_FEE, paymentAccountId }));
 
     const items: RubberEqcRequestItem[] = this.chat.pendingRubberItems.map((item, i) => ({
       itemNo: String(i + 1).padStart(4, '0'),
+      invoiceNumber: '',
+      invoiceDate: '',
       invoiceItemNo: '',
       destCountryCode: '',
       descriptionEn: item.name,
       descriptionTh: '',
       contractNo: '',
-      rubberType: '',
       rubberSpecies: '',
-      sampleNo: '',
       inspectionType: '',
-      sampleType: '',
-      weight: 0,
-      quantity: 0,
       packageAmount: 0,
       exportWeight: 0,
+      exportWeightUnit: '',
       productionFormula: 0,
-      estWeightPerLot: 0,
-      firstGradeNo: 0,
-      packagePerLot: 0,
-      lastGradeNo: 0,
-      piecePerPackage: 0,
       rubberQuantity: 0,
-      productionDate: '',
-      uncertaintyTopic: '',
       remark: '',
       // DRC (ปริมาณเนื้อยางแห้ง) is the test every e-QC compound-rubber request actually needs —
       // pre-filled since it's not an optional choice, not a guess at unknown data.

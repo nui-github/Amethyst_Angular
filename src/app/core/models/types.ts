@@ -428,6 +428,7 @@ export interface RubberCertPaymentData {
 // field values this mock doesn't otherwise model.
 export interface RubberEqcRequestData {
   referenceNumber: string;         // Reference Number * — auto-generated, not user-entered
+  senderRegistrationId: string;    // Sender Registration ID * — auto-issued, same as Reference Number
   companyTaxNumber: string;        // Company Tax Number *
   companyBranch: string;           // Company Branch *
   companyThaiName: string;         // Company Thai Name *
@@ -438,7 +439,8 @@ export interface RubberEqcRequestData {
   province: string;                // Province *
   postcode: string;                // Postcode *
   companyStrLicenseNo: string;     // Company Str License No (conditional)
-  brokerTaxNumber: string;         // Broker Tax Number (conditional)
+  // Broker Tax Number dropped — the RAOT data dictionary marks it "ไม่ใช้" (not used by กยท.),
+  // unlike Broker Branch which stays a conditional field.
   brokerBranch: string;            // Broker Branch (conditional)
   manufacturerTaxNumber: string;   // Manufacturer Tax Number (conditional)
   manufacturerBranch: string;      // Manufacturer Branch (conditional)
@@ -469,29 +471,20 @@ export interface RubberEqcRequestData {
 
 export interface RubberEqcRequestItem {
   itemNo: string;               // read-only, auto "0001", "0002", ...
+  invoiceNumber: string;        // เลขที่บัญชีราคาสินค้า/ใบกำกับสินค้า (conditional on Reason Type = ส่งออก)
+  invoiceDate: string;          // วันที่บัญชีราคาสินค้า/ใบกำกับสินค้า (conditional, same as above)
   invoiceItemNo: string;
   destCountryCode: string;      // รหัสประเทศปลายทาง
   descriptionEn: string;
   descriptionTh: string;
   contractNo: string;           // เลขที่สัญญา
-  rubberType: string;           // ประเภทยางพารา
-  rubberSpecies: string;        // ชนิดของยางพารา *
-  sampleNo: string;             // หมายเลขตัวอย่างยาง
+  rubberSpecies: string;        // Class Rubber — ชนิดของยางพารา *
   inspectionType: string;       // ประเภทการขอตรวจ *
-  sampleType: string;           // ประเภทตัวอย่าง
-  weight?: number;
-  quantity?: number;
   packageAmount?: number;
   exportWeight?: number;
+  exportWeightUnit: string;     // Export Weight Unit Code (conditional, pairs with exportWeight)
   productionFormula?: number;   // สูตรการผลิต ปริมาณยางธรรมชาติ (%)
-  estWeightPerLot?: number;     // น้ำหนักโดยประมาณ/ล๊อต
-  firstGradeNo?: number;        // หมายเลขอันดับแรกของยาง
-  packagePerLot?: number;       // จำนวนลังต่อล๊อต
-  lastGradeNo?: number;         // หมายเลขอันดับสุดท้ายของยาง
-  piecePerPackage?: number;     // จำนวนแท่งต่อลัง
   rubberQuantity?: number;      // จำนวนยาง
-  productionDate: string;       // วันที่ผลิต
-  uncertaintyTopic: string;     // หัวข้อที่จะทำ Uncertainty
   remark: string;
   attributes: RubberEqcAttribute[];
 }
