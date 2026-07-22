@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, Input, forwardRef, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, ViewChild, forwardRef, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { NzDatePickerComponent, NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 
 @Component({
   selector: 'app-date-picker',
@@ -22,9 +22,29 @@ export class DatePickerComponent implements ControlValueAccessor {
   @Input() placeholder = 'เลือกวันที่';
   @Input() disabled = false;
 
+  @ViewChild(NzDatePickerComponent) private picker?: NzDatePickerComponent;
+
   readonly value = signal<Date | null>(null);
   private onChange: (value: string) => void = () => {};
   private onTouched: () => void = () => {};
+
+  /** Drive the calendar open explicitly instead of relying on nz-date-picker's own
+   *  host-level click delegation, which does not reliably fire the panel open in
+   *  this app's drawer/backdrop layout. */
+  onFieldClick(): void {
+    if (this.disabled) return;
+    this.picker?.open();
+  }
+
+  /** CDK's connected-position strategy computes the dropdown's placement while the
+   *  entrance-animation panel is still mid-transition (collapsed height), so the
+   *  very first open lands the calendar at (0,0) instead of anchored under the
+   *  field. A resize-event nudge once the panel settles forces CDK's reposition
+   *  listener to recompute against the now-settled layout. */
+  onOpenChange(open: boolean): void {
+    if (!open) return;
+    setTimeout(() => window.dispatchEvent(new Event('resize')), 100);
+  }
 
   writeValue(value: string | null | undefined): void {
     this.value.set(value ? this.parseIsoDate(value) : null);

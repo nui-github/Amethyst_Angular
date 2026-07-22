@@ -4,5 +4,8 @@
   (ngModelChange)="onDateChange($event)"
   [nzPlaceHolder]="placeholder"
   [nzDisabled]="disabled"
+  [nzInputReadOnly]="true"
+  (nzOnOpenChange)="onOpenChange($event)"
+  (click)="onFieldClick()"
   nzFormat="dd/MM/yyyy"
 ></nz-date-picker>

@@ -75,6 +75,13 @@
   --ant-motion-duration-slow: 0.25s;
 }
 
+// CDK overlay container (nz-select/date-picker/dropdown panels) defaults to
+// z-index 1000, below our full-screen editor drawers (up to 2100) — so any
+// dropdown opened from inside a drawer would render invisibly behind it.
+.cdk-overlay-container {
+  z-index: 10000 !important;
+}
+
 // ── Component-level overrides ─────────────────────────────────────────────────
 
 // Buttons: 4px radius, solid primary color, white text
