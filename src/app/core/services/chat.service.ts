@@ -105,6 +105,14 @@ export class ChatService {
   // flow patches this record directly (e.g. setAgencyPaymentQr()) since it happens later in the
   // same session, after the shipment already exists in QueueService.
   private lastShipmentId: string | null = null;
+  // True once saveEarlyQueueEntry() has run for the CURRENT agency round — reset at the top of
+  // onProfileSelected() (every round, fresh or a "ขอใบอนุญาตเพิ่ม" repeat, starts there) and by
+  // loadQueueSession() setting it straight to true (a record already exists for a resumed round).
+  // Lets ensureQueueEntrySaved()/refreshQueueSnapshot() update the SAME round's record in place
+  // instead of saveEarlyQueueEntry() creating a second one — needed now that the การยาง (RAOT)
+  // e-QC wait card (showRubberEqcStatus()) creates the record earlier than continueAgencyFlow()
+  // used to, so continueAgencyFlow() must not re-create it once the round reaches that point.
+  private earlyEntrySavedForRound = false;
 
   // Public: tracks all agencies needed + which have been submitted
   readonly allPermitAgencies  = signal<string[]>([]);
@@ -721,6 +729,10 @@ export class ChatService {
   /** Called from ProfileSelectComponent when user confirms a profile */
   onProfileSelected(profile: { code: string; displayName: string; username: string }, afterFlow: 'agency-choice' | 'agency-docs' | 'proceed', agency?: string): void {
     this.user(`ใช้โปรไฟล์ ${profile.displayName}`);
+    // Every call here starts a fresh agency round (including each "ขอใบอนุญาตเพิ่ม" repeat) — reset
+    // so this round's first ensureQueueEntrySaved() call creates its own record instead of patching
+    // whatever round happened to run before it.
+    this.earlyEntrySavedForRound = false;
     const existing = this.spnSession();
     this.isConnected.set(true);
     this.spnSession.set({
@@ -763,7 +775,7 @@ export class ChatService {
         setTimeout(() => this.withTyping(() => {
           this.isAgencyDocsUpload = true;
           this.bot('agency-upload', { agency });
-          this.saveEarlyQueueEntry(this.currentAgency);
+          this.ensureQueueEntrySaved(this.currentAgency);
         }, 400), 600);
       }, 500);
     } else if (this.pendingAfterFlow === 'form-preview') {
@@ -771,16 +783,48 @@ export class ChatService {
       this.selectAllAgencyItems();
       this.withTyping(() => {
         this.showPreview();
-        this.saveEarlyQueueEntry(this.currentAgency);
+        this.ensureQueueEntrySaved(this.currentAgency);
       }, 500);
     } else {
       // SPN path: every item AI grouped under this agency is the request — no re-selection
       this.selectAllAgencyItems();
       this.withTyping(() => {
         this.showProceedChoice();
-        this.saveEarlyQueueEntry(this.currentAgency);
+        this.ensureQueueEntrySaved(this.currentAgency);
       }, 500);
     }
+  }
+
+  /** Saves this round's queue record the first time it's called (saveEarlyQueueEntry()), or just
+   *  re-snapshots the live messages/stage onto the already-saved record on every later call —
+   *  needed now that showRubberEqcStatus() can save the record earlier than continueAgencyFlow()
+   *  used to, so continueAgencyFlow() reaching this same round later must patch it, not duplicate
+   *  it. */
+  private ensureQueueEntrySaved(agency: string): void {
+    if (this.earlyEntrySavedForRound) {
+      this.refreshQueueSnapshot();
+    } else {
+      this.saveEarlyQueueEntry(agency);
+    }
+  }
+
+  /** Re-snapshots this round's live messages/stage onto the already-saved queue record — keeps the
+   *  queue and chat in sync whenever something changes after the record was first created (e.g. the
+   *  การยาง (RAOT) e-QC card flipping from 'rubber-accept' to 'rubber-accept-ready'). No-op for a
+   *  resumed session (queueShipmentId set) — syncQueueProgress() already handles merging a resumed
+   *  session's new progress back on newChat(), and its merge (append) semantics are the correct ones
+   *  there, unlike this method's full-replace snapshot which assumes flowStartIdx marks the round's
+   *  true start (only true for a fresh, non-resumed round). */
+  private refreshQueueSnapshot(): void {
+    if (this.queueShipmentId()) return;
+    if (!this.lastShipmentId) return;
+    const ship = this.queue.get(this.lastShipmentId);
+    if (!ship) return;
+    const messages = this.messages().slice(this.flowStartIdx);
+    this.queue.update(this.lastShipmentId, {
+      messages,
+      stage: Math.max(ship.stage, this.deriveStageFromMessages(messages)),
+    });
   }
 
   /** Posts a 2-way choice — gated between เลือกโปรไฟล์ and the agency's next step whenever the
@@ -885,13 +929,20 @@ export class ChatService {
     const account = MOCK_LINKED_BANK_ACCOUNTS.find(a => a.id === req?.paymentAccountId);
     const amount = req?.paymentAmount ?? RUBBER_COMPOUND_CERT_FEE;
     const paidAccountLabel = account ? `${account.bankName} ${account.accountNoMasked}` : '';
+    const labCode = req?.labCode;
 
     this.bot('rubber-eqc-status', {
       agency,
       status: 'rubber-accept',
       amount,
       paidAccountLabel,
+      labCode,
     } satisfies RubberEqcStatusData);
+
+    // Save/update the queue record NOW, not only once the whole e-QC wait resolves — the user has
+    // to wait 3-7 real business days here, so they need to be able to leave and pick this session
+    // back up from คิวงาน while it's still pending, not just once it's done.
+    this.ensureQueueEntrySaved(agency);
 
     setTimeout(() => {
       this.updateLastMessageData('rubber-eqc-status', {
@@ -899,23 +950,29 @@ export class ChatService {
         status: 'rubber-accept-ready',
         amount,
         paidAccountLabel,
+        labCode,
       } satisfies RubberEqcStatusData);
+      this.refreshQueueSnapshot();
     }, 3000);
   }
 
   /** Called from RubberEqcStatusComponent's "ดำเนินการต่อ" button — only reachable once the mock
    *  inspection result flips the card to 'rubber-accept-ready'. Seals that card read-only and
    *  posts a NEW rubber-eqc-status message carrying the full 'license-accept' detail (Certificate
-   *  No. and issuer info), then continues the agency flow. */
+   *  No. and issuer info), then continues the agency flow. Reads amount/paidAccountLabel/labCode
+   *  back off the card just sealed rather than this.rubberEqcRequestData — that field is never
+   *  restored by a queue resume (loadQueueSession()), but the values already posted on the card ARE
+   *  always present, resumed or not, so this stays correct either way. */
   onRubberEqcStatusProceed(): void {
     const agency = this.pendingRubberCertAgency;
+    const prior = [...this.messages()].reverse().find(m => m.type === 'rubber-eqc-status')?.data as RubberEqcStatusData | undefined;
+    const amount = prior?.amount ?? RUBBER_COMPOUND_CERT_FEE;
+    const paidAccountLabel = prior?.paidAccountLabel ?? '';
+    const labCode = prior?.labCode;
+
     this.markLastReadOnly('rubber-eqc-status');
     this.user('ดำเนินการต่อ');
     this.withTyping(() => {
-      const req = this.rubberEqcRequestData;
-      const account = MOCK_LINKED_BANK_ACCOUNTS.find(a => a.id === req?.paymentAccountId);
-      const amount = req?.paymentAmount ?? RUBBER_COMPOUND_CERT_FEE;
-      const paidAccountLabel = account ? `${account.bankName} ${account.accountNoMasked}` : '';
       const certificateNo = `RAOT-EQC-2568-${Math.floor(100000 + Math.random() * 900000)}`;
       const issueDate = new Date().toISOString().slice(0, 10);
       const expireDate = new Date(Date.now() + 45 * 24 * 3600_000).toISOString().slice(0, 10);
@@ -933,7 +990,7 @@ export class ChatService {
         issuerNameEn: 'Rubber Authority of Thailand',
         issuerAddressTh: '67/25 ถนนบางขุนนนท์ บางขุนนนท์ เขตบางกอกน้อย กรุงเทพมหานคร',
         issuerAddressEn: '67/25 Bangkhunnon, Bangkoknoi, Bangkok 10700',
-        labCode: req?.labCode,
+        labCode,
         remark: '',
         certUrl: SAMPLE_DOC_URL,
       } satisfies RubberEqcStatusData);
@@ -1483,6 +1540,7 @@ export class ChatService {
 
     this.queue.add([shipment]);
     this.lastShipmentId = shipment.id;
+    this.earlyEntrySavedForRound = true;
   }
 
   private finalizeSubmit(refNo: string, feeNote?: string): void {
@@ -1696,6 +1754,7 @@ export class ChatService {
     this.allPermitAgencies.set([]);
     this.submittedPermits.set([]);
     this.rubberCertPaid = false;
+    this.earlyEntrySavedForRound = false;
     this.pendingRubberCertAgency = '';
     this.pendingRubberFlowItems = [];
     this.rubberCertPaymentInfo = undefined;
@@ -1869,6 +1928,10 @@ export class ChatService {
     // in place rather than creating a new one — without restoring it here, continuing a resumed
     // session through to submit spawns a duplicate queue entry and leaves the original stranded.
     this.lastShipmentId = ship.id;
+    // A record already exists for this round — without this, continueAgencyFlow() reaching
+    // ensureQueueEntrySaved() later in a resumed session would call saveEarlyQueueEntry() again
+    // and spawn a duplicate shipment instead of patching this one.
+    this.earlyEntrySavedForRound = true;
     if (canResume) this.restoreStateFromMessages(msgs);
     // Restore step from statusKey so send() context is correct
     const stepMap: Record<string, import('@app/core/models/types').ChatStep> = {
