@@ -205,36 +205,6 @@
         </div>
       </div>
 
-      <!-- PAYMENT SECTION -->
-      <div class="cde-sec">
-        <div class="cde-sec__head" style="border-left-color: rgb(249, 115, 22);">
-          <span class="cde-sec__title">การชำระเงิน</span>
-        </div>
-        <div class="cde-form-grid">
-          <label class="cde-field">
-            <span class="cde-field__label">Payment Method</span>
-            <input class="cde-field__input" value="1 - e-Payment" readonly />
-          </label>
-          <label class="cde-field cde-field--full">
-            <span class="cde-field__label">บัญชีที่ตัดชำระ <em>*</em></span>
-            <select class="cde-field__input" [(ngModel)]="local().paymentAccountId">
-              <option value="">--Please Select--</option>
-              @for (acc of accounts; track acc.id) {
-                <option [value]="acc.id">{{ acc.bankName }} {{ acc.accountNoMasked }}{{ acc.isDefault ? ' (บัญชีหลัก)' : '' }}</option>
-              }
-            </select>
-          </label>
-          <label class="cde-field">
-            <span class="cde-field__label">Payment Amount</span>
-            <input class="cde-field__input" [value]="(computedPaymentAmount() | number:'1.2-2') + ' บาท'" readonly />
-          </label>
-          <label class="cde-field">
-            <span class="cde-field__label">Credit Amount</span>
-            <input class="cde-field__input" type="number" step="0.01" [(ngModel)]="local().creditAmount" />
-          </label>
-        </div>
-      </div>
-
       <!-- ITEMS SECTION -->
       <div class="cde-sec">
         <div class="cde-sec__head" style="border-left-color: rgb(59, 130, 246);">
@@ -367,6 +337,36 @@
               </div>
             </div>
           }
+        </div>
+      </div>
+
+      <!-- PAYMENT SECTION -->
+      <div class="cde-sec">
+        <div class="cde-sec__head" style="border-left-color: rgb(249, 115, 22);">
+          <span class="cde-sec__title">การชำระเงิน</span>
+        </div>
+        <div class="cde-form-grid">
+          <label class="cde-field cde-field--full">
+            <span class="cde-field__label">Payment Method</span>
+            <input class="cde-field__input" value="1 - e-Payment" readonly />
+          </label>
+          <label class="cde-field cde-field--full">
+            <span class="cde-field__label">บัญชีที่ตัดชำระ <em>*</em></span>
+            <select class="cde-field__input" [(ngModel)]="local().paymentAccountId">
+              <option value="">--Please Select--</option>
+              @for (acc of accounts; track acc.id) {
+                <option [value]="acc.id">{{ acc.bankName }} {{ acc.accountNoMasked }}{{ acc.isDefault ? ' (บัญชีหลัก)' : '' }}</option>
+              }
+            </select>
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">Payment Amount</span>
+            <input class="cde-field__input" [value]="(computedPaymentAmount() | number:'1.2-2') + ' บาท'" readonly />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">Credit Amount</span>
+            <input class="cde-field__input" type="number" step="0.01" [(ngModel)]="local().creditAmount" />
+          </label>
         </div>
       </div>
     </div>
