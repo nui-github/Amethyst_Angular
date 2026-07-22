@@ -394,7 +394,7 @@
             <span class="cde-field__label">Payment Method</span>
             <input class="cde-field__input" value="1 - e-Payment" readonly />
           </label>
-          <label class="cde-field cde-field--half">
+          <label class="cde-field">
             <span class="cde-field__label">บัญชีที่ตัดชำระ <em>*</em></span>
             <select class="cde-field__input" [(ngModel)]="local().paymentAccountId">
               <option value="">--Please Select--</option>
@@ -423,7 +423,7 @@
             <span class="cde-field__label">Announcement Number</span>
             <input class="cde-field__input" [(ngModel)]="local().announcementNumber" />
           </label>
-          <label class="cde-field cde-field--full">
+          <label class="cde-field">
             <span class="cde-field__label">Announcement Date</span>
             <input class="cde-field__input" type="date" [(ngModel)]="local().announcementDate" />
           </label>
