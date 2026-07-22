@@ -551,24 +551,71 @@ export interface RubberEsfrGateData {
   completed: boolean;  // true once RubberEsfrRequestEditorComponent has been saved at least once
 }
 
-// ใบขอผ่านด่านศุลกากร + ชำระค่าธรรมเนียมส่งยางออกนอกราชอาณาจักร (e-SFR) — first-pass placeholder
-// field set (no RAOT data dictionary for this one yet, unlike e-QC's V1.10). Only asks for what's
-// NOT already collected by the e-QC request moments earlier (company/broker/contact info) — this
-// is meant to read as "a few more things on top of e-QC", not a full re-entry of the same company
-// details.
+// ใบขออนุญาตผ่านด่านศุลกากรและใบชำระเงินค่าธรรมเนียมก่อนส่งออกยางไปนอกราชอาณาจักร (e-SFR /
+// Rubber License Request Message V1.0, กวก. data dictionary) — field set + required-ness follow
+// the "กวก." column there. Payment section (Payment Method/บัญชีที่ตัดชำระ/Payment Amount) is
+// deliberately NOT modeled off this dictionary's own (all "ไม่ใช้") payment fields — it stays the
+// linked-bank-account picker already built for e-QC, left untouched by design.
 export interface RubberEsfrRequestData {
-  referenceNumber: string;    // auto-issued, same convention as RubberEqcRequestData.referenceNumber
-  eqcCertificateNo: string;   // auto-filled from the just-completed e-QC's Certificate No. — the
-                               // choice-card gating this step already states an e-QC number is required
-  customsCheckpoint: string;  // ด่านศุลกากรที่จะผ่านพิธีการ *
-  exportPermitType: string;   // ประเภทใบอนุญาตส่งออก *
-  vesselOrTransport: string;  // ชื่อเรือ/พาหนะขนส่ง (optional)
-  expectedExportDate: string; // วันที่คาดว่าจะส่งออก *
-  contactName: string;        // ผู้ติดต่อประสานงาน *
-  contactPhone: string;       // *
-  remark: string;
-  paymentAccountId: string;   // บัญชีที่ตัดชำระ * — same linked-account picker as e-QC
-  paymentAmount: number;      // Cess fee, system-computed from the e-QC request's items (rateForExportWeight)
+  referenceNumber: string;        // auto-issued, same convention as RubberEqcRequestData.referenceNumber
+  senderRegistrationId: string;   // Sender Registration ID * — auto-issued, same as e-QC's
+  licenseType: string;            // License Type * — กวก. ยอมรับเฉพาะ "1 - ส่งออก" จึงล็อกค่าไว้
+  tradeLicenseNo: string;         // Trade License No * — เลขทะเบียนผู้ค้ายางพารา
+  exportLicenseNo: string;        // Export License No * — เลขทะเบียนผู้ส่งออกยางพารา
+  inventoryName: string;          // Inventory Name * — สถานที่เก็บสินค้าก่อนส่งออก ชื่อสถานที่
+  inventoryStreet: string;        // Inventory Street and Number *
+  inventoryDistrict: string;      // Inventory District *
+  inventorySubProvince: string;   // Inventory Sub province *
+  inventoryProvince: string;      // Inventory Province *
+  inventoryPostcode: string;      // Inventory Postcode (optional)
+  inventoryPhone: string;         // Inventory Phone Number *
+  inventoryContactPerson: string; // Inventory Contact Person *
+  companyTaxNumber: string;       // Company Tax Number *
+  companyBranch: string;          // Company Branch *
+  brokerTaxNumber: string;        // Broker Tax Number (conditional)
+  managerIdCard: string;          // Manager ID Card (conditional on Broker Tax Number)
+  modeOfTransport: string;        // Mode of Transport * — กวก. ยอมรับช่องทาง 1-4 เท่านั้น
+  loadPort: string;               // Load Port * — รหัสสถานที่ส่งออก
+  destinationCountryCode: string; // Destination Country Code *
+  invoiceNumber: string;          // Invoice Number *
+  invoiceDate: string;            // Invoice Date *
+  tradeTerms: string;             // Trade Terms * — เงื่อนไขการซื้อขายตาม INCOTERMS
+  freightFee: number;             // Freight fee * — ค่าระวาง
+  insuranceAmount: number;        // Insurance Amount Foreign * — ค่าประกันภัย
+  netWeight: number;              // Net Weight * — หน่วยเป็น KGM เท่านั้น
+  fobValueForeign: number;        // FOB Value Foreign * — ราคาต่อกิโลกรัม เงินต่างประเทศ (US)
+  currencyCode: string;           // Currency Code * — USD หรือ THB
+  contractPricePerKg: number;     // Contract price/kg *
+  paymentAccountId: string;       // บัญชีที่ตัดชำระ * — same linked-account picker as e-QC (payment
+                                   // section left untouched, see interface comment above)
+  paymentAmount: number;          // Cess fee, system-computed from items' Weight (rateForExportWeight)
+  items: RubberEsfrRequestItem[];
+}
+
+export interface RubberEsfrRequestItem {
+  invoiceItemNo: string;          // Invoice Item Number *
+  tariffCode: string;             // Tariff Code * — รหัสพิกัดศุลกากร
+  statisticalCode: string;        // Statistical Code * — รหัสสถิติสินค้าของกรมศุลกากร
+  descriptionTh: string;          // Thai Description of Goods *
+  descriptionEn: string;          // English Description of Goods *
+  rubberCode: string;             // Rubber Code * — Class Rubber
+  weight?: number;                // Weight * — น้ำหนักที่อนุญาต
+  weightUnitCode: string;         // Weight Unit Code * — KGM/TNE/GRM
+  drc?: number;                   // DRC * — ร้อยละเนื้อยางแห้ง
+  contractDate: string;           // Contract Date *
+  priceValueFreight?: number;     // Price Value Freight * — ราคาต่อกก. เงินต่างประเทศ
+  priceValueBaht?: number;        // Price Value Baht *
+  netPriceValueFreight?: number;  // Net Price Value Freight * — FOB เงิน US
+  netPriceValueBaht?: number;     // Net Price Value Baht * — FOB เงินบาท
+  certificates: RubberEsfrCertificate[]; // Quality Certificate — required when the tariff code is
+                                   // compound/mixed rubber, which is every item on this flow
+}
+
+export interface RubberEsfrCertificate {
+  certificateNumber: string;         // Certificate Number — เลขที่ใบรับรองคุณภาพยาง (e-QC)
+  certificateItemNo: string;         // Certificate Item Number — ลำดับรายการในใบรับรองคุณภาพยาง
+  certificateIssueAuthority: string; // Certificate Issue Authority — เลขประจำตัวผู้เสียภาษีของผู้ออกใบรับรอง
+  certificateIssueDate: string;      // Certificate Issue Date
 }
 
 export interface AgencyReturnDoc {
