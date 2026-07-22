@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, Loader2, BadgeCheck, Clock, CheckCircle2, Download, ArrowRight } from 'lucide-angular';
+import { LucideAngularModule, Loader2, BadgeCheck, Clock, CheckCircle2, Download, ArrowRight, Send } from 'lucide-angular';
 import { RubberEqcStatusData } from '@app/core/models/types';
 
 type Tab = 'license' | 'lab' | 'remark';
@@ -14,7 +14,7 @@ type Tab = 'license' | 'lab' | 'remark';
     <div class="res-wrap">
       <div class="res-hd">
         <span class="res-hd__icon" [class.res-hd__icon--done]="isDone">
-          <lucide-icon [img]="isDone ? BadgeCheck : Loader2" [size]="17" [class.res-spin]="!isDone" />
+          <lucide-icon [img]="isDone ? BadgeCheck : Send" [size]="17" />
         </span>
         <div class="res-hd__text">
           <p class="res-title">
@@ -250,6 +250,7 @@ export class RubberEqcStatusComponent {
   readonly CheckCircle2 = CheckCircle2;
   readonly Download = Download;
   readonly ArrowRight = ArrowRight;
+  readonly Send = Send;
 
   download(): void {
     if (this.data.certUrl) window.open(this.data.certUrl, '_blank', 'noopener');
