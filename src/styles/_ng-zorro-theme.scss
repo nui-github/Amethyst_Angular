@@ -137,5 +137,31 @@
   }
 }
 
+// Date picker calendar dropdown → BizX blue accents (base .ant-picker
+// border/focus already covered above; this covers the CDK-overlay
+// dropdown panel, which renders outside any component's DOM tree)
+.ant-picker-dropdown {
+  .ant-picker-panel-container {
+    border-radius: 8px !important;
+    box-shadow: 0 4px 16px rgba(4, 10, 80, 0.12) !important;
+  }
+
+  .ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner,
+  .ant-picker-cell-in-view.ant-picker-cell-range-start .ant-picker-cell-inner,
+  .ant-picker-cell-in-view.ant-picker-cell-range-end .ant-picker-cell-inner {
+    background: #0463ef !important;
+  }
+
+  .ant-picker-cell-in-view.ant-picker-cell-today .ant-picker-cell-inner::before {
+    border-color: #0463ef !important;
+  }
+
+  .ant-picker-header-view button:hover,
+  .ant-picker-today-btn,
+  .ant-picker-today-btn:hover {
+    color: #0463ef !important;
+  }
+}
+
 // Tags / badges → 4px
 .ant-tag { border-radius: 4px !important; }

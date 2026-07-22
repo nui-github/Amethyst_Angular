@@ -40,6 +40,14 @@
             </select>
           </label>
           <label class="cde-field cde-field--half">
+            <span class="cde-field__label">Trade License No — เลขทะเบียนผู้ค้ายางพารา <em>*</em></span>
+            <input class="cde-field__input" [(ngModel)]="local().tradeLicenseNo" />
+          </label>
+          <label class="cde-field cde-field--half">
+            <span class="cde-field__label">Export License No — เลขทะเบียนผู้ส่งออกยางพารา <em>*</em></span>
+            <input class="cde-field__input" [(ngModel)]="local().exportLicenseNo" />
+          </label>
+          <label class="cde-field cde-field--half">
             <span class="cde-field__label">Load Port — รหัสสถานที่ส่งออก <em>*</em></span>
             <input class="cde-field__input" [(ngModel)]="local().loadPort" />
           </label>
@@ -205,7 +213,7 @@
           </label>
           <label class="cde-field">
             <span class="cde-field__label">Invoice Date <em>*</em></span>
-            <input class="cde-field__input" type="date" [(ngModel)]="local().invoiceDate" />
+            <app-date-picker [(ngModel)]="local().invoiceDate" />
           </label>
           <label class="cde-field">
             <span class="cde-field__label">Trade Terms (INCOTERMS) <em>*</em></span>
@@ -310,7 +318,7 @@
                 </label>
                 <label class="cde-field">
                   <span class="cde-field__label">Contract Date <em>*</em></span>
-                  <input class="cde-field__input" type="date" [(ngModel)]="item.contractDate" />
+                  <app-date-picker [(ngModel)]="item.contractDate" />
                 </label>
                 <label class="cde-field">
                   <span class="cde-field__label">Reduction Rate (%)</span>
@@ -365,7 +373,7 @@
                         <td><input class="cde-field__input" [(ngModel)]="cert.certificateNumber" /></td>
                         <td><input class="cde-field__input" [(ngModel)]="cert.certificateItemNo" /></td>
                         <td><input class="cde-field__input" [(ngModel)]="cert.certificateIssueAuthority" /></td>
-                        <td><input class="cde-field__input" type="date" [(ngModel)]="cert.certificateIssueDate" /></td>
+                        <td><app-date-picker [(ngModel)]="cert.certificateIssueDate" /></td>
                         <td>
                           <button class="cde-attr__del" (click)="removeCertificate(item, ci)" type="button" aria-label="Delete">
                             ✕
@@ -425,7 +433,7 @@
           </label>
           <label class="cde-field">
             <span class="cde-field__label">Announcement Date</span>
-            <input class="cde-field__input" type="date" [(ngModel)]="local().announcementDate" />
+            <app-date-picker [(ngModel)]="local().announcementDate" />
           </label>
         </div>
       </div>

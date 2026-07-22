@@ -1,0 +1,46 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+:host ::ng-deep .app-date-picker.ant-picker {
+  width: 100%;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+
+  .ant-picker-input > input {
+    font-size: 12px;
+    font-family: inherit;
+    color: var(--bizx-navy, #0e1b4d);
+
+    &::placeholder {
+      color: #9ca3af;
+    }
+  }
+
+  .ant-picker-suffix {
+    color: #9ca3af;
+  }
+
+  &:hover {
+    border-color: var(--bizx-blue, #0463ef);
+  }
+
+  &.ant-picker-focused {
+    border-color: var(--bizx-blue, #0463ef);
+    box-shadow: 0 0 0 3px rgba(4, 99, 239, 0.1);
+  }
+
+  &.ant-picker-disabled {
+    background: #f3f4f6;
+    cursor: not-allowed;
+
+    .ant-picker-input > input {
+      color: #9ca3af;
+    }
+  }
+}

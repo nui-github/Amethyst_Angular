@@ -5,12 +5,13 @@ import { LucideAngularModule } from 'lucide-angular';
 import { ChatService } from '@app/core/services/chat.service';
 import { RubberEqcRequestData, RubberEqcRequestItem } from '@app/core/models/types';
 import { RUBBER_COMPOUND_CERT_FEE, MOCK_LINKED_BANK_ACCOUNTS, rateForExportWeight } from '@mock/rubber-cert.mock';
+import { DatePickerComponent } from '@app/shared/components/date-picker/date-picker.component';
 import { X, Save } from 'lucide-angular';
 
 @Component({
   selector: 'app-rubber-eqc-request-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule, DatePickerComponent],
   templateUrl: './rubber-eqc-request-editor.component.html',
   styleUrls: ['./rubber-eqc-request-editor.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

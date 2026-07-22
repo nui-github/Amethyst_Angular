@@ -1,0 +1,8 @@
+<nz-date-picker
+  class="app-date-picker"
+  [ngModel]="value()"
+  (ngModelChange)="onDateChange($event)"
+  [nzPlaceHolder]="placeholder"
+  [nzDisabled]="disabled"
+  nzFormat="dd/MM/yyyy"
+></nz-date-picker>

@@ -7,6 +7,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { ChatService } from '@app/core/services/chat.service';
 import { CustomsDeclarationData } from '@app/core/models/types';
+import { DatePickerComponent } from '@app/shared/components/date-picker/date-picker.component';
 import { X, Save } from 'lucide-angular';
 
 @Component({
@@ -19,6 +20,7 @@ import { X, Save } from 'lucide-angular';
     NzButtonModule,
     NzInputModule,
     NzSelectModule,
+    DatePickerComponent,
   ],
   templateUrl: './ddc-pink-form-editor.component.html',
   styleUrls: ['./ddc-pink-form-editor.component.scss'],

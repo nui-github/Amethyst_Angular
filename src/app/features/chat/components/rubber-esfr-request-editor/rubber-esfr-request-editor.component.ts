@@ -5,12 +5,13 @@ import { LucideAngularModule } from 'lucide-angular';
 import { ChatService } from '@app/core/services/chat.service';
 import { RubberEsfrRequestData, RubberEsfrRequestItem } from '@app/core/models/types';
 import { MOCK_LINKED_BANK_ACCOUNTS, rateForExportWeight } from '@mock/rubber-cert.mock';
+import { DatePickerComponent } from '@app/shared/components/date-picker/date-picker.component';
 import { X, Save } from 'lucide-angular';
 
 @Component({
   selector: 'app-rubber-esfr-request-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule, DatePickerComponent],
   templateUrl: './rubber-esfr-request-editor.component.html',
   styleUrls: ['./rubber-esfr-request-editor.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

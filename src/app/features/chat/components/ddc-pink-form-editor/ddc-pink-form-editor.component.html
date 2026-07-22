@@ -39,27 +39,15 @@
           </label>
           <label class="cde-field">
             <span class="cde-field__label">วันที่ออกใบรับรอง</span>
-            <input
-              class="cde-field__input"
-              type="date"
-              [(ngModel)]="local().ddcLicenseIssueDate"
-            />
+            <app-date-picker [(ngModel)]="local().ddcLicenseIssueDate" />
           </label>
           <label class="cde-field">
             <span class="cde-field__label">วันที่มีผลบังคับใช้</span>
-            <input
-              class="cde-field__input"
-              type="date"
-              [(ngModel)]="local().ddcEffectiveDate"
-            />
+            <app-date-picker [(ngModel)]="local().ddcEffectiveDate" />
           </label>
           <label class="cde-field">
             <span class="cde-field__label">วันหมดอายุ</span>
-            <input
-              class="cde-field__input"
-              type="date"
-              [(ngModel)]="local().ddcExpireDate"
-            />
+            <app-date-picker [(ngModel)]="local().ddcExpireDate" />
           </label>
         </div>
       </div>
@@ -166,11 +154,7 @@
         <div class="cde-form-grid">
           <label class="cde-field">
             <span class="cde-field__label">วันที่ส่งออก <em>*</em></span>
-            <input
-              class="cde-field__input"
-              type="date"
-              [(ngModel)]="local().departureDate"
-            />
+            <app-date-picker [(ngModel)]="local().departureDate" />
           </label>
           <label class="cde-field">
             <span class="cde-field__label">รหัสท่า</span>
@@ -182,11 +166,7 @@
           </label>
           <label class="cde-field">
             <span class="cde-field__label">วันที่ Invoice</span>
-            <input
-              class="cde-field__input"
-              type="date"
-              [(ngModel)]="local().invoiceDate"
-            />
+            <app-date-picker [(ngModel)]="local().invoiceDate" />
           </label>
           <label class="cde-field">
             <span class="cde-field__label">เลขที่ PO</span>
