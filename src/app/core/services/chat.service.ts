@@ -8,7 +8,7 @@ import {
   InvoiceSelectData, Direction, AgencyDocsReturnedData, AgencyApprovalPendingData,
   ShipmentItem, ShipmentDocument, AgencyKey, RubberCertPaymentData,
   RubberEqcRequestData, RubberEqcGateData, RubberEqcStatusData,
-  RubberEsfrGateData, RubberEsfrRequestData,
+  RubberEsfrGateData, RubberEsfrRequestData, RubberEsfrPreviewData, RubberEsfrStatusData,
 } from '@app/core/models/types';
 import { OcrService, MultiInvoiceDetection } from './ocr.service';
 import { QueueService } from './queue.service';
@@ -1101,26 +1101,86 @@ export class ChatService {
   }
 
   /** Called from RubberEsfrRequestEditorComponent once every required field is filled and the
-   *  user confirms save — mirrors saveRubberEqcRequest() above. */
+   *  user confirms save — mirrors saveRubberEqcRequest() above. The editor can be reopened from
+   *  either the gate card (first fill) or the preview card (edit-after-preview), so this patches
+   *  whichever one's msgId is currently tracked — the gate just flips its `completed` flag, the
+   *  preview gets its whole `request` swapped in place so the summary reflects the edit. */
   saveEsfrRequest(data: RubberEsfrRequestData): void {
     this.esfrRequestData = data;
     this.rubberEsfrEditorOpen.set(false);
     const msgId = this.rubberEsfrEditorMsgId();
     if (msgId) {
-      this.messages.update(ms => ms.map(m =>
-        m.id === msgId && m.type === 'rubber-esfr-gate'
-          ? { ...m, data: { ...(m.data as RubberEsfrGateData), completed: true } }
-          : m
-      ));
+      this.messages.update(ms => ms.map(m => {
+        if (m.id !== msgId) return m;
+        if (m.type === 'rubber-esfr-gate') {
+          return { ...m, data: { ...(m.data as RubberEsfrGateData), completed: true } };
+        }
+        if (m.type === 'rubber-esfr-preview') {
+          return { ...m, data: { ...(m.data as RubberEsfrPreviewData), request: data } };
+        }
+        return m;
+      }));
     }
   }
 
   /** Called from RubberEsfrGateComponent's "ดำเนินการต่อ" button, only reachable once the e-SFR
-   *  request form has been saved at least once. Posts a plain confirmation and continues the
-   *  normal agency flow — e-SFR has no separate accept/license wait like e-QC does. */
+   *  request form has been saved at least once. Moves on to the read-only preview card instead of
+   *  submitting directly — the user gets one more look at everything before it actually goes out. */
   onEsfrGateProceed(): void {
-    const agency = this.pendingRubberCertAgency;
     this.markLastReadOnly('rubber-esfr-gate');
+    this.user('ดำเนินการต่อ');
+    this.withTyping(() => this.showEsfrPreview(this.pendingRubberCertAgency), 500);
+  }
+
+  /** Posts the rubber-esfr-preview card — a read-only summary of the just-saved e-SFR request,
+   *  with "แก้ไขข้อมูล" (reopen the editor) and "ส่งคำขอใบอนุญาต" (actually submit) in its footer. */
+  private showEsfrPreview(agency: string): void {
+    if (!this.esfrRequestData) return;
+    this.bot('rubber-esfr-preview', {
+      agency,
+      request: this.esfrRequestData,
+    } satisfies RubberEsfrPreviewData);
+  }
+
+  /** Called from RubberEsfrPreviewComponent's "ส่งคำขอใบอนุญาต" button — seals the preview card
+   *  read-only and moves on to the submission-status card. */
+  onEsfrPreviewSubmit(msgId: string): void {
+    this.messages.update(list => list.map(m => m.id === msgId ? { ...m, isReadOnly: true } : m));
+    this.user('ส่งคำขอใบอนุญาต');
+    this.withTyping(() => this.showEsfrStatus(this.pendingRubberCertAgency), 500);
+  }
+
+  /** Posts the rubber-esfr-status card — starts as 'rubber-accept' (request accepted by RAOT),
+   *  then after a mock 3s wait (same convention as showRubberEqcStatus()) flips in place to
+   *  'license-accept', which enables the card's own "ดำเนินการต่อ" button. */
+  private showEsfrStatus(agency: string): void {
+    const referenceNumber = this.esfrRequestData?.referenceNumber ?? '';
+
+    this.bot('rubber-esfr-status', {
+      agency,
+      referenceNumber,
+      status: 'rubber-accept',
+    } satisfies RubberEsfrStatusData);
+
+    this.ensureQueueEntrySaved(agency);
+
+    setTimeout(() => {
+      this.updateLastMessageData('rubber-esfr-status', {
+        agency,
+        referenceNumber,
+        status: 'license-accept',
+      } satisfies RubberEsfrStatusData);
+      this.refreshQueueSnapshot();
+    }, 3000);
+  }
+
+  /** Called from RubberEsfrStatusComponent's "ดำเนินการต่อ" button — only reachable once the mock
+   *  wait flips the card to 'license-accept'. Posts the final confirmation and continues the
+   *  normal agency flow, same text onEsfrGateProceed() used to post directly before the preview
+   *  step was added. */
+  onEsfrStatusProceed(): void {
+    const agency = this.pendingRubberCertAgency;
+    this.markLastReadOnly('rubber-esfr-status');
     this.user('ดำเนินการต่อ');
     this.withTyping(() => {
       this.bot('text', undefined, 'ส่งคำขอผ่านด่านศุลกากรและชำระค่าธรรมเนียมส่งออก (e-SFR) เรียบร้อยแล้วครับ');
@@ -2114,6 +2174,15 @@ export class ChatService {
         const d = m.data as RubberEsfrGateData;
         this.pendingRubberCertAgency = d.agency;
         this.pendingRubberFlowItems = d.itemNames.map(name => ({ name } as ProductHsAnalysis));
+      }
+      if (m.type === 'rubber-esfr-preview') {
+        const d = m.data as RubberEsfrPreviewData;
+        this.pendingRubberCertAgency = d.agency;
+        this.esfrRequestData = d.request;
+      }
+      if (m.type === 'rubber-esfr-status') {
+        const d = m.data as RubberEsfrStatusData;
+        this.pendingRubberCertAgency = d.agency;
       }
     }
     this.formData.set(formData);

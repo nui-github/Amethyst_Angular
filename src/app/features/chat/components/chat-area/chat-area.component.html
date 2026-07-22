@@ -243,6 +243,26 @@
               }
             }
 
+            <!-- การยาง (RAOT) ยางผสม: e-SFR read-only summary before actual submission — posted
+                 when rubber-esfr-gate's "ดำเนินการต่อ" is clicked; "แก้ไขข้อมูล" reopens the editor,
+                 "ส่งคำขอใบอนุญาต" seals this card and moves on to rubber-esfr-status -->
+            @case ('rubber-esfr-preview') {
+              @if (!readOnly && !msg.isReadOnly) {
+                <app-rubber-esfr-preview [data]="$any(msg.data)" [msgId]="msg.id" />
+              } @else {
+                <span class="readonly-tag">✓ ส่งคำขอใบอนุญาต e-SFR แล้ว</span>
+              }
+            }
+
+            <!-- การยาง (RAOT) ยางผสม: e-SFR submission status — 'rubber-accept' mocks the processing
+                 wait, flips to 'license-accept' after 3s which enables "ดำเนินการต่อ" -->
+            @case ('rubber-esfr-status') {
+              <app-rubber-esfr-status
+                [data]="$any(msg.data)"
+                [interactive]="!readOnly && !msg.isReadOnly"
+                (proceed)="chat.onEsfrStatusProceed()" />
+            }
+
             <!-- การยาง (RAOT) ยางผสม: certificate fee, paid via linked bank account debit — LEGACY,
                  only shown by historical queue-mock/sessions-mock message replay now, see types.ts -->
             @case ('rubber-cert-payment') {

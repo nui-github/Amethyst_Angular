@@ -78,13 +78,25 @@ export type MessageType =
                         // showAgencyApproval()'s pending→approved flip) swaps in place to
                         // 'license-accept' with a mock Certificate No. + full license detail —
                         // see RubberEqcStatusComponent
-  | 'rubber-esfr-gate'; // การยาง (RAOT) export path only: posted right after e-QC LICENSE ACCEPT,
+  | 'rubber-esfr-gate' // การยาง (RAOT) export path only: posted right after e-QC LICENSE ACCEPT,
                         // once the user picks "ทำ e-SFR ต่อ" on the finish/continue choice-card
                         // (see showEsfrChoice()/onEsfrFlowChoice()) — same gate pattern as
                         // rubber-eqc-gate (only "กรอกข้อมูล" until RubberEsfrRequestEditorComponent
                         // is saved, then both "กรอกข้อมูล" + "ดำเนินการต่อ" show together). e-SFR
                         // field set is a first-pass placeholder (no RAOT data dictionary for it
                         // yet, unlike e-QC's) — see RubberEsfrRequestData
+  | 'rubber-esfr-preview' // posted when "ดำเนินการต่อ" is clicked on rubber-esfr-gate (see
+                        // showEsfrPreview()) — a read-only summary of the saved e-SFR request
+                        // before it's actually submitted to RAOT. Footer has "แก้ไขข้อมูล"
+                        // (reopens RubberEsfrRequestEditorComponent, saving updates this card's
+                        // data in place — see saveEsfrRequest()) and "ส่งคำขอใบอนุญาต" (seals this
+                        // card read-only and posts rubber-esfr-status — see onEsfrPreviewSubmit())
+  | 'rubber-esfr-status'; // posted once the preview's "ส่งคำขอใบอนุญาต" is clicked (see
+                        // showEsfrStatus()) — pure display card, never interactive itself besides
+                        // its own "ดำเนินการต่อ". Starts as status 'rubber-accept' (request
+                        // accepted by RAOT, mock processing in progress); after a 3s mock delay
+                        // (same convention as rubber-eqc-status) flips in place to 'license-accept',
+                        // which enables "ดำเนินการต่อ" — see onEsfrStatusProceed()
 
 // One alternative HS Code suggestion offered when the user edits an item's classification —
 // invoices from real users typically carry no HS Code at all, so AI classifies purely from the
@@ -648,6 +660,19 @@ export interface RubberEsfrCertificate {
   certificateItemNo: string;         // Certificate Item Number — ลำดับรายการในใบรับรองคุณภาพยาง
   certificateIssueAuthority: string; // Certificate Issue Authority — เลขประจำตัวผู้เสียภาษีของผู้ออกใบรับรอง
   certificateIssueDate: string;      // Certificate Issue Date
+}
+
+export interface RubberEsfrPreviewData {
+  agency: string;                  // 'การยาง'
+  request: RubberEsfrRequestData;  // full saved e-SFR request, shown as a read-only summary before submit
+}
+
+export interface RubberEsfrStatusData {
+  agency: string;          // 'การยาง'
+  referenceNumber: string; // from the saved e-SFR request, shown for context while waiting
+  // 'rubber-accept'  → request accepted by RAOT, mock processing in progress
+  // 'license-accept' → mock wait resolved; "ดำเนินการต่อ" enables
+  status: 'rubber-accept' | 'license-accept';
 }
 
 export interface AgencyReturnDoc {
