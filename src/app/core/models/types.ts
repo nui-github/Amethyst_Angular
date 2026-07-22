@@ -518,7 +518,22 @@ export interface RubberEqcStatusData {
   issuerNameEn?: string;
   issuerAddressTh?: string;
   issuerAddressEn?: string;
-  labCode?: string;                // from the saved request form, shown on the lab-detail tab
+  issuerAuthorizerNameTh?: string;     // เจ้าหน้าที่ที่มีอำนาจลงนามใบอนุญาต
+  issuerAuthorizerPositionTh?: string; // ตำแหน่งเจ้าหน้าที่ที่มีอำนาจลงนามใบอนุญาต
+  issuerAuthorizerNameEn?: string;     // Authority English Name
+  issuerAuthorizerPositionEn?: string; // Position of Authority English
+  labCode?: string;                // from the saved request form (unused in the lab-detail tab —
+                                    // that shows RAOT's own lab response fields below instead)
+  labNameEn?: string;               // ชื่อห้องทดสอบ (อังกฤษ)
+  labAddressTh?: string;
+  labAddressEn?: string;
+  labTestStartDate?: string;        // วันที่ทดสอบ
+  labTestEndDate?: string;          // วันที่สิ้นสุดทดสอบ
+  labSampleReceivedDate?: string;   // วันที่รับตัวอย่าง
+  labStaffName?: string;            // เจ้าหน้าที่ห้องปฏิบัติการ
+  labStaffPosition?: string;        // ตำแหน่งเจ้าหน้าที่ห้องปฏิบัติการ
+  labPhone?: string;
+  labFax?: string;
   remark?: string;
   certUrl?: string;                // downloadable หนังสือรับรองคุณภาพยาง (e-QC) file, set once status is 'license-accept'
 }

@@ -84,18 +84,31 @@ type Tab = 'license' | 'lab' | 'remark';
             <div class="info-card res-card">
               <div class="info-card__head">หน่วยงานผู้ออกใบอนุญาต</div>
               <div class="info-card__body">
-                <div class="info-card__row"><span>เลขประจำตัวหน่วยงาน</span><span>{{ data.issuerOrgId || '-' }}</span></div>
-                <div class="info-card__row"><span>ชื่อหน่วยงาน (ไทย)</span><span>{{ data.issuerNameTh }}</span></div>
-                <div class="info-card__row"><span>ชื่อหน่วยงาน (อังกฤษ)</span><span>{{ data.issuerNameEn }}</span></div>
+                <div class="info-card__row"><span>เลขประจำตัวหน่วยงานผู้ออกใบอนุญาต</span><span>{{ data.issuerOrgId || '-' }}</span></div>
+                <div class="info-card__row"><span>ชื่อหน่วยงานออกใบอนุญาต (ไทย)</span><span>{{ data.issuerNameTh }}</span></div>
+                <div class="info-card__row"><span>ชื่อหน่วยงานออกใบอนุญาต (อังกฤษ)</span><span>{{ data.issuerNameEn }}</span></div>
                 <div class="info-card__row res-row--wrap"><span>ที่อยู่</span><span>{{ data.issuerAddressTh }}</span></div>
                 <div class="info-card__row res-row--wrap"><span>ที่อยู่ (ภาษาอังกฤษ)</span><span>{{ data.issuerAddressEn }}</span></div>
+                <div class="info-card__row"><span>เจ้าหน้าที่ที่มีอำนาจลงนามใบอนุญาต</span><span>{{ data.issuerAuthorizerNameTh || '-' }}</span></div>
+                <div class="info-card__row"><span>ตำแหน่งเจ้าหน้าที่ที่มีอำนาจลงนามใบอนุญาต</span><span>{{ data.issuerAuthorizerPositionTh || '-' }}</span></div>
+                <div class="info-card__row"><span>Authority English Name</span><span>{{ data.issuerAuthorizerNameEn || '-' }}</span></div>
+                <div class="info-card__row"><span>Position of Authority English</span><span>{{ data.issuerAuthorizerPositionEn || '-' }}</span></div>
               </div>
             </div>
           } @else if (activeTab() === 'lab') {
             <div class="info-card res-card">
               <div class="info-card__head">ห้องปฏิบัติการทดสอบ</div>
               <div class="info-card__body">
-                <div class="info-card__row"><span>รหัสห้องปฏิบัติการ (Lab Code)</span><span>{{ data.labCode || '-' }}</span></div>
+                <div class="info-card__row"><span>ชื่อห้องทดสอบ (อังกฤษ)</span><span>{{ data.labNameEn || '-' }}</span></div>
+                <div class="info-card__row res-row--wrap"><span>ที่อยู่</span><span>{{ data.labAddressTh || '-' }}</span></div>
+                <div class="info-card__row res-row--wrap"><span>ที่อยู่ (ภาษาอังกฤษ)</span><span>{{ data.labAddressEn || '-' }}</span></div>
+                <div class="info-card__row"><span>วันที่ทดสอบ</span><span>{{ data.labTestStartDate || '-' }}</span></div>
+                <div class="info-card__row"><span>วันที่สิ้นสุดทดสอบ</span><span>{{ data.labTestEndDate || '-' }}</span></div>
+                <div class="info-card__row"><span>วันที่รับตัวอย่าง</span><span>{{ data.labSampleReceivedDate || '-' }}</span></div>
+                <div class="info-card__row"><span>เจ้าหน้าที่ห้องปฏิบัติการ</span><span>{{ data.labStaffName || '-' }}</span></div>
+                <div class="info-card__row"><span>ตำแหน่งเจ้าหน้าที่ห้องปฏิบัติการ</span><span>{{ data.labStaffPosition || 'N/A' }}</span></div>
+                <div class="info-card__row"><span>เบอร์โทรศัพท์</span><span>{{ data.labPhone || '-' }}</span></div>
+                <div class="info-card__row"><span>เบอร์แฟกซ์</span><span>{{ data.labFax || '-' }}</span></div>
               </div>
             </div>
           } @else {
