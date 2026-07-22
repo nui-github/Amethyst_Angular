@@ -8,6 +8,7 @@ import {
   InvoiceSelectData, Direction, AgencyDocsReturnedData, AgencyApprovalPendingData,
   ShipmentItem, ShipmentDocument, AgencyKey, RubberCertPaymentData,
   RubberEqcRequestData, RubberEqcGateData, RubberEqcStatusData,
+  RubberEsfrGateData, RubberEsfrRequestData,
 } from '@app/core/models/types';
 import { OcrService, MultiInvoiceDetection } from './ocr.service';
 import { QueueService } from './queue.service';
@@ -69,6 +70,12 @@ export class ChatService {
   readonly rubberEqcEditorOpen  = signal(false);
   readonly rubberEqcEditorMsgId = signal<string | null>(null);
 
+  // Full-screen e-SFR (ผ่านด่านศุลกากร + ค่าธรรมเนียมส่งออก) panel — same gate/drawer pattern as
+  // the e-QC one above, opened once the user picks "ทำ e-SFR ต่อ" after e-QC LICENSE ACCEPT (see
+  // showEsfrChoice()/onEsfrFlowChoice()).
+  readonly rubberEsfrEditorOpen  = signal(false);
+  readonly rubberEsfrEditorMsgId = signal<string | null>(null);
+
   // Which side of the pipeline the current session is on — set once from showDocTypeChoice()'s
   // answer, threaded into formData.direction and every message that needs direction-aware copy
   // (single-upload title, ocr-results/form-preview/declaration-editor header sections).
@@ -99,6 +106,18 @@ export class ChatService {
    *  "กรอกข้อมูล" instead of resetting to blank. */
   get rubberEqcRequest(): RubberEqcRequestData | undefined {
     return this.rubberEqcRequestData;
+  }
+
+  /** Same restore-on-reopen pattern as rubberEqcRequest, for the e-SFR drawer. */
+  get esfrRequest(): RubberEsfrRequestData | undefined {
+    return this.esfrRequestData;
+  }
+
+  /** The e-QC Certificate No. just obtained this round — the e-SFR request needs it (the
+   *  finish/continue choice-card that gates e-SFR already states an e-QC number is required), and
+   *  RubberEsfrRequestEditorComponent has no other way to read it. */
+  get eqcCertificateNo(): string {
+    return this.lastEqcCertificateNo;
   }
   private submittedAgencies: string[] = [];
   // Shipment.id most recently pushed to the queue by finalizeSubmit() — checkStatus()'s approval
@@ -413,6 +432,11 @@ export class ChatService {
   // pendingRubberItems below) so re-clicking "กรอกข้อมูล" after the first save shows what was
   // already entered instead of resetting blank.
   private rubberEqcRequestData?: RubberEqcRequestData;
+  // e-QC Certificate No. obtained this round — read by RubberEsfrRequestEditorComponent via the
+  // eqcCertificateNo getter above. Set in onRubberEqcStatusProceed(), cleared in newChat().
+  private lastEqcCertificateNo = '';
+  // Filled e-SFR request form, same persist-across-reopens purpose as rubberEqcRequestData above.
+  private esfrRequestData?: RubberEsfrRequestData;
 
   private showFullUpload(reEdit = false): void {
     this.isReEditOCR = reEdit;
@@ -1011,6 +1035,7 @@ export class ChatService {
       } satisfies RubberEqcStatusData);
 
       this.rubberCertPaid = true;
+      this.lastEqcCertificateNo = certificateNo;
       this.rubberCertPaymentInfo = {
         itemNames: this.pendingRubberFlowItems.map(i => i.name),
         amount,
@@ -1019,6 +1044,86 @@ export class ChatService {
         certUrl: SAMPLE_DOC_URL,
         paidAt: new Date().toLocaleDateString('th-TH'),
       };
+      this.showEsfrChoice(agency);
+    }, 500);
+  }
+
+  /** Posted right after e-QC LICENSE ACCEPT — offers "เสร็จสิ้น" (skip e-SFR for now, continue the
+   *  normal agency flow) or "ทำ e-SFR ต่อ" (fill in the e-SFR request now, gated behind having just
+   *  obtained the e-QC number). */
+  private showEsfrChoice(agency: string): void {
+    this.withTyping(() => {
+      this.bot('choice-card', {
+        question: 'ต้องการดำเนินการขั้นตอนใดต่อ?',
+        subtitle: 'ได้รับหนังสือรับรองคุณภาพยาง (e-QC) แล้ว ท่านสามารถขอผ่านด่านศุลกากรและชำระค่าธรรมเนียมส่งออก (e-SFR) ต่อได้เลย หรือจะทำภายหลังก็ได้',
+        options: [
+          { label: 'เสร็จสิ้น', value: 'esfr-finish', description: 'ดำเนินการขั้นตอน e-SFR ภายหลัง' },
+          { label: 'ทำ e-SFR ต่อ', value: 'esfr-continue', description: 'ขอผ่านด่านศุลกากร และชำระค่าธรรมเนียมส่งยางออกนอกราชอาณาจักรตอนนี้เลย' },
+        ],
+      } satisfies ChoiceCardData);
+    }, 500);
+  }
+
+  /** Called from ChatAreaComponent when the user picks an option on the e-SFR finish/continue
+   *  choice-card. */
+  onEsfrFlowChoice(value: string): void {
+    const agency = this.pendingRubberCertAgency;
+    if (value === 'esfr-continue') {
+      this.user('ทำ e-SFR ต่อ');
+      this.showEsfrGate(agency, this.pendingRubberFlowItems);
+      return;
+    }
+    this.user('เสร็จสิ้น');
+    this.continueAgencyFlow(agency);
+  }
+
+  /** Posts the rubber-esfr-gate card — same "กรอกข้อมูล"-only-until-saved pattern as
+   *  showRubberEqcGate() above. */
+  private showEsfrGate(agency: string, items: ProductHsAnalysis[]): void {
+    this.withTyping(() => {
+      this.bot('rubber-esfr-gate', {
+        agency,
+        itemNames: items.map(i => i.name),
+        completed: false,
+      } satisfies RubberEsfrGateData);
+    }, 500);
+  }
+
+  /** Called from RubberEsfrGateComponent's "กรอกข้อมูล" button. */
+  openEsfrEditor(msgId: string): void {
+    this.rubberEsfrEditorMsgId.set(msgId);
+    this.rubberEsfrEditorOpen.set(true);
+  }
+
+  /** Called from RubberEsfrRequestEditorComponent's close button — no partial save. */
+  closeEsfrEditor(): void {
+    this.rubberEsfrEditorOpen.set(false);
+  }
+
+  /** Called from RubberEsfrRequestEditorComponent once every required field is filled and the
+   *  user confirms save — mirrors saveRubberEqcRequest() above. */
+  saveEsfrRequest(data: RubberEsfrRequestData): void {
+    this.esfrRequestData = data;
+    this.rubberEsfrEditorOpen.set(false);
+    const msgId = this.rubberEsfrEditorMsgId();
+    if (msgId) {
+      this.messages.update(ms => ms.map(m =>
+        m.id === msgId && m.type === 'rubber-esfr-gate'
+          ? { ...m, data: { ...(m.data as RubberEsfrGateData), completed: true } }
+          : m
+      ));
+    }
+  }
+
+  /** Called from RubberEsfrGateComponent's "ดำเนินการต่อ" button, only reachable once the e-SFR
+   *  request form has been saved at least once. Posts a plain confirmation and continues the
+   *  normal agency flow — e-SFR has no separate accept/license wait like e-QC does. */
+  onEsfrGateProceed(): void {
+    const agency = this.pendingRubberCertAgency;
+    this.markLastReadOnly('rubber-esfr-gate');
+    this.user('ดำเนินการต่อ');
+    this.withTyping(() => {
+      this.bot('text', undefined, 'ส่งคำขอผ่านด่านศุลกากรและชำระค่าธรรมเนียมส่งออก (e-SFR) เรียบร้อยแล้วครับ');
       this.continueAgencyFlow(agency);
     }, 500);
   }
@@ -1776,6 +1881,10 @@ export class ChatService {
     this.rubberEqcEditorOpen.set(false);
     this.rubberEqcEditorMsgId.set(null);
     this.rubberEqcRequestData = undefined;
+    this.lastEqcCertificateNo = '';
+    this.rubberEsfrEditorOpen.set(false);
+    this.rubberEsfrEditorMsgId.set(null);
+    this.esfrRequestData = undefined;
     this.ocr.reset();
   }
 
@@ -1999,6 +2108,12 @@ export class ChatService {
         const d = m.data as RubberEqcStatusData;
         this.pendingRubberCertAgency = d.agency;
         this.rubberCertPaid = d.status === 'license-accept';
+        if (d.certificateNo) this.lastEqcCertificateNo = d.certificateNo;
+      }
+      if (m.type === 'rubber-esfr-gate') {
+        const d = m.data as RubberEsfrGateData;
+        this.pendingRubberCertAgency = d.agency;
+        this.pendingRubberFlowItems = d.itemNames.map(name => ({ name } as ProductHsAnalysis));
       }
     }
     this.formData.set(formData);

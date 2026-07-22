@@ -233,6 +233,16 @@
                 (proceed)="chat.onRubberEqcStatusProceed()" />
             }
 
+            <!-- การยาง (RAOT) ยางผสม: e-SFR request form gate — posted after e-QC LICENSE ACCEPT if
+                 the user picks "ทำ e-SFR ต่อ"; same "กรอกข้อมูล" → "ดำเนินการต่อ" gate as rubber-eqc-gate -->
+            @case ('rubber-esfr-gate') {
+              @if (!readOnly && !msg.isReadOnly) {
+                <app-rubber-esfr-gate [data]="$any(msg.data)" [msgId]="msg.id" />
+              } @else {
+                <span class="readonly-tag">✓ กรอกแบบคำขอ e-SFR แล้ว</span>
+              }
+            }
+
             <!-- การยาง (RAOT) ยางผสม: certificate fee, paid via linked bank account debit — LEGACY,
                  only shown by historical queue-mock/sessions-mock message replay now, see types.ts -->
             @case ('rubber-cert-payment') {

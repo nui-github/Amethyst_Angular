@@ -38,6 +38,7 @@ import { AgencyApprovalPendingComponent } from '../agency-approval-pending/agenc
 import { RubberCertPaymentComponent } from '../rubber-cert-payment/rubber-cert-payment.component';
 import { RubberEqcGateComponent } from '../rubber-eqc-gate/rubber-eqc-gate.component';
 import { RubberEqcStatusComponent } from '../rubber-eqc-status/rubber-eqc-status.component';
+import { RubberEsfrGateComponent } from '../rubber-esfr-gate/rubber-esfr-gate.component';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 
 /**
@@ -64,7 +65,7 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
     SpnConnectComponent, HsAnalysisComponent, FormPreviewComponent, MissingFieldsComponent, AgencyUploadComponent, ProfileSelectComponent, PermitStatusComponent,
     PaymentQrComponent, PaymentSlipComponent, ItemHsAnalysisComponent, ItemMeasurementComponent,
     InvoiceSelectComponent, AgencyDocsReturnedComponent, AgencyApprovalPendingComponent,
-    RubberCertPaymentComponent, RubberEqcGateComponent, RubberEqcStatusComponent,
+    RubberCertPaymentComponent, RubberEqcGateComponent, RubberEqcStatusComponent, RubberEsfrGateComponent,
   ],
   templateUrl: './chat-area.component.html',
   styleUrl: './chat-area.component.scss',
@@ -142,9 +143,11 @@ export class ChatAreaComponent implements OnChanges, AfterViewChecked {
     const hasAgencyKey   = data.options.some(o => o.value.startsWith('agency:'));
     const hasCheckStatus = data.options.some(o => o.value === 'check-status');
     const hasRubberFlow  = data.options.some(o => o.value === 'rubber-eqc');
+    const hasEsfrFlow    = data.options.some(o => o.value === 'esfr-continue');
 
     if (hasImport)       return this.chat.onDocTypeChoice(value);
     if (hasRubberFlow)   return this.chat.onRubberFlowChoice(value);
+    if (hasEsfrFlow)     return this.chat.onEsfrFlowChoice(value);
     if (hasSpn)          return this.chat.onCustomsDocsChoice(value);
     if (hasMulti)        return this.chat.onAgencyChoice(value);
     if (hasNoMore)       return this.chat.onNextAgencyChoice(value);

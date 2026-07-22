@@ -1,0 +1,135 @@
+<div class="cde-backdrop">
+  <div class="cde-panel">
+    <!-- Header -->
+    <div class="cde-hd">
+      <div class="cde-hd__content">
+        <h2 class="cde-hd__title">ใบขอผ่านด่านศุลกากรและชำระค่าธรรมเนียมส่งออก (e-SFR) — การยางแห่งประเทศไทย (RAOT)</h2>
+      </div>
+      <button class="cde-hd__close" (click)="onClose()" type="button" aria-label="Close">
+        <lucide-icon [img]="icClose" [size]="20" />
+      </button>
+    </div>
+
+    <div class="cde-body">
+      <!-- REQUEST INFO SECTION -->
+      <div class="cde-sec">
+        <div class="cde-sec__head" style="border-left-color: rgb(4, 99, 239);">
+          <span class="cde-sec__title">ข้อมูลคำขอ</span>
+        </div>
+        <div class="cde-form-grid">
+          <label class="cde-field">
+            <span class="cde-field__label">Reference Number</span>
+            <input class="cde-field__input" [(ngModel)]="local().referenceNumber" readonly />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">เลขที่หนังสือรับรองคุณภาพยาง (e-QC)</span>
+            <input class="cde-field__input" [(ngModel)]="local().eqcCertificateNo" readonly />
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">ด่านศุลกากรที่จะผ่านพิธีการ <em>*</em></span>
+            <select class="cde-field__input" [(ngModel)]="local().customsCheckpoint">
+              <option value="">--Please Select--</option>
+              <option value="laem-chabang">ท่าเรือแหลมฉบัง</option>
+              <option value="bangkok-port">ท่าเรือกรุงเทพ</option>
+              <option value="sadao">ด่านสะเดา</option>
+              <option value="suvarnabhumi">ท่าอากาศยานสุวรรณภูมิ</option>
+            </select>
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">ประเภทใบอนุญาตส่งออก <em>*</em></span>
+            <select class="cde-field__input" [(ngModel)]="local().exportPermitType">
+              <option value="">--Please Select--</option>
+              <option value="str">ใบอนุญาตส่งออกยางแท่ง STR</option>
+              <option value="compound">ใบอนุญาตส่งออกยางผสม</option>
+              <option value="rss">ใบอนุญาตส่งออกยางแผ่นรมควัน RSS</option>
+            </select>
+          </label>
+          <label class="cde-field cde-field--half">
+            <span class="cde-field__label">ชื่อเรือ/พาหนะขนส่ง</span>
+            <input class="cde-field__input" [(ngModel)]="local().vesselOrTransport" />
+          </label>
+          <label class="cde-field cde-field--half">
+            <span class="cde-field__label">วันที่คาดว่าจะส่งออก <em>*</em></span>
+            <input class="cde-field__input" type="date" [(ngModel)]="local().expectedExportDate" />
+          </label>
+        </div>
+      </div>
+
+      <!-- CONTACT SECTION -->
+      <div class="cde-sec">
+        <div class="cde-sec__head" style="border-left-color: rgb(13, 143, 97);">
+          <span class="cde-sec__title">ผู้ติดต่อ</span>
+        </div>
+        <div class="cde-form-grid">
+          <label class="cde-field cde-field--half">
+            <span class="cde-field__label">Contact Name <em>*</em></span>
+            <input class="cde-field__input" [(ngModel)]="local().contactName" />
+          </label>
+          <label class="cde-field cde-field--half">
+            <span class="cde-field__label">Contact Telephone Number <em>*</em></span>
+            <input class="cde-field__input" [(ngModel)]="local().contactPhone" />
+          </label>
+          <label class="cde-field cde-field--full">
+            <span class="cde-field__label">Remark</span>
+            <textarea class="cde-field__input" [(ngModel)]="local().remark" rows="2"></textarea>
+          </label>
+        </div>
+      </div>
+
+      <!-- PAYMENT SECTION -->
+      <div class="cde-sec">
+        <div class="cde-sec__head" style="border-left-color: rgb(249, 115, 22);">
+          <span class="cde-sec__title">การชำระเงิน</span>
+        </div>
+        <div class="cde-form-grid">
+          <label class="cde-field">
+            <span class="cde-field__label">Payment Method</span>
+            <input class="cde-field__input" value="1 - e-Payment" readonly />
+          </label>
+          <label class="cde-field cde-field--half">
+            <span class="cde-field__label">บัญชีที่ตัดชำระ <em>*</em></span>
+            <select class="cde-field__input" [(ngModel)]="local().paymentAccountId">
+              <option value="">--Please Select--</option>
+              @for (acc of accounts; track acc.id) {
+                <option [value]="acc.id">{{ acc.bankName }} {{ acc.accountNoMasked }}{{ acc.isDefault ? ' (บัญชีหลัก)' : '' }}</option>
+              }
+            </select>
+          </label>
+          <label class="cde-field">
+            <span class="cde-field__label">Payment Amount (ค่าธรรมเนียม Cess)</span>
+            <input class="cde-field__input" [value]="(computedPaymentAmount() | number:'1.2-2') + ' บาท'" readonly />
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="cde-ft">
+      <button class="cde-ft__btn cde-ft__btn--cancel" (click)="onClose()" type="button">
+        ปิด
+      </button>
+      <button class="cde-ft__btn cde-ft__btn--save" (click)="onSave()" type="button" [disabled]="!canSave()">
+        <lucide-icon [img]="icSave" [size]="16" />
+        บันทึก
+      </button>
+    </div>
+
+    <!-- Confirm Dialog -->
+    @if (showConfirmDialog()) {
+      <div class="cde-confirm-overlay" (click)="showConfirmDialog.set(false)">
+        <div class="cde-confirm-box" (click)="$event.stopPropagation()">
+          <h3>ยืนยันบันทึกข้อมูล</h3>
+          <p>กรุณาตรวจสอบความถูกต้องของข้อมูลทั้งหมด ก่อนบันทึก</p>
+          <div class="cde-confirm-actions">
+            <button class="cde-confirm-btn cancel" (click)="showConfirmDialog.set(false)">
+              ตรวจสอบอีกครั้ง
+            </button>
+            <button class="cde-confirm-btn submit" (click)="confirmSave()">
+              ยืนยันบันทึก
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

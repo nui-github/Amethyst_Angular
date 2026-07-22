@@ -70,7 +70,7 @@ export type MessageType =
                         // declarationGateRequired ("กรอกข้อมูลเพิ่มเติม" → "ดำเนินการต่อ"), except
                         // "กรอกข้อมูล" stays clickable even after completion so the user can
                         // reopen and edit again before actually proceeding to 'rubber-eqc-status'
-  | 'rubber-eqc-status'; // การยาง (RAOT) export path only: posted when "ดำเนินการต่อ" is clicked
+  | 'rubber-eqc-status' // การยาง (RAOT) export path only: posted when "ดำเนินการต่อ" is clicked
                         // on the rubber-eqc-gate card (see showRubberEqcStatus()) — a pure display
                         // card, never interactive. Starts as status 'rubber-accept' (request
                         // accepted by RAOT, awaiting auto-debit from the account chosen in the
@@ -78,6 +78,13 @@ export type MessageType =
                         // showAgencyApproval()'s pending→approved flip) swaps in place to
                         // 'license-accept' with a mock Certificate No. + full license detail —
                         // see RubberEqcStatusComponent
+  | 'rubber-esfr-gate'; // การยาง (RAOT) export path only: posted right after e-QC LICENSE ACCEPT,
+                        // once the user picks "ทำ e-SFR ต่อ" on the finish/continue choice-card
+                        // (see showEsfrChoice()/onEsfrFlowChoice()) — same gate pattern as
+                        // rubber-eqc-gate (only "กรอกข้อมูล" until RubberEsfrRequestEditorComponent
+                        // is saved, then both "กรอกข้อมูล" + "ดำเนินการต่อ" show together). e-SFR
+                        // field set is a first-pass placeholder (no RAOT data dictionary for it
+                        // yet, unlike e-QC's) — see RubberEsfrRequestData
 
 // One alternative HS Code suggestion offered when the user edits an item's classification —
 // invoices from real users typically carry no HS Code at all, so AI classifies purely from the
@@ -536,6 +543,32 @@ export interface RubberEqcStatusData {
   labFax?: string;
   remark?: string;
   certUrl?: string;                // downloadable หนังสือรับรองคุณภาพยาง (e-QC) file, set once status is 'license-accept'
+}
+
+export interface RubberEsfrGateData {
+  agency: string;      // 'การยาง'
+  itemNames: string[]; // compound-rubber items the e-SFR request covers (same items as the e-QC round)
+  completed: boolean;  // true once RubberEsfrRequestEditorComponent has been saved at least once
+}
+
+// ใบขอผ่านด่านศุลกากร + ชำระค่าธรรมเนียมส่งยางออกนอกราชอาณาจักร (e-SFR) — first-pass placeholder
+// field set (no RAOT data dictionary for this one yet, unlike e-QC's V1.10). Only asks for what's
+// NOT already collected by the e-QC request moments earlier (company/broker/contact info) — this
+// is meant to read as "a few more things on top of e-QC", not a full re-entry of the same company
+// details.
+export interface RubberEsfrRequestData {
+  referenceNumber: string;    // auto-issued, same convention as RubberEqcRequestData.referenceNumber
+  eqcCertificateNo: string;   // auto-filled from the just-completed e-QC's Certificate No. — the
+                               // choice-card gating this step already states an e-QC number is required
+  customsCheckpoint: string;  // ด่านศุลกากรที่จะผ่านพิธีการ *
+  exportPermitType: string;   // ประเภทใบอนุญาตส่งออก *
+  vesselOrTransport: string;  // ชื่อเรือ/พาหนะขนส่ง (optional)
+  expectedExportDate: string; // วันที่คาดว่าจะส่งออก *
+  contactName: string;        // ผู้ติดต่อประสานงาน *
+  contactPhone: string;       // *
+  remark: string;
+  paymentAccountId: string;   // บัญชีที่ตัดชำระ * — same linked-account picker as e-QC
+  paymentAmount: number;      // Cess fee, system-computed from the e-QC request's items (rateForExportWeight)
 }
 
 export interface AgencyReturnDoc {
