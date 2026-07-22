@@ -510,7 +510,10 @@ export interface RubberEqcGateData {
 
 export interface RubberEqcStatusData {
   agency: string;                  // 'การยาง'
-  status: 'rubber-accept' | 'license-accept';
+  // 'rubber-accept'       → request accepted by RAOT, mock 3-7 day officer inspection in progress
+  // 'rubber-accept-ready' → mock inspection result came back LICENSE ACCEPT; "ดำเนินการต่อ" enables
+  // 'license-accept'      → user proceeded; posted as a NEW message with the full license detail
+  status: 'rubber-accept' | 'rubber-accept-ready' | 'license-accept';
   amount: number;                  // fee amount, auto-debited from paidAccountLabel's account
   paidAccountLabel: string;        // e.g. "ธนาคารกสิกรไทย xxx-x-x4821-5" — from the request form's own account picker
   certificateNo?: string;          // set once status is 'license-accept'

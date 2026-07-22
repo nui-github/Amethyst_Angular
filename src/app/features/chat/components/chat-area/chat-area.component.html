@@ -223,10 +223,14 @@
               }
             }
 
-            <!-- การยาง (RAOT) ยางผสม: e-QC submission status — pure display, never interactive,
-                 so it renders regardless of readOnly (auto-flips rubber-accept → license-accept) -->
+            <!-- การยาง (RAOT) ยางผสม: e-QC submission status — 'rubber-accept'/'rubber-accept-ready'
+                 mock the 3-7 day officer inspection wait, with "ดำเนินการต่อ" enabled only once
+                 ready; 'license-accept' (a separate later message) is pure display -->
             @case ('rubber-eqc-status') {
-              <app-rubber-eqc-status [data]="$any(msg.data)" />
+              <app-rubber-eqc-status
+                [data]="$any(msg.data)"
+                [interactive]="!readOnly && !msg.isReadOnly"
+                (proceed)="chat.onRubberEqcStatusProceed()" />
             }
 
             <!-- การยาง (RAOT) ยางผสม: certificate fee, paid via linked bank account debit — LEGACY,

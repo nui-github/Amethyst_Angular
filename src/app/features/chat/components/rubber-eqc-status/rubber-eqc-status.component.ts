@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, Input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, Loader2, BadgeCheck, Clock, CheckCircle2, Download } from 'lucide-angular';
+import { LucideAngularModule, Loader2, BadgeCheck, Clock, CheckCircle2, Download, ArrowRight } from 'lucide-angular';
 import { RubberEqcStatusData } from '@app/core/models/types';
 
 type Tab = 'license' | 'lab' | 'remark';
@@ -30,10 +30,27 @@ type Tab = 'license' | 'lab' | 'remark';
         <div class="res-hint">
           <lucide-icon [img]="Clock" [size]="14" />
           <span>
-            ได้รับ Accept จากการยางแห่งประเทศไทย และรอการตัดชำระค่าบริการ
-            ฿{{ data.amount | number:'1.2-2' }} ผ่านบัญชี {{ data.paidAccountLabel }}
+            กรุณาส่งชิ้นงานตัวอย่างให้เจ้าหน้าที่การยางแห่งประเทศไทยตรวจสอบครับ เจ้าหน้าที่จะใช้เวลาตรวจสอบ
+            ประมาณ 3-7 วันทำการ และจะแจ้งผลกลับผ่านระบบทันทีที่ตรวจสอบเสร็จสิ้น
           </span>
         </div>
+
+        <div class="res-status-strip" [class.res-status-strip--ready]="isReady">
+          <span class="res-status-strip__label">
+            <lucide-icon [img]="isReady ? CheckCircle2 : Loader2" [size]="13" [class.res-spin]="!isReady" />
+            สถานะ LICENSE ACCEPT
+          </span>
+          <span class="res-status-strip__value">{{ isReady ? 'ตรวจสอบผ่านแล้ว' : 'รอผลตรวจสอบ' }}</span>
+        </div>
+
+        @if (interactive) {
+          <div class="res-ft">
+            <button class="res-proceed" [disabled]="!isReady || submitting()" (click)="onProceed()" type="button">
+              ดำเนินการต่อ
+              <lucide-icon [img]="ArrowRight" [size]="13" />
+            </button>
+          </div>
+        }
       } @else {
         <div class="res-hint res-hint--done">
           <lucide-icon [img]="CheckCircle2" [size]="14" />
@@ -175,8 +192,38 @@ type Tab = 'license' | 'lab' | 'remark';
     .res-remark {
       font-size: 12.5px; color: var(--bizx-navy); margin: 0;
     }
+    .res-status-strip {
+      display: flex; align-items: center; justify-content: space-between;
+      background: #FAFAFA; border: 1px solid #EEF0F6; border-radius: 10px;
+      padding: 9px 12px;
+    }
+    .res-status-strip__label {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12.5px; font-weight: 700; color: #B45309;
+
+      lucide-icon { color: #B45309; }
+    }
+    .res-status-strip__value {
+      font-size: 11.5px; font-weight: 600; color: #6B7280;
+    }
+    .res-status-strip--ready {
+      background: rgba(13, 143, 97, 0.06); border-color: rgba(13, 143, 97, 0.2);
+
+      .res-status-strip__label { color: #0D8F61; lucide-icon { color: #0D8F61; } }
+      .res-status-strip__value { color: #0D8F61; font-weight: 700; }
+    }
     .res-ft {
       display: flex; justify-content: flex-end;
+    }
+    .res-proceed {
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 18px; border-radius: 8px; border: none;
+      background: var(--bizx-blue); color: #fff;
+      font-size: 13px; font-weight: 700; font-family: inherit;
+      cursor: pointer; transition: background 0.15s, opacity 0.15s;
+
+      &:hover:not(:disabled) { background: #034DBA; }
+      &:disabled { opacity: 0.4; cursor: not-allowed; }
     }
     .res-dl {
       display: flex; align-items: center; gap: 6px;
@@ -191,17 +238,31 @@ type Tab = 'license' | 'lab' | 'remark';
 })
 export class RubberEqcStatusComponent {
   @Input({ required: true }) data!: RubberEqcStatusData;
+  @Input() interactive = true;
+  @Output() proceed = new EventEmitter<void>();
 
   readonly activeTab = signal<Tab>('license');
+  readonly submitting = signal(false);
 
   readonly Loader2 = Loader2;
   readonly BadgeCheck = BadgeCheck;
   readonly Clock = Clock;
   readonly CheckCircle2 = CheckCircle2;
   readonly Download = Download;
+  readonly ArrowRight = ArrowRight;
 
   download(): void {
     if (this.data.certUrl) window.open(this.data.certUrl, '_blank', 'noopener');
+  }
+
+  onProceed(): void {
+    if (!this.isReady || this.submitting()) return;
+    this.submitting.set(true);
+    this.proceed.emit();
+  }
+
+  get isReady(): boolean {
+    return this.data.status === 'rubber-accept-ready';
   }
 
   get isDone(): boolean {

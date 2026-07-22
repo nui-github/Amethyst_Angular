@@ -874,10 +874,12 @@ export class ChatService {
     this.withTyping(() => this.showRubberEqcStatus(this.pendingRubberCertAgency), 400);
   }
 
-  /** Posts the rubber-eqc-status card — starts as 'rubber-accept' (request accepted by RAOT,
-   *  awaiting auto-debit from the account already chosen in the request-form drawer), then after
-   *  a mock 3s processing delay flips in place to 'license-accept' with a Certificate No. and
-   *  full license detail, same pending→approved convention as showAgencyApproval(). */
+  /** Posts the rubber-eqc-status card — starts as 'rubber-accept' (request accepted by RAOT;
+   *  card explains the user must send the sample piece to the officer for inspection, ~3-7
+   *  business days), then after a mock 3s wait (standing in for the real inspection turnaround)
+   *  flips in place to 'rubber-accept-ready', which enables the card's own "ดำเนินการต่อ" button.
+   *  The full license detail only appears once the user clicks that button — see
+   *  onRubberEqcStatusProceed(). */
   private showRubberEqcStatus(agency: string): void {
     const req = this.rubberEqcRequestData;
     const account = MOCK_LINKED_BANK_ACCOUNTS.find(a => a.id === req?.paymentAccountId);
@@ -892,10 +894,33 @@ export class ChatService {
     } satisfies RubberEqcStatusData);
 
     setTimeout(() => {
+      this.updateLastMessageData('rubber-eqc-status', {
+        agency,
+        status: 'rubber-accept-ready',
+        amount,
+        paidAccountLabel,
+      } satisfies RubberEqcStatusData);
+    }, 3000);
+  }
+
+  /** Called from RubberEqcStatusComponent's "ดำเนินการต่อ" button — only reachable once the mock
+   *  inspection result flips the card to 'rubber-accept-ready'. Seals that card read-only and
+   *  posts a NEW rubber-eqc-status message carrying the full 'license-accept' detail (Certificate
+   *  No. and issuer info), then continues the agency flow. */
+  onRubberEqcStatusProceed(): void {
+    const agency = this.pendingRubberCertAgency;
+    this.markLastReadOnly('rubber-eqc-status');
+    this.user('ดำเนินการต่อ');
+    this.withTyping(() => {
+      const req = this.rubberEqcRequestData;
+      const account = MOCK_LINKED_BANK_ACCOUNTS.find(a => a.id === req?.paymentAccountId);
+      const amount = req?.paymentAmount ?? RUBBER_COMPOUND_CERT_FEE;
+      const paidAccountLabel = account ? `${account.bankName} ${account.accountNoMasked}` : '';
       const certificateNo = `RAOT-EQC-2568-${Math.floor(100000 + Math.random() * 900000)}`;
       const issueDate = new Date().toISOString().slice(0, 10);
       const expireDate = new Date(Date.now() + 45 * 24 * 3600_000).toISOString().slice(0, 10);
-      this.updateLastMessageData('rubber-eqc-status', {
+
+      this.bot('rubber-eqc-status', {
         agency,
         status: 'license-accept',
         amount,
@@ -923,7 +948,7 @@ export class ChatService {
         paidAt: new Date().toLocaleDateString('th-TH'),
       };
       this.continueAgencyFlow(agency);
-    }, 3000);
+    }, 500);
   }
 
   /** Posts the rubber-cert-payment card — gated between เลือกโปรไฟล์ and the agency's next step
