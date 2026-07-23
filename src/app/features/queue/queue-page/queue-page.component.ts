@@ -182,6 +182,32 @@ export class QueuePageComponent {
       && !ship.returnedDocuments?.length;
   }
 
+  /** การยาง only: e-QC round in progress this session but not done yet (see ChatService.eqcStatus/
+   *  currentRubberQueueFields()) — mirrors the exact wait state the chat's own rubber-eqc-status
+   *  card is showing, so a resumed queue view says the same thing. */
+  isEqcPending(ship: Shipment): boolean {
+    return !!ship.eqcStatus && ship.eqcStatus !== 'license-accept';
+  }
+
+  eqcStatusLabel(ship: Shipment): string {
+    return ship.eqcStatus === 'rubber-accept-ready'
+      ? 'ผลตรวจสอบผ่านแล้ว — กลับไปที่แชทเพื่อดำเนินการต่อ'
+      : 'รอผลตรวจสอบจากเจ้าหน้าที่การยางแห่งประเทศไทย (ประมาณ 3-7 วันทำการ)';
+  }
+
+  /** การยาง only: e-SFR round in progress but the fee receipt hasn't been issued yet — status set
+   *  but esfrFeeReceipt still absent (only finalizeEsfrRound() sets that, once the user actually
+   *  proceeds past LICENSE ACCEPT in chat). */
+  isEsfrPending(ship: Shipment): boolean {
+    return !!ship.esfrStatus && !ship.esfrFeeReceipt;
+  }
+
+  esfrStatusLabel(ship: Shipment): string {
+    return ship.esfrStatus === 'license-accept'
+      ? 'ผ่านด่านศุลกากรแล้ว — กลับไปที่แชทเพื่อรับใบรับค่าธรรมเนียม'
+      : 'รอผลตอบรับจากด่านศุลกากร';
+  }
+
   toggleSidebar(): void { this.collapsed.update(v => !v); }
 
   setTabFilter(key: TabValue): void {

@@ -425,9 +425,17 @@ export class ChatService {
   // Compound items pending a choice between requesting the e-QC cert now vs. going straight to
   // customs clearance (only legal once the e-QC number already exists — see onRubberFlowChoice()).
   private pendingRubberFlowItems: ProductHsAnalysis[] = [];
-  // Set by onRubberCertPaid(), consumed (and cleared) by the very next saveEarlyQueueEntry() —
-  // there's exactly one such call per agency round, right after the gate resolves.
+  // Set by onRubberCertPaid()/onRubberEqcStatusProceed() once the e-QC cert exists — kept for the
+  // rest of the round (not cleared after one save) and mirrored onto the queue record by every
+  // saveEarlyQueueEntry()/refreshQueueSnapshot() call from here on, see currentRubberQueueFields().
   private rubberCertPaymentInfo?: Shipment['rubberCertPayment'];
+  // Live e-QC/e-SFR round status + e-SFR fee receipt — same "kept for the round, mirrored onto the
+  // queue record on every save/refresh" convention as rubberCertPaymentInfo above. Reset per round
+  // in onProfileSelected() (below) so a round that skips e-QC/e-SFR entirely doesn't inherit stale
+  // status from an earlier round in the same multi-agency chat.
+  private eqcStatus?: Shipment['eqcStatus'];
+  private esfrStatus?: Shipment['esfrStatus'];
+  private esfrFeeReceiptInfo?: RubberEsfrFeeReceiptData;
   // Filled e-QC request form, persisted across re-opens of the drawer (see saveRubberEqcRequest()/
   // pendingRubberItems below) so re-clicking "กรอกข้อมูล" after the first save shows what was
   // already entered instead of resetting blank.
@@ -757,6 +765,9 @@ export class ChatService {
     // so this round's first ensureQueueEntrySaved() call creates its own record instead of patching
     // whatever round happened to run before it.
     this.earlyEntrySavedForRound = false;
+    this.eqcStatus = undefined;
+    this.esfrStatus = undefined;
+    this.esfrFeeReceiptInfo = undefined;
     const existing = this.spnSession();
     this.isConnected.set(true);
     this.spnSession.set({
@@ -848,7 +859,25 @@ export class ChatService {
     this.queue.update(this.lastShipmentId, {
       messages,
       stage: Math.max(ship.stage, this.deriveStageFromMessages(messages)),
+      ...this.currentRubberQueueFields(),
     });
+  }
+
+  /** การยาง only: this round's live e-QC/e-SFR status + documents, as they stand right now — spread
+   *  into both saveEarlyQueueEntry()'s initial record and every refreshQueueSnapshot() patch after
+   *  it, so the queue detail page always reflects whatever step the chat has actually reached
+   *  (still waiting on the department, e-QC done, e-SFR done, or both), not just the final result.
+   *  Gated on currentAgency to keep these instance fields (which persist across the whole chat, not
+   *  just one round — see rubberCertPaymentInfo above) from bleeding onto an unrelated agency's own
+   *  round if this session does การยาง then moves on to a different agency afterward. */
+  private currentRubberQueueFields(): Pick<Shipment, 'eqcStatus' | 'esfrStatus' | 'rubberCertPayment' | 'esfrFeeReceipt'> {
+    if (this.currentAgency !== 'การยาง') return {};
+    return {
+      eqcStatus: this.eqcStatus,
+      esfrStatus: this.esfrStatus,
+      rubberCertPayment: this.rubberCertPaymentInfo,
+      esfrFeeReceipt: this.esfrFeeReceiptInfo,
+    };
   }
 
   /** Posts a 2-way choice — gated between เลือกโปรไฟล์ and the agency's next step whenever the
@@ -956,6 +985,7 @@ export class ChatService {
     const paidAccountLabel = account ? `${account.bankName} ${account.accountNoMasked}` : '';
     const labCode = req?.labCode;
 
+    this.eqcStatus = 'rubber-accept';
     this.bot('rubber-eqc-status', {
       agency,
       status: 'rubber-accept',
@@ -970,6 +1000,7 @@ export class ChatService {
     this.ensureQueueEntrySaved(agency);
 
     setTimeout(() => {
+      this.eqcStatus = 'rubber-accept-ready';
       this.updateLastMessageData('rubber-eqc-status', {
         agency,
         status: 'rubber-accept-ready',
@@ -1035,6 +1066,7 @@ export class ChatService {
       } satisfies RubberEqcStatusData);
 
       this.rubberCertPaid = true;
+      this.eqcStatus = 'license-accept';
       this.lastEqcCertificateNo = certificateNo;
       this.rubberCertPaymentInfo = {
         itemNames: this.pendingRubberFlowItems.map(i => i.name),
@@ -1044,6 +1076,10 @@ export class ChatService {
         certUrl: SAMPLE_DOC_URL,
         paidAt: new Date().toLocaleDateString('th-TH'),
       };
+      // Flush the e-QC download onto the queue record right away — the flow may still continue
+      // into e-SFR or the normal agency-docs/form-preview submission from here, but the e-QC cert
+      // itself is already earned and shouldn't wait on either of those to show up in คิวงาน.
+      this.refreshQueueSnapshot();
       this.showEsfrChoice(agency);
     }, 500);
   }
@@ -1156,6 +1192,7 @@ export class ChatService {
   private showEsfrStatus(agency: string): void {
     const referenceNumber = this.esfrRequestData?.referenceNumber ?? '';
 
+    this.esfrStatus = 'rubber-accept';
     this.bot('rubber-esfr-status', {
       agency,
       referenceNumber,
@@ -1165,6 +1202,7 @@ export class ChatService {
     this.ensureQueueEntrySaved(agency);
 
     setTimeout(() => {
+      this.esfrStatus = 'license-accept';
       this.updateLastMessageData('rubber-esfr-status', {
         agency,
         referenceNumber,
@@ -1206,6 +1244,7 @@ export class ChatService {
    *  showRemainingAgencySelector()), records the permit, flips the queue record to submitted, then
    *  offers the same "ขอใบอนุญาตเพิ่ม" / "เสร็จสิ้น" choice every other agency round ends on. */
   private finalizeEsfrRound(agency: string, receipt: RubberEsfrFeeReceiptData): void {
+    this.esfrFeeReceiptInfo = receipt;
     this.submittedAgencies.push(agency);
     this.submittedPermits.update(ps => [...ps, {
       agency,
@@ -1219,6 +1258,7 @@ export class ChatService {
         statusKey: 'submitted',
         stage: 7,
         messages: this.messages().slice(this.flowStartIdx),
+        ...this.currentRubberQueueFields(),
       });
     }
     this.withTyping(() => this.showNextAgencyIfAny(), 700);
@@ -1750,9 +1790,8 @@ export class ChatService {
       documents: this.buildDocumentsFromFormData(fd), items: [], itemsSelected: false,
       email: { toName: '', to: '', subject: '', body: '', attName: '' },
       messages: this.messages().slice(this.flowStartIdx),
-      rubberCertPayment: this.rubberCertPaymentInfo,
+      ...this.currentRubberQueueFields(),
     };
-    this.rubberCertPaymentInfo = undefined;
 
     this.queue.add([shipment]);
     this.lastShipmentId = shipment.id;
@@ -1974,6 +2013,9 @@ export class ChatService {
     this.pendingRubberCertAgency = '';
     this.pendingRubberFlowItems = [];
     this.rubberCertPaymentInfo = undefined;
+    this.eqcStatus = undefined;
+    this.esfrStatus = undefined;
+    this.esfrFeeReceiptInfo = undefined;
     this.rubberEqcEditorOpen.set(false);
     this.rubberEqcEditorMsgId.set(null);
     this.rubberEqcRequestData = undefined;

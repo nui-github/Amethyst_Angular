@@ -901,6 +901,16 @@ export interface Shipment {
     certUrl: string;
     paidAt: string;
   };
+  // การยาง only: live e-QC/e-SFR round status mirrored from the chat's own RubberEqcStatusData/
+  // RubberEsfrStatusData as the user progresses through each — lets the queue detail page show
+  // the SAME "waiting on the department" state the chat card shows, not just the end result.
+  // undefined means that sub-flow was never started this round (e.g. user skipped e-SFR).
+  eqcStatus?: 'rubber-accept' | 'rubber-accept-ready' | 'license-accept';
+  esfrStatus?: 'rubber-accept' | 'license-accept';
+  // การยาง only: set once RubberEsfrStatusComponent's "ดำเนินการต่อ" is clicked while
+  // 'license-accept' (ChatService.finalizeEsfrRound) — the e-SFR fee-receipt download, shown
+  // alongside rubberCertPayment (e-QC) above when both are present, independently of each other.
+  esfrFeeReceipt?: RubberEsfrFeeReceiptData;
   email?: { toName: string; to: string; subject: string; body: string; attName: string };
   items?: ShipmentItem[]; // per-product line items from the invoice/customs doc used for this LPI request
   itemsSelected?: boolean; // true once the shipment's flow has confirmed its item group (item-hs-analysis) —
