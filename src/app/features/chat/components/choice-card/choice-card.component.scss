@@ -154,6 +154,22 @@
   color: #6B7280;
 }
 
+.choice-card__tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin-top: 2px;
+  background: rgba(4, 99, 239, 0.06);
+  border: 1px solid rgba(4, 99, 239, 0.18);
+  border-radius: 10px;
+  padding: 9px 11px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--bizx-navy);
+
+  svg { flex-shrink: 0; margin-top: 1px; color: var(--bizx-blue); }
+}
+
 // ── Simple card options ────────────────────────────────────────────────────────
 
 .simple-cards {

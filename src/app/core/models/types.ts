@@ -365,6 +365,9 @@ export interface FlagCardData {
 export interface ChoiceCardData {
   question: string;
   subtitle?: string;
+  tip?: string; // short callout rendered as a highlighted tip box (lightbulb icon) instead of a
+                // plain subtitle paragraph — for a hint the user should really notice, e.g.
+                // showRubberFlowChoice()'s e-QC/e-SFR guidance
   options: { label: string; value: string; description?: string }[];
 }
 
