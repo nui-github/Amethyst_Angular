@@ -1263,6 +1263,12 @@ export class ChatService {
       this.queue.update(this.lastShipmentId, {
         statusKey: 'submitted',
         stage: 7,
+        // saveEarlyQueueEntry() stamped the generic RAOT formCode/formName (formForAgency()'s
+        // 'ใบอนุญาตค้ายาง' — the actual RSS3 trade-license product) onto this record before it was
+        // known whether this round would end in that or in e-SFR; now that it has, correct both to
+        // name what was actually filed — same canonical title as the rubber-esfr-gate card.
+        formCode: 'ใบผ่านด่านศุลกากร (e-SFR)',
+        formName: 'ใบขอผ่านด่านศุลกากร และชำระค่าธรรมเนียมส่งยางออกนอกราชอาณาจักร (e-SFR)',
         messages: this.messages().slice(this.flowStartIdx),
         ...this.currentRubberQueueFields(),
       });
