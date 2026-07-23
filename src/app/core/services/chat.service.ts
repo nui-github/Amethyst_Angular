@@ -894,8 +894,9 @@ export class ChatService {
 
   /** Posts a 2-way choice — gated between เลือกโปรไฟล์ and the agency's next step whenever the
    *  confirmed การยาง group contains a compound-rubber item: request the e-QC quality cert now,
-   *  or go straight to customs clearance + export fee (only legal if the e-QC number already
-   *  exists, i.e. this session already paid for it earlier this round). */
+   *  or go straight to the e-SFR customs-clearance + export-fee request. e-QC is optional, not a
+   *  precondition for e-SFR — either path reaches the same "ขอใบอนุญาตเพิ่ม/เสร็จสิ้น" choice once
+   *  done. */
   private showRubberFlowChoice(agency: string, items: ProductHsAnalysis[]): void {
     this.pendingRubberFlowItems = items;
     this.withTyping(() => {
@@ -911,7 +912,7 @@ export class ChatService {
           {
             label: 'ขอใบอนุญาตผ่านด่านศุลกากร และชำระค่าธรรมเนียมส่งยางออกนอกราชอาณาจักร (e-SFR)',
             value: 'rubber-customs-fee',
-            description: 'หมายเหตุ: รายการยางผสมต้องมีเลขหนังสือรับรองคุณภาพยาง (e-QC) แล้วจึงจะขอขั้นตอนนี้ได้',
+            description: 'ขอผ่านด่านศุลกากรและชำระค่าธรรมเนียมส่งออกได้เลย ไม่จำเป็นต้องมีหนังสือรับรองคุณภาพยาง (e-QC) ก่อนก็ได้',
           },
         ],
       } satisfies ChoiceCardData);
@@ -923,7 +924,11 @@ export class ChatService {
     }, 500);
   }
 
-  /** Called from ChatAreaComponent when the user picks an option on the rubber-flow choice-card. */
+  /** Called from ChatAreaComponent when the user picks an option on the rubber-flow choice-card.
+   *  e-SFR no longer requires e-QC first — picking it goes straight to the e-SFR request gate,
+   *  same as if it were reached via showEsfrChoice() after an e-QC round (see onEsfrFlowChoice()
+   *  below), and finalizeEsfrRound() carries the round to completion (statusKey 'submitted' +
+   *  the usual "ขอใบอนุญาตเพิ่ม/เสร็จสิ้น" choice) exactly the same either way. */
   onRubberFlowChoice(value: string): void {
     if (value === 'rubber-eqc') {
       this.user('ขอหนังสือรับรองคุณภาพยาง (e-QC)');
@@ -931,14 +936,7 @@ export class ChatService {
       return;
     }
     this.user('ขอใบอนุญาตผ่านด่านศุลกากร และชำระค่าธรรมเนียมส่งยางออกนอกราชอาณาจักร');
-    if (!this.rubberCertPaid) {
-      this.withTyping(() => {
-        this.bot('text', undefined, 'รายการยางผสมยังไม่มีเลขหนังสือรับรองคุณภาพยาง (e-QC) กรุณาขอหนังสือรับรองให้เรียบร้อยก่อน จึงจะขอใบอนุญาตผ่านด่านศุลกากรได้ครับ');
-        this.showRubberFlowChoice(this.pendingRubberCertAgency, this.pendingRubberFlowItems);
-      }, 500);
-      return;
-    }
-    this.continueAgencyFlow(this.pendingRubberCertAgency);
+    this.showEsfrGate(this.pendingRubberCertAgency, this.pendingRubberFlowItems);
   }
 
   /** Posts the rubber-eqc-gate card — only a "กรอกข้อมูล" button shows until the request-form
