@@ -264,6 +264,15 @@
                 (proceed)="chat.onEsfrStatusProceed()" />
             }
 
+            <!-- การยาง (RAOT) ยางผสม: e-SFR fee receipt from ศุลกากร — terminal card of the e-SFR
+                 flow, posted once "ดำเนินการต่อ" is clicked on the LICENSE ACCEPT rubber-esfr-status
+                 card. Pure display, no further action besides download. -->
+            @case ('rubber-esfr-fee-receipt') {
+              <app-rubber-esfr-fee-receipt
+                [data]="$any(msg.data)"
+                [interactive]="!readOnly && !msg.isReadOnly" />
+            }
+
             <!-- การยาง (RAOT) ยางผสม: certificate fee, paid via linked bank account debit — LEGACY,
                  only shown by historical queue-mock/sessions-mock message replay now, see types.ts -->
             @case ('rubber-cert-payment') {

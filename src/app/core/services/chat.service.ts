@@ -8,7 +8,7 @@ import {
   InvoiceSelectData, Direction, AgencyDocsReturnedData, AgencyApprovalPendingData,
   ShipmentItem, ShipmentDocument, AgencyKey, RubberCertPaymentData,
   RubberEqcRequestData, RubberEqcGateData, RubberEqcStatusData,
-  RubberEsfrGateData, RubberEsfrRequestData, RubberEsfrPreviewData, RubberEsfrStatusData,
+  RubberEsfrGateData, RubberEsfrRequestData, RubberEsfrPreviewData, RubberEsfrStatusData, RubberEsfrFeeReceiptData,
 } from '@app/core/models/types';
 import { OcrService, MultiInvoiceDetection } from './ocr.service';
 import { QueueService } from './queue.service';
@@ -1175,15 +1175,25 @@ export class ChatService {
   }
 
   /** Called from RubberEsfrStatusComponent's "ดำเนินการต่อ" button — only reachable once the mock
-   *  wait flips the card to 'license-accept'. Posts the final confirmation and continues the
-   *  normal agency flow, same text onEsfrGateProceed() used to post directly before the preview
-   *  step was added. */
+   *  wait flips the card to 'license-accept'. Posts the fee-receipt card (terminal display for the
+   *  e-SFR flow — see RubberEsfrFeeReceiptData) then continues the normal agency flow. */
   onEsfrStatusProceed(): void {
     const agency = this.pendingRubberCertAgency;
+    const referenceNumber = this.esfrRequestData?.referenceNumber ?? '';
     this.markLastReadOnly('rubber-esfr-status');
     this.user('ดำเนินการต่อ');
     this.withTyping(() => {
-      this.bot('text', undefined, 'ส่งคำขอผ่านด่านศุลกากรและชำระค่าธรรมเนียมส่งออก (e-SFR) เรียบร้อยแล้วครับ');
+      this.bot('rubber-esfr-fee-receipt', {
+        agency,
+        referenceNumber,
+        licenseNumber: `ERL19004-${(new Date().getFullYear() + 543) % 100}/${String(Math.floor(10000 + Math.random() * 90000))}`,
+        issueDate: new Date().toLocaleDateString('en-GB').split('/').join('-'),
+        issueAuthority: '0994001057192-การยางแห่งประเทศไทย',
+        message: 'พร้อมที่จะผ่านพิธีการศุลกากรใบขนสินค้าขาออก',
+        effectiveDate: new Date().toLocaleDateString('en-GB').split('/').join('-'),
+        expireDate: new Date(Date.now() + 30 * 24 * 3600_000).toLocaleDateString('en-GB').split('/').join('-'),
+        receiptUrl: SAMPLE_DOC_URL,
+      } satisfies RubberEsfrFeeReceiptData);
       this.continueAgencyFlow(agency);
     }, 500);
   }
@@ -2182,6 +2192,10 @@ export class ChatService {
       }
       if (m.type === 'rubber-esfr-status') {
         const d = m.data as RubberEsfrStatusData;
+        this.pendingRubberCertAgency = d.agency;
+      }
+      if (m.type === 'rubber-esfr-fee-receipt') {
+        const d = m.data as RubberEsfrFeeReceiptData;
         this.pendingRubberCertAgency = d.agency;
       }
     }

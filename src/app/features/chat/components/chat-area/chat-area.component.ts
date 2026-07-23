@@ -41,6 +41,7 @@ import { RubberEqcStatusComponent } from '../rubber-eqc-status/rubber-eqc-status
 import { RubberEsfrGateComponent } from '../rubber-esfr-gate/rubber-esfr-gate.component';
 import { RubberEsfrPreviewComponent } from '../rubber-esfr-preview/rubber-esfr-preview.component';
 import { RubberEsfrStatusComponent } from '../rubber-esfr-status/rubber-esfr-status.component';
+import { RubberEsfrFeeReceiptComponent } from '../rubber-esfr-fee-receipt/rubber-esfr-fee-receipt.component';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 
 /**
@@ -68,7 +69,7 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
     PaymentQrComponent, PaymentSlipComponent, ItemHsAnalysisComponent, ItemMeasurementComponent,
     InvoiceSelectComponent, AgencyDocsReturnedComponent, AgencyApprovalPendingComponent,
     RubberCertPaymentComponent, RubberEqcGateComponent, RubberEqcStatusComponent, RubberEsfrGateComponent,
-    RubberEsfrPreviewComponent, RubberEsfrStatusComponent,
+    RubberEsfrPreviewComponent, RubberEsfrStatusComponent, RubberEsfrFeeReceiptComponent,
   ],
   templateUrl: './chat-area.component.html',
   styleUrl: './chat-area.component.scss',

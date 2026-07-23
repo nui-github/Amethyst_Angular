@@ -91,12 +91,17 @@ export type MessageType =
                         // (reopens RubberEsfrRequestEditorComponent, saving updates this card's
                         // data in place — see saveEsfrRequest()) and "ส่งคำขอใบอนุญาต" (seals this
                         // card read-only and posts rubber-esfr-status — see onEsfrPreviewSubmit())
-  | 'rubber-esfr-status'; // posted once the preview's "ส่งคำขอใบอนุญาต" is clicked (see
+  | 'rubber-esfr-status' // posted once the preview's "ส่งคำขอใบอนุญาต" is clicked (see
                         // showEsfrStatus()) — pure display card, never interactive itself besides
                         // its own "ดำเนินการต่อ". Starts as status 'rubber-accept' (request
                         // accepted by RAOT, mock processing in progress); after a 3s mock delay
                         // (same convention as rubber-eqc-status) flips in place to 'license-accept',
                         // which enables "ดำเนินการต่อ" — see onEsfrStatusProceed()
+  | 'rubber-esfr-fee-receipt'; // posted once "ดำเนินการต่อ" is clicked on rubber-esfr-status while
+                        // 'license-accept' (see onEsfrStatusProceed()) — the ใบรับค่าธรรมเนียม
+                        // reply from ศุลกากร (License Number/Issue Date/Issue Authority/Message/
+                        // EffectiveDate/ExpireDate) + a download button. Terminal card of the
+                        // e-SFR flow — pure display, no further action, see RubberEsfrFeeReceiptData
 
 // One alternative HS Code suggestion offered when the user edits an item's classification —
 // invoices from real users typically carry no HS Code at all, so AI classifies purely from the
@@ -673,6 +678,22 @@ export interface RubberEsfrStatusData {
   // 'rubber-accept'  → request accepted by RAOT, mock processing in progress
   // 'license-accept' → mock wait resolved; "ดำเนินการต่อ" enables
   status: 'rubber-accept' | 'license-accept';
+}
+
+// Posted from RubberEsfrStatusComponent's "ดำเนินการต่อ" (only reachable once status is
+// 'license-accept') — the fee-receipt reply from ศุลกากร, terminal card of the e-SFR flow.
+// Field set/labels mirror the reference ข้อมูลตอบกลับคำขอใบอนุญาต slip (License Number/Issue
+// Date/Issue Authority/Message/EffectiveDate/ExpireDate).
+export interface RubberEsfrFeeReceiptData {
+  agency: string;          // 'การยาง'
+  referenceNumber: string; // from the saved e-SFR request, shown for context
+  licenseNumber: string;
+  issueDate: string;
+  issueAuthority: string;
+  message: string;
+  effectiveDate: string;
+  expireDate: string;
+  receiptUrl?: string;     // downloadable ใบรับค่าธรรมเนียม file
 }
 
 export interface AgencyReturnDoc {
