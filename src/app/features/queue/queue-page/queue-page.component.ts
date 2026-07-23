@@ -359,19 +359,4 @@ export class QueuePageComponent {
   private nowTime(): string {
     return new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
   }
-
-  /** "ตรวจสอบสถานะอัปเดต" on the amber รอการตรวจสอบและอนุมัติ card — mocks the department
-   *  finishing its review (mirrors ChatService.markDeptApproved(), which normally runs
-   *  automatically from chat well before the user reaches this page; this is the queue-page
-   *  equivalent for the rare case the user lands here first). Only flags deptApproved — the QR
-   *  itself is a separate, independently-timed event with no user-triggerable mock (see the
-   *  รออนุมัติ QR จากกรม card in the template — no action button, since the user genuinely can't
-   *  prompt that along). */
-  approveDeptReview(ship: Shipment): void {
-    const agency = this.agencyFull(ship.agency);
-    this.q.update(ship.id, {
-      deptApproved: true,
-      audit: [...ship.audit, { time: this.nowTime(), text: `${agency}ตรวจสอบและอนุมัติคำขอแล้ว`, by: agency }],
-    });
-  }
 }

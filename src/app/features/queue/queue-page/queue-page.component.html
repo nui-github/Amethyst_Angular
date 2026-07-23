@@ -484,7 +484,10 @@
               </div>
             }
 
-            <!-- Still under department review — deptApproved not set yet (brief window, see isPendingApproval()) -->
+            <!-- Still under department review — deptApproved not set yet (brief window, see isPendingApproval()).
+                 No action button here: approval arrives on the department's own timeline (ChatService's
+                 own auto-approval timer, same as the รออนุมัติ QR จากกรม card below) and updates this
+                 record on its own once it lands. -->
             @if (isPendingApproval(openShipment()!)) {
               <div class="dv-card dv-card--alert">
                 <div class="dv-card__hd">
@@ -492,9 +495,6 @@
                   <span style="color:#B45309">รอการตรวจสอบและอนุมัติ</span>
                 </div>
                 <p class="dv-payment-waiting-text">{{ agencyFull(openShipment()!.agency) }}กำลังตรวจสอบคำขอของท่านครับ เมื่ออนุมัติแล้ว ระบบจะส่ง QR ให้ท่านชำระค่าธรรมเนียม</p>
-                <button class="dv-result-btn dv-result-btn--outline" (click)="approveDeptReview(openShipment()!)">
-                  ตรวจสอบสถานะอัปเดต
-                </button>
               </div>
             }
 
