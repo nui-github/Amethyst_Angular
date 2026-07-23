@@ -903,6 +903,11 @@ export class ChatService {
           },
         ],
       } satisfies ChoiceCardData);
+      // Every other onProfileSelected() branch saves the queue record right after posting its own
+      // next card (agency-upload/form-preview/proceed-choice) — this compound-item gate skipped
+      // that, so a session left sitting on this choice never showed up in คิวงาน at all until the
+      // user actually picked e-QC or e-SFR and moved past it.
+      this.ensureQueueEntrySaved(agency);
     }, 500);
   }
 
@@ -2221,6 +2226,18 @@ export class ChatService {
         const agencies = Array.from(new Set(d.items.filter(i => i.requiresPermit).map(i => i.agency)));
         this.ALL_AGENCIES = agencies;
         if (agencies.length) this.currentAgency = agencies[0];
+        // The confirmed group (post any manual re-classify edits — see onItemHsAnalysisConfirmed())
+        // is what selectAllAgencyItems()/the rubber compound-item check on onProfileSelected() both
+        // read; never restored before, so resuming anywhere after this step used to filter against
+        // an empty list.
+        this.confirmedProductItems = d.items;
+      }
+      // profile-select carries the actually-chosen agency for this round — a more reliable source
+      // than item-hs-analysis's agencies[0] guess above once the user has picked a SPECIFIC agency
+      // out of a multi-agency group (แนวทาง เลือกกรม → profile-select happens right after).
+      if (m.type === 'profile-select') {
+        const d = m.data as { agency?: string };
+        if (d.agency) this.currentAgency = d.agency;
       }
       // agency-upload only exists on the invoice-first path (chooseInvoiceFirst() → ... →
       // onProfileSelected() sets isAgencyDocsUpload right before posting this message — see there).
@@ -2229,6 +2246,15 @@ export class ChatService {
       // showing an unrelated generic analysis instead of continuing the real invoice-path flow.
       if (m.type === 'agency-upload') {
         this.isAgencyDocsUpload = true;
+      }
+      // showRubberFlowChoice()'s "ขอ e-QC ก่อน หรือขอ e-SFR เลย" card — the earliest point a
+      // การยาง compound-item round can be stuck at, right after profile-select and before any
+      // rubber-*-gate message exists yet. Its own ChoiceCardData carries no item names (just a
+      // count baked into the description string), so pendingRubberFlowItems is rebuilt from
+      // confirmedProductItems (restored above) filtered the same way onProfileSelected() did.
+      if (m.type === 'choice-card' && (m.data as ChoiceCardData).options.some(o => o.value === 'rubber-eqc')) {
+        this.pendingRubberCertAgency = this.currentAgency;
+        this.pendingRubberFlowItems = this.confirmedProductItems.filter(i => i.agency === this.currentAgency && i.isCompound);
       }
       if (m.type === 'rubber-eqc-gate') {
         const d = m.data as RubberEqcGateData;
