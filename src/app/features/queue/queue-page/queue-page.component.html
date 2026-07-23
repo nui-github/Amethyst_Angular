@@ -461,6 +461,10 @@
                     <span class="dv-result-label">Expire Date</span>
                     <span class="dv-result-value">{{ openShipment()!.esfrFeeReceipt!.expireDate }}</span>
                   </div>
+                  <div class="dv-result-row dv-result-row--fee">
+                    <span class="dv-result-label">ค่าธรรมเนียม</span>
+                    <span class="dv-result-value">฿{{ openShipment()!.esfrFeeReceipt!.feeAmount | number:'1.2-2' }}</span>
+                  </div>
                 </div>
                 <div class="dv-doc-list">
                   <div class="dv-doc-row dv-doc-row--plain">

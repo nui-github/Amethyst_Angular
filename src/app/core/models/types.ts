@@ -693,6 +693,9 @@ export interface RubberEsfrFeeReceiptData {
   message: string;
   effectiveDate: string;
   expireDate: string;
+  feeAmount: number;       // Cess fee actually charged — RubberEsfrRequestData.totalAmountRaot,
+                           // itself rateForExportWeight() per item (rubber-cert.mock.ts) summed;
+                           // this is a REAL fee, unlike RGoods's ใบอนุญาตค้ายาง path which is free
   receiptUrl?: string;     // downloadable ใบรับค่าธรรมเนียม file
 }
 

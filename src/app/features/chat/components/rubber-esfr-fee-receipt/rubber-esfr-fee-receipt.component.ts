@@ -25,6 +25,11 @@ import { RubberEsfrFeeReceiptData } from '@app/core/models/types';
         <span>{{ data.referenceNumber }}</span>
       </div>
 
+      <div class="efr-fee">
+        <span>ค่าธรรมเนียม (Cess)</span>
+        <span>฿{{ data.feeAmount | number:'1.2-2' }}</span>
+      </div>
+
       <div class="info-card efr-card">
         <div class="info-card__head">ข้อมูลตอบกลับคำขอใบอนุญาต</div>
         <div class="info-card__body">
@@ -78,6 +83,16 @@ import { RubberEsfrFeeReceiptData } from '@app/core/models/types';
 
       span:first-child { color: #6B7280; font-weight: 600; }
       span:last-child { color: var(--bizx-navy); font-weight: 700; }
+    }
+    .efr-fee {
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(249, 115, 22, 0.07); border: 1px solid rgba(249, 115, 22, 0.2);
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-size: 12.5px;
+
+      span:first-child { color: #C2410C; font-weight: 600; }
+      span:last-child { color: #C2410C; font-weight: 700; }
     }
     .efr-card {
       margin-top: 0;

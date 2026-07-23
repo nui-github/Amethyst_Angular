@@ -1235,6 +1235,7 @@ export class ChatService {
         message: 'พร้อมที่จะผ่านพิธีการศุลกากรใบขนสินค้าขาออก',
         effectiveDate: new Date().toLocaleDateString('en-GB').split('/').join('-'),
         expireDate: new Date(Date.now() + 30 * 24 * 3600_000).toLocaleDateString('en-GB').split('/').join('-'),
+        feeAmount: this.esfrRequestData?.totalAmountRaot ?? 0,
         receiptUrl: SAMPLE_DOC_URL,
       };
       this.bot('rubber-esfr-fee-receipt', receipt satisfies RubberEsfrFeeReceiptData);

@@ -1190,13 +1190,13 @@ export const MOCK_QUEUE: Shipment[] = [
       t('11:05', 'bot', 'status-card', undefined, {
         refNo: 'RG-2568-89100', customsRef: 'EXPINV0019',
         submittedAt: new Date(Date.now() - 26 * 3600_000).toLocaleDateString('th-TH'), isPending: false,
-        agency: 'การยาง', feeNote: 'ไม่มีค่าธรรมเนียม (ใบอนุญาตค้ายาง)',
+        agency: 'การยาง', feeNote: 'ค่าธรรมเนียม e-SFR ฿400 (ยางแผ่นผสม 3,000 กก.)',
       }),
       bot('11:20', 'การยางแห่งประเทศไทยตรวจสอบและอนุมัติคำขอแล้วครับ ✅'),
       t('11:21', 'bot', 'agency-docs-returned', undefined, {
         agency: 'การยาง',
         docs: [
-          { key: 'raot_permit_pdf', label: 'ใบอนุญาตค้ายาง (RAOTPERMIT PDF)', url: SAMPLE_PDF },
+          { key: 'raot_esfr_receipt', label: 'ใบรับค่าธรรมเนียม (RAOTFEERECEIPT PDF)', url: SAMPLE_PDF },
         ],
       }),
     ],
@@ -1213,7 +1213,7 @@ export const MOCK_QUEUE: Shipment[] = [
       paidAt: new Date(Date.now() - 26 * 3600_000).toLocaleDateString('th-TH'),
     },
     returnedDocuments: [
-      doc('d19r1', 'ใบอนุญาตค้ายาง (RAOTPERMIT PDF)', 'other', 'pdf', 'raot', new Date(Date.now() - 26 * 3600_000 + 3600_000).toLocaleDateString('th-TH') + ' 11:21'),
+      doc('d19r1', 'ใบรับค่าธรรมเนียม (RAOTFEERECEIPT PDF)', 'other', 'pdf', 'raot', new Date(Date.now() - 26 * 3600_000 + 3600_000).toLocaleDateString('th-TH') + ' 11:21'),
     ],
     itemsSelected: true,
     items: [
