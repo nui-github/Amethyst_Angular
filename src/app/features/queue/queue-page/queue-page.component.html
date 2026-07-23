@@ -74,13 +74,13 @@
 
           <tbody>
             @for (s of queueTable.data; track s.id) {
-              <tr class="qt-row" [class.qt-row--urgent]="s.statusKey === 'needs_you'"
+              <tr class="qt-row" [class.qt-row--urgent]="effectiveStatusKey(s) === 'needs_you'"
                 (click)="selectRow(s.id)">
 
                 <!-- Ref + customer -->
                 <td>
                   <div class="tc-ref">
-                    <div class="tc-accent" [style.background]="statusMeta(s.statusKey).dot"></div>
+                    <div class="tc-accent" [style.background]="statusMeta(effectiveStatusKey(s)).dot"></div>
                     <div class="tc-ref__info">
                       <div class="tc-ref__top">
                         <span class="ref-no">{{ s.customsNo }}</span>
@@ -123,10 +123,10 @@
                 <!-- Status -->
                 <td>
                   <span class="status-pill"
-                    [style.background]="statusMeta(s.statusKey).bg"
-                    [style.color]="statusMeta(s.statusKey).text">
-                    <span class="status-dot" [style.background]="statusMeta(s.statusKey).dot"></span>
-                    {{ statusMeta(s.statusKey).label }}
+                    [style.background]="statusMeta(effectiveStatusKey(s)).bg"
+                    [style.color]="statusMeta(effectiveStatusKey(s)).text">
+                    <span class="status-dot" [style.background]="statusMeta(effectiveStatusKey(s)).dot"></span>
+                    {{ statusMeta(effectiveStatusKey(s)).label }}
                   </span>
                 </td>
 
@@ -165,10 +165,10 @@
             <div class="dv-hrow__left">
               <h2 class="dv-ref">{{ openShipment()!.customsNo }}</h2>
               <span class="status-pill"
-                [style.background]="statusMeta(openShipment()!.statusKey).bg"
-                [style.color]="statusMeta(openShipment()!.statusKey).text">
-                <span class="status-dot" [style.background]="statusMeta(openShipment()!.statusKey).dot"></span>
-                {{ statusMeta(openShipment()!.statusKey).label }}
+                [style.background]="statusMeta(effectiveStatusKey(openShipment()!)).bg"
+                [style.color]="statusMeta(effectiveStatusKey(openShipment()!)).text">
+                <span class="status-dot" [style.background]="statusMeta(effectiveStatusKey(openShipment()!)).dot"></span>
+                {{ statusMeta(effectiveStatusKey(openShipment()!)).label }}
               </span>
             </div>
           </div>

@@ -68,7 +68,7 @@ export class QueuePageComponent {
     const permit  = this.permitFilter();
     return this.q.queue()
       .filter(s => {
-        const matchTab    = tab === 'all' || s.statusKey === tab;
+        const matchTab    = tab === 'all' || this.effectiveStatusKey(s) === tab;
         const matchPermit = permit === 'all' || s.type === permit;
         const matchTerm   = !term ||
           s.customsNo.toLowerCase().includes(term) ||
@@ -86,7 +86,28 @@ export class QueuePageComponent {
 
   tabCount(tab: TabValue): number {
     if (tab === 'all') return this.q.queue().length;
-    return this.q.queue().filter(s => s.statusKey === tab).length;
+    return this.q.queue().filter(s => this.effectiveStatusKey(s) === tab).length;
+  }
+
+  /** Agencies whose fee is actually collected via QR in this very page, after department approval
+   *  (currently just กรมควบคุมโรค's Pink Form — see PAYMENT_STEP_AGENCIES below / chat.service.ts
+   *  QR_PAYMENT_AGENCIES). finalizeSubmit() flips ship.statusKey to 'submitted' the moment ยืนยัน
+   *  ส่งกรม is clicked in chat — well before the department has actually approved, sent its QR, and
+   *  the user paid and got returnedDocuments back. isPendingApproval()/isAwaitingQr()/canProceed()
+   *  below rely on that raw 'submitted' value as their own precondition, so it's left alone; this
+   *  is only for the outward-facing status label — list badge, detail header pill, tabs/KPI counts. */
+  private readonly RETURN_DOCS_GATED_AGENCIES: Shipment['agency'][] = ['ddc'];
+
+  /** The status this shipment should actually be PRESENTED as — 'needs_you' for a
+   *  RETURN_DOCS_GATED_AGENCIES shipment until the department's documents have actually come back,
+   *  even though ship.statusKey itself already flipped to 'submitted' at ยืนยันส่งกรม. */
+  effectiveStatusKey(ship: Shipment): ShipmentStatus {
+    if (ship.statusKey === 'submitted'
+      && this.RETURN_DOCS_GATED_AGENCIES.includes(ship.agency)
+      && !ship.returnedDocuments?.length) {
+      return 'needs_you';
+    }
+    return ship.statusKey;
   }
 
   statusMeta(key: string) {
