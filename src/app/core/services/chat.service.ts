@@ -697,7 +697,13 @@ export class ChatService {
   // entries for the same pairing) — "Pink Form" is DDC's own real form name specifically, not a
   // generic label for every QR_PAYMENT_AGENCIES member, so การยาง needs its own case (real RAOT
   // document is ใบอนุญาตค้ายาง under พ.ร.บ.ควบคุมยาง — see product-hs-analysis licenseType).
-  private formForAgency(agency: string): { code: string; name: string } {
+  // isRubberSfrTrack: true for any การยาง round involving a compound-rubber item (this.
+  // pendingRubberFlowItems populated by showRubberFlowChoice()) — those never end in the real
+  // RSS3 trade license, always e-SFR (e-QC is only an optional earlier step), so the queue-page
+  // "ประเภทใบอนุญาต" tag must read ใบอนุญาตผ่านด่านศุลกากร from the moment that's known, not just
+  // once finalizeEsfrRound() actually issues the fee receipt — same wording whether or not the
+  // user did e-QC first.
+  private formForAgency(agency: string, isRubberSfrTrack = false): { code: string; name: string } {
     const isExport = this.direction() === 'export';
     if (agency === 'กรมควบคุมโรค') {
       return {
@@ -706,6 +712,12 @@ export class ChatService {
       };
     }
     if (agency === 'การยาง') {
+      if (isRubberSfrTrack) {
+        return {
+          code: 'ใบอนุญาตผ่านด่านศุลกากร',
+          name: 'ใบขอผ่านด่านศุลกากร และชำระค่าธรรมเนียมส่งยางออกนอกราชอาณาจักร (e-SFR)',
+        };
+      }
       return {
         code: 'ใบอนุญาตค้ายาง',
         name: `คำขอใบอนุญาตค้ายาง${isExport ? 'ขาออก' : ''} — การยางแห่งประเทศไทย (RAOT)`,
@@ -1263,11 +1275,10 @@ export class ChatService {
       this.queue.update(this.lastShipmentId, {
         statusKey: 'submitted',
         stage: 7,
-        // saveEarlyQueueEntry() stamped the generic RAOT formCode/formName (formForAgency()'s
-        // 'ใบอนุญาตค้ายาง' — the actual RSS3 trade-license product) onto this record before it was
-        // known whether this round would end in that or in e-SFR; now that it has, correct both to
-        // name what was actually filed — same canonical title as the rubber-esfr-gate card.
-        formCode: 'ใบผ่านด่านศุลกากร (e-SFR)',
+        // showRubberFlowChoice() already stamps the e-SFR formCode/formName as soon as a compound
+        // item is detected (formForAgency(agency, true)) — restated here too so this record reads
+        // correctly even if it somehow never went through that path (e.g. a resumed session).
+        formCode: 'ใบอนุญาตผ่านด่านศุลกากร',
         formName: 'ใบขอผ่านด่านศุลกากร และชำระค่าธรรมเนียมส่งยางออกนอกราชอาณาจักร (e-SFR)',
         messages: this.messages().slice(this.flowStartIdx),
         ...this.currentRubberQueueFields(),
@@ -1783,7 +1794,7 @@ export class ChatService {
   private saveEarlyQueueEntry(agency: string): void {
     const fd = this.formData();
     const agencyKey: AgencyKey = this.AGENCY_KEY_MAP[agency] ?? 'none';
-    const form = this.formForAgency(agency);
+    const form = this.formForAgency(agency, agency === 'การยาง' && this.pendingRubberFlowItems.length > 0);
 
     const shipment: Shipment = {
       id: genId(), chatName: this.chatNameFor(fd), isNew: true,
@@ -1815,7 +1826,7 @@ export class ChatService {
     const fd = this.formData();
 
     const agencyKey: AgencyKey = this.AGENCY_KEY_MAP[this.currentAgency] ?? 'none';
-    const form = this.formForAgency(this.currentAgency);
+    const form = this.formForAgency(this.currentAgency, this.currentAgency === 'การยาง' && this.pendingRubberFlowItems.length > 0);
 
     // Posted BEFORE the flowMsgs snapshot below so the status-card message is actually included
     // in the saved Shipment.messages — QueuePageComponent.openSubmissionResult() (queue-page.
