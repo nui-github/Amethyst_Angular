@@ -591,7 +591,7 @@ export const MOCK_QUEUE: Shipment[] = [
     origin: 'มาเลเซีย', importedAt: '13:20 น. วันนี้', createdAt: NOW - 0 * 3600_000, owner: 'ปวีณา ส.',
     agency: 'fda', permitNeeded: true, formCode: 'RGoods',
     formName: 'คำขออนุญาตนำเข้าวัตถุดิบยา — อย.',
-    conf: 93, stage: 3, statusKey: 'needs_you',
+    conf: 93, stage: 4, statusKey: 'needs_you',
     assess: { conf: 93, reason: 'Calcium Carbonate เกรด Pharmaceutical ต้องขออนุญาต อย.' },
     classify: { agency: 'fda', conf: 93, reason: '', alt: [] },
     draft: { fields: [] },
@@ -600,7 +600,7 @@ export const MOCK_QUEUE: Shipment[] = [
       { time: '13:20', text: 'เข้าระบบ', by: 'ระบบ' },
       { time: '13:22', text: 'OCR สำเร็จ', by: 'AI' },
       { time: '13:22', text: 'วิเคราะห์ HS Code: 2836.50.00 → อย. (93%)', by: 'AI' },
-      { time: '13:22', text: 'รอเลือกกรมและยืนยันโปรไฟล์', by: 'AI' },
+      { time: '13:22', text: 'รอแนบเอกสารรายกรม', by: 'AI' },
     ],
     messages: [
       bot('13:20', 'ใบขนสินค้า HTHM000000011 เข้าระบบแล้วครับ — Calcium Carbonate จากมาเลเซีย'),
