@@ -1183,7 +1183,7 @@ export class ChatService {
     this.markLastReadOnly('rubber-esfr-status');
     this.user('ดำเนินการต่อ');
     this.withTyping(() => {
-      this.bot('rubber-esfr-fee-receipt', {
+      const receipt: RubberEsfrFeeReceiptData = {
         agency,
         referenceNumber,
         licenseNumber: `ERL19004-${(new Date().getFullYear() + 543) % 100}/${String(Math.floor(10000 + Math.random() * 90000))}`,
@@ -1193,9 +1193,35 @@ export class ChatService {
         effectiveDate: new Date().toLocaleDateString('en-GB').split('/').join('-'),
         expireDate: new Date(Date.now() + 30 * 24 * 3600_000).toLocaleDateString('en-GB').split('/').join('-'),
         receiptUrl: SAMPLE_DOC_URL,
-      } satisfies RubberEsfrFeeReceiptData);
-      this.continueAgencyFlow(agency);
+      };
+      this.bot('rubber-esfr-fee-receipt', receipt satisfies RubberEsfrFeeReceiptData);
+      this.finalizeEsfrRound(agency, receipt);
     }, 500);
+  }
+
+  /** The fee-receipt card is the actual permit output for การยาง's e-SFR round — the normal
+   *  license-submission machinery (agency-upload/OCR/declaration-editor/form-preview/submit) that
+   *  continueAgencyFlow() would otherwise run next is redundant once it's been issued, so this
+   *  round is finalized here directly instead: marks the agency done (so it drops out of
+   *  showRemainingAgencySelector()), records the permit, flips the queue record to submitted, then
+   *  offers the same "ขอใบอนุญาตเพิ่ม" / "เสร็จสิ้น" choice every other agency round ends on. */
+  private finalizeEsfrRound(agency: string, receipt: RubberEsfrFeeReceiptData): void {
+    this.submittedAgencies.push(agency);
+    this.submittedPermits.update(ps => [...ps, {
+      agency,
+      refNo: receipt.licenseNumber,
+      submittedAt: new Date().toLocaleDateString('th-TH'),
+      licenseType: 'e-SFR',
+      invoiceRef: receipt.referenceNumber,
+    }]);
+    if (this.lastShipmentId) {
+      this.queue.update(this.lastShipmentId, {
+        statusKey: 'submitted',
+        stage: 7,
+        messages: this.messages().slice(this.flowStartIdx),
+      });
+    }
+    this.withTyping(() => this.showNextAgencyIfAny(), 700);
   }
 
   /** Posts the rubber-cert-payment card — gated between เลือกโปรไฟล์ and the agency's next step
