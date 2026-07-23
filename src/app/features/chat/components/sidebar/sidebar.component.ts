@@ -38,7 +38,12 @@ export class SidebarComponent {
   isQueue = () => this.router.url === '/queue';
 
   goChat()  { this.router.navigate(['/']); }
-  goQueue() { this.queue.open(''); this.router.navigate(['/queue']); }
+  // syncQueueProgress() persists whatever a resumed ("ดำเนินการต่อ") session did in chat back onto
+  // its Shipment record before leaving — without this, navigating to คิวงาน via the sidebar (as
+  // opposed to the chat page's own "กลับไปคิวงาน" banner, which goes through chat.newChat()) left
+  // the queue detail view showing stale progress (e.g. an e-QC/e-SFR card that was actually already
+  // done in chat still showing as not started).
+  goQueue() { this.chat.syncQueueProgress(); this.queue.open(''); this.router.navigate(['/queue']); }
   newChat() { this.chat.newChat(); this.goChat(); }
 
   // Fixed-position tooltip (escapes overflow:auto boundary)

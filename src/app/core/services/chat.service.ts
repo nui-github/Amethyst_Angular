@@ -2060,6 +2060,12 @@ export class ChatService {
     'form-preview': 'ตรวจสอบข้อมูลก่อนส่งกรมแล้ว',
     'flag-card': 'ยืนยันจุดที่ต้องตรวจสอบแล้ว',
     'item-measurement': 'กรอกข้อมูล Measurement แล้ว',
+    'rubber-eqc-gate': 'กรอกคำขอหนังสือรับรองคุณภาพยาง (e-QC) แล้ว',
+    'rubber-eqc-status': 'อัปเดตสถานะหนังสือรับรองคุณภาพยาง (e-QC)',
+    'rubber-esfr-gate': 'กรอกคำขอผ่านด่านศุลกากร (e-SFR) แล้ว',
+    'rubber-esfr-preview': 'ตรวจสอบคำขอ e-SFR ก่อนส่ง',
+    'rubber-esfr-status': 'อัปเดตสถานะคำขอผ่านด่านศุลกากร (e-SFR)',
+    'rubber-esfr-fee-receipt': 'ได้รับใบรับค่าธรรมเนียม (e-SFR) แล้ว',
   };
 
   /** How far the steps-bar (queue-page's STAGE_LABELS) should advance given the message types seen
@@ -2077,12 +2083,14 @@ export class ChatService {
 
   /** Persists whatever progress a RESUMED ("ดำเนินการต่อ") session made back onto its Shipment
    *  record, even if the flow was left unfinished — otherwise the queue detail view (steps-bar,
-   *  audit trail) stays frozen at the point loadQueueSession() first opened it, and the next
-   *  "ดำเนินการต่อ" would restore state from a stale, incomplete message history. A flow that DID
-   *  reach "ยืนยันส่งกรม" is already fully handled by finalizeSubmit()'s own queue.update(), so this
-   *  is a no-op once submittedRefNo is set — re-running it would re-append the whole flow a second
-   *  time, since flowStartIdx isn't advanced mid-flow. */
-  private syncQueueProgress(): void {
+   *  audit trail, e-QC/e-SFR cards) stays frozen at the point loadQueueSession() first opened it.
+   *  Called from every place a resumed session can be navigated away from chat (newChat(),
+   *  SidebarComponent.goQueue()) — safe to call more than once per session since it advances
+   *  flowStartIdx after each run, so a later call only appends the delta since the previous sync
+   *  instead of re-appending messages already merged in. A flow that DID reach "ยืนยันส่งกรม" is
+   *  already fully handled by finalizeSubmit()'s own queue.update(), so this is a no-op once
+   *  submittedRefNo is set. */
+  syncQueueProgress(): void {
     const shipmentId = this.queueShipmentId();
     if (!shipmentId || this.submittedRefNo()) return;
     const ship = this.queue.get(shipmentId);
@@ -2112,7 +2120,9 @@ export class ChatService {
       audit,
       stage: Math.max(ship.stage, this.deriveStageFromMessages(mergedMessages)),
       ...(items ? { items, itemsSelected: true } : {}),
+      ...this.currentRubberQueueFields(),
     });
+    this.flowStartIdx = this.messages().length;
   }
 
   /**
