@@ -392,9 +392,9 @@
                  permit below (returnedDocuments), paid via bank account debit earlier in the flow
                  (before agency-upload/form-preview) rather than QR — see RubberCertPaymentComponent -->
             @if (openShipment()!.rubberCertPayment) {
-              <div class="dv-card">
+              <div class="dv-card dv-card--submitted">
                 <div class="dv-card__hd">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0D8F61" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                   <span>หนังสือรับรองคุณภาพยาง (e-QC, ยางผสม)</span>
                 </div>
                 <div class="dv-result-rows">
@@ -443,9 +443,9 @@
                  shown alongside rubberCertPayment (e-QC) above when both are present, independently
                  of each other (a session may only have done one of the two) -->
             @if (openShipment()!.esfrFeeReceipt) {
-              <div class="dv-card">
+              <div class="dv-card dv-card--submitted">
                 <div class="dv-card__hd">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M14 8H8"/><path d="M16 12H8"/><path d="M13 16H8"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0D8F61" stroke-width="2"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M14 8H8"/><path d="M16 12H8"/><path d="M13 16H8"/></svg>
                   <span>ใบรับค่าธรรมเนียม (e-SFR)</span>
                 </div>
                 <div class="dv-result-rows">
