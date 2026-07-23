@@ -804,97 +804,67 @@ export const MOCK_QUEUE: Shipment[] = [
     ],
   },
 
-  // ── 13. submitted (EXP): Pathogen Diagnostic Reagent Kit – ขาออก pink form กรมควบคุมโรค ──
+  // ── 13. needs_you (EXP): Tetanus Antitoxin – ขาออก pink form กรมควบคุมโรค (รอแนบเอกสาร) ──
   {
     id: 'EXP-68-013001', customsNo: 'HLTH000000013', hthmRef: 'HTHM000000013',
-    isNew: false, type: 'EXP',
-    goods: 'Pathogen Diagnostic Reagent Kit (ชุดน้ำยาตรวจวินิจฉัยเชื้อโรค)', hs: '3822.00.00',
+    isNew: true, type: 'EXP',
+    goods: 'Tetanus Antitoxin (เซรุ่มแก้พิษบาดทะยัก)', hs: '3002.12.00',
     customer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', contact: 'คุณพิมพ์ชนก ส่งดี',
     contactEmail: 'pimchanok@siamagriexport.co.th',
-    origin: 'ไทย (TH)', importedAt: '10:05 น. วันนี้', createdAt: NOW - 4 * 3600_000, owner: 'ปวีณา ส.',
+    origin: 'ไทย (TH)', importedAt: '10:05 น. วันนี้', createdAt: NOW - 1 * 3600_000, owner: 'ปวีณา ส.',
     agency: 'ddc', permitNeeded: true, formCode: 'Pink Form',
     formName: 'คำขออนุญาตส่งออกเชื้อโรคและพิษจากสัตว์ (Pink Form) — กรมควบคุมโรค',
-    conf: 84, stage: 8, statusKey: 'submitted',
-    assess: { conf: 84, reason: 'บรรจุสารเชื้อโรคอ้างอิง (reference pathogen material) อยู่ภายใต้ พ.ร.บ.เชื้อโรคและพิษจากสัตว์ พ.ศ. 2558 ต้องขอใบอนุญาตจากกรมควบคุมโรคก่อนส่งออก' },
+    conf: 84, stage: 4, statusKey: 'needs_you',
+    assess: { conf: 84, reason: 'เซรุ่มแก้พิษบาดทะยัก จัดเป็นพิษจากสัตว์ อยู่ภายใต้ พ.ร.บ.เชื้อโรคและพิษจากสัตว์ พ.ศ. 2558 ต้องขอใบอนุญาตจากกรมควบคุมโรคก่อนส่งออก' },
     classify: { agency: 'ddc', conf: 84, reason: '', alt: [] },
     draft: { fields: [] },
     flags: [],
     audit: [
-      { time: '10:05', text: 'อัปโหลดใบ Invoice EXPINV0009 เข้าระบบแล้ว', by: 'ระบบ' },
+      { time: '10:05', text: 'อัปโหลดใบ Invoice EXPINV0020 เข้าระบบแล้ว', by: 'ระบบ' },
       { time: '10:08', text: 'OCR สำเร็จ', by: 'AI' },
-      { time: '10:10', text: 'วิเคราะห์ HS Code: 3822.00.00 → กรมควบคุมโรค (84%)', by: 'AI' },
-      { time: '10:14', text: 'แนบ Certificate of Analysis (COA) แล้ว', by: 'ปวีณา ส.' },
-      { time: '10:20', text: 'ยื่นกรมควบคุมโรค สำเร็จ (Pink Form)', by: 'ระบบ' },
-      { time: '10:32', text: 'กรมควบคุมโรคตรวจสอบและอนุมัติคำขอแล้ว', by: 'กรมควบคุมโรค' },
-      { time: '10:34', text: 'ชำระค่าธรรมเนียม ฿1,000 ผ่าน QR แล้ว', by: 'ปวีณา ส.' },
-      { time: '10:35', text: 'กรมควบคุมโรคส่งเอกสารกลับมาให้แล้ว (3 ไฟล์)', by: 'กรมควบคุมโรค' },
+      { time: '10:10', text: 'วิเคราะห์ HS Code: 3002.12.00 → กรมควบคุมโรค (84%)', by: 'AI' },
+      { time: '10:11', text: 'รอแนบ Certificate of Analysis (COA)', by: 'AI' },
     ],
     messages: [
-      bot('10:05', 'อัปโหลดใบ Invoice EXPINV0009 เข้าระบบแล้วครับ — Pathogen Diagnostic Reagent Kit 500 กล่อง จากไทย ส่งออกไปญี่ปุ่น'),
+      bot('10:05', 'อัปโหลดใบ Invoice EXPINV0020 เข้าระบบแล้วครับ — Tetanus Antitoxin 300 กล่อง จากไทย ส่งออกไปญี่ปุ่น'),
       t('10:08', 'bot', 'ocr-results', undefined, {
-        invoiceNo: 'EXPINV0009', invoiceDate: '12/05/2025', quantity: '500 กล่อง',
+        invoiceNo: 'EXPINV0020', invoiceDate: '17/07/2025', quantity: '300 กล่อง',
         importer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', port: 'ท่าเรือแหลมฉบัง (LCH)',
-        hsCode: '3822.00.00', countryOrigin: 'ไทย (TH)', lotNo: 'BIO-2568-014', uNo: '',
+        hsCode: '3002.12.00', countryOrigin: 'ไทย (TH)', lotNo: 'BIO-2568-040', uNo: '',
       }),
       t('10:10', 'bot', 'hs-analysis', undefined, {
-        hsCode: '3822.00.00', goodsName: 'Pathogen Diagnostic Reagent Kit (ชุดน้ำยาตรวจวินิจฉัยเชื้อโรค)',
-        description: 'บรรจุสารเชื้อโรคอ้างอิง (reference pathogen material) อยู่ภายใต้ พ.ร.บ.เชื้อโรคและพิษจากสัตว์ พ.ศ. 2558 ต้องขอใบอนุญาตจากกรมควบคุมโรคก่อนส่งออก',
+        hsCode: '3002.12.00', goodsName: 'Tetanus Antitoxin (เซรุ่มแก้พิษบาดทะยัก)',
+        description: 'เซรุ่มแก้พิษบาดทะยัก จัดเป็นพิษจากสัตว์ อยู่ภายใต้ พ.ร.บ.เชื้อโรคและพิษจากสัตว์ พ.ศ. 2558 ต้องขอใบอนุญาตจากกรมควบคุมโรคก่อนส่งออก',
         requiresPermit: true, direction: 'export', agency: 'กรมควบคุมโรค', agencyFull: 'กรมควบคุมโรค (DDC)',
         licenseType: 'Pink Form', confidence: 84,
       }),
-      t('10:14', 'bot', 'agency-upload', undefined, {
+      t('10:11', 'bot', 'agency-upload', undefined, {
         agency: 'กรมควบคุมโรค', agencyLabel: 'กรมควบคุมโรค (DDC)',
         slots: [
           { id: 's1', label: 'Certificate of Analysis (COA)', required: true },
         ],
       }),
-      t('10:20', 'bot', 'status-card', undefined, {
-        refNo: 'RG-2568-82300', customsRef: 'EXPINV0009',
-        submittedAt: new Date(Date.now() - 4 * 3600_000).toLocaleDateString('th-TH'), isPending: false,
-        agency: 'กรมควบคุมโรค', feeNote: 'ค่าธรรมเนียมกรม ฿1,000 (ชำระผ่าน QR แล้ว)',
-      }),
-      bot('10:32', 'กรมควบคุมโรคตรวจสอบและอนุมัติคำขอแล้วครับ ✅'),
-      t('10:33', 'bot', 'payment-qr', undefined, {
-        agency: 'กรมควบคุมโรค', amount: 1000, refNo: 'PAY-882300', expiresAt: '11:00',
-      }),
-      t('10:35', 'bot', 'agency-docs-returned', undefined, {
-        agency: 'กรมควบคุมโรค',
-        docs: [
-          { key: 'ddc_pink_form',     label: 'ใบรับรองฯ (DDCPINKFORM)',          url: SAMPLE_PDF },
-          { key: 'ddc_pink_form_pdf', label: 'ใบรับรองฯ (DDCPINKFORM PDF)',      url: SAMPLE_PDF },
-          { key: 'ddc_receipt',       label: 'ใบเสร็จรับเงิน (DDCERECEIPT PDF)', url: SAMPLE_PDF },
-        ],
-      }),
     ],
     documents: [
-      doc('d13a', 'Invoice EXPINV0009', 'invoice'),
-      doc('d13b', 'DDC_PINKFORM_V2.0.pdf', 'coa'),
+      doc('d13a', 'Invoice EXPINV0020', 'invoice'),
     ],
-    paymentQr: {
-      agency: 'กรมควบคุมโรค',
-      amount: 1000,
-      refNo: 'PAY-882300',
-      expiresAt: '11:00',
-      status: 'unpaid' as const,
-    },
     itemsSelected: true,
     items: [
-      { id: 'i13', name: 'Pathogen Diagnostic Reagent Kit', hsCode: '3822.00.00', origin: 'ไทย (TH)', quantity: '500', unit: 'กล่อง', lotNo: 'BIO-2568-014', amount: 533600,
-        detail: { lotNo: 'BIO-2568-014', mfgDate: '10-05-2568', expDate: '10-05-2570', measurement: '500', measUnit: 'กล่อง', qty: '25', qtyUnit: 'CTN' } },
+      { id: 'i13', name: 'Tetanus Antitoxin', hsCode: '3002.12.00', origin: 'ไทย (TH)', quantity: '300', unit: 'กล่อง', lotNo: 'BIO-2568-040', amount: 318000 },
     ],
   },
 
-  // ── 14. needs_you (EXP): Diphtheria Antitoxin – ขาออก pink form กรมควบคุมโรค (รอแนบเอกสาร) ──
+  // ── 14. submitted (EXP): Diphtheria Antitoxin – ขาออก pink form กรมควบคุมโรค (ยื่นแล้ว รอกรมตรวจสอบ) ──
   {
     id: 'EXP-68-014002', customsNo: 'HLTH000000014', hthmRef: 'HTHM000000014',
-    isNew: true, type: 'EXP',
+    isNew: false, type: 'EXP',
     goods: 'Diphtheria Antitoxin (เซรุ่มแก้พิษคอตีบ)', hs: '3002.12.00',
     customer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', contact: 'คุณพิมพ์ชนก ส่งดี',
     contactEmail: 'pimchanok@siamagriexport.co.th',
-    origin: 'ไทย (TH)', importedAt: '13:20 น. วันนี้', createdAt: NOW - 1 * 3600_000, owner: 'ปวีณา ส.',
+    origin: 'ไทย (TH)', importedAt: '13:20 น. วันนี้', createdAt: NOW - 3 * 3600_000, owner: 'ปวีณา ส.',
     agency: 'ddc', permitNeeded: true, formCode: 'Pink Form',
     formName: 'คำขออนุญาตส่งออกเชื้อโรคและพิษจากสัตว์ (Pink Form) — กรมควบคุมโรค',
-    conf: 88, stage: 4, statusKey: 'needs_you',
+    conf: 88, stage: 7, statusKey: 'submitted',
     assess: { conf: 88, reason: 'เซรุ่มแก้พิษ (antitoxin) จัดเป็นพิษจากสัตว์ อยู่ภายใต้ พ.ร.บ.เชื้อโรคและพิษจากสัตว์ พ.ศ. 2558 ต้องขอใบอนุญาตจากกรมควบคุมโรคก่อนส่งออก' },
     classify: { agency: 'ddc', conf: 88, reason: '', alt: [] },
     draft: { fields: [] },
@@ -903,7 +873,8 @@ export const MOCK_QUEUE: Shipment[] = [
       { time: '13:20', text: 'อัปโหลดใบ Invoice EXPINV0011 เข้าระบบแล้ว', by: 'ระบบ' },
       { time: '13:23', text: 'OCR สำเร็จ', by: 'AI' },
       { time: '13:25', text: 'วิเคราะห์ HS Code: 3002.12.00 → กรมควบคุมโรค (88%)', by: 'AI' },
-      { time: '13:26', text: 'รอแนบ Certificate of Analysis (COA)', by: 'AI' },
+      { time: '13:30', text: 'แนบ Certificate of Analysis (COA) แล้ว', by: 'ปวีณา ส.' },
+      { time: '13:35', text: 'ยื่นกรมควบคุมโรค สำเร็จ (Pink Form) — รอกรมตรวจสอบ', by: 'ระบบ' },
     ],
     messages: [
       bot('13:20', 'อัปโหลดใบ Invoice EXPINV0011 เข้าระบบแล้วครับ — Diphtheria Antitoxin 200 กล่อง จากไทย ส่งออกไปเวียดนาม'),
@@ -918,15 +889,21 @@ export const MOCK_QUEUE: Shipment[] = [
         requiresPermit: true, direction: 'export', agency: 'กรมควบคุมโรค', agencyFull: 'กรมควบคุมโรค (DDC)',
         licenseType: 'Pink Form', confidence: 88,
       }),
-      t('13:26', 'bot', 'agency-upload', undefined, {
+      t('13:30', 'bot', 'agency-upload', undefined, {
         agency: 'กรมควบคุมโรค', agencyLabel: 'กรมควบคุมโรค (DDC)',
         slots: [
           { id: 's1', label: 'Certificate of Analysis (COA)', required: true },
         ],
       }),
+      t('13:35', 'bot', 'status-card', undefined, {
+        refNo: 'RG-2568-83100', customsRef: 'EXPINV0011',
+        submittedAt: new Date(Date.now() - 3 * 3600_000).toLocaleDateString('th-TH'), isPending: false,
+        agency: 'กรมควบคุมโรค', feeNote: 'ค่าธรรมเนียมกรม ฿1,000 (รอกรมตรวจสอบคำขอก่อน)',
+      }),
     ],
     documents: [
       doc('d14a', 'Invoice EXPINV0011', 'invoice'),
+      doc('d14b', 'DDC_PINKFORM_V1.0.pdf', 'coa'),
     ],
     itemsSelected: true,
     items: [
@@ -934,7 +911,7 @@ export const MOCK_QUEUE: Shipment[] = [
     ],
   },
 
-  // ── 15. submitted (EXP): Botulinum Antitoxin – ขาออก pink form กรมควบคุมโรค (รออนุมัติ/ชำระ) ──
+  // ── 15. submitted (EXP): Botulinum Antitoxin – ขาออก pink form กรมควบคุมโรค (อนุมัติแล้ว รอชำระ QR) ──
   {
     id: 'EXP-68-015003', customsNo: 'HLTH000000015', hthmRef: 'HTHM000000015',
     isNew: false, type: 'EXP',
@@ -944,7 +921,7 @@ export const MOCK_QUEUE: Shipment[] = [
     origin: 'ไทย (TH)', importedAt: '08:40 น. เมื่อวาน', createdAt: NOW - 20 * 3600_000, owner: 'ปวีณา ส.',
     agency: 'ddc', permitNeeded: true, formCode: 'Pink Form',
     formName: 'คำขออนุญาตส่งออกเชื้อโรคและพิษจากสัตว์ (Pink Form) — กรมควบคุมโรค',
-    conf: 90, stage: 8, statusKey: 'submitted',
+    conf: 90, stage: 8, statusKey: 'submitted', deptApproved: true,
     assess: { conf: 90, reason: 'เซรุ่มแก้พิษโบทูลิซึม จัดเป็นพิษจากสัตว์ อยู่ภายใต้ พ.ร.บ.เชื้อโรคและพิษจากสัตว์ พ.ศ. 2558 ต้องขอใบอนุญาตจากกรมควบคุมโรคก่อนส่งออก' },
     classify: { agency: 'ddc', conf: 90, reason: '', alt: [] },
     draft: { fields: [] },
@@ -1030,6 +1007,7 @@ export const MOCK_QUEUE: Shipment[] = [
         submittedAt: new Date(Date.now() - 48 * 3600_000).toLocaleDateString('th-TH'), isPending: false,
         agency: 'กรมควบคุมโรค', feeNote: 'ค่าธรรมเนียมกรม ฿1,000 (รอกรมส่ง QR มาชำระ)',
       }),
+      bot('08:10', 'กรมควบคุมโรคตรวจสอบและอนุมัติคำขอแล้วครับ ✅'),
     ],
     documents: [
       doc('d16a', 'Invoice EXPINV0014', 'invoice'),
@@ -1041,7 +1019,7 @@ export const MOCK_QUEUE: Shipment[] = [
     ],
   },
 
-  // ── 17. submitted (EXP): Human Serum Albumin – ขาออก pink form กรมควบคุมโรค (ชำระแล้ว 3 ไฟล์) ──
+  // ── 17. submitted (EXP): Human Serum Albumin – ขาออก pink form กรมควบคุมโรค (ชำระแล้ว รอกรมยืนยัน) ──
   {
     id: 'EXP-68-017005', customsNo: 'HLTH000000017', hthmRef: 'HTHM000000017',
     isNew: false, type: 'EXP',
@@ -1051,7 +1029,7 @@ export const MOCK_QUEUE: Shipment[] = [
     origin: 'ไทย (TH)', importedAt: '14:20 น. เมื่อวาน', createdAt: NOW - 24 * 3600_000, owner: 'ปวีณา ส.',
     agency: 'ddc', permitNeeded: true, formCode: 'Pink Form',
     formName: 'คำขออนุญาตส่งออกเชื้อโรคและพิษจากสัตว์ (Pink Form) — กรมควบคุมโรค',
-    conf: 92, stage: 8, statusKey: 'submitted',
+    conf: 92, stage: 8, statusKey: 'submitted', deptApproved: true,
     assess: { conf: 92, reason: 'อัลบูมินเซรุ่มมนุษย์ (ผลิตจากเลือดมนุษย์) อยู่ภายใต้ พ.ร.บ.เชื้อโรคและพิษจากสัตว์ ต้องขอใบอนุญาต' },
     classify: { agency: 'ddc', conf: 92, reason: '', alt: [] },
     draft: { fields: [] },
@@ -1063,35 +1041,118 @@ export const MOCK_QUEUE: Shipment[] = [
       { time: '14:35', text: 'แนบ Certificate of Analysis (COA) แล้ว', by: 'ปวีณา ส.' },
       { time: '14:50', text: 'ยื่นกรมควบคุมโรค สำเร็จ (Pink Form)', by: 'ระบบ' },
       { time: '15:10', text: 'กรมควบคุมโรคตรวจสอบและอนุมัติคำขอแล้ว', by: 'กรมควบคุมโรค' },
-      { time: '15:15', text: 'ชำระค่าธรรมเนียม ฿1,000 ผ่าน QR แล้ว', by: 'ปวีณา ส.' },
-      { time: '15:16', text: 'กรมควบคุมโรคส่งเอกสารกลับมาให้แล้ว (3 ไฟล์)', by: 'กรมควบคุมโรค' },
+      { time: '15:15', text: 'ชำระค่าธรรมเนียม ฿1,000 ผ่าน QR แล้ว — รอกรมยืนยันการชำระเงิน', by: 'ปวีณา ส.' },
     ],
     messages: [
       bot('14:20', 'อัปโหลดใบ Invoice EXPINV0017 เข้าระบบแล้วครับ — Human Serum Albumin 120 กล่อง จากไทย ส่งออกไปญี่ปุ่น'),
-      t('15:16', 'bot', 'status-card', undefined, {
+      t('15:10', 'bot', 'status-card', undefined, {
         refNo: 'RG-2568-77100', customsRef: 'EXPINV0017',
         submittedAt: new Date(Date.now() - 24 * 3600_000).toLocaleDateString('th-TH'), isPending: false,
-        agency: 'กรมควบคุมโรค', feeNote: 'ค่าธรรมเนียมกรม ฿1,000 (ชำระแล้ว)',
+        agency: 'กรมควบคุมโรค', feeNote: 'ค่าธรรมเนียมกรม ฿1,000 (ชำระแล้ว รอกรมยืนยัน)',
       }),
     ],
     documents: [
       doc('d17a', 'Invoice EXPINV0017', 'invoice'),
       doc('d17b', 'DDC_PINKFORM_V2.0.pdf', 'coa'),
     ],
-    returnedDocuments: [
-      doc('d17r1', 'ใบรับรองฯ (DDCPINKFORM)', 'other', 'pdf', 'ddc', new Date(Date.now() - 24 * 3600_000 + 3600_000).toLocaleDateString('th-TH') + ' 15:16'),
-      doc('d17r2', 'ใบรับรองฯ (DDCPINKFORM PDF)', 'other', 'pdf', 'ddc', new Date(Date.now() - 24 * 3600_000 + 3600_000).toLocaleDateString('th-TH') + ' 15:16'),
-      doc('d17r3', 'ใบเสร็จรับเงิน (DDCERECEIPT PDF)', 'other', 'pdf', 'ddc', new Date(Date.now() - 24 * 3600_000 + 3600_000).toLocaleDateString('th-TH') + ' 15:16'),
-    ],
     itemsSelected: true,
     items: [
       { id: 'i17', name: 'Human Serum Albumin', hsCode: '3002.11.00', origin: 'ไทย (TH)', quantity: '120', unit: 'กล่อง', lotNo: 'BIO-2568-032', amount: 384000 },
     ],
+    paymentQr: {
+      agency: 'กรมควบคุมโรค', amount: 1000, refNo: 'PAY-771100', expiresAt: '15:15',
+      status: 'paid_pending',
+    },
   },
 
-  // ── 18. needs_you (EXP): RSS3 Smoked Rubber Sheet – ขาออก การยาง (รอแนบเอกสาร) ──
+  // ── 18. submitted (EXP): Pathogen Diagnostic Reagent Kit – ขาออก pink form กรมควบคุมโรค (อนุมัติแล้ว 3 ไฟล์) ──
   {
-    id: 'EXP-68-018006', customsNo: 'HLTH000000018', hthmRef: 'HTHM000000018',
+    id: 'EXP-68-018001', customsNo: 'HLTH000000026', hthmRef: 'HTHM000000026',
+    isNew: false, type: 'EXP',
+    goods: 'Pathogen Diagnostic Reagent Kit (ชุดน้ำยาตรวจวินิจฉัยเชื้อโรค)', hs: '3822.00.00',
+    customer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', contact: 'คุณพิมพ์ชนก ส่งดี',
+    contactEmail: 'pimchanok@siamagriexport.co.th',
+    origin: 'ไทย (TH)', importedAt: '10:05 น. เมื่อวาน', createdAt: NOW - 30 * 3600_000, owner: 'ปวีณา ส.',
+    agency: 'ddc', permitNeeded: true, formCode: 'Pink Form',
+    formName: 'คำขออนุญาตส่งออกเชื้อโรคและพิษจากสัตว์ (Pink Form) — กรมควบคุมโรค',
+    conf: 84, stage: 8, statusKey: 'submitted', deptApproved: true,
+    assess: { conf: 84, reason: 'บรรจุสารเชื้อโรคอ้างอิง (reference pathogen material) อยู่ภายใต้ พ.ร.บ.เชื้อโรคและพิษจากสัตว์ พ.ศ. 2558 ต้องขอใบอนุญาตจากกรมควบคุมโรคก่อนส่งออก' },
+    classify: { agency: 'ddc', conf: 84, reason: '', alt: [] },
+    draft: { fields: [] },
+    flags: [],
+    audit: [
+      { time: '10:05', text: 'อัปโหลดใบ Invoice EXPINV0009 เข้าระบบแล้ว', by: 'ระบบ' },
+      { time: '10:08', text: 'OCR สำเร็จ', by: 'AI' },
+      { time: '10:10', text: 'วิเคราะห์ HS Code: 3822.00.00 → กรมควบคุมโรค (84%)', by: 'AI' },
+      { time: '10:14', text: 'แนบ Certificate of Analysis (COA) แล้ว', by: 'ปวีณา ส.' },
+      { time: '10:20', text: 'ยื่นกรมควบคุมโรค สำเร็จ (Pink Form)', by: 'ระบบ' },
+      { time: '10:32', text: 'กรมควบคุมโรคตรวจสอบและอนุมัติคำขอแล้ว', by: 'กรมควบคุมโรค' },
+      { time: '10:34', text: 'ชำระค่าธรรมเนียม ฿1,000 ผ่าน QR แล้ว', by: 'ปวีณา ส.' },
+      { time: '10:35', text: 'กรมควบคุมโรคส่งเอกสารกลับมาให้แล้ว (3 ไฟล์)', by: 'กรมควบคุมโรค' },
+    ],
+    messages: [
+      bot('10:05', 'อัปโหลดใบ Invoice EXPINV0009 เข้าระบบแล้วครับ — Pathogen Diagnostic Reagent Kit 500 กล่อง จากไทย ส่งออกไปญี่ปุ่น'),
+      t('10:08', 'bot', 'ocr-results', undefined, {
+        invoiceNo: 'EXPINV0009', invoiceDate: '12/05/2025', quantity: '500 กล่อง',
+        importer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', port: 'ท่าเรือแหลมฉบัง (LCH)',
+        hsCode: '3822.00.00', countryOrigin: 'ไทย (TH)', lotNo: 'BIO-2568-014', uNo: '',
+      }),
+      t('10:10', 'bot', 'hs-analysis', undefined, {
+        hsCode: '3822.00.00', goodsName: 'Pathogen Diagnostic Reagent Kit (ชุดน้ำยาตรวจวินิจฉัยเชื้อโรค)',
+        description: 'บรรจุสารเชื้อโรคอ้างอิง (reference pathogen material) อยู่ภายใต้ พ.ร.บ.เชื้อโรคและพิษจากสัตว์ พ.ศ. 2558 ต้องขอใบอนุญาตจากกรมควบคุมโรคก่อนส่งออก',
+        requiresPermit: true, direction: 'export', agency: 'กรมควบคุมโรค', agencyFull: 'กรมควบคุมโรค (DDC)',
+        licenseType: 'Pink Form', confidence: 84,
+      }),
+      t('10:14', 'bot', 'agency-upload', undefined, {
+        agency: 'กรมควบคุมโรค', agencyLabel: 'กรมควบคุมโรค (DDC)',
+        slots: [
+          { id: 's1', label: 'Certificate of Analysis (COA)', required: true },
+        ],
+      }),
+      t('10:20', 'bot', 'status-card', undefined, {
+        refNo: 'RG-2568-82300', customsRef: 'EXPINV0009',
+        submittedAt: new Date(Date.now() - 30 * 3600_000).toLocaleDateString('th-TH'), isPending: false,
+        agency: 'กรมควบคุมโรค', feeNote: 'ค่าธรรมเนียมกรม ฿1,000 (ชำระผ่าน QR แล้ว)',
+      }),
+      bot('10:32', 'กรมควบคุมโรคตรวจสอบและอนุมัติคำขอแล้วครับ ✅'),
+      t('10:33', 'bot', 'payment-qr', undefined, {
+        agency: 'กรมควบคุมโรค', amount: 1000, refNo: 'PAY-882300', expiresAt: '11:00',
+      }),
+      t('10:35', 'bot', 'agency-docs-returned', undefined, {
+        agency: 'กรมควบคุมโรค',
+        docs: [
+          { key: 'ddc_pink_form',     label: 'ใบรับรองฯ (DDCPINKFORM)',          url: SAMPLE_PDF },
+          { key: 'ddc_pink_form_pdf', label: 'ใบรับรองฯ (DDCPINKFORM PDF)',      url: SAMPLE_PDF },
+          { key: 'ddc_receipt',       label: 'ใบเสร็จรับเงิน (DDCERECEIPT PDF)', url: SAMPLE_PDF },
+        ],
+      }),
+    ],
+    documents: [
+      doc('d18a', 'Invoice EXPINV0009', 'invoice'),
+      doc('d18b', 'DDC_PINKFORM_V2.0.pdf', 'coa'),
+    ],
+    paymentQr: {
+      agency: 'กรมควบคุมโรค',
+      amount: 1000,
+      refNo: 'PAY-882300',
+      expiresAt: '11:00',
+      status: 'paid_confirmed' as const,
+    },
+    returnedDocuments: [
+      doc('d18r1', 'ใบรับรองฯ (DDCPINKFORM)', 'other', 'pdf', 'ddc', new Date(Date.now() - 30 * 3600_000 + 3600_000).toLocaleDateString('th-TH') + ' 10:35'),
+      doc('d18r2', 'ใบรับรองฯ (DDCPINKFORM PDF)', 'other', 'pdf', 'ddc', new Date(Date.now() - 30 * 3600_000 + 3600_000).toLocaleDateString('th-TH') + ' 10:35'),
+      doc('d18r3', 'ใบเสร็จรับเงิน (DDCERECEIPT PDF)', 'other', 'pdf', 'ddc', new Date(Date.now() - 30 * 3600_000 + 3600_000).toLocaleDateString('th-TH') + ' 10:35'),
+    ],
+    itemsSelected: true,
+    items: [
+      { id: 'i18', name: 'Pathogen Diagnostic Reagent Kit', hsCode: '3822.00.00', origin: 'ไทย (TH)', quantity: '500', unit: 'กล่อง', lotNo: 'BIO-2568-014', amount: 533600,
+        detail: { lotNo: 'BIO-2568-014', mfgDate: '10-05-2568', expDate: '10-05-2570', measurement: '500', measUnit: 'กล่อง', qty: '25', qtyUnit: 'CTN' } },
+    ],
+  },
+
+  // ── 19. needs_you (EXP): RSS3 Smoked Rubber Sheet – ขาออก การยาง (รอแนบเอกสาร, ไม่ใช่ยางผสม) ──
+  {
+    id: 'EXP-68-019007', customsNo: 'HLTH000000018', hthmRef: 'HTHM000000018',
     isNew: true, type: 'EXP',
     goods: 'RSS3 Smoked Rubber Sheet (ยางแผ่นรมควันชั้น 3)', hs: '4001.21.00',
     customer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', contact: 'คุณพิมพ์ชนก ส่งดี',
@@ -1132,17 +1193,310 @@ export const MOCK_QUEUE: Shipment[] = [
       }),
     ],
     documents: [
-      doc('d18a', 'ใบขนสินค้าขาออก EXPINV0018', 'customs'),
+      doc('d19a', 'ใบขนสินค้าขาออก EXPINV0018', 'customs'),
     ],
     itemsSelected: true,
     items: [
-      { id: 'i18', name: 'RSS3 Smoked Rubber Sheet', hsCode: '4001.21.00', origin: 'ไทย (TH)', quantity: '20000', unit: 'กก.', lotNo: 'RSS3-2568-090', amount: 1704000 },
+      { id: 'i19', name: 'RSS3 Smoked Rubber Sheet', hsCode: '4001.21.00', origin: 'ไทย (TH)', quantity: '20000', unit: 'กก.', lotNo: 'RSS3-2568-090', amount: 1704000 },
     ],
   },
 
-  // ── 19. submitted (EXP): Rubber Compound Sheet – ขาออก การยาง (e-QC + e-SFR ยื่นแล้ว) ──
+  // ── 20. needs_you (EXP): Rubber Compound Block – ขาออก การยาง (ยางผสม, รอเลือก e-QC/e-SFR) ──
   {
-    id: 'EXP-68-019007', customsNo: 'HLTH000000019', hthmRef: 'HTHM000000019',
+    id: 'EXP-68-020008', customsNo: 'HLTH000000021', hthmRef: 'HTHM000000021',
+    isNew: true, type: 'EXP',
+    goods: 'Rubber Compound Block (ยางแท่งผสม)', hs: '4005.10.00',
+    customer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', contact: 'คุณพิมพ์ชนก ส่งดี',
+    contactEmail: 'pimchanok@siamagriexport.co.th',
+    origin: 'ไทย (TH)', importedAt: '08:20 น. วันนี้', createdAt: NOW - 5 * 3600_000, owner: 'ปวีณา ส.',
+    agency: 'raot', permitNeeded: true, formCode: 'ใบอนุญาตค้ายาง',
+    formName: 'คำขอใบอนุญาตค้ายางขาออก — การยางแห่งประเทศไทย (RAOT)',
+    conf: 87, stage: 4, statusKey: 'needs_you',
+    assess: { conf: 87, reason: 'ยางแท่งผสม (Compounded Rubber) ไม่เข้าข่ายใบอนุญาตค้ายาง แต่ต้องขอหนังสือรับรองคุณภาพยาง (e-QC) และชำระค่าธรรมเนียมผ่านด่านศุลกากร (e-SFR) ก่อนส่งออก' },
+    classify: { agency: 'raot', conf: 87, reason: '', alt: [] },
+    draft: { fields: [] },
+    flags: [],
+    audit: [
+      { time: '08:20', text: 'อัปโหลดใบขนสินค้าขาออก EXPINV0021 เข้าระบบแล้ว', by: 'ระบบ' },
+      { time: '08:23', text: 'OCR สำเร็จ', by: 'AI' },
+      { time: '08:25', text: 'วิเคราะห์ HS Code: 4005.10.00 → การยาง (87%)', by: 'AI' },
+      { time: '08:26', text: 'รอผู้ใช้เลือกขั้นตอน e-QC หรือ e-SFR', by: 'AI' },
+    ],
+    messages: [
+      bot('08:20', 'อัปโหลดใบขนสินค้าขาออก EXPINV0021 เข้าระบบแล้วครับ — Rubber Compound Block 4,500 กก. จากไทย ส่งออกไปเวียดนาม'),
+      t('08:23', 'bot', 'ocr-results', undefined, {
+        invoiceNo: 'EXPINV0021', invoiceDate: '18/07/2025', quantity: '4500 กก.',
+        importer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', port: 'ท่าเรือแหลมฉบัง (LCH)',
+        hsCode: '4005.10.00', countryOrigin: 'ไทย (TH)', lotNo: 'SGL-2568-051', uNo: '',
+      }),
+      t('08:25', 'bot', 'hs-analysis', undefined, {
+        hsCode: '4005.10.00', goodsName: 'Rubber Compound Block (ยางแท่งผสม)',
+        description: 'ยางแท่งผสม (Compounded Rubber) ไม่เข้าข่ายใบอนุญาตค้ายาง แต่ต้องขอหนังสือรับรองคุณภาพยาง (e-QC) และชำระค่าธรรมเนียมผ่านด่านศุลกากร (e-SFR) ก่อนส่งออก',
+        requiresPermit: true, direction: 'export', agency: 'การยาง', agencyFull: 'การยางแห่งประเทศไทย (RAOT)',
+        licenseType: 'e-QC / e-SFR', confidence: 87,
+      }),
+      t('08:26', 'bot', 'choice-card', undefined, {
+        question: 'ท่านต้องการดำเนินการขั้นตอนใดต่อ?',
+        tip: 'ถ้ามีรายการยางผสมอยู่ด้วย แนะนำให้ขอหนังสือรับรองคุณภาพยาง (e-QC) ก่อน แล้วค่อยนำเลขหนังสือรับรองไปใช้ขอผ่านด่านศุลกากรและชำระค่าธรรมเนียม (e-SFR) ต่อได้เลยครับ',
+        options: [
+          { label: 'ขอหนังสือรับรองคุณภาพยาง (e-QC)', value: 'rubber-eqc', description: 'สำหรับรายการยางผสม (1 รายการ) — ต้องขอและชำระค่าธรรมเนียมก่อนส่งออก' },
+          { label: 'ขอใบอนุญาตผ่านด่านศุลกากร และชำระค่าธรรมเนียมส่งยางออกนอกราชอาณาจักร (e-SFR)', value: 'rubber-customs-fee', description: 'หมายเหตุ: รายการยางผสมต้องมีเลขหนังสือรับรองคุณภาพยาง (e-QC) แล้วจึงจะขอขั้นตอนนี้ได้' },
+        ],
+      }),
+    ],
+    documents: [
+      doc('d20a', 'ใบขนสินค้าขาออก EXPINV0021', 'customs'),
+    ],
+    itemsSelected: true,
+    items: [
+      { id: 'i20', name: 'Rubber Compound Block', hsCode: '4005.10.00', origin: 'ไทย (TH)', quantity: '4500', unit: 'กก.', lotNo: 'SGL-2568-051', amount: 239800 },
+    ],
+  },
+
+  // ── 21. needs_you (EXP): Rubber Compound Latex – ขาออก การยาง (กรอกคำขอ e-QC ค้างอยู่) ──
+  {
+    id: 'EXP-68-021009', customsNo: 'HLTH000000022', hthmRef: 'HTHM000000022',
+    isNew: false, type: 'EXP',
+    goods: 'Rubber Compound Latex (น้ำยางผสมข้น)', hs: '4005.10.00',
+    customer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', contact: 'คุณพิมพ์ชนก ส่งดี',
+    contactEmail: 'pimchanok@siamagriexport.co.th',
+    origin: 'ไทย (TH)', importedAt: '11:00 น. วันนี้', createdAt: NOW - 2 * 3600_000, owner: 'ปวีณา ส.',
+    agency: 'raot', permitNeeded: true, formCode: 'ใบอนุญาตค้ายาง',
+    formName: 'คำขอใบอนุญาตค้ายางขาออก — การยางแห่งประเทศไทย (RAOT)',
+    conf: 88, stage: 4, statusKey: 'needs_you',
+    assess: { conf: 88, reason: 'น้ำยางผสมข้น (Compounded Rubber) ไม่เข้าข่ายใบอนุญาตค้ายาง แต่ต้องขอหนังสือรับรองคุณภาพยาง (e-QC) และชำระค่าธรรมเนียมผ่านด่านศุลกากร (e-SFR) ก่อนส่งออก' },
+    classify: { agency: 'raot', conf: 88, reason: '', alt: [] },
+    draft: { fields: [] },
+    flags: [],
+    audit: [
+      { time: '11:00', text: 'อัปโหลดใบขนสินค้าขาออก EXPINV0022 เข้าระบบแล้ว', by: 'ระบบ' },
+      { time: '11:03', text: 'OCR สำเร็จ', by: 'AI' },
+      { time: '11:05', text: 'วิเคราะห์ HS Code: 4005.10.00 → การยาง (88%)', by: 'AI' },
+      { time: '11:06', text: 'เลือกขอหนังสือรับรองคุณภาพยาง (e-QC)', by: 'ปวีณา ส.' },
+      { time: '11:07', text: 'รอกรอกคำขอ e-QC ให้ครบถ้วน', by: 'AI' },
+    ],
+    messages: [
+      bot('11:00', 'อัปโหลดใบขนสินค้าขาออก EXPINV0022 เข้าระบบแล้วครับ — Rubber Compound Latex 2,800 กก. จากไทย ส่งออกไปมาเลเซีย'),
+      t('11:03', 'bot', 'ocr-results', undefined, {
+        invoiceNo: 'EXPINV0022', invoiceDate: '19/07/2025', quantity: '2800 กก.',
+        importer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', port: 'ท่าเรือแหลมฉบัง (LCH)',
+        hsCode: '4005.10.00', countryOrigin: 'ไทย (TH)', lotNo: 'SGL-2568-058', uNo: '',
+      }),
+      t('11:05', 'bot', 'choice-card', undefined, {
+        question: 'ท่านต้องการดำเนินการขั้นตอนใดต่อ?',
+        tip: 'ถ้ามีรายการยางผสมอยู่ด้วย แนะนำให้ขอหนังสือรับรองคุณภาพยาง (e-QC) ก่อน แล้วค่อยนำเลขหนังสือรับรองไปใช้ขอผ่านด่านศุลกากรและชำระค่าธรรมเนียม (e-SFR) ต่อได้เลยครับ',
+        options: [
+          { label: 'ขอหนังสือรับรองคุณภาพยาง (e-QC)', value: 'rubber-eqc', description: 'สำหรับรายการยางผสม (1 รายการ) — ต้องขอและชำระค่าธรรมเนียมก่อนส่งออก' },
+          { label: 'ขอใบอนุญาตผ่านด่านศุลกากร และชำระค่าธรรมเนียมส่งยางออกนอกราชอาณาจักร (e-SFR)', value: 'rubber-customs-fee', description: 'หมายเหตุ: รายการยางผสมต้องมีเลขหนังสือรับรองคุณภาพยาง (e-QC) แล้วจึงจะขอขั้นตอนนี้ได้' },
+        ],
+      }),
+      usr('11:06', 'ขอหนังสือรับรองคุณภาพยาง (e-QC)'),
+      t('11:07', 'bot', 'rubber-eqc-gate', undefined, {
+        agency: 'การยาง', itemNames: ['Rubber Compound Latex (น้ำยางผสมข้น)'], completed: false,
+      }),
+    ],
+    documents: [
+      doc('d21a', 'ใบขนสินค้าขาออก EXPINV0022', 'customs'),
+    ],
+    itemsSelected: true,
+    items: [
+      { id: 'i21', name: 'Rubber Compound Latex', hsCode: '4005.10.00', origin: 'ไทย (TH)', quantity: '2800', unit: 'กก.', lotNo: 'SGL-2568-058', amount: 149800 },
+    ],
+  },
+
+  // ── 22. needs_you (EXP): Rubber Compound Crepe – ขาออก การยาง (รอผลตรวจ e-QC จาก กยท.) ──
+  {
+    id: 'EXP-68-022010', customsNo: 'HLTH000000023', hthmRef: 'HTHM000000023',
+    isNew: false, type: 'EXP',
+    goods: 'Rubber Compound Crepe (ยางเครปผสม)', hs: '4005.10.00',
+    customer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', contact: 'คุณพิมพ์ชนก ส่งดี',
+    contactEmail: 'pimchanok@siamagriexport.co.th',
+    origin: 'ไทย (TH)', importedAt: '09:45 น. เมื่อวาน', createdAt: NOW - 22 * 3600_000, owner: 'ปวีณา ส.',
+    agency: 'raot', permitNeeded: true, formCode: 'ใบอนุญาตค้ายาง',
+    formName: 'คำขอใบอนุญาตค้ายางขาออก — การยางแห่งประเทศไทย (RAOT)',
+    conf: 86, stage: 4, statusKey: 'needs_you', eqcStatus: 'rubber-accept',
+    assess: { conf: 86, reason: 'ยางเครปผสม (Compounded Rubber) ไม่เข้าข่ายใบอนุญาตค้ายาง แต่ต้องขอหนังสือรับรองคุณภาพยาง (e-QC) และชำระค่าธรรมเนียมผ่านด่านศุลกากร (e-SFR) ก่อนส่งออก' },
+    classify: { agency: 'raot', conf: 86, reason: '', alt: [] },
+    draft: { fields: [] },
+    flags: [],
+    audit: [
+      { time: '09:45', text: 'อัปโหลดใบขนสินค้าขาออก EXPINV0023 เข้าระบบแล้ว', by: 'ระบบ' },
+      { time: '09:48', text: 'OCR สำเร็จ', by: 'AI' },
+      { time: '09:50', text: 'วิเคราะห์ HS Code: 4005.10.00 → การยาง (86%)', by: 'AI' },
+      { time: '09:52', text: 'เลือกขอหนังสือรับรองคุณภาพยาง (e-QC) และกรอกคำขอครบถ้วนแล้ว', by: 'ปวีณา ส.' },
+      { time: '09:55', text: 'กยท. รับคำขอ e-QC แล้ว — รอผลตรวจสอบจากเจ้าหน้าที่ (ประมาณ 3-7 วันทำการ)', by: 'การยางแห่งประเทศไทย' },
+    ],
+    messages: [
+      bot('09:45', 'อัปโหลดใบขนสินค้าขาออก EXPINV0023 เข้าระบบแล้วครับ — Rubber Compound Crepe 3,600 กก. จากไทย ส่งออกไปอินโดนีเซีย'),
+      t('09:48', 'bot', 'ocr-results', undefined, {
+        invoiceNo: 'EXPINV0023', invoiceDate: '19/07/2025', quantity: '3600 กก.',
+        importer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', port: 'ท่าเรือแหลมฉบัง (LCH)',
+        hsCode: '4005.10.00', countryOrigin: 'ไทย (TH)', lotNo: 'SGL-2568-064', uNo: '',
+      }),
+      usr('09:52', 'ขอหนังสือรับรองคุณภาพยาง (e-QC)'),
+      t('09:53', 'bot', 'rubber-eqc-gate', undefined, {
+        agency: 'การยาง', itemNames: ['Rubber Compound Crepe (ยางเครปผสม)'], completed: true,
+      }),
+      usr('09:54', 'ดำเนินการต่อ'),
+      t('09:55', 'bot', 'rubber-eqc-status', undefined, {
+        agency: 'การยาง', status: 'rubber-accept', amount: 150,
+        paidAccountLabel: 'ธนาคารกสิกรไทย xxx-x-x4821-5', labCode: 'LAB-002',
+      }),
+    ],
+    documents: [
+      doc('d22a', 'ใบขนสินค้าขาออก EXPINV0023', 'customs'),
+    ],
+    itemsSelected: true,
+    items: [
+      { id: 'i22', name: 'Rubber Compound Crepe', hsCode: '4005.10.00', origin: 'ไทย (TH)', quantity: '3600', unit: 'กก.', lotNo: 'SGL-2568-064', amount: 191800 },
+    ],
+  },
+
+  // ── 23. needs_you (EXP): Rubber Compound Sheet — Lot B – ขาออก การยาง (e-QC ผ่านแล้ว, รอเลือก e-SFR) ──
+  {
+    id: 'EXP-68-023011', customsNo: 'HLTH000000024', hthmRef: 'HTHM000000024',
+    isNew: false, type: 'EXP',
+    goods: 'Rubber Compound Sheet — Lot B (ยางแผ่นผสม ล็อต B)', hs: '4005.10.00',
+    customer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', contact: 'คุณพิมพ์ชนก ส่งดี',
+    contactEmail: 'pimchanok@siamagriexport.co.th',
+    origin: 'ไทย (TH)', importedAt: '13:10 น. เมื่อวาน', createdAt: NOW - 25 * 3600_000, owner: 'ปวีณา ส.',
+    agency: 'raot', permitNeeded: true, formCode: 'ใบอนุญาตค้ายาง',
+    formName: 'คำขอใบอนุญาตค้ายางขาออก — การยางแห่งประเทศไทย (RAOT)',
+    conf: 89, stage: 4, statusKey: 'needs_you', eqcStatus: 'license-accept',
+    assess: { conf: 89, reason: 'ยางแผ่นผสม (Compounded Rubber) ไม่เข้าข่ายใบอนุญาตค้ายาง แต่ต้องขอหนังสือรับรองคุณภาพยาง (e-QC) และชำระค่าธรรมเนียมผ่านด่านศุลกากร (e-SFR) ก่อนส่งออก' },
+    classify: { agency: 'raot', conf: 89, reason: '', alt: [] },
+    draft: { fields: [] },
+    flags: [],
+    audit: [
+      { time: '13:10', text: 'อัปโหลดใบขนสินค้าขาออก EXPINV0024 เข้าระบบแล้ว', by: 'ระบบ' },
+      { time: '13:13', text: 'OCR สำเร็จ', by: 'AI' },
+      { time: '13:15', text: 'วิเคราะห์ HS Code: 4005.10.00 → การยาง (89%)', by: 'AI' },
+      { time: '13:20', text: 'เลือกขอหนังสือรับรองคุณภาพยาง (e-QC) และกรอกคำขอครบถ้วนแล้ว', by: 'ปวีณา ส.' },
+      { time: '13:25', text: 'กยท. รับคำขอ e-QC แล้ว — รอผลตรวจสอบจากเจ้าหน้าที่', by: 'การยางแห่งประเทศไทย' },
+      { time: '15:40', text: 'ผลตรวจสอบผ่าน (LICENSE ACCEPT) — ออกหนังสือรับรองคุณภาพยาง (e-QC) แล้ว', by: 'การยางแห่งประเทศไทย' },
+      { time: '15:41', text: 'รอผู้ใช้เลือกดำเนินการ e-SFR ต่อ หรือทำภายหลัง', by: 'AI' },
+    ],
+    messages: [
+      bot('13:10', 'อัปโหลดใบขนสินค้าขาออก EXPINV0024 เข้าระบบแล้วครับ — Rubber Compound Sheet Lot B 3,200 กก. จากไทย ส่งออกไปจีน'),
+      t('13:13', 'bot', 'ocr-results', undefined, {
+        invoiceNo: 'EXPINV0024', invoiceDate: '18/07/2025', quantity: '3200 กก.',
+        importer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', port: 'ท่าเรือแหลมฉบัง (LCH)',
+        hsCode: '4005.10.00', countryOrigin: 'ไทย (TH)', lotNo: 'SGL-2568-071', uNo: '',
+      }),
+      usr('13:20', 'ขอหนังสือรับรองคุณภาพยาง (e-QC)'),
+      t('13:21', 'bot', 'rubber-eqc-gate', undefined, {
+        agency: 'การยาง', itemNames: ['Rubber Compound Sheet — Lot B (ยางแผ่นผสม ล็อต B)'], completed: true,
+      }),
+      usr('13:22', 'ดำเนินการต่อ'),
+      t('13:25', 'bot', 'rubber-eqc-status', undefined, {
+        agency: 'การยาง', status: 'rubber-accept', amount: 150,
+        paidAccountLabel: 'ธนาคารกสิกรไทย xxx-x-x4821-5', labCode: 'LAB-003',
+      }),
+      usr('15:40', 'ดำเนินการต่อ'),
+      t('15:40', 'bot', 'rubber-eqc-status', undefined, {
+        agency: 'การยาง', status: 'license-accept', amount: 150,
+        paidAccountLabel: 'ธนาคารกสิกรไทย xxx-x-x4821-5',
+        certificateNo: 'RAOT-EQC-2568-403311', issueDate: '2025-07-19', expireDate: '2025-09-02',
+        issuerOrgId: '0994001057192', issuerNameTh: 'การยางแห่งประเทศไทย', issuerNameEn: 'Rubber Authority of Thailand',
+        labCode: 'LAB-003', certUrl: SAMPLE_PDF,
+      }),
+      t('15:41', 'bot', 'choice-card', undefined, {
+        question: 'ต้องการดำเนินการขั้นตอนใดต่อ?',
+        subtitle: 'ได้รับหนังสือรับรองคุณภาพยาง (e-QC) แล้ว ท่านสามารถขอผ่านด่านศุลกากรและชำระค่าธรรมเนียมส่งออก (e-SFR) ต่อได้เลย หรือจะทำภายหลังก็ได้',
+        options: [
+          { label: 'เสร็จสิ้น', value: 'esfr-finish', description: 'ดำเนินการขั้นตอน e-SFR ภายหลัง' },
+          { label: 'ทำ e-SFR ต่อ', value: 'esfr-continue', description: 'ขอผ่านด่านศุลกากร และชำระค่าธรรมเนียมส่งยางออกนอกราชอาณาจักรตอนนี้เลย' },
+        ],
+      }),
+    ],
+    documents: [
+      doc('d23a', 'ใบขนสินค้าขาออก EXPINV0024', 'customs'),
+    ],
+    rubberCertPayment: {
+      itemNames: ['Rubber Compound Sheet — Lot B (ยางแผ่นผสม ล็อต B)'],
+      amount: 150,
+      refNo: 'RAOT-EQC-2568-403311',
+      paidAccountLabel: 'ธนาคารกสิกรไทย xxx-x-x4821-5',
+      certUrl: SAMPLE_PDF,
+      paidAt: new Date(Date.now() - 25 * 3600_000 + 2.5 * 3600_000).toLocaleDateString('th-TH'),
+    },
+    itemsSelected: true,
+    items: [
+      { id: 'i23', name: 'Rubber Compound Sheet — Lot B', hsCode: '4005.10.00', origin: 'ไทย (TH)', quantity: '3200', unit: 'กก.', lotNo: 'SGL-2568-071', amount: 170600 },
+    ],
+  },
+
+  // ── 24. needs_you (EXP): Rubber Compound Sheet — Lot C – ขาออก การยาง (e-QC ผ่านแล้ว, รอผ่านด่านศุลกากร e-SFR) ──
+  {
+    id: 'EXP-68-024012', customsNo: 'HLTH000000025', hthmRef: 'HTHM000000025',
+    isNew: false, type: 'EXP',
+    goods: 'Rubber Compound Sheet — Lot C (ยางแผ่นผสม ล็อต C)', hs: '4005.10.00',
+    customer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', contact: 'คุณพิมพ์ชนก ส่งดี',
+    contactEmail: 'pimchanok@siamagriexport.co.th',
+    origin: 'ไทย (TH)', importedAt: '08:50 น. 2 วันที่แล้ว', createdAt: NOW - 50 * 3600_000, owner: 'ปวีณา ส.',
+    agency: 'raot', permitNeeded: true, formCode: 'ใบอนุญาตค้ายาง',
+    formName: 'คำขอใบอนุญาตค้ายางขาออก — การยางแห่งประเทศไทย (RAOT)',
+    conf: 90, stage: 4, statusKey: 'needs_you', eqcStatus: 'license-accept', esfrStatus: 'rubber-accept',
+    assess: { conf: 90, reason: 'ยางแผ่นผสม (Compounded Rubber) ไม่เข้าข่ายใบอนุญาตค้ายาง แต่ต้องขอหนังสือรับรองคุณภาพยาง (e-QC) และชำระค่าธรรมเนียมผ่านด่านศุลกากร (e-SFR) ก่อนส่งออก' },
+    classify: { agency: 'raot', conf: 90, reason: '', alt: [] },
+    draft: { fields: [] },
+    flags: [],
+    audit: [
+      { time: '08:50', text: 'อัปโหลดใบขนสินค้าขาออก EXPINV0025 เข้าระบบแล้ว', by: 'ระบบ' },
+      { time: '08:53', text: 'OCR สำเร็จ', by: 'AI' },
+      { time: '08:55', text: 'วิเคราะห์ HS Code: 4005.10.00 → การยาง (90%)', by: 'AI' },
+      { time: '09:20', text: 'ได้รับหนังสือรับรองคุณภาพยาง (e-QC) แล้ว', by: 'การยางแห่งประเทศไทย' },
+      { time: '09:22', text: 'เลือกทำ e-SFR ต่อ และกรอกคำขอครบถ้วนแล้ว', by: 'ปวีณา ส.' },
+      { time: '09:30', text: 'ส่งคำขอผ่านด่านศุลกากร (e-SFR) แล้ว — รอผลตอบรับจากด่านศุลกากร', by: 'ระบบ' },
+    ],
+    messages: [
+      bot('08:50', 'อัปโหลดใบขนสินค้าขาออก EXPINV0025 เข้าระบบแล้วครับ — Rubber Compound Sheet Lot C 3,900 กก. จากไทย ส่งออกไปจีน'),
+      t('08:53', 'bot', 'ocr-results', undefined, {
+        invoiceNo: 'EXPINV0025', invoiceDate: '17/07/2025', quantity: '3900 กก.',
+        importer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', port: 'ท่าเรือแหลมฉบัง (LCH)',
+        hsCode: '4005.10.00', countryOrigin: 'ไทย (TH)', lotNo: 'SGL-2568-078', uNo: '',
+      }),
+      t('09:20', 'bot', 'rubber-eqc-status', undefined, {
+        agency: 'การยาง', status: 'license-accept', amount: 150,
+        paidAccountLabel: 'ธนาคารกสิกรไทย xxx-x-x4821-5',
+        certificateNo: 'RAOT-EQC-2568-517722', issueDate: '2025-07-17', expireDate: '2025-08-31',
+        issuerOrgId: '0994001057192', issuerNameTh: 'การยางแห่งประเทศไทย', issuerNameEn: 'Rubber Authority of Thailand',
+        certUrl: SAMPLE_PDF,
+      }),
+      usr('09:22', 'ทำ e-SFR ต่อ'),
+      t('09:23', 'bot', 'rubber-esfr-gate', undefined, {
+        agency: 'การยาง', itemNames: ['Rubber Compound Sheet — Lot C (ยางแผ่นผสม ล็อต C)'], completed: true,
+      }),
+      usr('09:26', 'ดำเนินการต่อ'),
+      t('09:27', 'bot', 'rubber-esfr-preview', undefined, {
+        agency: 'การยาง',
+        request: { referenceNumber: 'ESFR-2568-517722', totalAmountRaot: 600 },
+      }),
+      usr('09:29', 'ส่งคำขอใบอนุญาต'),
+      t('09:30', 'bot', 'rubber-esfr-status', undefined, {
+        agency: 'การยาง', referenceNumber: 'ESFR-2568-517722', status: 'rubber-accept',
+      }),
+    ],
+    documents: [
+      doc('d24a', 'ใบขนสินค้าขาออก EXPINV0025', 'customs'),
+    ],
+    rubberCertPayment: {
+      itemNames: ['Rubber Compound Sheet — Lot C (ยางแผ่นผสม ล็อต C)'],
+      amount: 150,
+      refNo: 'RAOT-EQC-2568-517722',
+      paidAccountLabel: 'ธนาคารกสิกรไทย xxx-x-x4821-5',
+      certUrl: SAMPLE_PDF,
+      paidAt: new Date(Date.now() - 50 * 3600_000 + 9.5 * 3600_000).toLocaleDateString('th-TH'),
+    },
+    itemsSelected: true,
+    items: [
+      { id: 'i24', name: 'Rubber Compound Sheet — Lot C', hsCode: '4005.10.00', origin: 'ไทย (TH)', quantity: '3900', unit: 'กก.', lotNo: 'SGL-2568-078', amount: 207900 },
+    ],
+  },
+
+  // ── 25. submitted (EXP): Rubber Compound Sheet – ขาออก การยาง (e-QC + e-SFR เสร็จสิ้นทั้งคู่) ──
+  {
+    id: 'EXP-68-025013', customsNo: 'HLTH000000019', hthmRef: 'HTHM000000019',
     isNew: false, type: 'EXP',
     goods: 'Rubber Compound Sheet (ยางแผ่นผสม)', hs: '4005.10.00',
     customer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', contact: 'คุณพิมพ์ชนก ส่งดี',
@@ -1150,7 +1504,7 @@ export const MOCK_QUEUE: Shipment[] = [
     origin: 'ไทย (TH)', importedAt: '10:40 น. เมื่อวาน', createdAt: NOW - 26 * 3600_000, owner: 'ปวีณา ส.',
     agency: 'raot', permitNeeded: true, formCode: 'ใบผ่านด่านศุลกากร (e-SFR)',
     formName: 'ใบขอผ่านด่านศุลกากร และชำระค่าธรรมเนียมส่งยางออกนอกราชอาณาจักร (e-SFR)',
-    conf: 89, stage: 7, statusKey: 'submitted',
+    conf: 89, stage: 7, statusKey: 'submitted', eqcStatus: 'license-accept', esfrStatus: 'license-accept',
     assess: { conf: 89, reason: 'ยางแผ่นผสม (Compounded Rubber) ไม่เข้าข่ายใบอนุญาตค้ายาง แต่ต้องขอหนังสือรับรองคุณภาพยาง (e-QC) และชำระค่าธรรมเนียมผ่านด่านศุลกากร (e-SFR) ก่อนส่งออก' },
     classify: { agency: 'raot', conf: 89, reason: '', alt: [] },
     draft: { fields: [] },
@@ -1159,10 +1513,10 @@ export const MOCK_QUEUE: Shipment[] = [
       { time: '10:40', text: 'อัปโหลดใบขนสินค้าขาออก EXPINV0019 เข้าระบบแล้ว', by: 'ระบบ' },
       { time: '10:43', text: 'OCR สำเร็จ', by: 'AI' },
       { time: '10:46', text: 'วิเคราะห์ HS Code: 4005.10.00 → การยาง (89%)', by: 'AI' },
-      { time: '10:50', text: 'ชำระค่าธรรมเนียมหนังสือรับรองคุณภาพยาง (e-QC) ฿150 ผ่านบัญชีธนาคารกสิกรไทยแล้ว', by: 'ปวีณา ส.' },
-      { time: '10:55', text: 'แนบใบรับรองคุณภาพยางแล้ว', by: 'ปวีณา ส.' },
-      { time: '11:05', text: 'ยื่นการยางแห่งประเทศไทย สำเร็จ (e-SFR)', by: 'ระบบ' },
-      { time: '11:20', text: 'การยางแห่งประเทศไทยตรวจสอบและอนุมัติคำขอแล้ว ส่งใบรับค่าธรรมเนียมกลับมาให้แล้ว', by: 'การยางแห่งประเทศไทย' },
+      { time: '10:50', text: 'เลือกขอหนังสือรับรองคุณภาพยาง (e-QC) และกรอกคำขอครบถ้วนแล้ว', by: 'ปวีณา ส.' },
+      { time: '10:55', text: 'ได้รับหนังสือรับรองคุณภาพยาง (e-QC) แล้ว', by: 'การยางแห่งประเทศไทย' },
+      { time: '11:00', text: 'เลือกทำ e-SFR ต่อ และส่งคำขอผ่านด่านศุลกากรแล้ว', by: 'ปวีณา ส.' },
+      { time: '11:20', text: 'ผ่านพิธีการศุลกากรแล้ว — ออกใบรับค่าธรรมเนียม (e-SFR) แล้ว', by: 'ด่านศุลกากร' },
     ],
     messages: [
       bot('10:40', 'อัปโหลดใบขนสินค้าขาออก EXPINV0019 เข้าระบบแล้วครับ — Rubber Compound Sheet 3,000 กก. จากไทย ส่งออกไปจีน'),
@@ -1171,52 +1525,52 @@ export const MOCK_QUEUE: Shipment[] = [
         importer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', port: 'ท่าเรือแหลมฉบัง (LCH)',
         hsCode: '4005.10.00', countryOrigin: 'ไทย (TH)', lotNo: 'SGL-2568-045', uNo: '',
       }),
-      t('10:50', 'bot', 'rubber-cert-payment', undefined, {
-        agency: 'การยาง', itemNames: ['Rubber Compound Sheet (ยางแผ่นผสม)'], amount: 150,
-        refNo: 'RC-2568-773100',
-        accounts: [
-          { id: 'kbank-1', bankName: 'ธนาคารกสิกรไทย', accountNoMasked: 'xxx-x-x4821-5', accountName: 'บจก. เน็ตเบย์', isDefault: true },
-          { id: 'scb-1', bankName: 'ธนาคารไทยพาณิชย์', accountNoMasked: 'xxx-x-x0932-1', accountName: 'บจก. เน็ตเบย์' },
-        ],
-        paid: true, paidAccountId: 'kbank-1',
+      usr('10:50', 'ขอหนังสือรับรองคุณภาพยาง (e-QC)'),
+      t('10:51', 'bot', 'rubber-eqc-gate', undefined, {
+        agency: 'การยาง', itemNames: ['Rubber Compound Sheet (ยางแผ่นผสม)'], completed: true,
       }),
-      t('10:55', 'bot', 'agency-upload', undefined, {
-        agency: 'การยาง', agencyLabel: 'การยางแห่งประเทศไทย (RAOT)',
-        slots: [
-          { id: 's2', label: 'ใบรับรองคุณภาพยาง', required: true },
-        ],
+      t('10:55', 'bot', 'rubber-eqc-status', undefined, {
+        agency: 'การยาง', status: 'license-accept', amount: 150,
+        paidAccountLabel: 'ธนาคารกสิกรไทย xxx-x-x4821-5',
+        certificateNo: 'RAOT-EQC-2568-773100', issueDate: '2025-07-16', expireDate: '2025-08-30',
+        issuerOrgId: '0994001057192', issuerNameTh: 'การยางแห่งประเทศไทย', issuerNameEn: 'Rubber Authority of Thailand',
+        certUrl: SAMPLE_PDF,
       }),
-      t('11:05', 'bot', 'status-card', undefined, {
-        refNo: 'RG-2568-89100', customsRef: 'EXPINV0019',
-        submittedAt: new Date(Date.now() - 26 * 3600_000).toLocaleDateString('th-TH'), isPending: false,
-        agency: 'การยาง', feeNote: 'ค่าธรรมเนียม e-SFR ฿400 (ยางแผ่นผสม 3,000 กก.)',
+      usr('11:00', 'ทำ e-SFR ต่อ'),
+      t('11:01', 'bot', 'rubber-esfr-gate', undefined, {
+        agency: 'การยาง', itemNames: ['Rubber Compound Sheet (ยางแผ่นผสม)'], completed: true,
       }),
-      bot('11:20', 'การยางแห่งประเทศไทยตรวจสอบและอนุมัติคำขอแล้วครับ ✅'),
-      t('11:21', 'bot', 'agency-docs-returned', undefined, {
-        agency: 'การยาง',
-        docs: [
-          { key: 'raot_esfr_receipt', label: 'ใบรับค่าธรรมเนียม (RAOTFEERECEIPT PDF)', url: SAMPLE_PDF },
-        ],
+      t('11:05', 'bot', 'rubber-esfr-status', undefined, {
+        agency: 'การยาง', referenceNumber: 'ESFR-2568-773100', status: 'license-accept',
+      }),
+      t('11:20', 'bot', 'rubber-esfr-fee-receipt', undefined, {
+        agency: 'การยาง', referenceNumber: 'ESFR-2568-773100',
+        licenseNumber: 'ERL19004-68/77310', issueDate: '16-07-2025', issueAuthority: '0994001057192-การยางแห่งประเทศไทย',
+        message: 'พร้อมที่จะผ่านพิธีการศุลกากรใบขนสินค้าขาออก',
+        effectiveDate: '16-07-2025', expireDate: '15-08-2025', feeAmount: 400, receiptUrl: SAMPLE_PDF,
       }),
     ],
     documents: [
-      doc('d19a', 'ใบขนสินค้าขาออก EXPINV0019', 'customs'),
-      doc('d19b', 'RAOT_ESFR_APPLICATION.pdf', 'other'),
+      doc('d25a', 'ใบขนสินค้าขาออก EXPINV0019', 'customs'),
+      doc('d25b', 'RAOT_ESFR_APPLICATION.pdf', 'other'),
     ],
     rubberCertPayment: {
       itemNames: ['Rubber Compound Sheet (ยางแผ่นผสม)'],
       amount: 150,
-      refNo: 'RC-2568-773100',
+      refNo: 'RAOT-EQC-2568-773100',
       paidAccountLabel: 'ธนาคารกสิกรไทย xxx-x-x4821-5',
       certUrl: SAMPLE_PDF,
       paidAt: new Date(Date.now() - 26 * 3600_000).toLocaleDateString('th-TH'),
     },
-    returnedDocuments: [
-      doc('d19r1', 'ใบรับค่าธรรมเนียม (RAOTFEERECEIPT PDF)', 'other', 'pdf', 'raot', new Date(Date.now() - 26 * 3600_000 + 3600_000).toLocaleDateString('th-TH') + ' 11:21'),
-    ],
+    esfrFeeReceipt: {
+      agency: 'การยาง', referenceNumber: 'ESFR-2568-773100',
+      licenseNumber: 'ERL19004-68/77310', issueDate: '16-07-2025', issueAuthority: '0994001057192-การยางแห่งประเทศไทย',
+      message: 'พร้อมที่จะผ่านพิธีการศุลกากรใบขนสินค้าขาออก',
+      effectiveDate: '16-07-2025', expireDate: '15-08-2025', feeAmount: 400, receiptUrl: SAMPLE_PDF,
+    },
     itemsSelected: true,
     items: [
-      { id: 'i19b', name: 'Rubber Compound Sheet', hsCode: '4005.10.00', origin: 'ไทย (TH)', quantity: '3000', unit: 'กก.', lotNo: 'SGL-2568-045', amount: 159800 },
+      { id: 'i25', name: 'Rubber Compound Sheet', hsCode: '4005.10.00', origin: 'ไทย (TH)', quantity: '3000', unit: 'กก.', lotNo: 'SGL-2568-045', amount: 159800 },
     ],
   },
 ];
