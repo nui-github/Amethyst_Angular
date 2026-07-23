@@ -1140,36 +1140,36 @@ export const MOCK_QUEUE: Shipment[] = [
     ],
   },
 
-  // ── 19. submitted (EXP): RSS3 + Rubber Compound Sheet – ขาออก การยาง (ยื่นแล้ว, ชำระค่าธรรมเนียม e-QC ยางผสมแล้ว) ──
+  // ── 19. submitted (EXP): Rubber Compound Sheet – ขาออก การยาง (e-QC + e-SFR ยื่นแล้ว) ──
   {
     id: 'EXP-68-019007', customsNo: 'HLTH000000019', hthmRef: 'HTHM000000019',
     isNew: false, type: 'EXP',
-    goods: 'RSS3 Smoked Rubber Sheet + Rubber Compound Sheet (ยางแผ่นรมควัน + ยางแผ่นผสม)', hs: '4001.21.00',
+    goods: 'Rubber Compound Sheet (ยางแผ่นผสม)', hs: '4005.10.00',
     customer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', contact: 'คุณพิมพ์ชนก ส่งดี',
     contactEmail: 'pimchanok@siamagriexport.co.th',
     origin: 'ไทย (TH)', importedAt: '10:40 น. เมื่อวาน', createdAt: NOW - 26 * 3600_000, owner: 'ปวีณา ส.',
     agency: 'raot', permitNeeded: true, formCode: 'ใบผ่านด่านศุลกากร (e-SFR)',
     formName: 'ใบขอผ่านด่านศุลกากร และชำระค่าธรรมเนียมส่งยางออกนอกราชอาณาจักร (e-SFR)',
     conf: 89, stage: 7, statusKey: 'submitted',
-    assess: { conf: 89, reason: 'ยางแผ่นรมควันดิบ (RSS3) ต้องมีใบอนุญาตค้ายาง ส่วนยางแผ่นผสม (Compounded Rubber) ไม่เข้าข่ายใบอนุญาตค้ายาง แต่ต้องขอหนังสือรับรองคุณภาพยาง (e-QC) และชำระค่าธรรมเนียมก่อนส่งออก' },
+    assess: { conf: 89, reason: 'ยางแผ่นผสม (Compounded Rubber) ไม่เข้าข่ายใบอนุญาตค้ายาง แต่ต้องขอหนังสือรับรองคุณภาพยาง (e-QC) และชำระค่าธรรมเนียมผ่านด่านศุลกากร (e-SFR) ก่อนส่งออก' },
     classify: { agency: 'raot', conf: 89, reason: '', alt: [] },
     draft: { fields: [] },
     flags: [],
     audit: [
       { time: '10:40', text: 'อัปโหลดใบขนสินค้าขาออก EXPINV0019 เข้าระบบแล้ว', by: 'ระบบ' },
       { time: '10:43', text: 'OCR สำเร็จ', by: 'AI' },
-      { time: '10:46', text: 'วิเคราะห์ HS Code: 2 รายการ → การยาง (89%)', by: 'AI' },
+      { time: '10:46', text: 'วิเคราะห์ HS Code: 4005.10.00 → การยาง (89%)', by: 'AI' },
       { time: '10:50', text: 'ชำระค่าธรรมเนียมหนังสือรับรองคุณภาพยาง (e-QC) ฿150 ผ่านบัญชีธนาคารกสิกรไทยแล้ว', by: 'ปวีณา ส.' },
-      { time: '10:55', text: 'แนบใบอนุญาตค้ายางและใบรับรองคุณภาพยางแล้ว', by: 'ปวีณา ส.' },
+      { time: '10:55', text: 'แนบใบรับรองคุณภาพยางแล้ว', by: 'ปวีณา ส.' },
       { time: '11:05', text: 'ยื่นการยางแห่งประเทศไทย สำเร็จ (e-SFR)', by: 'ระบบ' },
-      { time: '11:20', text: 'การยางแห่งประเทศไทยตรวจสอบและอนุมัติคำขอแล้ว ส่งใบอนุญาตกลับมาให้แล้ว', by: 'การยางแห่งประเทศไทย' },
+      { time: '11:20', text: 'การยางแห่งประเทศไทยตรวจสอบและอนุมัติคำขอแล้ว ส่งใบรับค่าธรรมเนียมกลับมาให้แล้ว', by: 'การยางแห่งประเทศไทย' },
     ],
     messages: [
-      bot('10:40', 'อัปโหลดใบขนสินค้าขาออก EXPINV0019 เข้าระบบแล้วครับ — RSS3 Smoked Rubber Sheet 20,000 กก. และ Rubber Compound Sheet 3,000 กก. จากไทย ส่งออกไปจีน'),
+      bot('10:40', 'อัปโหลดใบขนสินค้าขาออก EXPINV0019 เข้าระบบแล้วครับ — Rubber Compound Sheet 3,000 กก. จากไทย ส่งออกไปจีน'),
       t('10:43', 'bot', 'ocr-results', undefined, {
-        invoiceNo: 'EXPINV0019', invoiceDate: '16/07/2025', quantity: '23000 กก.',
+        invoiceNo: 'EXPINV0019', invoiceDate: '16/07/2025', quantity: '3000 กก.',
         importer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', port: 'ท่าเรือแหลมฉบัง (LCH)',
-        hsCode: '4001.21.00', countryOrigin: 'ไทย (TH)', lotNo: 'RSS3-2568-091', uNo: '',
+        hsCode: '4005.10.00', countryOrigin: 'ไทย (TH)', lotNo: 'SGL-2568-045', uNo: '',
       }),
       t('10:50', 'bot', 'rubber-cert-payment', undefined, {
         agency: 'การยาง', itemNames: ['Rubber Compound Sheet (ยางแผ่นผสม)'], amount: 150,
@@ -1183,7 +1183,6 @@ export const MOCK_QUEUE: Shipment[] = [
       t('10:55', 'bot', 'agency-upload', undefined, {
         agency: 'การยาง', agencyLabel: 'การยางแห่งประเทศไทย (RAOT)',
         slots: [
-          { id: 's1', label: 'ใบอนุญาตค้ายาง', required: true },
           { id: 's2', label: 'ใบรับรองคุณภาพยาง', required: true },
         ],
       }),
@@ -1202,7 +1201,7 @@ export const MOCK_QUEUE: Shipment[] = [
     ],
     documents: [
       doc('d19a', 'ใบขนสินค้าขาออก EXPINV0019', 'customs'),
-      doc('d19b', 'RAOT_PERMIT_APPLICATION.pdf', 'other'),
+      doc('d19b', 'RAOT_ESFR_APPLICATION.pdf', 'other'),
     ],
     rubberCertPayment: {
       itemNames: ['Rubber Compound Sheet (ยางแผ่นผสม)'],
@@ -1217,7 +1216,6 @@ export const MOCK_QUEUE: Shipment[] = [
     ],
     itemsSelected: true,
     items: [
-      { id: 'i19a', name: 'RSS3 Smoked Rubber Sheet', hsCode: '4001.21.00', origin: 'ไทย (TH)', quantity: '20000', unit: 'กก.', lotNo: 'RSS3-2568-091', amount: 1704000 },
       { id: 'i19b', name: 'Rubber Compound Sheet', hsCode: '4005.10.00', origin: 'ไทย (TH)', quantity: '3000', unit: 'กก.', lotNo: 'SGL-2568-045', amount: 159800 },
     ],
   },
