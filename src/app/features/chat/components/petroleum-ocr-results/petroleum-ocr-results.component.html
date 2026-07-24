@@ -15,18 +15,18 @@
         </div>
         <div class="ocr-tbl">
           @for (row of section.rows; track row.key) {
-            @if (declHasValue(row.key)) {
+            @if (declHasValue(section, row.key)) {
               <div class="ocr-row"
-                [class.ocr-row--editing]="editingKey === row.key"
+                [class.ocr-row--editing]="editingKey === rowEditId(section, row.key)"
                 [class.ocr-row--ro]="proceeded()"
-                (click)="startDeclEdit(row.key)">
+                (click)="startDeclEdit(section, row.key)">
                 <span class="ocr-row__lbl">{{ row.label }}</span>
                 <span class="ocr-row__val-wrap">
-                  @if (editingKey === row.key) {
-                    <input class="ocr-input" [attr.data-decl-key]="row.key" [value]="declValue(row.key)"
-                      (input)="onDeclInput(row.key, $event)" (blur)="commitEdit()" (keydown)="onKeydown($event)" />
+                  @if (editingKey === rowEditId(section, row.key)) {
+                    <input class="ocr-input" [attr.data-decl-key]="rowEditId(section, row.key)" [value]="declValue(section, row.key)"
+                      (input)="onDeclInput(section, row.key, $event)" (blur)="commitEdit()" (keydown)="onKeydown($event)" />
                   } @else {
-                    <span class="ocr-row__val" [class.ocr-row__val--accent]="row.required">{{ declDisplay(row.key) }}</span>
+                    <span class="ocr-row__val" [class.ocr-row__val--accent]="row.required">{{ declDisplay(section, row.key) }}</span>
                     @if (!proceeded()) {
                       <span class="ocr-edit-chip">
                         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
@@ -52,7 +52,7 @@
           <div class="ocr-item ocr-item--decl">
             <div class="ocr-item__main">
               <span class="ocr-item__name">{{ item.nameTh }}</span>
-              <span class="ocr-item__meta">พิกัด {{ item.tariffCode }} · {{ item.originCountry }}</span>
+              <span class="ocr-item__meta">พิกัด {{ item.tariffCode }} · {{ item.originCountryCode }}</span>
             </div>
             <span class="ocr-item__qty">{{ item.quantity }} {{ item.quantityUnit }}</span>
           </div>

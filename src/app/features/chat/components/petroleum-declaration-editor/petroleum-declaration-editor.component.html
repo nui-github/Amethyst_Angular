@@ -4,7 +4,7 @@
     <div class="cde-hd">
       <div>
         <p class="cde-hd__title">กรอกข้อมูลเพิ่มเติม</p>
-        <p class="cde-hd__sub">คำร้องขอออกของไปก่อน เพื่อยกเว้นอากรนำเข้า (มาตรา 70 พ.ร.บ.ปิโตรเลียม) — บางส่วนดึงมาจาก OCR ให้แล้ว ที่เหลือกรุณากรอกให้ครบ</p>
+        <p class="cde-hd__sub">คำร้องขอออกของไปก่อน เพื่อยกเว้นอากรนำเข้า (มาตรา 70 พ.ร.บ.ปิโตรเลียม) — ตามโครงสร้างคำขอใบอนุญาตของกรมเชื้อเพลิงธรรมชาติ (DMF) บางส่วนดึงมาจาก OCR ให้แล้ว ที่เหลือกรุณากรอกให้ครบ</p>
       </div>
       <button class="cde-close" (click)="close()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
@@ -19,9 +19,9 @@
           </div>
           <div class="cde-form-grid">
             @for (row of section.rows; track row.key) {
-              <label class="cde-field" [class.cde-field--missing]="isHeaderMissing(row)">
+              <label class="cde-field" [class.cde-field--missing]="isHeaderMissing(section.group, row)">
                 <span class="cde-field__label">{{ row.label }} @if (row.required) { <em>*</em> }</span>
-                <input class="cde-field__input" [value]="headerValue(row.key)" (input)="onHeaderInput(row.key, $event)" />
+                <input class="cde-field__input" [value]="headerValue(section.group, row.key)" (input)="onHeaderInput(section.group, row.key, $event)" />
               </label>
             }
           </div>
@@ -62,14 +62,130 @@
           </table>
         </div>
       </div>
+
+      <div class="cde-sec">
+        <div class="cde-sec__head" style="border-left-color:#B45309">
+          <span class="cde-sec__title">รายละเอียดเพิ่มเติม / ภาษีอากร / ใบอนุญาต — แยกตามรายการสินค้า</span>
+        </div>
+        <div class="cde-item-groups">
+          @for (item of local.items; track item.itemNumber) {
+            <div class="cde-item-group">
+              <div class="cde-item-group__head">
+                <span class="cde-item-group__order">{{ itemOrder(item) }}</span>
+                <span class="cde-item-group__name">{{ itemLabel(item) }}</span>
+                @if (item.tariffCode) { <span class="cde-item-group__meta">พิกัด {{ item.tariffCode }}</span> }
+              </div>
+
+              <div class="cde-item-group__sub">
+                <span class="cde-item-group__sub-title">ข้อมูลมูลค่า / อัตราแลกเปลี่ยน / สิทธิพิเศษ</span>
+                <div class="cde-extra-grid">
+                  @for (f of extraFields; track f.key) {
+                    <label class="cde-field cde-field--sm" [class.cde-field--missing]="isExtraFieldMissing(item, f)">
+                      <span class="cde-field__label">{{ f.label }} @if (f.required) { <em>*</em> }</span>
+                      @if (f.select) {
+                        <select class="cde-field__input" (change)="onItemInput(item, f.key, $event)">
+                          <option value="" [selected]="!itemValue(item, f.key)">(เลือก)</option>
+                          @for (opt of f.select; track opt) {
+                            <option [value]="opt" [selected]="itemValue(item, f.key) === opt">{{ opt }}</option>
+                          }
+                        </select>
+                      } @else {
+                        <input class="cde-field__input" [value]="itemValue(item, f.key)" (input)="onItemInput(item, f.key, $event)" />
+                      }
+                    </label>
+                  }
+                </div>
+              </div>
+
+              <div class="cde-item-group__sub">
+                <span class="cde-item-group__sub-title">ภาษีอากรและการยกเว้น (Duty)</span>
+                <div class="cde-table-wrap">
+                  <table class="cde-mini-table">
+                    <thead>
+                      <tr>
+                        <th>ประเภทภาษี <em>*</em></th>
+                        <th>อัตราตามราคา % <em>*</em></th>
+                        <th>อัตราตามสภาพ</th>
+                        <th>ค่าภาษี <em>*</em></th>
+                        <th>ค่าภาษีที่ชำระ <em>*</em></th>
+                        <th>อัตรายกเว้นอากร %</th>
+                        <th>เงินประกัน</th>
+                        <th>รหัสเหตุผลวางประกัน</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (d of item.duties; track $index) {
+                        <tr>
+                          <td [class.cde-td--missing]="!dutyValue(d, 'dutyType').trim()"><input class="cde-table__input" [value]="dutyValue(d, 'dutyType')" (input)="onDutyInput(d, 'dutyType', $event)" /></td>
+                          <td [class.cde-td--missing]="!dutyValue(d, 'valueRate').trim()"><input class="cde-table__input" [value]="dutyValue(d, 'valueRate')" (input)="onDutyInput(d, 'valueRate', $event)" /></td>
+                          <td><input class="cde-table__input" [value]="dutyValue(d, 'specificRate')" (input)="onDutyInput(d, 'specificRate', $event)" /></td>
+                          <td [class.cde-td--missing]="!dutyValue(d, 'amount').trim()"><input class="cde-table__input" [value]="dutyValue(d, 'amount')" (input)="onDutyInput(d, 'amount', $event)" /></td>
+                          <td [class.cde-td--missing]="!dutyValue(d, 'amountPaid').trim()"><input class="cde-table__input" [value]="dutyValue(d, 'amountPaid')" (input)="onDutyInput(d, 'amountPaid', $event)" /></td>
+                          <td><input class="cde-table__input" [value]="dutyValue(d, 'exemptionRate')" (input)="onDutyInput(d, 'exemptionRate', $event)" /></td>
+                          <td><input class="cde-table__input" [value]="dutyValue(d, 'depositAmount')" (input)="onDutyInput(d, 'depositAmount', $event)" /></td>
+                          <td><input class="cde-table__input" [value]="dutyValue(d, 'depositReasonCode')" (input)="onDutyInput(d, 'depositReasonCode', $event)" /></td>
+                          <td>
+                            <button type="button" class="cde-row-del" (click)="removeDutyAt(item, $index)">
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
+                            </button>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+                <button type="button" class="cde-mini-add" (click)="addDuty(item)">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                  เพิ่มรายการภาษี
+                </button>
+              </div>
+
+              <div class="cde-item-group__sub">
+                <span class="cde-item-group__sub-title">ใบอนุญาต/ใบรับรอง (ถ้ามี)</span>
+                <div class="cde-table-wrap">
+                  <table class="cde-mini-table">
+                    <thead>
+                      <tr>
+                        <th>เลขที่ใบอนุญาต/ใบรับรอง</th>
+                        <th>วันที่ออก</th>
+                        <th>เลขผู้เสียภาษีหน่วยงานผู้ออก</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (p of item.permits; track $index) {
+                        <tr>
+                          <td><input class="cde-table__input" [value]="permitValue(p, 'permitNumber')" (input)="onPermitInput(p, 'permitNumber', $event)" /></td>
+                          <td><input class="cde-table__input" [value]="permitValue(p, 'issueDate')" (input)="onPermitInput(p, 'issueDate', $event)" /></td>
+                          <td><input class="cde-table__input" [value]="permitValue(p, 'issueAuthority')" (input)="onPermitInput(p, 'issueAuthority', $event)" /></td>
+                          <td>
+                            <button type="button" class="cde-row-del" (click)="removePermitAt(item, $index)">
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
+                            </button>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+                <button type="button" class="cde-mini-add" (click)="addPermit(item)">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                  เพิ่มใบอนุญาต
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
     </div>
 
     <div class="cde-ft">
       @if (!isComplete) {
         <span class="cde-ft__hint">
-          กรุณากรอกข้อมูลที่มี <em>*</em> ให้ครบ
-          @if (missingHeaderCount + missingItemCount > 0) {
-            (เหลืออีก {{ missingHeaderCount + missingItemCount }} ช่อง)
+          กรุณากรอกข้อมูลที่มี <em>*</em> ให้ครบ (ทุกรายการต้องมีอย่างน้อย 1 แถวภาษี)
+          @if (missingHeaderCount + missingItemCount + missingDutyCount > 0) {
+            (เหลืออีก {{ missingHeaderCount + missingItemCount + missingDutyCount }} ช่อง)
           }
         </span>
       } @else {
@@ -86,8 +202,8 @@
         <div class="cde-dialog" (click)="$event.stopPropagation()">
           <p class="cde-dialog__title">ยืนยันการบันทึกข้อมูล</p>
           <p class="cde-dialog__body">
-            กรุณาตรวจสอบความถูกต้องของข้อมูลทั้งหมด — ทั้งข้อมูลใบขน ข้อมูลบริษัท ข้อมูลสิทธิยกเว้นอากร
-            และรายการวัสดุ/อุปกรณ์ ให้ครบถ้วนก่อนบันทึก
+            กรุณาตรวจสอบความถูกต้องของข้อมูลทั้งหมด — ข้อมูลควบคุมเอกสาร ข้อมูลบริษัท ข้อมูลอินวอย
+            รายการสินค้า และภาษีอากร/การยกเว้นอากรของแต่ละรายการ ให้ครบถ้วนก่อนบันทึก
           </p>
           <div class="cde-dialog__actions">
             <button type="button" class="cde-dialog__btn cde-dialog__btn--cancel" (click)="cancelSave()">ตรวจสอบอีกครั้ง</button>

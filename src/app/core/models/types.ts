@@ -832,46 +832,189 @@ export interface SPNEntry {
 }
 
 // ─── Petroleum duty-exemption ("ขอออกของไปก่อน") ─────────────────────────────
-// Own schema, deliberately not the generic CustomsDeclarationData/GoodsShipment shape — see
-// 'petroleum-ocr-results' in MessageType above for why.
+// Own schema, deliberately not the generic CustomsDeclarationData/GoodsShipment shape — modeled
+// directly on the real DMF "License Request" message (Control/Invoice/Detail/Duty/Permit), not a
+// generic declaration. Fields marked M below are Mandatory (must always have a value); C fields
+// are Condition (required only when applicable — mainly the guarantee/deposit group, since that's
+// the whole point of "ขอออกของไปก่อน"); everything else is Optional. A handful of low-relevance
+// Optional fields from the source schema (sub-broker, tax-card debit account, argumentative-tariff
+// dispute fields, AEOs/self-cert-origin remarks) were left out to keep the form usable — none of
+// them apply to a straightforward petroleum-equipment early-release request.
 
-export interface PetroleumEquipmentItem {
-  itemNumber: number;
-  nameTh: string;
-  nameEn: string;
-  tariffCode: string;
-  quantity: string;
-  quantityUnit: string;
-  originCountry: string;
-  invoiceAmountBaht: string;
+// ── ส่วนภาษี (Duty) — one row per duty type charged/exempted on an item ──────────
+export interface DmfDutyRow {
+  dutyType?: string;        // M - Duty Type, an4
+  valueRate?: string;       // M - อัตราตามราคา (%)
+  specificRate?: string;    // M - อัตราตามสภาพ
+  amount?: string;          // M - ค่าภาษีตามปกติ
+  amountPaid?: string;      // M - ค่าภาษีที่ชำระ
+  exemptionRate?: string;   // O - อัตรายกเว้นอากร (%) — 100 สำหรับยกเว้นเต็มจำนวน
+  depositAmount?: string;   // O - เงินประกัน (ของ duty แถวนี้)
+  depositReasonCode?: string; // O - รหัสเหตุผลการวางประกัน (ส่วนประกัน, ผูกกับ depositAmount)
+}
+
+// ── ส่วนใบอนุญาต (Permit) — 0-99 ต่อรายการ ────────────────────────────────────────
+export interface DmfPermitRow {
+  permitNumber?: string;    // M - เลขที่ใบอนุญาต/ใบรับรอง
+  issueDate?: string;       // M
+  issueAuthority?: string;  // M - เลขผู้เสียภาษีของหน่วยงานผู้ออก
+}
+
+// ── ส่วนรายการ (Detail) ───────────────────────────────────────────────────────────
+export interface DmfItemData {
+  itemNumber: number;             // M - ลำดับรายการในใบขน
+  invoiceItemNumber?: string;     // M - ลำดับรายการในอินวอย
+  tariffCode?: string;            // M
+  tariffSequence?: string;        // M
+  statisticalCode?: string;       // M
+  importTariff?: string;          // O - พิกัดภาค 4 (ของที่ได้รับยกเว้นอากร)
+  privilegeCode?: string;         // M - รหัสสิทธิพิเศษ, an3 — '005' ระหว่างรออนุมัติ
+  natureOfTransaction?: string;   // M - 11/21/90
+  nameTh?: string;                // M
+  nameEn?: string;                // M
+  productYear?: string;           // M - CCYY
+  brandName?: string;             // M - 'NO BRAND' ถ้าไม่มี
+  originCountryCode?: string;     // M
+  netWeight?: string;             // M
+  netWeightUnit?: string;         // M
+  quantity?: string;              // M
+  quantityUnit?: string;          // M
+  currencyCode?: string;          // M
+  exchangeRate?: string;          // M
+  unitPriceForeign?: string;      // M
+  unitPriceBaht?: string;         // M
+  invoiceQuantity?: string;       // M
+  invoiceQuantityUnit?: string;   // M
+  invoiceAmountForeign?: string;  // M
+  invoiceAmountBaht?: string;     // M
+  cifValueForeign?: string;       // M
+  cifValueBaht?: string;          // M
+  shippingMarks?: string;         // M
+  reImportationCertificate?: 'Y' | 'N'; // M
+  boi?: 'Y' | 'N';                // M - สิทธิ์ส่งเสริมการลงทุน
+  bond?: 'Y' | 'N';               // M - คลังสินค้าทัณฑ์บน
+  bis19?: 'Y' | 'N';              // M - คืนอากร ม.19 ทวิ
+  reExport?: 'Y' | 'N';           // M
+  fz?: 'Y' | 'N';                 // M - Free Zone
+  ieat?: 'Y' | 'N';               // M
+
+  duties: DmfDutyRow[];
+  permits: DmfPermitRow[];
+}
+
+// ── ส่วนควบคุมอินวอย (Invoice Control) — หนึ่งอินวอยต่อคำร้อง ─────────────────────
+export interface DmfInvoiceData {
+  invoiceNumber?: string;       // M
+  invoiceDate?: string;         // M
+  purchaseOrderNumber?: string; // M
+  termOfPaymentCode?: string;   // M
+  tradeTerms?: string;          // M - INCOTERMS เช่น CIF/FOB
+  buyerStatus?: string;         // M - AG/DI/CO/MA/OT
+  consignorStatus?: string;     // M - AG/DI/CO/MA/OT
+  commercialLevel?: string;     // M - WO/RE
+  consignorName?: string;       // M
+  streetAndNumber?: string;     // M
+  district?: string;            // O
+  subProvince?: string;         // O
+  province?: string;            // O
+  postcode?: string;            // M
+  countryCode?: string;         // M
+  invoiceCurrencyCode?: string; // M
+  totalInvoiceAmount?: string;  // M
+}
+
+// ── ส่วนควบคุม (Control) — header ของคำร้อง ────────────────────────────────────────
+export interface DmfControlData {
+  // ข้อมูลควบคุมเอกสาร
+  declarationNo?: string;       // O - เลขที่ใบขนสินค้า (มักยังไม่มี ณ ตอนยื่นคำร้องขอออกของไปก่อน)
+  declarationDate?: string;     // O
+  referenceNumber?: string;     // M - an13, XXXXnnnnnnnnn (Profile Name + running number)
+  documentType?: string;        // M - fixed '3' = คำร้องขอรับของไปก่อน
+
+  // ข้อมูลบริษัทผู้นำเข้า
+  companyTaxNumber?: string;    // M
+  companyBranch?: string;       // M
+  companyName?: string;         // M (TH)
+  companyEnglishName?: string;  // M
+  streetAndNumber?: string;     // M
+  district?: string;            // O
+  subProvince?: string;         // O
+  province?: string;            // O
+  postcode?: string;            // M
+
+  // ตัวแทนออกของ / ผู้ปฏิบัติพิธีการ / ผู้รับมอบอำนาจ
+  brokerTaxNumber?: string;         // O
+  brokerBranch?: string;            // C - เมื่อมี brokerTaxNumber
+  customsClearanceIdCard?: string;  // M
+  customsClearanceName?: string;    // M
+  managerIdCard?: string;           // M
+  managerName?: string;             // M
+
+  // ข้อมูลการขนส่ง
+  modeOfTransport?: string;        // M - 1-9 (UNECE Rec.19)
+  cargoTypeCode?: string;          // M - 0-9 (UNECE Rec.21)
+  vesselName?: string;             // M
+  arrivalDate?: string;            // M
+  masterBillOfLading?: string;     // C
+  houseBillOfLading?: string;      // M
+  outsideReleasePort?: string;     // O
+  releasePort?: string;            // M
+  dischargePort?: string;          // M
+  originCountryCode?: string;      // M
+  consignmentCountryCode?: string; // M
+
+  // หีบห่อ/น้ำหนักรวม
+  shippingMarks?: string;             // M
+  totalPackageAmount?: string;        // M
+  totalPackageUnitCode?: string;      // M
+  totalNetWeight?: string;            // M
+  netWeightUnitCode?: string;         // M
+  totalGrossWeight?: string;          // M
+  totalGrossWeightUnitCode?: string;  // M
+
+  // มูลค่า/อัตราแลกเปลี่ยนรวม
+  currencyCode?: string;    // M
+  exchangeRate?: string;    // M
+  cifValueForeign?: string; // M
+  cifValueBaht?: string;    // M
+
+  // การชำระเงิน
+  paymentMethod?: string;       // M - A/H/L
+  totalTax?: string;            // M
+  totalDeposit?: string;        // M
+  rgsCode?: string;             // C
+  customsBankCode?: string;     // C
+  bankCode?: string;            // C
+  bankBranchCode?: string;      // C
+  bankAccountNumber?: string;   // C
+  totalPaymentAmount?: string;  // C
+
+  // การวางประกัน — หัวใจของคำร้องขอออกของไปก่อน (ต้องค้ำประกันก่อนรับของออกระหว่างรอ DMF อนุมัติ)
+  guaranteeMethod?: string;             // M - A/H/L
+  guaranteeType?: string;               // C - C/B/E/O/M
+  guaranteeBankCode?: string;           // C
+  guaranteeBankBranchCode?: string;     // C
+  guaranteeBankAccountNumber?: string;  // O
+  totalDepositAmount?: string;          // C
+
+  departureDate?: string;   // C
+  approvalPort?: string;    // C
+  approvalNumber?: string;  // C
+
+  exportTaxIncentivesId?: string;  // C
+  senderRegistrationId?: string;   // M - รหัสประจำตัวผู้ส่งข้อมูล
 }
 
 export interface PetroleumDutyDeclarationData {
-  // ข้อมูลใบขนขาเข้า
-  importDeclarationNo?: string;   // เลขที่ใบขน — the one field known for certain going in
-  importDate?: string;
-  customsHouseName?: string;      // ด่านศุลกากรนำเข้า
-  declarationType?: string;       // ประเภทใบขน
-
-  // ข้อมูลบริษัทผู้นำเข้า/ผู้รับสัมปทาน
-  companyName?: string;
-  companyTaxNumber?: string;
-  concessionNumber?: string;      // เลขที่สัมปทานปิโตรเลียม/แปลงสำรวจ
-
-  // ข้อมูลสิทธิยกเว้นอากร (มาตรา 70 พ.ร.บ.ปิโตรเลียม พ.ศ. 2514)
-  earlyReleaseRequestNo?: string; // เลขที่คำร้องขอออกของไปก่อน
-  privilegeCode?: string;         // รหัสสิทธิพิเศษ — '005' ระหว่างรออนุมัติ
-  dmfCertificateNo?: string;      // เลขที่หนังสือรับรอง กรมเชื้อเพลิงธรรมชาติ (มักยังไม่ออก ณ จุดนี้)
-  guaranteeNumber?: string;       // เลขที่หนังสือค้ำประกัน
-  guaranteeAmount?: string;       // วงเงินค้ำประกัน (บาท)
-
-  items: PetroleumEquipmentItem[];
+  control: DmfControlData;
+  invoice: DmfInvoiceData;
+  items: DmfItemData[];
 }
 
 export interface PetroleumOcrResultsData {
-  importDeclarationNo?: string;
+  referenceNumber?: string;
   companyName?: string;
-  customsHouseName?: string;
+  vesselName?: string;
   itemCount: number;
   declaration?: PetroleumDutyDeclarationData;
   declarationComplete?: boolean;

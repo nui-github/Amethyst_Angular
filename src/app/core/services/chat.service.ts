@@ -681,13 +681,13 @@ export class ChatService {
     this.pendingAfterFlow = 'form-preview';
     this.isPetroleumDutyPath = true;
     this.submittedAgencies = [];
-    const decl = this.formData().petroleumDeclaration;
+    const control = this.formData().petroleumDeclaration?.control;
     this.formData.update(f => ({
       ...f,
       selectedItems: getPetroleumEquipmentLineItems(),
-      ref: decl?.importDeclarationNo ?? f.ref,
-      importer: decl?.companyName ?? f.importer,
-      port: decl?.customsHouseName ?? f.port,
+      ref: control?.declarationNo || control?.referenceNumber || f.ref,
+      importer: control?.companyName ?? f.importer,
+      port: control?.dischargePort ?? f.port,
       goodsDesc: 'วัสดุ/อุปกรณ์สำหรับกิจการปิโตรเลียม (ขอออกของไปก่อน ยกเว้นอากร ม.70)',
       licenseType: 'ขอออกของไปก่อน (ยกเว้นอากร ม.70 พ.ร.บ.ปิโตรเลียม)',
     }));
