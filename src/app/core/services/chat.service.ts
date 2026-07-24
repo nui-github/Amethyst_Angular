@@ -540,7 +540,10 @@ export class ChatService {
       lotNo: fd.lotNo ?? '', uNo: fd.uNo ?? '',
       isManual: true,
       ...(fd.customsDeclaration ? { customsDeclaration: fd.customsDeclaration } : {}),
-      declarationGateRequired: this.isCustomsOnlyUpload || this.isAgencyDocsUpload,
+      // Only the invoice path's 2nd (agency-upload) pass gates on the declaration-editor — the
+      // customs-only single-upload pass now runs the same plain "ดำเนินการต่อ" → item-hs-analysis
+      // flow as a normal invoice upload, no mandatory declaration fill-in first.
+      declarationGateRequired: this.isAgencyDocsUpload,
       direction: this.direction(),
     } satisfies OcrResultsData);
     this.withTyping(() => this.continueAfterOCR(), 600);
@@ -568,10 +571,10 @@ export class ChatService {
       ...(withLineItems.qtyUnit ? { qtyUnit: withLineItems.qtyUnit } : {}),
       ...(withLineItems.lineItems ? { lineItems: withLineItems.lineItems } : {}),
       ...(this.formData().customsDeclaration ? { customsDeclaration: this.formData().customsDeclaration } : {}),
-      // Only the customs-only single-upload pass and the invoice path's 2nd (agency-upload) pass
-      // are meant to be the final/complete declaration — the invoice path's 1st pass (invoice doc
-      // alone) can't carry full customs-manifest data yet, so it isn't gated.
-      declarationGateRequired: this.isCustomsOnlyUpload || this.isAgencyDocsUpload,
+      // Only the invoice path's 2nd (agency-upload) pass gates on the declaration-editor — the
+      // customs-only single-upload pass now runs the same plain "ดำเนินการต่อ" → item-hs-analysis
+      // flow as a normal invoice upload, no mandatory declaration fill-in first.
+      declarationGateRequired: this.isAgencyDocsUpload,
       direction: this.direction(),
     } satisfies OcrResultsData);
 
