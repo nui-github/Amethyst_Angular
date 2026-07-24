@@ -62,7 +62,7 @@ interface DocSlot {
                   <line x1="12" y1="3" x2="12" y2="15"/>
                 </svg>
                 <span>{{ slot.files.length > 0 ? 'คลิกหรือลากไฟล์เพิ่ม' : 'คลิกหรือลากไฟล์' }}</span>
-                <input [id]="'au_' + slot.doc.key" type="file" accept=".pdf,.jpg,.jpeg,.png" [multiple]="!!slot.doc.multiple"
+                <input [id]="'au_' + slot.doc.key" type="file" [attr.accept]="slot.doc.accept ?? '.pdf,.jpg,.jpeg,.png'" [multiple]="!!slot.doc.multiple"
                   style="display:none" (change)="onFileChange($event, slot)" />
               </label>
             }
@@ -96,8 +96,18 @@ export class AgencyUploadComponent {
 
   slots: DocSlot[] = getAgencyDocs('อย.').map(doc => ({ doc, files: [], dragging: false }));
 
+  // Drag-and-drop bypasses the file input's `accept` picker filter, so a doc slot restricted to a
+  // specific extension (e.g. เชื้อเพลิง's fuel_customs_xml → .xml only) needs its own enforcement
+  // here too, not just the input attribute.
+  private filterAccepted(files: File[], slot: DocSlot): File[] {
+    const accept = slot.doc.accept;
+    if (!accept) return files;
+    const exts = accept.split(',').map(e => e.trim().toLowerCase());
+    return files.filter(f => exts.some(ext => f.name.toLowerCase().endsWith(ext)));
+  }
+
   onFileChange(event: Event, slot: DocSlot): void {
-    const picked = Array.from((event.target as HTMLInputElement).files ?? []);
+    const picked = this.filterAccepted(Array.from((event.target as HTMLInputElement).files ?? []), slot);
     if (!picked.length) return;
     slot.files = slot.doc.multiple ? [...slot.files, ...picked] : [picked[0]];
     this.cdr.detectChanges();
@@ -112,7 +122,7 @@ export class AgencyUploadComponent {
   onDrop(event: DragEvent, slot: DocSlot): void {
     event.preventDefault();
     slot.dragging = false;
-    const dropped = Array.from(event.dataTransfer?.files ?? []);
+    const dropped = this.filterAccepted(Array.from(event.dataTransfer?.files ?? []), slot);
     if (!dropped.length) return;
     slot.files = slot.doc.multiple ? [...slot.files, ...dropped] : [dropped[0]];
     this.cdr.detectChanges();

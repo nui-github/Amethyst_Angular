@@ -11,6 +11,7 @@ export interface AgencyDoc {
   required: boolean;
   manualFields: ManualField[];
   multiple?: boolean;
+  accept?: string; // file input `accept` override — defaults to .pdf,.jpg,.jpeg,.png if unset
 }
 
 export const AGENCY_REQUIRED_DOCS: Record<string, AgencyDoc[]> = {
@@ -100,19 +101,11 @@ export const AGENCY_REQUIRED_DOCS: Record<string, AgencyDoc[]> = {
   ],
   'เชื้อเพลิง': [
     {
-      key: 'fuel_business_permit', label: 'ใบอนุญาตประกอบกิจการควบคุมประเภทที่ 3', required: true,
-      hint: 'ออกโดยกรมธุรกิจพลังงาน ตาม พ.ร.บ.ควบคุมน้ำมันเชื้อเพลิง พ.ศ. 2542',
+      key: 'fuel_customs_xml', label: 'ใบขนสินค้าขาออก (ไฟล์ XML)', required: true, accept: '.xml',
+      hint: 'ยื่นกรมธุรกิจพลังงานด้วยไฟล์ใบขนสินค้าขาออกรูปแบบ XML เท่านั้น — ไม่รับไฟล์ PDF/รูปภาพ',
       manualFields: [
-        { key: 'fuelPermitNo',   label: 'เลขที่ใบอนุญาต', placeholder: 'เช่น ธพ.-2568-000456' },
-        { key: 'fuelPermitDate', label: 'วันที่อนุมัติ',    placeholder: 'dd/mm/yyyy' },
-      ],
-    },
-    {
-      key: 'fuel_quality_cert', label: 'หนังสือรับรองคุณภาพน้ำมันเชื้อเพลิง', required: true,
-      hint: 'ระบุชนิด/คุณสมบัติของน้ำมันที่ส่งออก',
-      manualFields: [
-        { key: 'fuelQualityNo',   label: 'เลขที่หนังสือรับรอง', placeholder: 'Certificate No.' },
-        { key: 'fuelQualityDate', label: 'วันที่ออก',            placeholder: 'dd/mm/yyyy' },
+        { key: 'fuelCustomsNo',   label: 'เลขที่ใบขน', placeholder: 'เช่น A00516907M8Q2Z' },
+        { key: 'fuelCustomsDate', label: 'วันที่ยื่น',   placeholder: 'dd/mm/yyyy' },
       ],
     },
   ],
