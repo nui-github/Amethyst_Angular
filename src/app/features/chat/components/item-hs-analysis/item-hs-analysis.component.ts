@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Search, Check, ArrowDown, ArrowUp, Percent, ShieldCheck, Sprout, PackageCheck, Radiation, Pencil, X, CircleHelp, Biohazard, Fuel, Trees } from 'lucide-angular';
+import { LucideAngularModule, Search, Check, ArrowDown, ArrowUp, Percent, ShieldCheck, Sprout, PackageCheck, Pencil, X, CircleHelp, Biohazard, Fuel, Trees } from 'lucide-angular';
 import { HsCandidate, ItemHsAnalysisData, ProductHsAnalysis } from '@app/core/models/types';
 import { getAgencyPayment } from '@mock/payment.mock';
 import { lookupHsCode } from '@mock/hs-code-db.mock';
@@ -22,13 +22,13 @@ interface AgencyGroup {
   items: ProductHsAnalysis[];
 }
 
-const GROUP_STYLE: Record<string, { color: string; bg: string; icon: 'shield' | 'sprout' | 'package' | 'radiation' | 'help' | 'biohazard' | 'fuel' | 'trees' }> = {
+const GROUP_STYLE: Record<string, { color: string; bg: string; icon: 'shield' | 'sprout' | 'package' | 'help' | 'biohazard' | 'fuel' | 'trees' }> = {
   'อย.': { color: '#0463EF', bg: 'rgba(4, 99, 239, 0.08)', icon: 'shield' },
   'กษ.': { color: '#B45309', bg: 'rgba(180, 83, 9, 0.08)', icon: 'sprout' },
-  'ปส.': { color: '#7C3AED', bg: 'rgba(124, 58, 237, 0.08)', icon: 'radiation' },
   '—':   { color: '#6B7280', bg: 'rgba(107, 114, 128, 0.08)', icon: 'package' },
   '?':   { color: '#B45309', bg: 'rgba(180, 83, 9, 0.08)', icon: 'help' },
-  // Export-path agencies (see 'Export path' in CLAUDE.md)
+  // เชื้อเพลิง (DMF) reachable from both import (product-hs-analysis.mock.ts) and export
+  // (export-product-classification.mock.ts) item-hs-analysis datasets.
   'กรมควบคุมโรค': { color: '#DC2626', bg: 'rgba(220, 38, 38, 0.08)', icon: 'biohazard' },
   'เชื้อเพลิง':    { color: '#EA580C', bg: 'rgba(234, 88, 12, 0.08)', icon: 'fuel' },
   'การยาง':       { color: '#0D8F61', bg: 'rgba(13, 143, 97, 0.08)', icon: 'trees' },
@@ -57,7 +57,6 @@ export class ItemHsAnalysisComponent implements OnInit {
   readonly ShieldCheck = ShieldCheck;
   readonly Sprout = Sprout;
   readonly PackageCheck = PackageCheck;
-  readonly Radiation = Radiation;
   readonly Pencil = Pencil;
   readonly X = X;
   readonly CircleHelp = CircleHelp;

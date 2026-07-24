@@ -146,7 +146,7 @@ export interface ProductHsAnalysis {
   hsCode: string;
   tariffCode: string;    // เลขพิกัดอัตราศุลกากรเต็ม (Smart Tariff)
   requiresPermit: boolean;
-  agency: string;        // 'อย.' | 'กษ.' | 'ปส.' | '—' (ไม่ต้องขอ) | '?' (AI จัดกลุ่มไม่ได้ ต้องระบุเอง)
+  agency: string;        // 'อย.' | 'กษ.' | 'เชื้อเพลิง' | '—' (ไม่ต้องขอ) | '?' (AI จัดกลุ่มไม่ได้ ต้องระบุเอง)
   agencyFull: string;
   licenseType?: string;
   confidence: number;
@@ -1026,13 +1026,10 @@ export interface PetroleumOcrResultsData {
 
 // dld/fda/dft/doa/diw are import-side agencies; ddc/raot are export-side agencies added for the
 // ขาออก pink-form flow (see ChatService.QR_PAYMENT_AGENCIES) — กรมควบคุมโรค/การยาง.
-// oap = สำนักงานปรมาณูเพื่อสันติภาพ (ปส., Office of Atoms for Peace) — the import-side item-hs-analysis
-// dataset (product-hs-analysis.mock.ts) classifies some items under 'ปส.' but no AgencyKey existed
-// for it until ChatService.finalizeSubmit() needed to map a real submitted agency onto a Shipment.
-// dmf = กรมเชื้อเพลิงธรรมชาติ (Department of Mineral Fuels) — both the export-side 'เชื้อเพลิง'
-// item-hs-analysis group and the import-side petroleum duty-exemption path (see
-// 'petroleum-ocr-results' above) map to this same real-world department.
-export type AgencyKey = 'dld' | 'fda' | 'dft' | 'doa' | 'diw' | 'ddc' | 'raot' | 'oap' | 'dmf' | 'none';
+// dmf = กรมเชื้อเพลิงธรรมชาติ (Department of Mineral Fuels) — both the 'เชื้อเพลิง' item-hs-analysis
+// group (product-hs-analysis.mock.ts p1/p3, import-side) and the standalone import-side petroleum
+// duty-exemption path (see 'petroleum-ocr-results' above) map to this same real-world department.
+export type AgencyKey = 'dld' | 'fda' | 'dft' | 'doa' | 'diw' | 'ddc' | 'raot' | 'dmf' | 'none';
 
 // Queue shipments only exist once a chat session has passed profile selection — which only
 // happens when a permit is actually required — so there is no "no_permit" queue status.

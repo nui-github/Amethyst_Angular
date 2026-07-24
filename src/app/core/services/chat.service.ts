@@ -754,16 +754,16 @@ export class ChatService {
   private readonly AGENCY_DESC: Record<string, string> = {
     'อย.': 'สำนักงานคณะกรรมการอาหารและยา (อย.)',
     'กษ.': 'กรมวิชาการเกษตร (กษ.)',
-    'ปส.': 'สำนักงานปรมาณูเพื่อสันติภาพ (ปส.)',
     '—':   'ขอใบอนุญาตนำเข้าทั่วไป',
-    // Export-path agencies (see 'Export path' in CLAUDE.md)
+    // 'เชื้อเพลิง' is reachable from item-hs-analysis on both directions (product-hs-analysis.mock.ts
+    // p1/p3 on import, export-product-classification.mock.ts on export — though the export dataset
+    // no longer routes anything there, see CLAUDE.md); the standalone customs-docs duty-exemption
+    // path (see 'petroleum-ocr-results' in types.ts) uses the fuller 'กรมเชื้อเพลิงธรรมชาติ' string
+    // instead — same real department (DMF), just a separate agency-string key since it's a distinct
+    // flow with its own AgencyKey mapping below.
     'กรมควบคุมโรค': 'กรมควบคุมโรค (DDC)',
     'เชื้อเพลิง':    'กรมเชื้อเพลิงธรรมชาติ กระทรวงพลังงาน (DMF)',
     'การยาง':       'การยางแห่งประเทศไทย (RAOT)',
-    // Petroleum duty-exemption path (see 'petroleum-ocr-results' in types.ts) — import-side only.
-    // Same real-world department (DMF) as 'เชื้อเพลิง' above, kept as a separate agency-string key
-    // since it's a distinct flow (item-hs-analysis classification vs. the direct customs-docs
-    // duty-exemption path) with its own AgencyKey mapping below.
     'กรมเชื้อเพลิงธรรมชาติ': 'กรมเชื้อเพลิงธรรมชาติ (DMF)',
   };
 
@@ -772,7 +772,7 @@ export class ChatService {
   // keys off of (AGENCY_LABEL/AGENCY_SHORT in queue.mock.ts) — finalizeSubmit() needs this since it
   // used to just hardcode 'fda' regardless of which agency the user actually submitted to.
   private readonly AGENCY_KEY_MAP: Record<string, AgencyKey> = {
-    'อย.': 'fda', 'กษ.': 'doa', 'ปส.': 'oap',
+    'อย.': 'fda', 'กษ.': 'doa',
     'กรมควบคุมโรค': 'ddc', 'เชื้อเพลิง': 'dmf', 'การยาง': 'raot',
     'กรมเชื้อเพลิงธรรมชาติ': 'dmf',
   };

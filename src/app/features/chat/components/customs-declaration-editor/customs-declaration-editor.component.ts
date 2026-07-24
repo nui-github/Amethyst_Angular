@@ -51,7 +51,7 @@ export class CustomsDeclarationEditorComponent {
     { label: 'ผู้ผลิต', key: 'manufacture', width: 220 },
   ];
 
-  readonly agencyOptions = ['อย.', 'กษ.', 'ปส.'];
+  readonly agencyOptions = ['อย.', 'กษ.', 'เชื้อเพลิง'];
 
   local: CustomsDeclarationData;
 

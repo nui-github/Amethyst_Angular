@@ -62,24 +62,6 @@ export const AGENCY_REQUIRED_DOCS: Record<string, AgencyDoc[]> = {
       ],
     },
   ],
-  'ปส.': [
-    {
-      key: 'irradiation_cert', label: 'ใบรับรองการฆ่าเชื้อด้วยรังสี', required: true,
-      hint: 'Certificate of Irradiation/Sterilization จากผู้ผลิต',
-      manualFields: [
-        { key: 'irradiationNo',   label: 'เลขที่ใบรับรอง', placeholder: 'Certificate No.' },
-        { key: 'irradiationDate', label: 'วันที่ออก',       placeholder: 'dd/mm/yyyy' },
-      ],
-    },
-    {
-      key: 'radiation_permit', label: 'ใบอนุญาตครอบครองเครื่องมือแพทย์ที่ผ่านการฉายรังสี', required: true,
-      hint: 'ออกโดยสำนักงานปรมาณูเพื่อสันติภาพ (ปส.)',
-      manualFields: [
-        { key: 'radiationPermitNo',   label: 'เลขที่ใบอนุญาต', placeholder: 'เช่น ปส.-2568-000456' },
-        { key: 'radiationPermitDate', label: 'วันที่อนุมัติ',    placeholder: 'dd/mm/yyyy' },
-      ],
-    },
-  ],
   // Export-path agencies (see 'Export path' in CLAUDE.md)
   // กรมควบคุมโรค — DOA + ฉลากภาชนะบรรจุ (พ.ร.บ.เชื้อโรคและพิษจากสัตว์ พ.ศ. 2558 กำหนดให้ต้องยื่น
   // เอกสารกำกับ ฉลาก และภาชนะบรรจุประกอบการขออนุญาต); the pathogen-permit/sanitary-cert docs
@@ -99,13 +81,23 @@ export const AGENCY_REQUIRED_DOCS: Record<string, AgencyDoc[]> = {
       manualFields: [],
     },
   ],
+  // Import path only now (see product-hs-analysis.mock.ts p1/p3) — เชื้อเพลิง/DMF's export
+  // classification was moved to the import-side ขอออกของไปก่อน flow, see CLAUDE.md.
   'เชื้อเพลิง': [
     {
-      key: 'fuel_customs_xml', label: 'ใบขนสินค้าขาออก (ไฟล์ XML)', required: true, accept: '.xml',
-      hint: 'ยื่นกรมเชื้อเพลิงธรรมชาติด้วยไฟล์ใบขนสินค้าขาออกรูปแบบ XML เท่านั้น — ไม่รับไฟล์ PDF/รูปภาพ',
+      key: 'dmf_early_release_request', label: 'คำร้องขอออกของไปก่อน (DMF)', required: true,
+      hint: 'แบบคำร้องขอออกของไปก่อน เพื่อยกเว้นอากรนำเข้าตามมาตรา 70 พ.ร.บ.ปิโตรเลียม พ.ศ. 2514',
       manualFields: [
-        { key: 'fuelCustomsNo',   label: 'เลขที่ใบขน', placeholder: 'เช่น A00516907M8Q2Z' },
-        { key: 'fuelCustomsDate', label: 'วันที่ยื่น',   placeholder: 'dd/mm/yyyy' },
+        { key: 'dmfRequestNo',   label: 'เลขที่คำร้อง',     placeholder: 'เช่น EROB-2568-00317' },
+        { key: 'dmfRequestDate', label: 'วันที่ยื่นคำร้อง', placeholder: 'dd/mm/yyyy' },
+      ],
+    },
+    {
+      key: 'guarantee_letter', label: 'หนังสือค้ำประกันธนาคาร', required: true,
+      hint: 'ใช้วางประกันระหว่างรอกรมเชื้อเพลิงธรรมชาติออกหนังสือรับรอง',
+      manualFields: [
+        { key: 'guaranteeNo',     label: 'เลขที่หนังสือค้ำประกัน', placeholder: 'เช่น LG-BKK-2568-4471' },
+        { key: 'guaranteeAmount', label: 'วงเงินค้ำประกัน (บาท)',   placeholder: 'เช่น 5,000,000' },
       ],
     },
   ],

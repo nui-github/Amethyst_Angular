@@ -10,25 +10,29 @@ import { ProductHsAnalysis, InvoiceLineItem } from '@app/core/models/types';
 // to 5 `candidates` so the user can manually re-classify a single item if the AI's pick looks
 // wrong (see ItemHsAnalysisComponent's edit/candidate-picker UI).
 //
-// p1/p3 (gamma-sterilized implantable devices) additionally require ปส. (สำนักงานปรมาณูเพื่อสันติภาพ)
-// clearance on top of อย. — this intentionally gives the flow 2 permit-required agencies so the
-// "ขอใบอนุญาตเพิ่ม" (next-agency LPI) step is reachable from every flow (invoice, SPN, customs).
+// p1/p3 are petroleum-business equipment (imported alongside the medical-device shipment on the
+// same invoice) requiring กรมเชื้อเพลิงธรรมชาติ (DMF) clearance — this intentionally gives the flow
+// 2 permit-required agencies (อย. + เชื้อเพลิง) so the "ขอใบอนุญาตเพิ่ม" (next-agency LPI) step is
+// reachable from every flow (invoice, SPN, customs). Was ปส. (Office of Atoms for Peace) — moved
+// to กรมเชื้อเพลิงธรรมชาติ/DMF, mirroring the same real department the standalone petroleum
+// duty-exemption path (petroleum-duty.mock.ts) and the export item-hs-analysis dataset use (see
+// AGENCY_DESC/AGENCY_KEY_MAP in chat.service.ts) — ปส. is no longer used anywhere in the app.
 // p6 is classified as a general plastic accessory (not a controlled medical device), demonstrating
 // the "ไม่ต้องขอใบอนุญาต" group that also renders in item-hs-analysis.
 // Used as the single shared dataset for item-hs-analysis across every flow.
 const PRODUCT_HS_ANALYSIS: ProductHsAnalysis[] = [
   {
-    id: 'p1', name: 'Stent Graft (ETBF2313C145EE)',
-    hsCode: '9021.39.00', tariffCode: '9021.39.00.001', requiresPermit: true,
-    agency: 'ปส.', agencyFull: 'สำนักงานปรมาณูเพื่อสันติภาพ', licenseType: 'ผ่านการฆ่าเชื้อด้วยรังสีแกมมา',
+    id: 'p1', name: 'Wellhead Control Valve Assembly (WHV-2201X)',
+    hsCode: '8481.80.99', tariffCode: '8481.80.99.001', requiresPermit: true,
+    agency: 'เชื้อเพลิง', agencyFull: 'กรมเชื้อเพลิงธรรมชาติ กระทรวงพลังงาน (DMF)', licenseType: 'ขอออกของไปก่อน (ยกเว้นอากร ม.70 พ.ร.บ.ปิโตรเลียม)',
     confidence: 95, dutyRate: 0,
-    reason: 'จัดเป็นอุปกรณ์ปลูกถ่ายหลอดเลือด (Stent Graft) ที่ใช้ฝังในร่างกายถาวร ตรงตามพิกัดเครื่องมือแพทย์ประเภทอุปกรณ์เทียม และผ่านการฆ่าเชื้อด้วยรังสีแกมมาก่อนส่งมอบ',
+    reason: 'จัดเป็นชุดวาล์วควบคุมหลุมเจาะสำหรับใช้ในกิจการปิโตรเลียม อยู่ภายใต้สิทธิยกเว้นอากรตามมาตรา 70 พ.ร.บ.ปิโตรเลียม พ.ศ. 2514 ต้องขอใบรับรองจากกรมเชื้อเพลิงธรรมชาติก่อนนำเข้า',
     candidates: [
-      { hsCode: '9021.39.00', tariffCode: '9021.39.00.001', description: 'อุปกรณ์เทียมชนิดอื่นๆ ที่ใช้ฝังในร่างกาย (Stent Graft)', dutyRate: 0, confidence: 95 },
-      { hsCode: '9021.39.00', tariffCode: '9021.39.00.002', description: 'ข้อต่อเทียม/อวัยวะเทียมอื่นๆ', dutyRate: 0, confidence: 78 },
-      { hsCode: '9018.39.90', tariffCode: '9018.39.90.010', description: 'สายสวนและอุปกรณ์การแพทย์ประเภทท่อ/สาย', dutyRate: 5, confidence: 65 },
-      { hsCode: '9021.90.90', tariffCode: '9021.90.90.005', description: 'อุปกรณ์ทางออร์โธปิดิกส์อื่นๆ', dutyRate: 0, confidence: 55 },
-      { hsCode: '9018.90.90', tariffCode: '9018.90.90.099', description: 'เครื่องมือแพทย์อื่นๆ ที่มิได้ระบุไว้เฉพาะ', dutyRate: 5, confidence: 40 },
+      { hsCode: '8481.80.99', tariffCode: '8481.80.99.001', description: 'วาล์วควบคุมสำหรับกิจการปิโตรเลียม (Wellhead Valve)', dutyRate: 0, confidence: 95 },
+      { hsCode: '8481.80.99', tariffCode: '8481.80.99.002', description: 'วาล์วอุตสาหกรรมทั่วไปอื่นๆ', dutyRate: 5, confidence: 78 },
+      { hsCode: '7307.99.00', tariffCode: '7307.99.00.010', description: 'ข้อต่อ/อุปกรณ์ประกอบท่อเหล็ก', dutyRate: 5, confidence: 65 },
+      { hsCode: '8481.90.00', tariffCode: '8481.90.00.005', description: 'ส่วนประกอบของวาล์วอื่นๆ', dutyRate: 5, confidence: 55 },
+      { hsCode: '8479.89.90', tariffCode: '8479.89.90.099', description: 'เครื่องจักรอุตสาหกรรมอื่นๆ ที่มิได้ระบุไว้เฉพาะ', dutyRate: 5, confidence: 40 },
     ],
   },
   {
@@ -46,17 +50,17 @@ const PRODUCT_HS_ANALYSIS: ProductHsAnalysis[] = [
     ],
   },
   {
-    id: 'p3', name: 'Introducer Sheath (SENSH1628W)',
-    hsCode: '9018.39.90', tariffCode: '9018.39.90.003', requiresPermit: true,
-    agency: 'ปส.', agencyFull: 'สำนักงานปรมาณูเพื่อสันติภาพ', licenseType: 'ผ่านการฆ่าเชื้อด้วยรังสีแกมมา',
+    id: 'p3', name: 'Tricone Drill Bit (TCB-1128W)',
+    hsCode: '8431.43.00', tariffCode: '8431.43.00.003', requiresPermit: true,
+    agency: 'เชื้อเพลิง', agencyFull: 'กรมเชื้อเพลิงธรรมชาติ กระทรวงพลังงาน (DMF)', licenseType: 'ขอออกของไปก่อน (ยกเว้นอากร ม.70 พ.ร.บ.ปิโตรเลียม)',
     confidence: 91, dutyRate: 5,
-    reason: 'จัดเป็นปลอกนำสาย (Introducer Sheath) ที่ใช้ร่วมกับสายสวนในหัตถการหลอดเลือด เป็นอุปกรณ์ใช้ครั้งเดียวที่ผ่านการฆ่าเชื้อด้วยรังสีแกมมา',
+    reason: 'จัดเป็นหัวเจาะสามง่ามสำหรับใช้ในการขุดเจาะปิโตรเลียม อยู่ภายใต้สิทธิยกเว้นอากรตามมาตรา 70 พ.ร.บ.ปิโตรเลียม พ.ศ. 2514 ต้องขอใบรับรองจากกรมเชื้อเพลิงธรรมชาติก่อนนำเข้า',
     candidates: [
-      { hsCode: '9018.39.90', tariffCode: '9018.39.90.003', description: 'ปลอกนำสาย/สายสวนใช้ครั้งเดียว (Introducer Sheath)', dutyRate: 5, confidence: 91 },
-      { hsCode: '9018.39.90', tariffCode: '9018.39.90.012', description: 'สายสวนหลอดเลือดทั่วไป', dutyRate: 5, confidence: 74 },
-      { hsCode: '9018.90.90', tariffCode: '9018.90.90.060', description: 'อุปกรณ์เสริมสำหรับหัตถการหลอดเลือด', dutyRate: 5, confidence: 62 },
-      { hsCode: '9021.39.00', tariffCode: '9021.39.00.004', description: 'อุปกรณ์เทียมที่ฝังร่วมกับสายสวน', dutyRate: 0, confidence: 44 },
-      { hsCode: '4015.19.00', tariffCode: '4015.19.00.001', description: 'ผลิตภัณฑ์ยางสำหรับการแพทย์ทั่วไป', dutyRate: 10, confidence: 28 },
+      { hsCode: '8431.43.00', tariffCode: '8431.43.00.003', description: 'หัวเจาะ/อุปกรณ์ขุดเจาะสำหรับกิจการปิโตรเลียม (Drill Bit)', dutyRate: 5, confidence: 91 },
+      { hsCode: '8431.43.00', tariffCode: '8431.43.00.012', description: 'อะไหล่เครื่องขุดเจาะทั่วไป', dutyRate: 5, confidence: 74 },
+      { hsCode: '7304.29.00', tariffCode: '7304.29.00.060', description: 'ท่อกรุบ่อน้ำมัน (Casing Pipe)', dutyRate: 5, confidence: 62 },
+      { hsCode: '8207.13.00', tariffCode: '8207.13.00.004', description: 'เครื่องมือขุดเจาะ/เจาะหินชนิดอื่นๆ', dutyRate: 5, confidence: 44 },
+      { hsCode: '7326.19.00', tariffCode: '7326.19.00.001', description: 'ผลิตภัณฑ์เหล็กทั่วไป', dutyRate: 10, confidence: 28 },
     ],
   },
   {
@@ -112,8 +116,6 @@ const PRODUCT_HS_ANALYSIS: ProductHsAnalysis[] = [
         agency: 'อย.', agencyFull: 'สำนักงานคณะกรรมการอาหารและยา', requiresPermit: true, licenseType: 'เครื่องมือแพทย์' },
       { hsCode: '3005.90.90', tariffCode: '3005.90.90.020', description: 'ผ้าพันแผล/วัสดุปิดแผลทั่วไป (ไม่ควบคุม)', dutyRate: 10, confidence: 45,
         agency: '—', agencyFull: '—', requiresPermit: false },
-      { hsCode: '9021.39.00', tariffCode: '9021.39.00.009', description: 'วัสดุปิดแผลที่มีส่วนประกอบฝังตัว/ผ่านการฆ่าเชื้อพิเศษ', dutyRate: 0, confidence: 33,
-        agency: 'ปส.', agencyFull: 'สำนักงานปรมาณูเพื่อสันติภาพ', requiresPermit: true, licenseType: 'ผ่านการฆ่าเชื้อด้วยรังสีแกมมา' },
     ],
   },
 ];
@@ -127,9 +129,9 @@ export function getProductHsAnalysis(): ProductHsAnalysis[] {
 // shows realistic figures, and so form-preview's item modal can auto-fill Lot/Mfg/Exp/Qty from
 // OCR instead of asking the user to retype data already captured.
 const ITEM_COMMERCIAL: Record<string, { quantity: string; unit: string; unitPrice: number; amount: number; lotNo: string; mfgDate?: string; expDate?: string }> = {
-  p1: { quantity: '1',   unit: 'ชิ้น', unitPrice: 85326.74, amount: 85326.74,  lotNo: 'ETBF2313C145EE', mfgDate: '01-02-2568', expDate: '01-02-2571' },
+  p1: { quantity: '1',   unit: 'ชิ้น', unitPrice: 85326.74, amount: 85326.74,  lotNo: 'WHV-2201X',      mfgDate: '01-02-2568', expDate: '01-02-2571' },
   p2: { quantity: '39',  unit: 'ชิ้น', unitPrice: 11001.55, amount: 429060.45, lotNo: 'TRCR30015X',     mfgDate: '15-01-2568', expDate: '15-01-2571' },
-  p3: { quantity: '29',  unit: 'ชิ้น', unitPrice: 3864.14,  amount: 112060.06, lotNo: 'SENSH1628W',     mfgDate: '20-01-2568', expDate: '20-01-2571' },
+  p3: { quantity: '29',  unit: 'ชิ้น', unitPrice: 3864.14,  amount: 112060.06, lotNo: 'TCB-1128W',      mfgDate: '20-01-2568', expDate: '20-01-2571' },
   p4: { quantity: '189', unit: 'ชิ้น', unitPrice: 1966.27,  amount: 371625.03, lotNo: 'SPL20015X',      mfgDate: '10-02-2568', expDate: '10-02-2571' },
   p5: { quantity: '1',   unit: 'ชิ้น', unitPrice: 5246.59,  amount: 5246.59,   lotNo: 'SBI06012013P',   mfgDate: '05-02-2568', expDate: '05-02-2571' },
   p6: { quantity: '1',   unit: 'ชิ้น', unitPrice: 1962.24,  amount: 1962.24,   lotNo: 'SPL30020X' }, // no production details on file — left blank

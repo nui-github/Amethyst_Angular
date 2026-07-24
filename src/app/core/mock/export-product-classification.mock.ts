@@ -5,11 +5,14 @@ import { ProductHsAnalysis, InvoiceLineItem } from '@app/core/models/types';
 //
 // Item set mirrors the export-invoice OCR line items (export-invoice-ocr.mock.ts) so the
 // AI-analysis box's item count/content matches the invoice OCR box, same as the import side.
-// The 3 export-control agencies this build starts with: กรมควบคุมโรค (pathogen/biological
-// diagnostic reagents), เชื้อเพลิง = กรมเชื้อเพลิงธรรมชาติ (fuel), การยาง = การยางแห่งประเทศไทย
-// (rubber) — see CLAUDE.md 'Export path'. e4 (rubber compound sheet) is compounded/processed
-// rubber (isCompound: true) — same 'การยาง' group as raw RSS3 (e1), but needs a natural-rubber-
-// content certificate + fee (RubberCertPaymentComponent) instead of ใบอนุญาตค้ายาง.
+// 2 export-control agencies on this path: กรมควบคุมโรค (pathogen/biological diagnostic reagents),
+// การยาง = การยางแห่งประเทศไทย (rubber) — see CLAUDE.md 'Export path'. เชื้อเพลิง/DMF (fuel) used to
+// be a 3rd export agency here (e2, Industrial Fuel Oil) but that classification moved to the
+// import-side มาตรา 70 พ.ร.บ.ปิโตรเลียม duty-exemption path (product-hs-analysis.mock.ts p1/p3) —
+// e2 is kept as a "ไม่ต้องขอใบอนุญาต" item now, not deleted, so item counts still match the
+// 4-item export invoice. e4 (rubber compound sheet) is compounded/processed rubber
+// (isCompound: true) — same 'การยาง' group as raw RSS3 (e1), but needs a natural-rubber-content
+// certificate + fee (RubberCertPaymentComponent) instead of ใบอนุญาตค้ายาง.
 const EXPORT_PRODUCT_CLASSIFICATION: ProductHsAnalysis[] = [
   {
     id: 'e1', name: 'RSS3 Smoked Rubber Sheet (ยางแผ่นรมควันชั้น 3)',
@@ -27,10 +30,13 @@ const EXPORT_PRODUCT_CLASSIFICATION: ProductHsAnalysis[] = [
   },
   {
     id: 'e2', name: 'Industrial Fuel Oil (น้ำมันเตาอุตสาหกรรม)',
-    hsCode: '2710.19.51', tariffCode: '2710.19.51.001', requiresPermit: true,
-    agency: 'เชื้อเพลิง', agencyFull: 'กรมเชื้อเพลิงธรรมชาติ กระทรวงพลังงาน (DMF)', licenseType: 'ใบอนุญาตประกอบกิจการควบคุมประเภทที่ 3 (พ.ร.บ.ควบคุมน้ำมันเชื้อเพลิง)',
+    hsCode: '2710.19.51', tariffCode: '2710.19.51.001', requiresPermit: false,
+    agency: '—', agencyFull: '—',
     confidence: 88, dutyRate: 0,
-    reason: 'จัดเป็นน้ำมันเตาสำหรับใช้ในอุตสาหกรรม อยู่ภายใต้การควบคุมของ พ.ร.บ.ควบคุมน้ำมันเชื้อเพลิง พ.ศ. 2542 ต้องขอใบอนุญาตจากกรมเชื้อเพลิงธรรมชาติก่อนส่งออก',
+    // เชื้อเพลิง/DMF classification moved to the import side (product-hs-analysis.mock.ts p1/p3,
+    // มาตรา 70 พ.ร.บ.ปิโตรเลียม duty-exemption path) — this export item no longer routes anywhere,
+    // demonstrating the "ไม่ต้องขอใบอนุญาต" group instead (same role p6/e4-alt play elsewhere).
+    reason: 'จัดเป็นน้ำมันเตาสำหรับใช้ในอุตสาหกรรมทั่วไป ไม่เข้าข่ายวัตถุควบคุมการส่งออกตามประกาศกระทรวงพาณิชย์ จึงไม่ต้องขอใบอนุญาตส่งออก',
     candidates: [
       { hsCode: '2710.19.51', tariffCode: '2710.19.51.001', description: 'น้ำมันเตา (Fuel Oil) สำหรับอุตสาหกรรม', dutyRate: 0, confidence: 88 },
       { hsCode: '2710.19.31', tariffCode: '2710.19.31.001', description: 'น้ำมันดีเซล (Diesel Fuel)', dutyRate: 0, confidence: 62 },
