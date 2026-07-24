@@ -19,6 +19,8 @@ export const AGENCY_PAYMENT: Record<string, AgencyPaymentConfig> = {
   'กรมควบคุมโรค': { requiresFee: true,  amount: 1000, note: 'ค่าตรวจสอบเชื้อโรคและพิษจากสัตว์' },
   'เชื้อเพลิง':    { requiresFee: true,  amount: 600,  note: 'ค่าธรรมเนียมใบอนุญาตควบคุมประเภทที่ 3' },
   'การยาง':       { requiresFee: false, amount: 0,    note: 'ไม่มีค่าธรรมเนียม (ใบอนุญาตค้ายาง)' },
+  // Petroleum duty-exemption path (import) — ยกเว้นอากรตามมาตรา 70 พ.ร.บ.ปิโตรเลียม, ไม่มีค่าธรรมเนียม LPI
+  'กรมเชื้อเพลิงธรรมชาติ': { requiresFee: false, amount: 0, note: 'ยกเว้นอากรตามมาตรา 70 พ.ร.บ.ปิโตรเลียม — ไม่มีค่าธรรมเนียม' },
 };
 
 export function getAgencyPayment(agency: string): AgencyPaymentConfig {

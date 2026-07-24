@@ -9,8 +9,9 @@ import {
   ShipmentItem, ShipmentDocument, AgencyKey, RubberCertPaymentData,
   RubberEqcRequestData, RubberEqcGateData, RubberEqcStatusData,
   RubberEsfrGateData, RubberEsfrRequestData, RubberEsfrPreviewData, RubberEsfrStatusData, RubberEsfrFeeReceiptData,
+  PetroleumOcrResultsData, PetroleumDutyDeclarationData,
 } from '@app/core/models/types';
-import { OcrService, MultiInvoiceDetection } from './ocr.service';
+import { OcrService, MultiInvoiceDetection, PetroleumDutyDetection } from './ocr.service';
 import { QueueService } from './queue.service';
 import { analyzeHsCode } from '@mock/hs-analysis.mock';
 import { getAgencyPayment } from '@mock/payment.mock';
@@ -22,6 +23,7 @@ import { getProductHsAnalysis, mapToInvoiceLineItems } from '@mock/product-hs-an
 import { getExportProductClassification, mapExportItemsToInvoiceLineItems } from '@mock/export-product-classification.mock';
 import { RUBBER_COMPOUND_CERT_FEE, MOCK_LINKED_BANK_ACCOUNTS } from '@mock/rubber-cert.mock';
 import { InvoiceOcrResult, toInvoiceSummaryOption } from '@mock/invoice-ocr.mock';
+import { getPetroleumEquipmentLineItems } from '@mock/petroleum-duty.mock';
 import { environment } from '@env/environment';
 import { MOCK_SESSIONS } from '@mock/sessions.mock';
 import { mergeCustomsDeclaration } from '@app/shared/utils/helpers';
@@ -75,6 +77,14 @@ export class ChatService {
   // showEsfrChoice()/onEsfrFlowChoice()).
   readonly rubberEsfrEditorOpen  = signal(false);
   readonly rubberEsfrEditorMsgId = signal<string | null>(null);
+
+  // Full-screen petroleum duty-exemption ("ขอออกของไปก่อน") declaration-editor panel — same
+  // gate/drawer pattern as declarationEditorOpen above, but a fully separate signal/component
+  // pair (see PetroleumDutyDeclarationData) since this scenario's fields don't fit the generic
+  // CustomsDeclarationData schema. Opened from a 'petroleum-ocr-results' card's own
+  // "กรอกข้อมูลเพิ่มเติม" button.
+  readonly petroleumEditorOpen  = signal(false);
+  readonly petroleumEditorMsgId = signal<string | null>(null);
 
   // Which side of the pipeline the current session is on — set once from showDocTypeChoice()'s
   // answer, threaded into formData.direction and every message that needs direction-aware copy
@@ -415,6 +425,13 @@ export class ChatService {
   private isInvoicePath = false;
   private isAgencyDocsUpload = false;
   private isCustomsDocPath = false;
+  // Set once startOCR() detects a petroleum duty-exemption ใบขน (PETROLEUM_DUTY_TRIGGER) and
+  // cleared right after continueAgencyFlow() consumes it — only one agency (DMF) ever applies to
+  // this path, so it skips selectAllAgencyItems() (which needs confirmedProductItems from
+  // item-hs-analysis, never run here) since formData.selectedItems is already set directly in
+  // onPetroleumOcrProceed().
+  private isPetroleumDutyPath = false;
+  private static readonly PETROLEUM_AGENCY = 'กรมเชื้อเพลิงธรรมชาติ';
   private checkMissingAfterFlags = false;          // invoice path: check missing fields after flags
   private pendingAfterMissingFields: 'ocr' | 'proceed-choice' = 'ocr';
   // What to do after agency+profile selection
@@ -464,6 +481,10 @@ export class ChatService {
 
     if ('multiInvoice' in result) {
       this.showInvoiceSelect(result);
+      return;
+    }
+    if ('petroleumDutyExemption' in result) {
+      this.showPetroleumOcrResults(result);
       return;
     }
 
@@ -616,6 +637,63 @@ export class ChatService {
     this.withTyping(() => this.continueAfterOCR(), 400);
   }
 
+  // ── Petroleum duty-exemption ("ขอออกของไปก่อน") — customs-docs path only, see
+  //    ocr.service.ts PETROLEUM_DUTY_TRIGGER ─────────────────────────────────────
+  private showPetroleumOcrResults(detection: PetroleumDutyDetection): void {
+    this.formData.update(f => ({ ...f, direction: this.direction(), petroleumDeclaration: detection.data.declaration }));
+    this.promoteActiveSession();
+    this.bot('petroleum-ocr-results', { ...detection.data } satisfies PetroleumOcrResultsData);
+  }
+
+  /** Called from PetroleumOcrResultsComponent's "กรอกข้อมูลเพิ่มเติม" button. */
+  openPetroleumEditor(msgId: string): void {
+    this.petroleumEditorMsgId.set(msgId);
+    this.petroleumEditorOpen.set(true);
+  }
+
+  closePetroleumEditor(): void {
+    this.petroleumEditorOpen.set(false);
+  }
+
+  /** Called from PetroleumDeclarationEditorComponent once every required field is filled and the
+   *  user confirms save — mirrors saveDeclarationEditor() above but for the separate petroleum
+   *  schema (own formData.petroleumDeclaration slot, own message data). */
+  savePetroleumEditor(updated: PetroleumDutyDeclarationData): void {
+    const msgId = this.petroleumEditorMsgId();
+    this.formData.update(f => ({ ...f, petroleumDeclaration: updated }));
+    if (msgId) {
+      this.messages.update(ms => ms.map(m =>
+        m.id === msgId && m.type === 'petroleum-ocr-results'
+          ? { ...m, data: { ...(m.data as PetroleumOcrResultsData), declaration: updated, declarationComplete: true } }
+          : m
+      ));
+    }
+    this.petroleumEditorOpen.set(false);
+  }
+
+  /** Called from PetroleumOcrResultsComponent "ดำเนินการต่อ" button — only one agency (DMF) ever
+   *  applies to this path, so it skips item-hs-analysis/เลือกกรม entirely and goes straight to
+   *  profile-select, same as continueAfterCustomsOCR()'s generic path but with the agency and
+   *  selected items already known. */
+  onPetroleumOcrProceed(): void {
+    this.user('ดำเนินการต่อ');
+    this.currentAgency = ChatService.PETROLEUM_AGENCY;
+    this.pendingAfterFlow = 'form-preview';
+    this.isPetroleumDutyPath = true;
+    this.submittedAgencies = [];
+    const decl = this.formData().petroleumDeclaration;
+    this.formData.update(f => ({
+      ...f,
+      selectedItems: getPetroleumEquipmentLineItems(),
+      ref: decl?.importDeclarationNo ?? f.ref,
+      importer: decl?.companyName ?? f.importer,
+      port: decl?.customsHouseName ?? f.port,
+      goodsDesc: 'วัสดุ/อุปกรณ์สำหรับกิจการปิโตรเลียม (ขอออกของไปก่อน ยกเว้นอากร ม.70)',
+      licenseType: 'ขอออกของไปก่อน (ยกเว้นอากร ม.70 พ.ร.บ.ปิโตรเลียม)',
+    }));
+    this.withTyping(() => this.showProfileSelectForAgency(ChatService.PETROLEUM_AGENCY), 400);
+  }
+
   private continueAfterOCR(): void {
     // Agency docs upload (2nd doc in invoice path): skip hs-analysis AND flags/item-measurement —
     // the declaration-editor panel (gated on this very OCR pass, see declarationGateRequired)
@@ -682,6 +760,9 @@ export class ChatService {
     'กรมควบคุมโรค': 'กรมควบคุมโรค (DDC)',
     'เชื้อเพลิง':    'กรมธุรกิจพลังงาน (DOEB)',
     'การยาง':       'การยางแห่งประเทศไทย (RAOT)',
+    // Petroleum duty-exemption path (see 'petroleum-ocr-results' in types.ts) — import-side only,
+    // not the same as 'เชื้อเพลิง' above (DOEB, export fuel-oil path).
+    'กรมเชื้อเพลิงธรรมชาติ': 'กรมเชื้อเพลิงธรรมชาติ (DMF)',
   };
 
   // Maps this.currentAgency's display string (as used throughout the chat flow — item-hs-analysis
@@ -691,6 +772,7 @@ export class ChatService {
   private readonly AGENCY_KEY_MAP: Record<string, AgencyKey> = {
     'อย.': 'fda', 'กษ.': 'doa', 'ปส.': 'oap',
     'กรมควบคุมโรค': 'ddc', 'เชื้อเพลิง': 'doeb', 'การยาง': 'raot',
+    'กรมเชื้อเพลิงธรรมชาติ': 'dmf',
   };
 
   // formCode/formName as actually shown for this agency's own flow (see queue.mock.ts static
@@ -721,6 +803,12 @@ export class ChatService {
       return {
         code: 'ใบอนุญาตค้ายาง',
         name: `คำขอใบอนุญาตค้ายาง${isExport ? 'ขาออก' : ''} — การยางแห่งประเทศไทย (RAOT)`,
+      };
+    }
+    if (agency === ChatService.PETROLEUM_AGENCY) {
+      return {
+        code: 'ขอออกของไปก่อน',
+        name: 'คำร้องขอออกของไปก่อน เพื่อยกเว้นอากรนำเข้า (มาตรา 70 พ.ร.บ.ปิโตรเลียม) — กรมเชื้อเพลิงธรรมชาติ (DMF)',
       };
     }
     return {
@@ -826,8 +914,14 @@ export class ChatService {
         }, 400), 600);
       }, 500);
     } else if (this.pendingAfterFlow === 'form-preview') {
-      // Customs path: every item AI grouped under this agency is the request — no re-selection
-      this.selectAllAgencyItems();
+      // Customs path: every item AI grouped under this agency is the request — no re-selection.
+      // Petroleum duty-exemption path already set formData.selectedItems directly (no
+      // item-hs-analysis ever ran, so confirmedProductItems would just be stale/empty here).
+      if (this.isPetroleumDutyPath) {
+        this.isPetroleumDutyPath = false;
+      } else {
+        this.selectAllAgencyItems();
+      }
       this.withTyping(() => {
         this.showPreview();
         this.ensureQueueEntrySaved(this.currentAgency);
@@ -1337,8 +1431,11 @@ export class ChatService {
       this.bot('ocr-progress');
       const ocrResult = await this.ocr.startOCR([file]);
       // This re-upload path only ever runs default-variant OCR (customs/full-upload flows),
-      // never 'invoice', so multi-invoice detection is not reachable here.
-      if ('multiInvoice' in ocrResult) return;
+      // never 'invoice', so multi-invoice detection is not reachable here. Petroleum duty-exemption
+      // detection is technically reachable (same default/import variant) but that path never
+      // reaches missing-fields at all (bypassed via showPetroleumOcrResults()'s own return), so
+      // this is just a type-narrowing no-op, not a real case.
+      if ('multiInvoice' in ocrResult || 'petroleumDutyExemption' in ocrResult) return;
       const result = ocrResult;
       // Merge: existing fields take priority for fields already filled
       const merged = {
@@ -2044,6 +2141,9 @@ export class ChatService {
     this.rubberEsfrEditorOpen.set(false);
     this.rubberEsfrEditorMsgId.set(null);
     this.esfrRequestData = undefined;
+    this.petroleumEditorOpen.set(false);
+    this.petroleumEditorMsgId.set(null);
+    this.isPetroleumDutyPath = false;
     this.ocr.reset();
   }
 
@@ -2066,6 +2166,7 @@ export class ChatService {
     'rubber-esfr-preview': 'ตรวจสอบคำขอ e-SFR ก่อนส่ง',
     'rubber-esfr-status': 'อัปเดตสถานะคำขอผ่านด่านศุลกากร (e-SFR)',
     'rubber-esfr-fee-receipt': 'ได้รับใบรับค่าธรรมเนียม (e-SFR) แล้ว',
+    'petroleum-ocr-results': 'OCR อ่านใบขนขาเข้า (ขอออกของไปก่อน) สำเร็จ',
   };
 
   /** How far the steps-bar (queue-page's STAGE_LABELS) should advance given the message types seen
@@ -2241,6 +2342,12 @@ export class ChatService {
     for (const m of msgs) {
       if (m.type === 'ocr-results' || m.type === 'form-preview') {
         formData = { ...formData, ...(m.data as LicenseFormData) };
+      }
+      if (m.type === 'petroleum-ocr-results') {
+        const d = m.data as PetroleumOcrResultsData;
+        this.currentAgency = ChatService.PETROLEUM_AGENCY;
+        this.isCustomsOnlyUpload = true;
+        if (d.declaration) formData = { ...formData, petroleumDeclaration: d.declaration };
       }
       if (m.type === 'hs-analysis') {
         const d = m.data as HsAnalysisData;

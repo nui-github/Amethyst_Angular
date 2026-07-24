@@ -97,11 +97,25 @@ export type MessageType =
                         // accepted by RAOT, mock processing in progress); after a 3s mock delay
                         // (same convention as rubber-eqc-status) flips in place to 'license-accept',
                         // which enables "ดำเนินการต่อ" — see onEsfrStatusProceed()
-  | 'rubber-esfr-fee-receipt'; // posted once "ดำเนินการต่อ" is clicked on rubber-esfr-status while
+  | 'rubber-esfr-fee-receipt' // posted once "ดำเนินการต่อ" is clicked on rubber-esfr-status while
                         // 'license-accept' (see onEsfrStatusProceed()) — the ใบรับค่าธรรมเนียม
                         // reply from ศุลกากร (License Number/Issue Date/Issue Authority/Message/
                         // EffectiveDate/ExpireDate) + a download button. Terminal card of the
                         // e-SFR flow — pure display, no further action, see RubberEsfrFeeReceiptData
+  | 'petroleum-ocr-results'; // customs-docs (import) path only — shown instead of the generic
+                        // 'ocr-results' card when the uploaded ใบขนขาเข้า is detected as a
+                        // "ขอออกของไปก่อน" duty-exemption request for petroleum-business equipment
+                        // (ocr.service.ts PETROLEUM_DUTY_TRIGGER; มาตรา 70 พ.ร.บ.ปิโตรเลียม 2514,
+                        // agency กรมเชื้อเพลิงธรรมชาติ/DMF). Fully separate component/data/mock from
+                        // the generic customsDeclaration pipeline (per explicit product decision —
+                        // this scenario's fields, like privilege code/DMF cert/guarantee bond
+                        // number, don't fit the DocumentControl/GoodsShipment schema at all). Same
+                        // gate pattern as ocr-results' declarationGateRequired: only "กรอกข้อมูลเพิ่มเติม"
+                        // shows until PetroleumDeclarationEditorComponent (own signals — see
+                        // petroleumEditorOpen/petroleumEditorMsgId — not the shared
+                        // declarationEditorOpen) is saved, then "ดำเนินการต่อ" appears alongside it.
+                        // Only one agency ever applies (DMF), so onPetroleumOcrProceed() skips
+                        // item-hs-analysis/เลือกกรม entirely and goes straight to profile-select.
 
 // One alternative HS Code suggestion offered when the user edits an item's classification —
 // invoices from real users typically carry no HS Code at all, so AI classifies purely from the
@@ -740,6 +754,8 @@ export interface LicenseFormData {
   importDate?: string;
   selectedItems?: InvoiceLineItem[]; // สินค้าที่ยื่นขอใบอนุญาต (ทั้งกลุ่มที่ AI จัดไว้ให้กรมนี้)
   customsDeclaration?: CustomsDeclarationData; // structured OCR output, merged across every upload step
+  petroleumDeclaration?: PetroleumDutyDeclarationData; // see PetroleumDutyDeclarationData below — own
+                                                        // schema, not part of customsDeclaration
   direction?: Direction; // 'import' | 'export' — set once at flow start (ChatService.direction)
 }
 
@@ -815,6 +831,53 @@ export interface SPNEntry {
   inQueue?: boolean;
 }
 
+// ─── Petroleum duty-exemption ("ขอออกของไปก่อน") ─────────────────────────────
+// Own schema, deliberately not the generic CustomsDeclarationData/GoodsShipment shape — see
+// 'petroleum-ocr-results' in MessageType above for why.
+
+export interface PetroleumEquipmentItem {
+  itemNumber: number;
+  nameTh: string;
+  nameEn: string;
+  tariffCode: string;
+  quantity: string;
+  quantityUnit: string;
+  originCountry: string;
+  invoiceAmountBaht: string;
+}
+
+export interface PetroleumDutyDeclarationData {
+  // ข้อมูลใบขนขาเข้า
+  importDeclarationNo?: string;   // เลขที่ใบขน — the one field known for certain going in
+  importDate?: string;
+  customsHouseName?: string;      // ด่านศุลกากรนำเข้า
+  declarationType?: string;       // ประเภทใบขน
+
+  // ข้อมูลบริษัทผู้นำเข้า/ผู้รับสัมปทาน
+  companyName?: string;
+  companyTaxNumber?: string;
+  concessionNumber?: string;      // เลขที่สัมปทานปิโตรเลียม/แปลงสำรวจ
+
+  // ข้อมูลสิทธิยกเว้นอากร (มาตรา 70 พ.ร.บ.ปิโตรเลียม พ.ศ. 2514)
+  earlyReleaseRequestNo?: string; // เลขที่คำร้องขอออกของไปก่อน
+  privilegeCode?: string;         // รหัสสิทธิพิเศษ — '005' ระหว่างรออนุมัติ
+  dmfCertificateNo?: string;      // เลขที่หนังสือรับรอง กรมเชื้อเพลิงธรรมชาติ (มักยังไม่ออก ณ จุดนี้)
+  guaranteeNumber?: string;       // เลขที่หนังสือค้ำประกัน
+  guaranteeAmount?: string;       // วงเงินค้ำประกัน (บาท)
+
+  items: PetroleumEquipmentItem[];
+}
+
+export interface PetroleumOcrResultsData {
+  importDeclarationNo?: string;
+  companyName?: string;
+  customsHouseName?: string;
+  itemCount: number;
+  declaration?: PetroleumDutyDeclarationData;
+  declarationComplete?: boolean;
+  declarationGateRequired?: boolean;
+}
+
 // ─── Queue / Shipment ────────────────────────────────────────────────────────
 
 // dld/fda/dft/doa/diw are import-side agencies; ddc/doeb/raot are the export-side agencies added
@@ -822,7 +885,8 @@ export interface SPNEntry {
 // oap = สำนักงานปรมาณูเพื่อสันติภาพ (ปส., Office of Atoms for Peace) — the import-side item-hs-analysis
 // dataset (product-hs-analysis.mock.ts) classifies some items under 'ปส.' but no AgencyKey existed
 // for it until ChatService.finalizeSubmit() needed to map a real submitted agency onto a Shipment.
-export type AgencyKey = 'dld' | 'fda' | 'dft' | 'doa' | 'diw' | 'ddc' | 'doeb' | 'raot' | 'oap' | 'none';
+// dmf = กรมเชื้อเพลิงธรรมชาติ (Department of Mineral Fuels) — see 'petroleum-ocr-results' above.
+export type AgencyKey = 'dld' | 'fda' | 'dft' | 'doa' | 'diw' | 'ddc' | 'doeb' | 'raot' | 'oap' | 'dmf' | 'none';
 
 // Queue shipments only exist once a chat session has passed profile selection — which only
 // happens when a permit is actually required — so there is no "no_permit" queue status.

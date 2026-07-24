@@ -1,0 +1,104 @@
+<div class="cde-backdrop" (click)="close()">
+  <div class="cde-panel" (click)="$event.stopPropagation()">
+
+    <div class="cde-hd">
+      <div>
+        <p class="cde-hd__title">กรอกข้อมูลเพิ่มเติม</p>
+        <p class="cde-hd__sub">คำร้องขอออกของไปก่อน เพื่อยกเว้นอากรนำเข้า (มาตรา 70 พ.ร.บ.ปิโตรเลียม) — บางส่วนดึงมาจาก OCR ให้แล้ว ที่เหลือกรุณากรอกให้ครบ</p>
+      </div>
+      <button class="cde-close" (click)="close()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="cde-body">
+      @for (section of declSections; track section.title) {
+        <div class="cde-sec">
+          <div class="cde-sec__head" [style.border-left-color]="section.color">
+            <span class="cde-sec__title">{{ section.title }}</span>
+          </div>
+          <div class="cde-form-grid">
+            @for (row of section.rows; track row.key) {
+              <label class="cde-field" [class.cde-field--missing]="isHeaderMissing(row)">
+                <span class="cde-field__label">{{ row.label }} @if (row.required) { <em>*</em> }</span>
+                <input class="cde-field__input" [value]="headerValue(row.key)" (input)="onHeaderInput(row.key, $event)" />
+              </label>
+            }
+          </div>
+        </div>
+      }
+
+      <div class="cde-sec">
+        <div class="cde-sec__head" style="border-left-color:#0D8F61">
+          <span class="cde-sec__title">รายการวัสดุ/อุปกรณ์ ({{ local.items.length }} รายการ)</span>
+        </div>
+        <div class="cde-table-wrap">
+          <table class="cde-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                @for (col of itemCols; track col.key) {
+                  <th>{{ col.label }} @if (col.required) { <em>*</em> }</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of local.items; track item.itemNumber; let i = $index) {
+                <tr>
+                  <td class="cde-td--order">{{ i + 1 }}</td>
+                  @for (col of itemCols; track col.key) {
+                    <td [class.cde-td--missing]="isItemFieldMissing(item, col.key)">
+                      <div class="cde-cell">
+                        <input class="cde-table__input" [style.width.px]="col.width" [value]="itemValue(item, col.key)" (input)="onItemInput(item, col.key, $event)" />
+                        @if (col.unitKey) {
+                          <input class="cde-table__input cde-table__input--unit" [style.width.px]="col.unitWidth" [value]="itemValue(item, col.unitKey)" (input)="onItemInput(item, col.unitKey!, $event)" />
+                        }
+                      </div>
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="cde-ft">
+      @if (!isComplete) {
+        <span class="cde-ft__hint">
+          กรุณากรอกข้อมูลที่มี <em>*</em> ให้ครบ
+          @if (missingHeaderCount + missingItemCount > 0) {
+            (เหลืออีก {{ missingHeaderCount + missingItemCount }} ช่อง)
+          }
+        </span>
+      } @else {
+        <span class="cde-ft__hint cde-ft__hint--ok">ข้อมูลครบถ้วนแล้ว พร้อมบันทึก</span>
+      }
+      <button class="cde-save-btn" [disabled]="!isComplete" (click)="requestSave()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        บันทึก
+      </button>
+    </div>
+
+    @if (confirming) {
+      <div class="cde-dialog__backdrop" (click)="cancelSave()">
+        <div class="cde-dialog" (click)="$event.stopPropagation()">
+          <p class="cde-dialog__title">ยืนยันการบันทึกข้อมูล</p>
+          <p class="cde-dialog__body">
+            กรุณาตรวจสอบความถูกต้องของข้อมูลทั้งหมด — ทั้งข้อมูลใบขน ข้อมูลบริษัท ข้อมูลสิทธิยกเว้นอากร
+            และรายการวัสดุ/อุปกรณ์ ให้ครบถ้วนก่อนบันทึก
+          </p>
+          <div class="cde-dialog__actions">
+            <button type="button" class="cde-dialog__btn cde-dialog__btn--cancel" (click)="cancelSave()">ตรวจสอบอีกครั้ง</button>
+            <button type="button" class="cde-dialog__btn cde-dialog__btn--confirm" (click)="save()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              ข้อมูลถูกต้อง บันทึก
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+  </div>
+</div>

@@ -12,6 +12,7 @@ import { CustomsDeclarationEditorComponent } from '../components/customs-declara
 import { DdcPinkFormEditorComponent } from '../components/ddc-pink-form-editor/ddc-pink-form-editor.component';
 import { RubberEqcRequestEditorComponent } from '../components/rubber-eqc-request-editor/rubber-eqc-request-editor.component';
 import { RubberEsfrRequestEditorComponent } from '../components/rubber-esfr-request-editor/rubber-esfr-request-editor.component';
+import { PetroleumDeclarationEditorComponent } from '../components/petroleum-declaration-editor/petroleum-declaration-editor.component';
 
 @Component({
   selector: 'app-chat-page',
@@ -22,6 +23,7 @@ import { RubberEsfrRequestEditorComponent } from '../components/rubber-esfr-requ
     NzInputModule, LucideAngularModule,
     ChatAreaComponent, SidebarComponent, CustomsDeclarationEditorComponent, DdcPinkFormEditorComponent,
     RubberEqcRequestEditorComponent, RubberEsfrRequestEditorComponent,
+    PetroleumDeclarationEditorComponent,
   ],
   templateUrl: './chat-page.component.html',
   styleUrl:    './chat-page.component.scss',

@@ -75,6 +75,11 @@
               <app-ocr-results [data]="asAny(msg.data)" [msgId]="msg.id" />
             }
 
+            <!-- Petroleum duty-exemption ("ขอออกของไปก่อน") OCR results -->
+            @case ('petroleum-ocr-results') {
+              <app-petroleum-ocr-results [data]="asAny(msg.data)" [msgId]="msg.id" />
+            }
+
             <!-- Flag confirmation (interactive) -->
             @case ('flag-card') {
               @if (!readOnly && !msg.isReadOnly) {
