@@ -102,7 +102,7 @@ export type MessageType =
                         // reply from ศุลกากร (License Number/Issue Date/Issue Authority/Message/
                         // EffectiveDate/ExpireDate) + a download button. Terminal card of the
                         // e-SFR flow — pure display, no further action, see RubberEsfrFeeReceiptData
-  | 'petroleum-ocr-results'; // customs-docs (import) path only — shown instead of the generic
+  | 'petroleum-ocr-results' // customs-docs (import) path only — shown instead of the generic
                         // 'ocr-results' card when the uploaded ใบขนขาเข้า is detected as a
                         // "ขอออกของไปก่อน" duty-exemption request for petroleum-business equipment
                         // (ocr.service.ts PETROLEUM_DUTY_TRIGGER; มาตรา 70 พ.ร.บ.ปิโตรเลียม 2514,
@@ -116,6 +116,12 @@ export type MessageType =
                         // declarationEditorOpen) is saved, then "ดำเนินการต่อ" appears alongside it.
                         // Only one agency ever applies (DMF), so onPetroleumOcrProceed() skips
                         // item-hs-analysis/เลือกกรม entirely and goes straight to profile-select.
+  | 'dmf-submission-status'; // DMF (เชื้อเพลิง) duty-exemption path only — posted right after
+                        // "ยืนยันส่งกรม" (see ChatService.showDmfSubmissionStatus()), BEFORE
+                        // showNextAgencyIfAny() runs. Mocks the real ยื่นข้อมูลผ่านระบบคอมพิวเตอร์
+                        // round-trip to กรมเชื้อเพลิงธรรมชาติ: 'waiting-response' → (3s) 'dmf-accept'
+                        // (DECL info + item table appear) → (5s) 'license-accept' (duty-exempt
+                        // items ticked, "ดูรายละเอียดใบอนุญาต" unlocked) — see DmfSubmissionStatusData
 
 // One alternative HS Code suggestion offered when the user edits an item's classification —
 // invoices from real users typically carry no HS Code at all, so AI classifies purely from the
@@ -1020,6 +1026,61 @@ export interface PetroleumOcrResultsData {
   declaration?: PetroleumDutyDeclarationData;
   declarationComplete?: boolean;
   declarationGateRequired?: boolean;
+}
+
+// One row of the DMF submission-status item table — flattened from DmfItemData for display,
+// same field set as the reference "ผลการส่งข้อมูล/DECL" screens DMF returns after ยื่นข้อมูล.
+export interface DmfSubmissionStatusItem {
+  itemNo: number;
+  invNo: string;
+  invItem: string;
+  tariff: string;
+  stat: string;
+  enDesc: string;
+  thDesc: string;
+  pk: string;
+  nw: string;
+  qty: string;
+  invAmount: string;
+  cifForeign: string;
+  cifBaht: string;
+  dutyExempt: boolean; // true once DMF grants the ม.70 duty exemption for this item (LICENSE ACCEPT)
+}
+
+// "ดูรายละเอียดใบอนุญาต" detail — only present once status is 'license-accept'.
+export interface DmfLicenseDetail {
+  licenseNo: string;
+  issueDate: string;
+  requestNo: string;
+  licenseName: string;
+  licenseIssueAuthority: string;
+  licenseAuthorityName: string;
+  licenseType: string;
+  licenseIssueDate: string;
+  effectiveDate: string;
+  expireDate: string;
+}
+
+// Posted right after "ยืนยันส่งกรม" on the DMF (เชื้อเพลิง) duty-exemption path — mocks the real
+// ยื่นข้อมูลผ่านระบบคอมพิวเตอร์ round-trip to กรมเชื้อเพลิงธรรมชาติ กระทรวงพลังงาน:
+//   waiting-response → dmf-accept (DECL info + item table appear) → license-accept (duty-exempt
+//   items ticked + license detail unlocked). ChatService.showDmfSubmissionStatus() flips this same
+//   message's data in place through the 3 stages, same updateLastMessageData() convention as
+//   showRubberEqcStatus()/showAgencyApproval().
+export interface DmfSubmissionStatusData {
+  agency: string; // 'กรมเชื้อเพลิงธรรมชาติ'
+  referenceNumber: string;
+  status: 'waiting-response' | 'dmf-accept' | 'license-accept';
+  declNo?: string;
+  declDate?: string;
+  companyNameTh?: string;
+  companyNameEn?: string;
+  taxNumber?: string;
+  branch?: string;
+  address?: string;
+  remark?: string;
+  items?: DmfSubmissionStatusItem[];
+  license?: DmfLicenseDetail;
 }
 
 // ─── Queue / Shipment ────────────────────────────────────────────────────────

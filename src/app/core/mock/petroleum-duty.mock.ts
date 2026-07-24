@@ -1,4 +1,4 @@
-import { DmfControlData, DmfInvoiceData, DmfItemData, InvoiceLineItem, PetroleumDutyDeclarationData, PetroleumOcrResultsData } from '@app/core/models/types';
+import { DmfControlData, DmfInvoiceData, DmfItemData, DmfLicenseDetail, DmfSubmissionStatusData, DmfSubmissionStatusItem, InvoiceLineItem, PetroleumDutyDeclarationData, PetroleumOcrResultsData } from '@app/core/models/types';
 
 // วัสดุ/อุปกรณ์สำหรับกิจการปิโตรเลียม (ขุดเจาะ/ผลิต) — มาตรา 70 พ.ร.บ.ปิโตรเลียม พ.ศ. 2514 ยกเว้น
 // อากรนำเข้าให้ผู้รับสัมปทาน โดยระหว่างรอหนังสือรับรองจากกรมเชื้อเพลิงธรรมชาติ (DMF) ต้องยื่น
@@ -282,6 +282,69 @@ export const MOCK_PETROLEUM_DUTY_OCR_RESULT: PetroleumOcrResultsData = {
   declarationComplete: false,
   declarationGateRequired: true,
 };
+
+// ── ผลการยื่นข้อมูลกับ DMF (dmf-submission-status card) ─────────────────────────
+// Flattened item rows for the DECL/Detail table DMF returns once it receives the submission —
+// same commercial fields as MOCK_DMF_ITEMS, reshaped for a single wide table row. All 4 items
+// carry exemptionRate 100 in their duty rows (see MOCK_DMF_ITEMS above), so all 4 come back
+// duty-exempt once DMF grants the ม.70 exemption — dutyExempt only actually renders as a
+// checkmark once status is 'license-accept' (see DmfSubmissionStatusComponent).
+const MOCK_DMF_SUBMISSION_ITEMS: DmfSubmissionStatusItem[] = MOCK_DMF_ITEMS.map(i => ({
+  itemNo: i.itemNumber,
+  invNo: MOCK_DMF_INVOICE.invoiceNumber ?? '',
+  invItem: i.invoiceItemNumber ?? '',
+  tariff: i.importTariff ?? '',
+  stat: i.statisticalCode ?? '',
+  enDesc: i.nameEn ?? '',
+  thDesc: i.nameTh ?? '',
+  pk: `${i.quantity ?? ''} ${i.quantityUnit ?? ''}`.trim(),
+  nw: `${i.netWeight ?? ''} ${i.netWeightUnit ?? ''}`.trim(),
+  qty: `${i.quantity ?? ''} ${i.quantityUnit ?? ''}`.trim(),
+  invAmount: `${i.invoiceAmountForeign ?? ''} ${MOCK_DMF_INVOICE.invoiceCurrencyCode ?? ''}`.trim(),
+  cifForeign: `${i.cifValueForeign ?? ''} ${MOCK_DMF_CONTROL.currencyCode ?? ''}`.trim(),
+  cifBaht: i.cifValueBaht ?? '0.00',
+  dutyExempt: (i.duties ?? []).some(d => Number(d.exemptionRate) >= 100),
+}));
+
+// เลขที่ใบขน DMF ออกกลับมาให้เมื่อรับคำร้องขอออกของไปก่อนแล้ว (ยังไม่มี ณ ตอนอัปโหลด — ดู
+// MOCK_DMF_CONTROL.declarationNo comment ด้านบน)
+const MOCK_DMF_SUBMISSION_DECL_NO = 'A0173630700042';
+
+const MOCK_DMF_LICENSE_DETAIL: DmfLicenseDetail = {
+  licenseNo: 'DMFRS6907/0042',
+  issueDate: '2026-07-27',
+  requestNo: 'DMF 6907-00042',
+  licenseName: 'ใบอนุญาตตามมาตรา 70 แห่งพระราชบัญญัติปิโตรเลียม พ.ศ.2514',
+  licenseIssueAuthority: '4030036183000011',
+  licenseAuthorityName: 'กรมเชื้อเพลิงธรรมชาติ',
+  licenseType: 'ขอออกของไปก่อน (Document Type 3)',
+  licenseIssueDate: '2026-07-27',
+  effectiveDate: '2026-07-27',
+  expireDate: '9999-12-31',
+};
+
+/** Builds the dmf-submission-status card's data for a given stage — ChatService.
+ *  showDmfSubmissionStatus() calls this 3 times (waiting-response → dmf-accept → license-accept)
+ *  and swaps the message's data in place via updateLastMessageData(), same convention as
+ *  showRubberEqcStatus(). DECL info + item table only exist once DMF has actually accepted the
+ *  submission; license detail only once the license itself is granted. */
+export function getDmfSubmissionStatusData(status: DmfSubmissionStatusData['status']): DmfSubmissionStatusData {
+  const c = MOCK_DMF_CONTROL;
+  return {
+    agency: 'กรมเชื้อเพลิงธรรมชาติ',
+    referenceNumber: c.referenceNumber ?? '',
+    status,
+    declNo: status === 'waiting-response' ? undefined : MOCK_DMF_SUBMISSION_DECL_NO,
+    declDate: status === 'waiting-response' ? undefined : new Date().toISOString().slice(0, 10),
+    companyNameTh: c.companyName,
+    companyNameEn: c.companyEnglishName,
+    taxNumber: c.companyTaxNumber,
+    branch: c.companyBranch,
+    address: [c.streetAndNumber, c.district, c.subProvince, c.province, c.postcode].filter(Boolean).join(' '),
+    items: status === 'waiting-response' ? undefined : MOCK_DMF_SUBMISSION_ITEMS,
+    license: status === 'license-accept' ? MOCK_DMF_LICENSE_DETAIL : undefined,
+  };
+}
 
 // ทั้งหมดในคำร้องนี้ยื่นให้กรมเชื้อเพลิงธรรมชาติ (DMF) เพียงกรมเดียว — ไม่มีขั้นตอนจัดกลุ่มหลายกรม
 // เหมือน item-hs-analysis จึงแปลงตรงเป็น formData.selectedItems ได้เลย

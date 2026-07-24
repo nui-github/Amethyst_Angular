@@ -331,6 +331,12 @@
               <app-agency-approval-pending [data]="$any(msg.data)" />
             }
 
+            <!-- DMF (เชื้อเพลิง) duty-exemption path only: posted after "ยืนยันส่งกรม", cycles
+                 waiting-response → dmf-accept → license-accept in place -->
+            @case ('dmf-submission-status') {
+              <app-dmf-submission-status [data]="$any(msg.data)" />
+            }
+
           }
         </div>
 

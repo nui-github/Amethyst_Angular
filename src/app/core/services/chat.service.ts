@@ -23,7 +23,7 @@ import { getProductHsAnalysis, mapToInvoiceLineItems } from '@mock/product-hs-an
 import { getExportProductClassification, mapExportItemsToInvoiceLineItems } from '@mock/export-product-classification.mock';
 import { RUBBER_COMPOUND_CERT_FEE, MOCK_LINKED_BANK_ACCOUNTS } from '@mock/rubber-cert.mock';
 import { InvoiceOcrResult, toInvoiceSummaryOption } from '@mock/invoice-ocr.mock';
-import { getPetroleumEquipmentLineItems } from '@mock/petroleum-duty.mock';
+import { getPetroleumEquipmentLineItems, getDmfSubmissionStatusData } from '@mock/petroleum-duty.mock';
 import { environment } from '@env/environment';
 import { MOCK_SESSIONS } from '@mock/sessions.mock';
 import { mergeCustomsDeclaration } from '@app/shared/utils/helpers';
@@ -1993,12 +1993,31 @@ export class ChatService {
       // here rather than waiting on the status-card's "ตรวจสอบสถานะ" chip (not shown for these
       // agencies — see StatusCardComponent/isAutoApprovalAgency()) since the department review
       // is simulated anyway; no reason to make the user click through it.
-      if (this.QR_PAYMENT_AGENCIES.includes(this.currentAgency)) {
+      if (this.AGENCY_KEY_MAP[this.currentAgency] === 'dmf') {
+        this.withTyping(() => this.showDmfSubmissionStatus(), 900);
+      } else if (this.QR_PAYMENT_AGENCIES.includes(this.currentAgency)) {
         this.withTyping(() => this.showAgencyApproval(this.currentAgency), 900);
       } else {
         this.withTyping(() => this.showNextAgencyIfAny(), 800);
       }
     }
+  }
+
+  /** DMF (เชื้อเพลิง) duty-exemption path only — posted right after "ยืนยันส่งกรม", before
+   *  showNextAgencyIfAny() runs. Mocks the real ยื่นข้อมูลผ่านระบบคอมพิวเตอร์ round-trip: starts
+   *  'waiting-response', flips in place to 'dmf-accept' after 3s (DECL info + item table appear),
+   *  then to 'license-accept' after another 5s (duty-exempt items ticked, license detail
+   *  unlocked) — same updateLastMessageData() convention as showRubberEqcStatus()/
+   *  showAgencyApproval(). */
+  private showDmfSubmissionStatus(): void {
+    this.bot('dmf-submission-status', getDmfSubmissionStatusData('waiting-response'));
+    setTimeout(() => {
+      this.updateLastMessageData('dmf-submission-status', getDmfSubmissionStatusData('dmf-accept'));
+      setTimeout(() => {
+        this.updateLastMessageData('dmf-submission-status', getDmfSubmissionStatusData('license-accept'));
+        this.withTyping(() => this.showNextAgencyIfAny(), 700);
+      }, 5000);
+    }, 3000);
   }
 
   private ALL_AGENCIES = ['อย.', 'กษ.'];
