@@ -572,6 +572,51 @@
                       รอกรมตรวจสอบสถานะการชำระเงิน...
                     </div>
                   }
+                } @else if (openShipment()!.agency === 'dmf' && openShipment()!.dmfLicense) {
+                  <!-- DMF (เชื้อเพลิง) duty-exemption path: license granted isn't a downloadable file
+                       in this flow — show the license number/detail + exempted item list instead of
+                       the generic พิมพ์/ดาวน์โหลดใบอนุญาต buttons below. Mirrors ChatService.
+                       showDmfSubmissionStatus()'s license-accept card. -->
+                  <div class="dv-result-rows">
+                    <div class="dv-result-row">
+                      <span class="dv-result-label">เลขที่ใบอนุญาต</span>
+                      <span class="dv-result-value">{{ openShipment()!.dmfLicense!.licenseNo }}</span>
+                    </div>
+                    <div class="dv-result-row">
+                      <span class="dv-result-label">ชื่อใบอนุญาต</span>
+                      <span class="dv-result-value">{{ openShipment()!.dmfLicense!.licenseName }}</span>
+                    </div>
+                    <div class="dv-result-row">
+                      <span class="dv-result-label">หน่วยงานผู้ออก</span>
+                      <span class="dv-result-value">{{ openShipment()!.dmfLicense!.licenseAuthorityName }}</span>
+                    </div>
+                    <div class="dv-result-row">
+                      <span class="dv-result-label">ประเภทใบอนุญาต</span>
+                      <span class="dv-result-value">{{ openShipment()!.dmfLicense!.licenseType }}</span>
+                    </div>
+                    <div class="dv-result-row">
+                      <span class="dv-result-label">วันที่ออก / มีผล</span>
+                      <span class="dv-result-value">{{ openShipment()!.dmfLicense!.issueDate }} / {{ openShipment()!.dmfLicense!.effectiveDate }}</span>
+                    </div>
+                    <div class="dv-result-row">
+                      <span class="dv-result-label">วันหมดอายุ</span>
+                      <span class="dv-result-value">{{ openShipment()!.dmfLicense!.expireDate }}</span>
+                    </div>
+                  </div>
+                  @if (openShipment()!.dmfSubmissionItems?.length) {
+                    <div class="dv-result-docs">
+                      <p class="dv-result-docs__label">รายการสินค้าที่ได้รับอนุญาต ({{ openShipment()!.dmfSubmissionItems!.length }} รายการ)</p>
+                      @for (it of openShipment()!.dmfSubmissionItems!; track it.itemNo) {
+                        <div class="dv-doc-row dv-doc-row--plain">
+                          <div class="dv-doc-icon">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0D8F61" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+                          </div>
+                          <span class="dv-doc-name">{{ it.thDesc }} ({{ it.enDesc }})</span>
+                          <span class="dv-doc-date">พิกัด {{ it.tariff }}</span>
+                        </div>
+                      }
+                    </div>
+                  }
                 } @else {
                   <div class="dv-result-actions">
                     <button class="dv-result-btn dv-result-btn--outline" (click)="printLicense(openShipment()!)">

@@ -1185,6 +1185,13 @@ export interface Shipment {
   // 'license-accept' (ChatService.finalizeEsfrRound) — the e-SFR fee-receipt download, shown
   // alongside rubberCertPayment (e-QC) above when both are present, independently of each other.
   esfrFeeReceipt?: RubberEsfrFeeReceiptData;
+  // DMF (เชื้อเพลิง) duty-exemption path only: set once ChatService.showDmfSubmissionStatus()'s
+  // mock wait resolves to 'license-accept' — mirrors the chat's own dmf-submission-status card so
+  // the queue detail page can show the granted license + exempted items directly, instead of the
+  // generic ผลการยื่น card's พิมพ์/ดาวน์โหลดใบอนุญาต buttons (DMF's license isn't a downloadable
+  // file in this flow, see QueuePageComponent's submission-result branch).
+  dmfLicense?: DmfLicenseDetail;
+  dmfSubmissionItems?: DmfSubmissionStatusItem[];
   email?: { toName: string; to: string; subject: string; body: string; attName: string };
   items?: ShipmentItem[]; // per-product line items from the invoice/customs doc used for this LPI request
   itemsSelected?: boolean; // true once the shipment's flow has confirmed its item group (item-hs-analysis) —

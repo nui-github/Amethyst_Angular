@@ -2014,7 +2014,18 @@ export class ChatService {
     setTimeout(() => {
       this.updateLastMessageData('dmf-submission-status', getDmfSubmissionStatusData('dmf-accept'));
       setTimeout(() => {
-        this.updateLastMessageData('dmf-submission-status', getDmfSubmissionStatusData('license-accept'));
+        const licenseData = getDmfSubmissionStatusData('license-accept');
+        this.updateLastMessageData('dmf-submission-status', licenseData);
+        // Mirrors the granted license onto the queue record — same convention as
+        // showAgencyReturnedDocs()'s returnedDocuments write — so QueuePageComponent can show the
+        // license number/detail + exempted items directly instead of the generic ผลการยื่น card's
+        // download buttons (DMF's license isn't a downloadable file in this flow).
+        if (this.lastShipmentId) {
+          this.queue.update(this.lastShipmentId, {
+            dmfLicense: licenseData.license,
+            dmfSubmissionItems: licenseData.items,
+          });
+        }
         this.withTyping(() => this.showNextAgencyIfAny(), 700);
       }, 5000);
     }, 3000);
