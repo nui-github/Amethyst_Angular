@@ -807,10 +807,13 @@ export class ChatService {
         name: `คำขอใบอนุญาตค้ายาง${isExport ? 'ขาออก' : ''} — การยางแห่งประเทศไทย (RAOT)`,
       };
     }
-    if (agency === ChatService.PETROLEUM_AGENCY) {
+    // 'เชื้อเพลิง' (export item-hs-analysis group) and PETROLEUM_AGENCY (import duty-exemption
+    // path) are the same real-world department (กรมเชื้อเพลิงธรรมชาติ, DMF) — see AGENCY_DESC/
+    // AGENCY_KEY_MAP above — so both get the same "ขอออกของไปก่อน" license type on the queue.
+    if (agency === ChatService.PETROLEUM_AGENCY || agency === 'เชื้อเพลิง') {
       return {
         code: 'ขอออกของไปก่อน',
-        name: 'คำร้องขอออกของไปก่อน เพื่อยกเว้นอากรนำเข้า (มาตรา 70 พ.ร.บ.ปิโตรเลียม) — กรมเชื้อเพลิงธรรมชาติ (DMF)',
+        name: 'คำร้องขอออกของไปก่อน เพื่อยกเว้นอากรฯ — กรมเชื้อเพลิงธรรมชาติ (DMF)',
       };
     }
     return {
