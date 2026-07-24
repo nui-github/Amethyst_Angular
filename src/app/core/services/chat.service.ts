@@ -1969,7 +1969,10 @@ export class ChatService {
       origin: fd.countryOrigin ?? '', importedAt: new Date().toLocaleString('th-TH'), createdAt: Date.now(),
       owner: '', permitNeeded: true, agency: agencyKey,
       formCode: form.code, formName: form.name,
-      conf: 88, stage: agencyKey === 'ddc' ? 8 : 7, statusKey: 'submitted',
+      // DMF (เชื้อเพลิง): ยื่นข้อมูลแล้วไม่ได้แปลว่าอนุมัติแล้ว — คงสถานะ "รอดำเนินการ" ไว้จนกว่าจะได้
+      // LICENSE ACCEPT จริง (see showDmfSubmissionStatus(), which flips this to 'submitted' once
+      // that lands). Every other agency treats "ยืนยันส่งกรม" itself as the terminal state.
+      conf: 88, stage: agencyKey === 'ddc' ? 8 : 7, statusKey: agencyKey === 'dmf' ? 'needs_you' : 'submitted',
       assess: { conf: 88, reason: 'ยื่นแล้ว' },
       classify: { agency: agencyKey, conf: 88, reason: '', alt: [] },
       draft: { fields: [] }, flags: [],
@@ -2041,9 +2044,11 @@ export class ChatService {
         // Mirrors the granted license onto the queue record — same convention as
         // showAgencyReturnedDocs()'s returnedDocuments write — so QueuePageComponent can show the
         // license number/detail + exempted items directly instead of the generic ผลการยื่น card's
-        // download buttons (DMF's license isn't a downloadable file in this flow).
+        // download buttons (DMF's license isn't a downloadable file in this flow). Only NOW does
+        // this shipment actually count as "อนุมัติแล้ว" — finalizeSubmit() deliberately left
+        // statusKey at 'needs_you' since ยื่นข้อมูลแล้ว ≠ อนุมัติแล้ว for this agency.
         if (this.lastShipmentId) {
-          this.queue.update(this.lastShipmentId, { dmfSubmission: licenseData });
+          this.queue.update(this.lastShipmentId, { dmfSubmission: licenseData, statusKey: 'submitted' });
         }
         this.withTyping(() => this.showNextAgencyIfAny(), 700);
       }, 5000);

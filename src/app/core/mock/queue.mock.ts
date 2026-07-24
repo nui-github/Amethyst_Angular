@@ -1567,7 +1567,10 @@ export const MOCK_QUEUE: Shipment[] = [
     ],
   },
 
-  // ── 27. submitted: DMF (เชื้อเพลิง) — ยื่นแล้ว ค้างที่ DMF ACCEPT (รอผลตรวจสอบ 1-3 วันทำการ) ──
+  // ── 27. needs_you: DMF (เชื้อเพลิง) — ยื่นแล้ว ค้างที่ DMF ACCEPT (รอผลตรวจสอบ 1-3 วันทำการ) ──
+  // สถานะยังเป็น "รอดำเนินการ" อยู่ — ยื่นข้อมูลแล้วไม่ได้แปลว่าอนุมัติแล้ว, ต้องรอ LICENSE ACCEPT
+  // จริงก่อนถึงจะนับเป็น "อนุมัติแล้ว" (เทียบกับ finalizeSubmit()/showDmfSubmissionStatus() ใน
+  // chat.service.ts ซึ่งใช้กฎเดียวกัน)
   {
     id: 'IMP-68-027502', customsNo: 'NETB000000502',
     isNew: false, type: 'IMP',
@@ -1577,7 +1580,7 @@ export const MOCK_QUEUE: Shipment[] = [
     origin: 'ญี่ปุ่น (JP)', importedAt: '09:10 น. เมื่อวาน', createdAt: NOW - 22 * 3600_000, owner: 'ปวีณา ส.',
     agency: 'dmf', permitNeeded: true, formCode: 'ขอออกของไปก่อน',
     formName: 'คำร้องขอออกของไปก่อน เพื่อยกเว้นอากรฯ — กรมเชื้อเพลิงธรรมชาติ (DMF)',
-    conf: 91, stage: 7, statusKey: 'submitted',
+    conf: 91, stage: 7, statusKey: 'needs_you',
     assess: { conf: 91, reason: 'วัสดุ/อุปกรณ์สำหรับกิจการปิโตรเลียม เข้าเงื่อนไขยกเว้นอากรตามมาตรา 70 พ.ร.บ.ปิโตรเลียม พ.ศ. 2514' },
     classify: { agency: 'dmf', conf: 91, reason: '', alt: [] },
     draft: { fields: [] },
