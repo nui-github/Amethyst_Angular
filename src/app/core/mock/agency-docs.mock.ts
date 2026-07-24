@@ -82,22 +82,18 @@ export const AGENCY_REQUIRED_DOCS: Record<string, AgencyDoc[]> = {
     },
   ],
   // Import path only now (see product-hs-analysis.mock.ts p1/p3) — เชื้อเพลิง/DMF's export
-  // classification was moved to the import-side ขอออกของไปก่อน flow, see CLAUDE.md.
+  // classification was moved to the import-side ขอออกของไปก่อน flow, see CLAUDE.md. Requires the
+  // same ใบขนขาเข้า XML upload as the standalone customs-docs duty-exemption path (ocr.service.ts
+  // PETROLEUM_DUTY_TRIGGER) — dropping a file named with "petroleum" here reuses that exact OCR
+  // detection, routing straight into the petroleum-ocr-results/petroleum-declaration-editor flow
+  // instead of the generic ocr-results/customs-declaration-editor pair.
   'เชื้อเพลิง': [
     {
-      key: 'dmf_early_release_request', label: 'คำร้องขอออกของไปก่อน (DMF)', required: true,
-      hint: 'แบบคำร้องขอออกของไปก่อน เพื่อยกเว้นอากรนำเข้าตามมาตรา 70 พ.ร.บ.ปิโตรเลียม พ.ศ. 2514',
+      key: 'fuel_customs_xml', label: 'ใบขนสินค้าขาเข้า (ไฟล์ XML)', required: true, accept: '.xml',
+      hint: 'ยื่นกรมเชื้อเพลิงธรรมชาติด้วยไฟล์ใบขนสินค้าขาเข้ารูปแบบ XML เท่านั้น — ไม่รับไฟล์ PDF/รูปภาพ',
       manualFields: [
-        { key: 'dmfRequestNo',   label: 'เลขที่คำร้อง',     placeholder: 'เช่น EROB-2568-00317' },
-        { key: 'dmfRequestDate', label: 'วันที่ยื่นคำร้อง', placeholder: 'dd/mm/yyyy' },
-      ],
-    },
-    {
-      key: 'guarantee_letter', label: 'หนังสือค้ำประกันธนาคาร', required: true,
-      hint: 'ใช้วางประกันระหว่างรอกรมเชื้อเพลิงธรรมชาติออกหนังสือรับรอง',
-      manualFields: [
-        { key: 'guaranteeNo',     label: 'เลขที่หนังสือค้ำประกัน', placeholder: 'เช่น LG-BKK-2568-4471' },
-        { key: 'guaranteeAmount', label: 'วงเงินค้ำประกัน (บาท)',   placeholder: 'เช่น 5,000,000' },
+        { key: 'fuelCustomsNo',   label: 'เลขที่ใบขน', placeholder: 'เช่น 0109256800118842' },
+        { key: 'fuelCustomsDate', label: 'วันที่ยื่น',   placeholder: 'dd/mm/yyyy' },
       ],
     },
   ],
