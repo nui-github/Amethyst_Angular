@@ -1876,6 +1876,14 @@ export class ChatService {
     if (fd.ref?.startsWith('HTHM')) {
       documents.push({ id: genId(), name: `ใบขนสินค้า ${fd.ref}`, fileType: 'pdf', category: 'customs', url: SAMPLE_DOC_URL, uploadedAt });
     }
+    // DMF (เชื้อเพลิง) duty-exemption path: the ใบขนขาเข้า XML that triggered PETROLEUM_DUTY_TRIGGER
+    // (ocr.service.ts) never gets a document entry above since fd.ref here is the DMF reference
+    // number (control.referenceNumber), not an 'HTHM'-prefixed SPN ref — add it explicitly so
+    // "เอกสารที่อัปโหลด" on the queue detail page shows the actual file that was uploaded.
+    if (fd.petroleumDeclaration) {
+      const declNo = fd.petroleumDeclaration.control.declarationNo ?? fd.petroleumDeclaration.control.referenceNumber ?? fd.ref ?? '';
+      documents.push({ id: genId(), name: `ใบขนสินค้าขาเข้า (ไฟล์ XML) ${declNo}`.trim(), fileType: 'other', category: 'customs', url: SAMPLE_DOC_URL, uploadedAt });
+    }
     return documents;
   }
 
