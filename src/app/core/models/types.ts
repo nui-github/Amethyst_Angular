@@ -337,6 +337,7 @@ export interface CustomsDeclarationItem {
 // DocumentControl (header) + GoodsShipment (line items) — the structure ready to submit to the
 // agency, also reused as the pre-submission preview structure (form-preview item detail).
 export interface CustomsDeclarationData {
+  declarationNo?: string;     // เลขที่ใบขน
   referenceNumber?: string;
   requestFactName?: string;
   controlAgencyOfficeCode?: string;

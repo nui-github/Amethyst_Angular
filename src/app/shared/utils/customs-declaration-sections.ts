@@ -16,6 +16,7 @@ export function getCustomsDeclarationHeaderSections(direction: 'import' | 'expor
   const isExport = direction === 'export';
   return [
     { title: 'ข้อมูลควบคุมเอกสาร', color: '#0463EF', rows: [
+      { label: 'เลขที่ใบขน',        key: 'declarationNo',           accent: true, required: true },
       { label: 'เลขที่อ้างอิง',      key: 'referenceNumber',         accent: true, required: true },
       { label: 'ผู้ยื่นคำขอ',        key: 'requestFactName',         accent: false, required: true },
       { label: 'รหัสหน่วยงานควบคุม', key: 'controlAgencyOfficeCode', accent: false },

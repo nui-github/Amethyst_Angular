@@ -15,6 +15,7 @@ const CUSTOMS_DECLARATION_ITEMS = INVOICE_CUSTOMS_ITEMS.map(item => ({
 // `customsDeclaration` mirrors the real LPI submission payload (DocumentControl + GoodsShipment);
 // fields the OCR engine couldn't read off this particular document are simply left blank.
 export const MOCK_CUSTOMS_DECLARATION: CustomsDeclarationData = {
+  declarationNo:          '0110256800234567',
   referenceNumber:        '2568061000891',
   requestFactName:        'บริษัท เฮลท์ฟาร์มา จำกัด',
   controlAgencyOfficeCode: '00501',

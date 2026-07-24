@@ -10,6 +10,7 @@ const EXPORT_CUSTOMS_DECLARATION_ITEMS = EXPORT_INVOICE_CUSTOMS_ITEMS.map(item =
 }));
 
 export const MOCK_EXPORT_CUSTOMS_DECLARATION: CustomsDeclarationData = {
+  declarationNo:          '0302256800198734',
   referenceNumber:        '2568051200734',
   requestFactName:        'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด',
   controlAgencyOfficeCode: '00302',
