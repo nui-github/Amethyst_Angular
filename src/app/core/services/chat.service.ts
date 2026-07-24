@@ -1941,11 +1941,16 @@ export class ChatService {
     // component.ts) finds its "ผลการยื่น" data by scanning ship.messages for a status-card
     // message; posting it after the snapshot silently left every live-submitted shipment with no
     // ผลการยื่น card at all on the queue page (only the static mock data had one baked in).
-    this.bot('status-card', {
-      refNo, customsRef: fd.ref ?? fd.invoiceNo ?? '—',
-      submittedAt: new Date().toLocaleDateString('th-TH'),
-      feeNote, agency: this.currentAgency,
-    } satisfies StatusCardData);
+    // Skipped for DMF (เชื้อเพลิง) — its own dmf-submission-status card (posted right below by
+    // showDmfSubmissionStatus()) covers the exact same "submitted, awaiting result" information,
+    // so this generic card would just be a duplicate box with a temporary ref number.
+    if (agencyKey !== 'dmf') {
+      this.bot('status-card', {
+        refNo, customsRef: fd.ref ?? fd.invoiceNo ?? '—',
+        submittedAt: new Date().toLocaleDateString('th-TH'),
+        feeNote, agency: this.currentAgency,
+      } satisfies StatusCardData);
+    }
 
     const flowMsgs = this.messages().slice(this.flowStartIdx);
 
@@ -2011,28 +2016,34 @@ export class ChatService {
     }
   }
 
-  /** DMF (เชื้อเพลิง) duty-exemption path only — posted right after "ยืนยันส่งกรม", before
-   *  showNextAgencyIfAny() runs. Mocks the real ยื่นข้อมูลผ่านระบบคอมพิวเตอร์ round-trip: starts
-   *  'waiting-response', flips in place to 'dmf-accept' after 3s (DECL info + item table appear),
-   *  then to 'license-accept' after another 5s (duty-exempt items ticked, license detail
-   *  unlocked) — same updateLastMessageData() convention as showRubberEqcStatus()/
-   *  showAgencyApproval(). */
+  /** DMF (เชื้อเพลิง) duty-exemption path only — posted right after "ยืนยันส่งกรม" (no generic
+   *  status-card for this agency, see finalizeSubmit()), before showNextAgencyIfAny() runs. Mocks
+   *  the real ยื่นข้อมูลผ่านระบบคอมพิวเตอร์ round-trip: starts 'waiting-response', flips in place to
+   *  'dmf-accept' after 3s (DECL info + item table appear). The real DMF review then has an actual
+   *  2-3 day gap before 'license-accept' comes back, so — unlike showRubberEqcStatus()'s in-place
+   *  flip — that DMF ACCEPT card is sealed read-only and left in chat history as-is (so the user can
+   *  scroll back and see they genuinely passed through it), and 'license-accept' arrives as a BRAND
+   *  NEW message instead of overwriting it. Both stages also mirror onto the queue record (see
+   *  dmfSubmission on Shipment) so QueuePageComponent shows whichever stage is current during that
+   *  wait, not nothing. */
   private showDmfSubmissionStatus(): void {
     this.bot('dmf-submission-status', getDmfSubmissionStatusData('waiting-response'));
     setTimeout(() => {
-      this.updateLastMessageData('dmf-submission-status', getDmfSubmissionStatusData('dmf-accept'));
+      const acceptData = getDmfSubmissionStatusData('dmf-accept');
+      this.updateLastMessageData('dmf-submission-status', acceptData);
+      if (this.lastShipmentId) {
+        this.queue.update(this.lastShipmentId, { dmfSubmission: acceptData });
+      }
       setTimeout(() => {
+        this.markLastReadOnly('dmf-submission-status');
         const licenseData = getDmfSubmissionStatusData('license-accept');
-        this.updateLastMessageData('dmf-submission-status', licenseData);
+        this.bot('dmf-submission-status', licenseData);
         // Mirrors the granted license onto the queue record — same convention as
         // showAgencyReturnedDocs()'s returnedDocuments write — so QueuePageComponent can show the
         // license number/detail + exempted items directly instead of the generic ผลการยื่น card's
         // download buttons (DMF's license isn't a downloadable file in this flow).
         if (this.lastShipmentId) {
-          this.queue.update(this.lastShipmentId, {
-            dmfLicense: licenseData.license,
-            dmfSubmissionItems: licenseData.items,
-          });
+          this.queue.update(this.lastShipmentId, { dmfSubmission: licenseData });
         }
         this.withTyping(() => this.showNextAgencyIfAny(), 700);
       }, 5000);

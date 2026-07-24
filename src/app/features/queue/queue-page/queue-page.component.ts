@@ -13,6 +13,7 @@ import { QueueService, STATUS_META, AGENCY_SHORT, AGENCY_LABEL } from '@app/core
 import { ChatService } from '@app/core/services/chat.service';
 import { SidebarComponent } from '../../chat/components/sidebar/sidebar.component';
 import { PaymentQrComponent } from '../../chat/components/payment-qr/payment-qr.component';
+import { DmfSubmissionStatusComponent } from '../../chat/components/dmf-submission-status/dmf-submission-status.component';
 import { ChatMessage, Shipment, ShipmentStatus, ShipmentItem, ITEM_MANUAL_DETAIL_FIELDS } from '@app/core/models/types';
 import { getAgencyReturnDocs } from '@mock/agency-return-docs.mock';
 
@@ -26,7 +27,7 @@ const STAGE_LABELS = ['','ตรวจรับใบขน','วิเครา
   selector: 'app-queue-page',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, NzInputModule, NzButtonModule, NzTagModule, NzTableModule, NzToolTipModule, NzBadgeModule, LucideAngularModule, SidebarComponent, PaymentQrComponent],
+  imports: [CommonModule, FormsModule, NzInputModule, NzButtonModule, NzTagModule, NzTableModule, NzToolTipModule, NzBadgeModule, LucideAngularModule, SidebarComponent, PaymentQrComponent, DmfSubmissionStatusComponent],
   templateUrl: './queue-page.component.html',
   styleUrl:    './queue-page.component.scss',
 })
