@@ -1,7 +1,10 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, Printer, Download } from 'lucide-angular';
+import { Router } from '@angular/router';
+import { LucideAngularModule, Printer, Download, ArrowRight } from 'lucide-angular';
 import { ChatService } from '@app/core/services/chat.service';
+import { QueueService } from '@app/core/services/queue.service';
+import { DmfSubmissionStatusData } from '@app/core/models/types';
 
 export interface PermitItem {
   refNo: string;
@@ -11,6 +14,11 @@ export interface PermitItem {
   submittedAt: string;
   status: 'not_applied' | 'pending' | 'approved' | 'rejected';
   licenseNo?: string;
+  shipmentId?: string;
+  // Present only for the DMF (เชื้อเพลิง) duty-exemption permit — its real-time status/detail comes
+  // from Shipment.dmfSubmission (ChatService.showDmfSubmissionStatus()), not the generic fake
+  // pending→approved toggle every other agency uses here (refresh()/approvedRefs below).
+  dmf?: DmfSubmissionStatusData;
 }
 
 @Component({
@@ -44,7 +52,14 @@ export interface PermitItem {
                 [class.ps-status-badge--pending]="item.status === 'pending'"
                 [class.ps-status-badge--not-applied]="item.status === 'not_applied'"
                 [class.ps-status-badge--rejected]="item.status === 'rejected'">
-                @if (item.status === 'approved') {
+                @if (item.dmf) {
+                  @if (item.dmf.status === 'license-accept') {
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                  } @else {
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  }
+                  {{ dmfStatusLabel(item.dmf) }}
+                } @else if (item.status === 'approved') {
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
                   อนุมัติแล้ว
                 } @else if (item.status === 'pending') {
@@ -60,7 +75,34 @@ export interface PermitItem {
               </span>
             </div>
 
-            @if (item.status !== 'not_applied') {
+            @if (item.dmf) {
+              <!-- DMF (เชื้อเพลิง): own fields (Ref./DECL No./เลขที่ใบอนุญาต), no print/download —
+                   the license isn't a downloadable file in this flow, see queue-page.component.html.
+                   Only "ดูรายละเอียดในหน้าคิวงาน" jumps to the full live status there instead. -->
+              <div class="ps-item__details">
+                <span class="ps-detail-row">
+                  <span class="ps-detail-label">Ref.</span>
+                  <span class="ps-detail-value">{{ item.dmf.referenceNumber }}</span>
+                </span>
+                @if (item.dmf.declNo) {
+                  <span class="ps-detail-row">
+                    <span class="ps-detail-label">DECL No.</span>
+                    <span class="ps-detail-value">{{ item.dmf.declNo }}</span>
+                  </span>
+                }
+                @if (item.dmf.license) {
+                  <span class="ps-detail-row ps-detail-row--highlight">
+                    <span class="ps-detail-label">เลขที่ใบอนุญาต</span>
+                    <span class="ps-detail-value ps-license-no">{{ item.dmf.license.licenseNo }}</span>
+                  </span>
+                }
+              </div>
+              <div class="ps-item__actions">
+                <button class="ps-action-btn ps-action-btn--primary" (click)="viewInQueue(item)">
+                  ดูรายละเอียดในหน้าคิวงาน <lucide-icon [img]="ArrowRight" [size]="12" />
+                </button>
+              </div>
+            } @else if (item.status !== 'not_applied') {
               <div class="ps-item__details">
                 <span class="ps-detail-row">
                   <span class="ps-detail-label">เลขที่ยื่นขอ</span>
@@ -105,10 +147,13 @@ export interface PermitItem {
 export class PermitStatusComponent {
   readonly chat      = inject(ChatService);
   readonly cdr       = inject(ChangeDetectorRef);
+  readonly queue     = inject(QueueService);
+  readonly router    = inject(Router);
   readonly refreshing  = signal(false);
   readonly lastUpdated = signal(new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }));
-  readonly Printer  = Printer;
-  readonly Download = Download;
+  readonly Printer    = Printer;
+  readonly Download   = Download;
+  readonly ArrowRight = ArrowRight;
 
   printLicense(item: PermitItem): void {
     window.open(`/print?ref=${item.refNo}`, '_blank');
@@ -122,6 +167,22 @@ export class PermitStatusComponent {
     URL.revokeObjectURL(url);
   }
 
+  dmfStatusLabel(dmf: DmfSubmissionStatusData): string {
+    switch (dmf.status) {
+      case 'waiting-response': return 'WAITING RESPONSE';
+      case 'dmf-accept': return 'DMF ACCEPT';
+      case 'license-accept': return 'LICENSE ACCEPT';
+    }
+  }
+
+  /** Jumps straight to this permit's shipment in the queue detail view — DMF's license isn't a
+   *  downloadable file in this flow, so this replaces พิมพ์/ดาวน์โหลดใบอนุญาต for it entirely. */
+  viewInQueue(item: PermitItem): void {
+    if (!item.shipmentId) return;
+    this.queue.open(item.shipmentId);
+    this.router.navigate(['/queue']);
+  }
+
   private readonly approvedRefs = signal<Set<string>>(new Set());
 
   readonly permits = computed<PermitItem[]>(() => {
@@ -132,9 +193,17 @@ export class PermitStatusComponent {
     return all.map(agency => {
       const sub = submitted.find(s => s.agency === agency);
       if (!sub) return { agency, refNo: '—', invoiceRef: '—', licenseType: '—', submittedAt: '—', status: 'not_applied' } as PermitItem;
+      // DMF (เชื้อเพลิง): real-time status comes from the shipment's own dmfSubmission, kept in
+      // sync by ChatService.showDmfSubmissionStatus() — not the generic fake pending→approved
+      // toggle below (refresh()/approvedRefs), which never applies to this agency.
+      const dmf = sub.shipmentId ? this.queue.get(sub.shipmentId)?.dmfSubmission : undefined;
+      if (dmf) {
+        const status = dmf.status === 'license-accept' ? 'approved' : 'pending';
+        return { agency, refNo: sub.refNo, invoiceRef: sub.invoiceRef, licenseType: sub.licenseType, submittedAt: sub.submittedAt, status, shipmentId: sub.shipmentId, dmf } as PermitItem;
+      }
       const status = approved.has(sub.refNo) ? 'approved' : 'pending';
       const licenseNo = status === 'approved' ? `LIC-${sub.refNo.replace(/\D/g, '')}` : undefined;
-      return { agency, refNo: sub.refNo, invoiceRef: sub.invoiceRef, licenseType: sub.licenseType, submittedAt: sub.submittedAt, status, licenseNo } as PermitItem;
+      return { agency, refNo: sub.refNo, invoiceRef: sub.invoiceRef, licenseType: sub.licenseType, submittedAt: sub.submittedAt, status, licenseNo, shipmentId: sub.shipmentId } as PermitItem;
     });
   });
 

@@ -145,7 +145,7 @@ export class ChatService {
 
   // Public: tracks all agencies needed + which have been submitted
   readonly allPermitAgencies  = signal<string[]>([]);
-  readonly submittedPermits   = signal<{ agency: string; refNo: string; submittedAt: string; licenseType: string; invoiceRef: string }[]>([]);
+  readonly submittedPermits   = signal<{ agency: string; refNo: string; submittedAt: string; licenseType: string; invoiceRef: string; shipmentId?: string }[]>([]);
 
   constructor(
     private readonly ocr: OcrService,
@@ -2005,6 +2005,7 @@ export class ChatService {
         submittedAt: new Date().toLocaleDateString('th-TH'),
         licenseType: fd.licenseType ?? 'RGoods',
         invoiceRef: fd.ref ?? fd.invoiceNo ?? '—',
+        shipmentId,
       }]);
       // QR_PAYMENT_AGENCIES must finish approval → (QR payment in the queue page, if a fee
       // applies, else returned docs right away) first — showNextAgencyIfAny() runs from
