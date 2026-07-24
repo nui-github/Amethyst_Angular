@@ -6,7 +6,7 @@ import { ProductHsAnalysis, InvoiceLineItem } from '@app/core/models/types';
 // Item set mirrors the export-invoice OCR line items (export-invoice-ocr.mock.ts) so the
 // AI-analysis box's item count/content matches the invoice OCR box, same as the import side.
 // The 3 export-control agencies this build starts with: กรมควบคุมโรค (pathogen/biological
-// diagnostic reagents), เชื้อเพลิง = กรมธุรกิจพลังงาน (fuel), การยาง = การยางแห่งประเทศไทย
+// diagnostic reagents), เชื้อเพลิง = กรมเชื้อเพลิงธรรมชาติ (fuel), การยาง = การยางแห่งประเทศไทย
 // (rubber) — see CLAUDE.md 'Export path'. e4 (rubber compound sheet) is compounded/processed
 // rubber (isCompound: true) — same 'การยาง' group as raw RSS3 (e1), but needs a natural-rubber-
 // content certificate + fee (RubberCertPaymentComponent) instead of ใบอนุญาตค้ายาง.
@@ -28,9 +28,9 @@ const EXPORT_PRODUCT_CLASSIFICATION: ProductHsAnalysis[] = [
   {
     id: 'e2', name: 'Industrial Fuel Oil (น้ำมันเตาอุตสาหกรรม)',
     hsCode: '2710.19.51', tariffCode: '2710.19.51.001', requiresPermit: true,
-    agency: 'เชื้อเพลิง', agencyFull: 'กรมธุรกิจพลังงาน (DOEB)', licenseType: 'ใบอนุญาตประกอบกิจการควบคุมประเภทที่ 3 (พ.ร.บ.ควบคุมน้ำมันเชื้อเพลิง)',
+    agency: 'เชื้อเพลิง', agencyFull: 'กรมเชื้อเพลิงธรรมชาติ กระทรวงพลังงาน (DMF)', licenseType: 'ใบอนุญาตประกอบกิจการควบคุมประเภทที่ 3 (พ.ร.บ.ควบคุมน้ำมันเชื้อเพลิง)',
     confidence: 88, dutyRate: 0,
-    reason: 'จัดเป็นน้ำมันเตาสำหรับใช้ในอุตสาหกรรม อยู่ภายใต้การควบคุมของ พ.ร.บ.ควบคุมน้ำมันเชื้อเพลิง พ.ศ. 2542 ต้องขอใบอนุญาตจากกรมธุรกิจพลังงานก่อนส่งออก',
+    reason: 'จัดเป็นน้ำมันเตาสำหรับใช้ในอุตสาหกรรม อยู่ภายใต้การควบคุมของ พ.ร.บ.ควบคุมน้ำมันเชื้อเพลิง พ.ศ. 2542 ต้องขอใบอนุญาตจากกรมเชื้อเพลิงธรรมชาติก่อนส่งออก',
     candidates: [
       { hsCode: '2710.19.51', tariffCode: '2710.19.51.001', description: 'น้ำมันเตา (Fuel Oil) สำหรับอุตสาหกรรม', dutyRate: 0, confidence: 88 },
       { hsCode: '2710.19.31', tariffCode: '2710.19.31.001', description: 'น้ำมันดีเซล (Diesel Fuel)', dutyRate: 0, confidence: 62 },

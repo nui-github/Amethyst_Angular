@@ -14,13 +14,13 @@ const doc = (
 export const AGENCY_LABEL: Record<AgencyKey, string> = {
   dld: 'กรมปศุสัตว์', fda: 'อย.', dft: 'กรมการค้าต่างประเทศ',
   doa: 'กษ.', diw: 'วอ.', oap: 'ปส.',
-  ddc: 'กรมควบคุมโรค', doeb: 'กรมธุรกิจพลังงาน', raot: 'การยางแห่งประเทศไทย',
+  ddc: 'กรมควบคุมโรค', raot: 'การยางแห่งประเทศไทย',
   dmf: 'กรมเชื้อเพลิงธรรมชาติ',
   none: 'ไม่ระบุ',
 };
 export const AGENCY_SHORT: Record<AgencyKey, string> = {
   dld: 'ปศ.', fda: 'อย.', dft: 'กค.', doa: 'กษ.', diw: 'วอ.', oap: 'ปส.',
-  ddc: 'DDC', doeb: 'DOEB', raot: 'RAOT', dmf: 'DMF',
+  ddc: 'DDC', raot: 'RAOT', dmf: 'DMF',
   none: '—',
 };
 

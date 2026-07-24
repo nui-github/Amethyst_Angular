@@ -758,10 +758,12 @@ export class ChatService {
     '—':   'ขอใบอนุญาตนำเข้าทั่วไป',
     // Export-path agencies (see 'Export path' in CLAUDE.md)
     'กรมควบคุมโรค': 'กรมควบคุมโรค (DDC)',
-    'เชื้อเพลิง':    'กรมธุรกิจพลังงาน (DOEB)',
+    'เชื้อเพลิง':    'กรมเชื้อเพลิงธรรมชาติ กระทรวงพลังงาน (DMF)',
     'การยาง':       'การยางแห่งประเทศไทย (RAOT)',
-    // Petroleum duty-exemption path (see 'petroleum-ocr-results' in types.ts) — import-side only,
-    // not the same as 'เชื้อเพลิง' above (DOEB, export fuel-oil path).
+    // Petroleum duty-exemption path (see 'petroleum-ocr-results' in types.ts) — import-side only.
+    // Same real-world department (DMF) as 'เชื้อเพลิง' above, kept as a separate agency-string key
+    // since it's a distinct flow (item-hs-analysis classification vs. the direct customs-docs
+    // duty-exemption path) with its own AgencyKey mapping below.
     'กรมเชื้อเพลิงธรรมชาติ': 'กรมเชื้อเพลิงธรรมชาติ (DMF)',
   };
 
@@ -771,7 +773,7 @@ export class ChatService {
   // used to just hardcode 'fda' regardless of which agency the user actually submitted to.
   private readonly AGENCY_KEY_MAP: Record<string, AgencyKey> = {
     'อย.': 'fda', 'กษ.': 'doa', 'ปส.': 'oap',
-    'กรมควบคุมโรค': 'ddc', 'เชื้อเพลิง': 'doeb', 'การยาง': 'raot',
+    'กรมควบคุมโรค': 'ddc', 'เชื้อเพลิง': 'dmf', 'การยาง': 'raot',
     'กรมเชื้อเพลิงธรรมชาติ': 'dmf',
   };
 

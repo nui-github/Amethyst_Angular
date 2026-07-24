@@ -102,7 +102,7 @@ export const AGENCY_REQUIRED_DOCS: Record<string, AgencyDoc[]> = {
   'เชื้อเพลิง': [
     {
       key: 'fuel_customs_xml', label: 'ใบขนสินค้าขาออก (ไฟล์ XML)', required: true, accept: '.xml',
-      hint: 'ยื่นกรมธุรกิจพลังงานด้วยไฟล์ใบขนสินค้าขาออกรูปแบบ XML เท่านั้น — ไม่รับไฟล์ PDF/รูปภาพ',
+      hint: 'ยื่นกรมเชื้อเพลิงธรรมชาติด้วยไฟล์ใบขนสินค้าขาออกรูปแบบ XML เท่านั้น — ไม่รับไฟล์ PDF/รูปภาพ',
       manualFields: [
         { key: 'fuelCustomsNo',   label: 'เลขที่ใบขน', placeholder: 'เช่น A00516907M8Q2Z' },
         { key: 'fuelCustomsDate', label: 'วันที่ยื่น',   placeholder: 'dd/mm/yyyy' },
