@@ -762,6 +762,11 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  // Grid items default to min-width: auto (content-based) — a wide table (e.g. the DMF
+  // submission-status card's item table) would otherwise force this column past its 1fr share
+  // and push the whole page wider instead of scrolling internally via its own overflow-x. This is
+  // what actually lets .dss-table-wrap's overflow-x: auto take effect.
+  min-width: 0;
 }
 
 // ── Cards ─────────────────────────────────────────────────────────────────────
