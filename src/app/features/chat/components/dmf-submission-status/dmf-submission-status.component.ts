@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, Loader2, CheckCircle2, FileCheck2, Send, ChevronDown, ChevronUp } from 'lucide-angular';
+import { LucideAngularModule, Loader2, CheckCircle2, FileCheck2, Send, Clock, ChevronDown, ChevronUp } from 'lucide-angular';
 import { DmfSubmissionStatusData } from '@app/core/models/types';
 
 @Component({
@@ -25,6 +25,13 @@ import { DmfSubmissionStatusData } from '@app/core/models/types';
         <div class="dss-hint">
           <lucide-icon [img]="Send" [size]="14" />
           <span>ยื่นข้อมูลผ่านระบบคอมพิวเตอร์ไปยังกรมเชื้อเพลิงธรรมชาติ กระทรวงพลังงาน (DMF) เรียบร้อยแล้ว กำลังรอผลตอบกลับจากกรมครับ...</span>
+        </div>
+      }
+
+      @if (data.status === 'dmf-accept') {
+        <div class="dss-hint">
+          <lucide-icon [img]="Clock" [size]="14" />
+          <span>กรมได้รับข้อมูลของท่านแล้ว อยู่ระหว่างพิจารณาออกใบอนุญาต ใช้เวลาประมาณ 1-3 วันทำการ ระบบจะอัปเดตสถานะเป็น "อนุมัติแล้ว" ให้อัตโนมัติทันทีที่กรมแจ้งผลกลับมาครับ ยังไม่ต้องดำเนินการใดๆ เพิ่มเติมในระหว่างนี้</span>
         </div>
       }
 
@@ -202,6 +209,7 @@ export class DmfSubmissionStatusComponent {
   readonly CheckCircle2 = CheckCircle2;
   readonly FileCheck2 = FileCheck2;
   readonly Send = Send;
+  readonly Clock = Clock;
   readonly ChevronDown = ChevronDown;
   readonly ChevronUp = ChevronUp;
 
