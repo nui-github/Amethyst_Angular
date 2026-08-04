@@ -759,6 +759,8 @@ export interface LicenseFormData {
   uNo?: string;
   drugRegNo?: string;
   importDate?: string;
+  fuelCustomsNo?: string;   // เชื้อเพลิง (DMF) manual fill-in — เลขที่ใบขน, see ChatService.FUEL_CUSTOMS_FIELDS
+  fuelCustomsDate?: string; // เชื้อเพลิง (DMF) manual fill-in — วันที่ยื่น
   selectedItems?: InvoiceLineItem[]; // สินค้าที่ยื่นขอใบอนุญาต (ทั้งกลุ่มที่ AI จัดไว้ให้กรมนี้)
   customsDeclaration?: CustomsDeclarationData; // structured OCR output, merged across every upload step
   petroleumDeclaration?: PetroleumDutyDeclarationData; // see PetroleumDutyDeclarationData below — own

@@ -401,6 +401,7 @@ export class ChatService {
     this.user(dir === 'export' ? 'ใบขนสินค้าขาออก' : 'ใบขนสินค้าขาเข้า');
     this.markFlowStart();
     this.isCustomsOnlyUpload = true;
+    this.customsUploadIsXml = false;
     this.withTyping(() => { this.step.set('invoice_upload'); this.bot('single-upload', { direction: dir }); }, 400);
   }
 
@@ -432,8 +433,17 @@ export class ChatService {
   // onPetroleumOcrProceed().
   private isPetroleumDutyPath = false;
   private static readonly PETROLEUM_AGENCY = 'กรมเชื้อเพลิงธรรมชาติ';
+  // เชื้อเพลิง (DMF) via the ordinary item-hs-analysis customs-only path (NOT the
+  // PETROLEUM_DUTY_TRIGGER duty-exemption path above) only accepts a ใบขนสินค้าขาเข้า in XML
+  // format — customsUploadIsXml records whether the customs-only path's ORIGINAL upload
+  // (chooseCustomsDocs → startOCR) was already an XML file; checked once agency+profile are
+  // confirmed for เชื้อเพลิง (continueAgencyFlow()'s 'form-preview' branch) to decide whether to
+  // force a fresh XML re-upload (isFuelXmlReupload — see continueAfterOCR()) or skip straight to
+  // filling in the DMF-specific fields (FUEL_CUSTOMS_FIELDS below) instead.
+  private customsUploadIsXml = false;
+  private isFuelXmlReupload = false;
   private checkMissingAfterFlags = false;          // invoice path: check missing fields after flags
-  private pendingAfterMissingFields: 'ocr' | 'proceed-choice' = 'ocr';
+  private pendingAfterMissingFields: 'ocr' | 'proceed-choice' | 'fuel-preview' = 'ocr';
   // What to do after agency+profile selection
   private pendingAfterFlow: 'agency-docs' | 'form-preview' | 'proceed' = 'proceed';
   // การยาง (RAOT) compound-rubber cert fee gate — see onProfileSelected()/showRubberCertPayment()
@@ -474,6 +484,10 @@ export class ChatService {
   private pendingInvoiceOptions: InvoiceOcrResult[] = [];
 
   async startOCR(_files?: unknown[]): Promise<void> {
+    if (this.isCustomsOnlyUpload) {
+      const uploaded = (_files ?? []) as { name?: string }[];
+      this.customsUploadIsXml = uploaded.some(f => (f?.name ?? '').toLowerCase().endsWith('.xml'));
+    }
     this.step.set('ocr');
     this.bot('ocr-progress');
     const dir = this.direction();
@@ -560,6 +574,15 @@ export class ChatService {
   private getMissingFields(data: LicenseFormData): MissingField[] {
     return this.REQUIRED_FIELDS.filter(f => !((data as Record<string, string>)[f.key]?.trim()));
   }
+
+  // เชื้อเพลิง (DMF) fill-in-only fields, shown via missing-fields when the customs-only upload
+  // was already XML (customsUploadIsXml) — same keys/labels as agency-docs.mock.ts's
+  // 'เชื้อเพลิง' → fuel_customs_xml.manualFields, kept in sync manually since that slot's UI is
+  // never actually reached on this path (see gate in continueAgencyFlow()).
+  private readonly FUEL_CUSTOMS_FIELDS: MissingField[] = [
+    { key: 'fuelCustomsNo',   label: 'เลขที่ใบขน', placeholder: 'เช่น 0109256800118842' },
+    { key: 'fuelCustomsDate', label: 'วันที่ยื่น',   placeholder: 'dd/mm/yyyy' },
+  ];
 
   private showOCRResults(result: typeof import('@mock/ocr.mock').MOCK_OCR_RESULT | InvoiceOcrResult, round = 1): void {
     const withLineItems = result as Partial<InvoiceOcrResult>;
@@ -698,6 +721,18 @@ export class ChatService {
   }
 
   private continueAfterOCR(): void {
+    // เชื้อเพลิง (DMF) forced XML re-upload (see continueAgencyFlow()'s 'form-preview' branch) —
+    // agency+profile were already confirmed and the item group already chosen before this
+    // detour, so just resume straight into form-preview, same as the plain form-preview branch.
+    if (this.isFuelXmlReupload) {
+      this.isFuelXmlReupload = false;
+      this.selectAllAgencyItems();
+      this.withTyping(() => {
+        this.showPreview();
+        this.ensureQueueEntrySaved(this.currentAgency);
+      }, 500);
+      return;
+    }
     // Agency docs upload (2nd doc in invoice path): skip hs-analysis AND flags/item-measurement —
     // the declaration-editor panel (gated on this very OCR pass, see declarationGateRequired)
     // already made the user fill in everything (including Measurement/Meas. Unit per item and any
@@ -927,13 +962,44 @@ export class ChatService {
       // item-hs-analysis ever ran, so confirmedProductItems would just be stale/empty here).
       if (this.isPetroleumDutyPath) {
         this.isPetroleumDutyPath = false;
+        this.withTyping(() => {
+          this.showPreview();
+          this.ensureQueueEntrySaved(this.currentAgency);
+        }, 500);
+      } else if (agency === 'เชื้อเพลิง' && !this.customsUploadIsXml) {
+        // DMF only accepts a ใบขนสินค้าขาเข้า in XML format — the original customs-only upload
+        // wasn't XML (customsUploadIsXml), so force a fresh XML upload before continuing. Picked
+        // back up by continueAfterOCR()'s isFuelXmlReupload branch once that OCR pass completes.
+        this.isFuelXmlReupload = true;
+        this.withTyping(() => {
+          this.bot('text', undefined, 'กรมเชื้อเพลิงธรรมชาติ (DMF) รับยื่นเฉพาะไฟล์ใบขนสินค้าขาเข้ารูปแบบ XML เท่านั้น รบกวนอัปโหลดไฟล์ XML อีกครั้งครับ');
+          setTimeout(() => this.withTyping(() => {
+            this.step.set('invoice_upload');
+            this.bot('single-upload', { direction: this.direction() });
+            this.ensureQueueEntrySaved(this.currentAgency);
+          }, 400), 600);
+        }, 500);
+      } else if (agency === 'เชื้อเพลิง') {
+        // Original upload was already XML — DMF's file requirement is already satisfied, so skip
+        // straight to filling in the DMF-specific fields (FUEL_CUSTOMS_FIELDS) instead of asking
+        // for the file again. afterComplete() in onMissingFieldsSubmit() resumes form-preview.
+        this.selectAllAgencyItems();
+        this.withTyping(() => {
+          this.pendingAfterMissingFields = 'fuel-preview';
+          this.bot('missing-fields', {
+            missingFields: this.FUEL_CUSTOMS_FIELDS,
+            existingData: { ...this.formData() },
+            round: 1,
+          } satisfies MissingFieldsData);
+          this.ensureQueueEntrySaved(this.currentAgency);
+        }, 500);
       } else {
         this.selectAllAgencyItems();
+        this.withTyping(() => {
+          this.showPreview();
+          this.ensureQueueEntrySaved(this.currentAgency);
+        }, 500);
       }
-      this.withTyping(() => {
-        this.showPreview();
-        this.ensureQueueEntrySaved(this.currentAgency);
-      }, 500);
     } else {
       // SPN path: every item AI grouped under this agency is the request — no re-selection
       this.selectAllAgencyItems();
@@ -1428,6 +1494,12 @@ export class ChatService {
       if (this.pendingAfterMissingFields === 'proceed-choice') {
         this.pendingAfterMissingFields = 'ocr';
         this.withTyping(() => this.showProceedChoice(), 600);
+      } else if (this.pendingAfterMissingFields === 'fuel-preview') {
+        this.pendingAfterMissingFields = 'ocr';
+        this.withTyping(() => {
+          this.showPreview();
+          this.ensureQueueEntrySaved(this.currentAgency);
+        }, 600);
       } else {
         this.continueAfterOCR();
       }
@@ -2207,6 +2279,8 @@ export class ChatService {
     this.petroleumEditorOpen.set(false);
     this.petroleumEditorMsgId.set(null);
     this.isPetroleumDutyPath = false;
+    this.customsUploadIsXml = false;
+    this.isFuelXmlReupload = false;
     this.ocr.reset();
   }
 
