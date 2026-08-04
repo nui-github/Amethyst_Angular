@@ -575,13 +575,12 @@ export class ChatService {
     return this.REQUIRED_FIELDS.filter(f => !((data as Record<string, string>)[f.key]?.trim()));
   }
 
-  // เชื้อเพลิง (DMF) fill-in-only fields, shown via missing-fields when the customs-only upload
-  // was already XML (customsUploadIsXml) — same keys/labels as agency-docs.mock.ts's
-  // 'เชื้อเพลิง' → fuel_customs_xml.manualFields, kept in sync manually since that slot's UI is
-  // never actually reached on this path (see gate in continueAgencyFlow()).
+  // เชื้อเพลิง (DMF) fill-in-only field, shown via missing-fields when the customs-only upload
+  // was already XML (customsUploadIsXml) — เลขที่ใบขน only, the XML declaration itself already
+  // carries the filing date so there's nothing else to ask for here (see gate in
+  // continueAgencyFlow()).
   private readonly FUEL_CUSTOMS_FIELDS: MissingField[] = [
-    { key: 'fuelCustomsNo',   label: 'เลขที่ใบขน', placeholder: 'เช่น 0109256800118842' },
-    { key: 'fuelCustomsDate', label: 'วันที่ยื่น',   placeholder: 'dd/mm/yyyy' },
+    { key: 'fuelCustomsNo', label: 'เลขที่ใบขน', placeholder: 'เช่น 0109256800118842' },
   ];
 
   private showOCRResults(result: typeof import('@mock/ocr.mock').MOCK_OCR_RESULT | InvoiceOcrResult, round = 1): void {
