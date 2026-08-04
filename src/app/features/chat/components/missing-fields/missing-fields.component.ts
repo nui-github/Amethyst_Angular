@@ -29,6 +29,12 @@ export class MissingFieldsComponent implements OnInit {
   readonly IconUpload = Upload;
   readonly IconCheck  = CheckCircle;
 
+  // Unique per instance — more than one missing-fields card can be mounted at once in chat
+  // history (e.g. across separate rounds), and a duplicate DOM id makes the label's implicit
+  // `for` target the FIRST matching input instead of this instance's own.
+  private static nextId = 0;
+  readonly fileInputId = `mf_file_${MissingFieldsComponent.nextId++}`;
+
   values: Record<string, string> = {};
   uploadFile = signal<File | null>(null);
   dragging   = signal(false);

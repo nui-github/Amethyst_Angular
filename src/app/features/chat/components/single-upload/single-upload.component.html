@@ -13,7 +13,7 @@
   </p>
 
   <!-- Drop zone -->
-  <label class="drop-zone" for="su_file"
+  <label class="drop-zone" [for]="fileInputId"
     [class.drop-zone--over]="dragging()"
     [class.drop-zone--filled]="!!file()"
     (dragover)="onDragOver($event)"
@@ -66,7 +66,7 @@
       </div>
     }
 
-    <input id="su_file" type="file" [accept]="mode === 'customs' ? '.pdf,.jpg,.jpeg,.png,.xml' : '.pdf,.jpg,.jpeg,.png'" style="display:none"
+    <input [id]="fileInputId" type="file" [accept]="mode === 'customs' ? '.pdf,.jpg,.jpeg,.png,.xml' : '.pdf,.jpg,.jpeg,.png'" style="display:none"
       (change)="onFileChange($event)" />
   </label>
 

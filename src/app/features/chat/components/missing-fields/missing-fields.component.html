@@ -32,7 +32,7 @@
       <p class="mf-section__label">อัปโหลดเอกสารเพิ่ม (ไม่บังคับ)</p>
       <p class="mf-section__hint">ระบบจะ OCR รวมกับข้อมูลเดิม และเช็คความครบถ้วนอีกครั้ง</p>
 
-      <label class="mf-drop" for="mf_file"
+      <label class="mf-drop" [for]="fileInputId"
         [class.mf-drop--over]="dragging()"
         [class.mf-drop--filled]="!!uploadFile()"
         (dragover)="$event.preventDefault(); dragging.set(true)"
@@ -52,7 +52,7 @@
             <button class="mf-clear" (click)="$event.preventDefault(); clearFile()">✕</button>
           </div>
         }
-        <input id="mf_file" type="file" accept=".pdf,.jpg,.jpeg,.png,.xml" style="display:none"
+        <input [id]="fileInputId" type="file" accept=".pdf,.jpg,.jpeg,.png,.xml" style="display:none"
           (change)="onFileChange($event)" />
       </label>
     </div>

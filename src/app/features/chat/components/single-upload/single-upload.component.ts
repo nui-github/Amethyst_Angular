@@ -18,6 +18,14 @@ export class SingleUploadComponent {
   readonly chat = inject(ChatService);
   readonly cdr  = inject(ChangeDetectorRef);
 
+  // Unique per instance — more than one single-upload card can be mounted at once in chat
+  // history (e.g. the original customs upload plus a later forced re-upload for เชื้อเพลิง's
+  // XML gate), and a duplicate DOM id makes the label's implicit `for` target the FIRST
+  // matching input instead of this instance's own, so clicking a later box's dropzone silently
+  // opens (or does nothing to) the wrong one.
+  private static nextId = 0;
+  readonly fileInputId = `su_file_${SingleUploadComponent.nextId++}`;
+
   file     = signal<File | null>(null);
   dragging = signal(false);
 
