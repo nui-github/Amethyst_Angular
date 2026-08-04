@@ -989,6 +989,7 @@ export class ChatService {
             missingFields: this.FUEL_CUSTOMS_FIELDS,
             existingData: { ...this.formData() },
             round: 1,
+            hideUpload: true,
           } satisfies MissingFieldsData);
           this.ensureQueueEntrySaved(this.currentAgency);
         }, 500);

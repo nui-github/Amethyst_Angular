@@ -181,6 +181,8 @@ export interface MissingFieldsData {
   missingFields: MissingField[];
   existingData: LicenseFormData;
   round: number;
+  hideUpload?: boolean; // true when a re-upload wouldn't make sense here (e.g. เชื้อเพลิง's
+                         // XML-already-on-file gate — the doc is already OCR'd, just need one field)
 }
 
 // One invoice found inside the uploaded file, summarized for the picker card — full data for

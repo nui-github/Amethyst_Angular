@@ -28,34 +28,36 @@
     </div>
 
     <!-- Upload more (optional) -->
-    <div class="mf-section">
-      <p class="mf-section__label">อัปโหลดเอกสารเพิ่ม (ไม่บังคับ)</p>
-      <p class="mf-section__hint">ระบบจะ OCR รวมกับข้อมูลเดิม และเช็คความครบถ้วนอีกครั้ง</p>
+    @if (!data.hideUpload) {
+      <div class="mf-section">
+        <p class="mf-section__label">อัปโหลดเอกสารเพิ่ม (ไม่บังคับ)</p>
+        <p class="mf-section__hint">ระบบจะ OCR รวมกับข้อมูลเดิม และเช็คความครบถ้วนอีกครั้ง</p>
 
-      <label class="mf-drop" [for]="fileInputId"
-        [class.mf-drop--over]="dragging()"
-        [class.mf-drop--filled]="!!uploadFile()"
-        (dragover)="$event.preventDefault(); dragging.set(true)"
-        (dragleave)="dragging.set(false)"
-        (drop)="onDrop($event)">
+        <label class="mf-drop" [for]="fileInputId"
+          [class.mf-drop--over]="dragging()"
+          [class.mf-drop--filled]="!!uploadFile()"
+          (dragover)="$event.preventDefault(); dragging.set(true)"
+          (dragleave)="dragging.set(false)"
+          (drop)="onDrop($event)">
 
-        @if (!uploadFile()) {
-          <div class="mf-drop__empty">
-            <lucide-icon [img]="IconUpload" [size]="20" color="#9CA3AF" />
-            <span>คลิกหรือลากไฟล์มาวางที่นี่</span>
-            <span class="mf-drop__types">PDF · JPG · PNG · XML</span>
-          </div>
-        } @else {
-          <div class="mf-drop__file">
-            <span class="mf-file-name">{{ uploadFile()!.name }}</span>
-            <span class="mf-file-size">{{ formatSize(uploadFile()!.size) }}</span>
-            <button class="mf-clear" (click)="$event.preventDefault(); clearFile()">✕</button>
-          </div>
-        }
-        <input [id]="fileInputId" type="file" accept=".pdf,.jpg,.jpeg,.png,.xml" style="display:none"
-          (change)="onFileChange($event)" />
-      </label>
-    </div>
+          @if (!uploadFile()) {
+            <div class="mf-drop__empty">
+              <lucide-icon [img]="IconUpload" [size]="20" color="#9CA3AF" />
+              <span>คลิกหรือลากไฟล์มาวางที่นี่</span>
+              <span class="mf-drop__types">PDF · JPG · PNG · XML</span>
+            </div>
+          } @else {
+            <div class="mf-drop__file">
+              <span class="mf-file-name">{{ uploadFile()!.name }}</span>
+              <span class="mf-file-size">{{ formatSize(uploadFile()!.size) }}</span>
+              <button class="mf-clear" (click)="$event.preventDefault(); clearFile()">✕</button>
+            </div>
+          }
+          <input [id]="fileInputId" type="file" accept=".pdf,.jpg,.jpeg,.png,.xml" style="display:none"
+            (change)="onFileChange($event)" />
+        </label>
+      </div>
+    }
 
     <!-- Action -->
     <div class="mf-actions">
