@@ -835,7 +835,7 @@ export class ChatService {
     if (agency === 'การยาง') {
       if (isRubberSfrTrack) {
         return {
-          code: 'ใบอนุญาตผ่านด่านศุลกากร',
+          code: 'e-SFR/e-QC',
           name: 'ใบขอผ่านด่านศุลกากร และชำระค่าธรรมเนียมส่งยางออกนอกราชอาณาจักร (e-SFR)',
         };
       }
@@ -1444,7 +1444,7 @@ export class ChatService {
         // showRubberFlowChoice() already stamps the e-SFR formCode/formName as soon as a compound
         // item is detected (formForAgency(agency, true)) — restated here too so this record reads
         // correctly even if it somehow never went through that path (e.g. a resumed session).
-        formCode: 'ใบอนุญาตผ่านด่านศุลกากร',
+        formCode: 'e-SFR/e-QC',
         formName: 'ใบขอผ่านด่านศุลกากร และชำระค่าธรรมเนียมส่งยางออกนอกราชอาณาจักร (e-SFR)',
         messages: this.messages().slice(this.flowStartIdx),
         ...this.currentRubberQueueFields(),
