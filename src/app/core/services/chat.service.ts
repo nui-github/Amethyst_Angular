@@ -849,7 +849,7 @@ export class ChatService {
     // AGENCY_KEY_MAP above — so both get the same "ขอออกของไปก่อน" license type on the queue.
     if (agency === ChatService.PETROLEUM_AGENCY || agency === 'เชื้อเพลิง') {
       return {
-        code: 'ขอออกของไปก่อน',
+        code: 'DMF License',
         name: 'คำร้องขอออกของไปก่อน เพื่อยกเว้นอากรฯ — กรมเชื้อเพลิงธรรมชาติ (DMF)',
       };
     }
