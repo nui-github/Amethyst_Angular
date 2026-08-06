@@ -1829,11 +1829,16 @@ export class ChatService {
     this.pendingSubmitRefNo = refNo;
 
     const payConfig = getAgencyPayment(this.currentAgency);
-    const feeNote = payConfig.requiresFee
-      ? this.QR_PAYMENT_AGENCIES.includes(this.currentAgency)
-        ? `ค่าธรรมเนียมกรม ฿${payConfig.amount.toLocaleString('th-TH')} (รอชำระผ่าน QR หลังกรมอนุมัติ)`
-        : `ค่าธรรมเนียมกรม ฿${payConfig.amount.toLocaleString('th-TH')} จะรวมในบิลรายเดือน`
-      : undefined;
+    // RGoods (formForAgency's default catch-all — currently อย./กษ./diw agencies) never actually
+    // charges a fee at submission time regardless of payment.mock's configured amount, so its
+    // status-card/queue-detail fee line always reads "ไม่มีค่าธรรมเนียม" instead of an amount.
+    const feeNote = this.formForAgency(this.currentAgency).code === 'RGoods'
+      ? 'ไม่มีค่าธรรมเนียม'
+      : payConfig.requiresFee
+        ? this.QR_PAYMENT_AGENCIES.includes(this.currentAgency)
+          ? `ค่าธรรมเนียมกรม ฿${payConfig.amount.toLocaleString('th-TH')} (รอชำระผ่าน QR หลังกรมอนุมัติ)`
+          : `ค่าธรรมเนียมกรม ฿${payConfig.amount.toLocaleString('th-TH')} จะรวมในบิลรายเดือน`
+        : undefined;
 
     this.finalizeSubmit(refNo, feeNote);
   }

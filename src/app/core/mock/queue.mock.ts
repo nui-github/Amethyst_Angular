@@ -253,7 +253,7 @@ export const MOCK_QUEUE: Shipment[] = [
       t('08:45', 'bot', 'status-card', undefined, {
         refNo: 'RG-2568-20188', customsRef: 'CN-2024-0601',
         submittedAt: new Date().toLocaleDateString('th-TH'), isPending: false,
-        feeNote: 'ค่าธรรมเนียมกรม ฿500 จะรวมในบิลรายเดือน',
+        feeNote: 'ไม่มีค่าธรรมเนียม',
       }),
     ],
     documents: [
