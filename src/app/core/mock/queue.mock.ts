@@ -25,8 +25,10 @@ export const AGENCY_SHORT: Record<AgencyKey, string> = {
 };
 
 export const STATUS_META: Record<ShipmentStatus, { label: string; bg: string; text: string; dot: string }> = {
-  needs_you: { label: 'รอดำเนินการ',        bg: '#FFFBEB', text: '#B45309', dot: '#F59E0B' },
-  submitted:  { label: 'อนุมัติแล้ว',         bg: '#ECFDF5', text: '#065F46', dot: '#10B981' },
+  needs_you:         { label: 'รอดำเนินการ',        bg: '#FFFBEB', text: '#B45309', dot: '#F59E0B' },
+  returned_for_edit: { label: 'ส่งกลับเพื่อแก้ไข',   bg: '#F5F3FF', text: '#6D28D9', dot: '#7C3AED' },
+  rejected:          { label: 'ไม่อนุมัติ',          bg: '#FEF2F2', text: '#B91C1C', dot: '#EF4444' },
+  submitted:         { label: 'อนุมัติแล้ว',         bg: '#ECFDF5', text: '#065F46', dot: '#10B981' },
 };
 
 const t = (time: string, role: 'bot'|'user', type: ChatMessage['type'], content?: string, data?: unknown): ChatMessage => ({
