@@ -19,7 +19,7 @@ import { getAgencyReturnDocs } from '@mock/agency-return-docs.mock';
 
 export { STATUS_META, AGENCY_SHORT };
 
-type TabValue = 'all' | 'needs_you' | 'returned_for_edit' | 'rejected' | 'submitted';
+type TabValue = 'all' | 'needs_you' | 'rejected' | 'submitted';
 
 const STAGE_LABELS = ['','ตรวจรับใบขน','วิเคราะห์ HS','จัดประเภท','แนบเอกสาร','กรอกข้อมูล','ยืนยันร่าง','ยื่นกรม'];
 
@@ -52,19 +52,17 @@ export class QueuePageComponent {
   readonly today = new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
 
   readonly tabs = [
-    { label: 'ทั้งหมด',            value: 'all'               as TabValue },
-    { label: 'รอดำเนินการ',        value: 'needs_you'         as TabValue },
-    { label: 'ส่งกลับเพื่อแก้ไข',   value: 'returned_for_edit' as TabValue },
-    { label: 'ไม่อนุมัติ',          value: 'rejected'          as TabValue },
-    { label: 'อนุมัติแล้ว',         value: 'submitted'         as TabValue },
+    { label: 'ทั้งหมด',      value: 'all'       as TabValue },
+    { label: 'รอดำเนินการ',  value: 'needs_you' as TabValue },
+    { label: 'ไม่อนุมัติ',    value: 'rejected'  as TabValue },
+    { label: 'อนุมัติแล้ว',   value: 'submitted' as TabValue },
   ];
 
   readonly statCards = [
-    { key: 'all'               as TabValue, label: 'ทั้งหมด',            dot: '#6366F1', iconBg: '#EEF2FF' },
-    { key: 'needs_you'         as TabValue, label: 'รอดำเนินการ',        dot: '#F59E0B', iconBg: '#FFFBEB' },
-    { key: 'returned_for_edit' as TabValue, label: 'ส่งกลับเพื่อแก้ไข',   dot: '#7C3AED', iconBg: '#F5F3FF' },
-    { key: 'rejected'          as TabValue, label: 'ไม่อนุมัติ',          dot: '#EF4444', iconBg: '#FEF2F2' },
-    { key: 'submitted'         as TabValue, label: 'อนุมัติแล้ว',         dot: '#10B981', iconBg: '#ECFDF5' },
+    { key: 'all'       as TabValue, label: 'ทั้งหมด',      dot: '#6366F1', iconBg: '#EEF2FF' },
+    { key: 'needs_you' as TabValue, label: 'รอดำเนินการ', dot: '#F59E0B', iconBg: '#FFFBEB' },
+    { key: 'rejected'  as TabValue, label: 'ไม่อนุมัติ',   dot: '#EF4444', iconBg: '#FEF2F2' },
+    { key: 'submitted' as TabValue, label: 'อนุมัติแล้ว',  dot: '#10B981', iconBg: '#ECFDF5' },
   ];
 
   readonly filteredQueue = computed(() => {

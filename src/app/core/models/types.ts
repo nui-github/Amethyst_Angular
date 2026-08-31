@@ -1100,8 +1100,7 @@ export type AgencyKey = 'dld' | 'fda' | 'dft' | 'doa' | 'diw' | 'ddc' | 'raot' |
 // happens when a permit is actually required — so there is no "no_permit" queue status.
 export type ShipmentStatus =
   | 'needs_you'
-  | 'returned_for_edit' // department sent it back for correction — user must re-edit in chat
-  | 'rejected'          // department declined the request outright — terminal, no further action
+  | 'rejected' // department declined the request outright — terminal, no further action
   | 'submitted';
 
 export interface ShipmentFlag {
