@@ -538,6 +538,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  max-width: 100%;
   font-size: 11px;
   font-weight: 700;
   padding: 4px 9px;
@@ -545,6 +546,17 @@
   margin-bottom: 5px;
   background: #EEF2FF;
   color: #4338CA;
+
+  &__text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
 
   &--customs {
     background: #E0F2FE;
