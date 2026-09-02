@@ -818,13 +818,12 @@ export class ChatService {
   // entries for the same pairing) — "Pink Form" is DDC's own real form name specifically, not a
   // generic label for every QR_PAYMENT_AGENCIES member, so การยาง needs its own case (real RAOT
   // document is ใบอนุญาตค้ายาง under พ.ร.บ.ควบคุมยาง — see product-hs-analysis licenseType).
-  // isRubberSfrTrack: true for any การยาง round involving a compound-rubber item (this.
-  // pendingRubberFlowItems populated by showRubberFlowChoice()) — those never end in the real
-  // RSS3 trade license, always e-SFR (e-QC is only an optional earlier step), so the queue-page
-  // "ประเภทใบอนุญาต" tag must read ใบอนุญาตผ่านด่านศุลกากร from the moment that's known, not just
-  // once finalizeEsfrRound() actually issues the fee receipt — same wording whether or not the
-  // user did e-QC first.
-  private formForAgency(agency: string, isRubberSfrTrack = false): { code: string; name: string } {
+  // rubberTrack: e-QC and e-SFR are each their own permit with their own ref/queue record now (see
+  // onRubberEqcStatusProceed()/finalizeEsfrRound()) — 'eqc'/'esfr' tag this agency's OWN round as
+  // exactly one of those, never both combined. undefined is the generic RAOT compound-rubber
+  // license (ใบอนุญาตค้ายาง) — used for the placeholder record before the user has picked either
+  // track yet, and for the plain flow that continues after e-QC when the user skips e-SFR.
+  private formForAgency(agency: string, rubberTrack?: 'eqc' | 'esfr'): { code: string; name: string } {
     const isExport = this.direction() === 'export';
     if (agency === 'กรมควบคุมโรค') {
       return {
@@ -833,10 +832,16 @@ export class ChatService {
       };
     }
     if (agency === 'การยาง') {
-      if (isRubberSfrTrack) {
+      if (rubberTrack === 'esfr') {
         return {
-          code: 'e-SFR/e-QC',
+          code: 'e-SFR',
           name: 'ใบขอผ่านด่านศุลกากร และชำระค่าธรรมเนียมส่งยางออกนอกราชอาณาจักร (e-SFR)',
+        };
+      }
+      if (rubberTrack === 'eqc') {
+        return {
+          code: 'e-QC',
+          name: 'คำขอหนังสือรับรองคุณภาพยาง (e-QC) — การยางแห่งประเทศไทย (RAOT)',
         };
       }
       return {
@@ -1259,10 +1264,28 @@ export class ChatService {
         certUrl: SAMPLE_DOC_URL,
         paidAt: new Date().toLocaleDateString('th-TH'),
       };
-      // Flush the e-QC download onto the queue record right away — the flow may still continue
-      // into e-SFR or the normal agency-docs/form-preview submission from here, but the e-QC cert
-      // itself is already earned and shouldn't wait on either of those to show up in คิวงาน.
-      this.refreshQueueSnapshot();
+      // e-QC is its own complete permit the moment the certificate is issued — finalize THIS
+      // round's queue record now (own ref = certificateNo, own 'e-QC' tag) rather than leaving it
+      // to be overwritten by whatever comes next (e-SFR, or the plain RGoods-style filing if the
+      // user skips e-SFR — see formForAgency()). Then clear the round tracking so that next step
+      // creates its OWN fresh record instead of patching this now-finalized one.
+      if (this.lastShipmentId) {
+        const eqcForm = this.formForAgency(agency, 'eqc');
+        this.queue.update(this.lastShipmentId, {
+          statusKey: 'submitted',
+          stage: 7,
+          customsNo: certificateNo,
+          formCode: eqcForm.code,
+          formName: eqcForm.name,
+          messages: this.messages().slice(this.flowStartIdx),
+          eqcStatus: this.eqcStatus,
+          rubberCertPayment: this.rubberCertPaymentInfo,
+        });
+      }
+      this.lastShipmentId = null;
+      this.earlyEntrySavedForRound = false;
+      this.eqcStatus = undefined;
+      this.rubberCertPaymentInfo = undefined;
       this.showEsfrChoice(agency);
     }, 500);
   }
@@ -1438,14 +1461,17 @@ export class ChatService {
       invoiceRef: receipt.referenceNumber,
     }]);
     if (this.lastShipmentId) {
+      // This round's own record — a fresh one if it followed a completed e-QC round (reset by
+      // onRubberEqcStatusProceed()), or the round's original placeholder if e-SFR was picked
+      // directly with no e-QC. Either way its own ref (licenseNumber) and 'e-SFR' tag, never
+      // merged with e-QC's.
+      const esfrForm = this.formForAgency(agency, 'esfr');
       this.queue.update(this.lastShipmentId, {
         statusKey: 'submitted',
         stage: 7,
-        // showRubberFlowChoice() already stamps the e-SFR formCode/formName as soon as a compound
-        // item is detected (formForAgency(agency, true)) — restated here too so this record reads
-        // correctly even if it somehow never went through that path (e.g. a resumed session).
-        formCode: 'e-SFR/e-QC',
-        formName: 'ใบขอผ่านด่านศุลกากร และชำระค่าธรรมเนียมส่งยางออกนอกราชอาณาจักร (e-SFR)',
+        customsNo: receipt.licenseNumber,
+        formCode: esfrForm.code,
+        formName: esfrForm.name,
         messages: this.messages().slice(this.flowStartIdx),
         ...this.currentRubberQueueFields(),
       });
@@ -1982,7 +2008,10 @@ export class ChatService {
   private saveEarlyQueueEntry(agency: string): void {
     const fd = this.formData();
     const agencyKey: AgencyKey = this.AGENCY_KEY_MAP[agency] ?? 'none';
-    const form = this.formForAgency(agency, agency === 'การยาง' && this.pendingRubberFlowItems.length > 0);
+    // Provisional label — the eQC/e-SFR choice hasn't been made (or resolved) yet at this point,
+    // so this placeholder stays generic until onRubberEqcStatusProceed()/finalizeEsfrRound() stamp
+    // this same record with its real, single track once that's known.
+    const form = this.formForAgency(agency);
 
     const shipment: Shipment = {
       id: genId(), chatName: this.chatNameFor(fd), isNew: true,
@@ -2014,7 +2043,11 @@ export class ChatService {
     const fd = this.formData();
 
     const agencyKey: AgencyKey = this.AGENCY_KEY_MAP[this.currentAgency] ?? 'none';
-    const form = this.formForAgency(this.currentAgency, this.currentAgency === 'การยาง' && this.pendingRubberFlowItems.length > 0);
+    // This ordinary submission path never carries the e-SFR track (that terminates on its own via
+    // finalizeEsfrRound() instead) — a การยาง round reaching here is either non-compound, or
+    // compound but e-QC-only/skipped-e-SFR (its own e-QC record already finalized separately by
+    // onRubberEqcStatusProceed()), so the plain generic ใบอนุญาตค้ายาง label is always correct here.
+    const form = this.formForAgency(this.currentAgency);
 
     // Posted BEFORE the flowMsgs snapshot below so the status-card message is actually included
     // in the saved Shipment.messages — QueuePageComponent.openSubmissionResult() (queue-page.
