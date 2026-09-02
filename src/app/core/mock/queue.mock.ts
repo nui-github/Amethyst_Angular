@@ -1525,6 +1525,75 @@ export const MOCK_QUEUE: Shipment[] = [
     ],
   },
 
+  // ── 25b. submitted (EXP): Rubber Compound Sheet — Lot D – ขาออก การยาง (e-QC เท่านั้น, เสร็จสิ้น
+  // ไม่ได้ทำ e-SFR ต่อ) — e-QC finalizes as its OWN queue record the moment LICENSE ACCEPT lands
+  // (see onRubberEqcStatusProceed() in chat.service.ts), independently of whether e-SFR ever
+  // happens after it; customsNo here is the e-QC certificate number itself, not the original
+  // customs-doc ref, same as the live flow.
+  {
+    id: 'EXP-68-025014', customsNo: 'RAOT-EQC-2568-891234', hthmRef: 'HTHM000000027',
+    isNew: false, type: 'EXP',
+    goods: 'Rubber Compound Sheet — Lot D (ยางแผ่นผสม ล็อต D)', hs: '4005.10.00',
+    customer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', contact: 'คุณพิมพ์ชนก ส่งดี',
+    contactEmail: 'pimchanok@siamagriexport.co.th',
+    origin: 'ไทย (TH)', importedAt: '09:05 น. 30 ชม.ที่แล้ว', createdAt: NOW - 30 * 3600_000, owner: 'ปวีณา ส.',
+    agency: 'raot', permitNeeded: true, formCode: 'e-QC',
+    formName: 'คำขอหนังสือรับรองคุณภาพยาง (e-QC) — การยางแห่งประเทศไทย (RAOT)',
+    conf: 90, stage: 7, statusKey: 'submitted', eqcStatus: 'license-accept',
+    assess: { conf: 90, reason: 'ยางแผ่นผสม (Compounded Rubber) ไม่เข้าข่ายใบอนุญาตค้ายาง แต่ต้องขอหนังสือรับรองคุณภาพยาง (e-QC) และชำระค่าธรรมเนียมผ่านด่านศุลกากร (e-SFR) ก่อนส่งออก' },
+    classify: { agency: 'raot', conf: 90, reason: '', alt: [] },
+    draft: { fields: [] },
+    flags: [],
+    audit: [
+      { time: '09:05', text: 'อัปโหลดใบขนสินค้าขาออก EXPINV0026 เข้าระบบแล้ว', by: 'ระบบ' },
+      { time: '09:08', text: 'OCR สำเร็จ', by: 'AI' },
+      { time: '09:10', text: 'วิเคราะห์ HS Code: 4005.10.00 → การยาง (90%)', by: 'AI' },
+      { time: '09:15', text: 'เลือกขอหนังสือรับรองคุณภาพยาง (e-QC) และกรอกคำขอครบถ้วนแล้ว', by: 'ปวีณา ส.' },
+      { time: '09:20', text: 'กยท. รับคำขอ e-QC แล้ว — รอผลตรวจสอบจากเจ้าหน้าที่', by: 'การยางแห่งประเทศไทย' },
+      { time: '11:40', text: 'ผลตรวจสอบผ่าน (LICENSE ACCEPT) — ออกหนังสือรับรองคุณภาพยาง (e-QC) เรียบร้อยแล้ว', by: 'การยางแห่งประเทศไทย' },
+    ],
+    messages: [
+      bot('09:05', 'อัปโหลดใบขนสินค้าขาออก EXPINV0026 เข้าระบบแล้วครับ — Rubber Compound Sheet Lot D 2,600 กก. จากไทย ส่งออกไปเวียดนาม'),
+      t('09:08', 'bot', 'ocr-results', undefined, {
+        invoiceNo: 'EXPINV0026', invoiceDate: '20/07/2025', quantity: '2600 กก.',
+        importer: 'บริษัท สยามอกริ เอ็กซ์ปอร์ต จำกัด', port: 'ท่าเรือแหลมฉบัง (LCH)',
+        hsCode: '4005.10.00', countryOrigin: 'ไทย (TH)', lotNo: 'SGL-2568-085', uNo: '',
+      }),
+      usr('09:15', 'ขอหนังสือรับรองคุณภาพยาง (e-QC)'),
+      t('09:16', 'bot', 'rubber-eqc-gate', undefined, {
+        agency: 'การยาง', itemNames: ['Rubber Compound Sheet — Lot D (ยางแผ่นผสม ล็อต D)'], completed: true,
+      }),
+      usr('09:19', 'ดำเนินการต่อ'),
+      t('09:20', 'bot', 'rubber-eqc-status', undefined, {
+        agency: 'การยาง', status: 'rubber-accept', amount: 150,
+        paidAccountLabel: 'ธนาคารกสิกรไทย xxx-x-x4821-5', labCode: 'LAB-004',
+      }),
+      usr('11:39', 'ดำเนินการต่อ'),
+      t('11:40', 'bot', 'rubber-eqc-status', undefined, {
+        agency: 'การยาง', status: 'license-accept', amount: 150,
+        paidAccountLabel: 'ธนาคารกสิกรไทย xxx-x-x4821-5',
+        certificateNo: 'RAOT-EQC-2568-891234', issueDate: '2025-07-20', expireDate: '2025-09-03',
+        issuerOrgId: '0994001057192', issuerNameTh: 'การยางแห่งประเทศไทย', issuerNameEn: 'Rubber Authority of Thailand',
+        labCode: 'LAB-004', certUrl: SAMPLE_PDF,
+      }),
+    ],
+    documents: [
+      doc('d25b', 'ใบขนสินค้าขาออก EXPINV0026', 'customs'),
+    ],
+    rubberCertPayment: {
+      itemNames: ['Rubber Compound Sheet — Lot D (ยางแผ่นผสม ล็อต D)'],
+      amount: 150,
+      refNo: 'RAOT-EQC-2568-891234',
+      paidAccountLabel: 'ธนาคารกสิกรไทย xxx-x-x4821-5',
+      certUrl: SAMPLE_PDF,
+      paidAt: new Date(Date.now() - 30 * 3600_000 + 2.5 * 3600_000).toLocaleDateString('th-TH'),
+    },
+    itemsSelected: true,
+    items: [
+      { id: 'i25b', name: 'Rubber Compound Sheet — Lot D', hsCode: '4005.10.00', origin: 'ไทย (TH)', quantity: '2600', unit: 'กก.', lotNo: 'SGL-2568-085', amount: 138580 },
+    ],
+  },
+
   // ── 26. needs_you: DMF (เชื้อเพลิง) — ขอออกของไปก่อน, รอยืนยันส่งกรม (ยังไม่ถึง DMF ACCEPT) ──
   {
     id: 'IMP-68-026501', customsNo: 'NETB000000501',
